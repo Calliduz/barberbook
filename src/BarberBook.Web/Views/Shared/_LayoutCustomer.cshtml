@@ -1,47 +1,86 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-[#FBF7EE]">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BarberBook Customer Portal</title>
+    <title>@ViewData["Title"] - BarberBook Master Grooming</title>
+    
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                    },
                     colors: {
                         brand: {
                             50: '#fbf7ee',
                             100: '#f5edd6',
+                            200: '#eddcb2',
+                            300: '#e1c587',
+                            400: '#d4a359',
                             500: '#b4832c',
                             600: '#9b6c20',
                             700: '#7a5119',
                             800: '#5c3d14',
                             900: '#3c270d'
+                        },
+                        barber: {
+                            red: '#D62828',
+                            blue: '#1D3557',
+                            cream: '#FBF7EE',
+                            leather: '#0F172A',
+                            charcoal: '#1E293B',
+                            gold: '#B4832C'
                         }
                     }
                 }
             }
         }
     </script>
+    
+    <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="flex flex-col min-h-full text-slate-800 antialiased">
-    <header class="bg-slate-900 text-white shadow sticky top-0 z-50">
+<body class="flex flex-col min-h-full text-slate-800 antialiased font-sans selection:bg-brand-500 selection:text-white bg-[#FBF7EE]">
+    <!-- Animated Barber Pole Ribbon Divider -->
+    <div class="barber-pole-divider"></div>
+
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-18 py-3">
                 <div class="flex items-center space-x-8">
-                    <a href="/" class="flex items-center space-x-2">
-                        <span class="text-2xl font-bold tracking-tight text-brand-500">Barber<span class="text-white">Book</span></span>
+                    <!-- Brand with Spinning Barber Pole Icon -->
+                    <a href="/" class="flex items-center space-x-3 group">
+                        <div class="barber-pole-icon shadow-lg group-hover:scale-105 transition-transform"></div>
+                        <div class="flex flex-col">
+                            <span class="text-2xl font-serif font-black tracking-tight text-brand-400 group-hover:text-brand-300 transition-colors">
+                                Barber<span class="text-white font-sans font-extrabold">Book</span>
+                            </span>
+                            <span class="text-[9px] uppercase tracking-widest text-brand-400/80 font-bold -mt-1">Classic Craft &bull; Manila</span>
+                        </div>
                     </a>
-                    <nav class="hidden md:flex space-x-1">
-                        <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Home</a>
-                        <a href="/services" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Services</a>
-                        <a href="/barbers" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Barbers</a>
-                        <a href="/book" class="px-3 py-2 rounded-md text-sm font-medium text-brand-400 hover:text-brand-300 hover:bg-slate-800">Book Appointment</a>
+
+                    <!-- Navigation Links -->
+                    <nav class="hidden md:flex space-x-1 items-center">
+                        <a href="/" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition">Home</a>
+                        <a href="/services" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition">Services</a>
+                        <a href="/barbers" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition">Master Barbers</a>
+                        <a href="/book" class="ml-2 inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-brand-500 text-slate-950 shadow-md hover:bg-brand-400 transition transform hover:-translate-y-0.5">
+                            Book Appointment
+                        </a>
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
                         {
-                            <a href="/my-appointments" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Appointments</a>
-                            <a href="/profile" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Profile</a>
+                            <a href="/my-appointments" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition">My Appointments</a>
+                            <a href="/profile" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition">Profile</a>
                         }
                     </nav>
                 </div>
@@ -55,7 +94,10 @@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="p-4 rounded-md bg-green-50 border border-green-200 text-green-800 text-sm">
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center shadow-sm">
+                <svg class="h-5 w-5 text-emerald-500 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
                 @TempData["SuccessMessage"]
             </div>
         </div>
@@ -65,13 +107,46 @@
         @RenderBody()
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 text-sm text-center border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; @DateTime.UtcNow.Year BarberBook — Customer Portal</p>
+    <footer class="bg-slate-900 text-slate-400 py-12 text-sm border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800">
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="barber-pole-icon"></div>
+                        <span class="text-xl font-serif font-bold text-brand-400">Barber<span class="text-white font-sans font-bold">Book</span></span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Handcrafted hair styling, precision hot-towel shaves, and traditional beard sculpting. Est. 2026.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Shop Hours</h4>
+                    <p class="text-xs text-slate-400">Monday &ndash; Saturday</p>
+                    <p class="text-xs font-semibold text-brand-300">9:00 AM &ndash; 6:00 PM</p>
+                    <p class="text-xs text-slate-500 mt-1">Closed on Sundays & Special Holidays</p>
+                </div>
+                <div>
+                    <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Quick Navigation</h4>
+                    <ul class="space-y-1.5 text-xs text-slate-400">
+                        <li><a href="/services" class="hover:text-brand-300 transition">Services Menu</a></li>
+                        <li><a href="/barbers" class="hover:text-brand-300 transition">Master Barbers</a></li>
+                        <li><a href="/book" class="hover:text-brand-300 transition">Book Appointment</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Shop Policy</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        In-shop settlement upon service completion. All appointments scheduled in Asia/Manila standard time.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+                <p>&copy; @DateTime.UtcNow.Year BarberBook Management System &bull; SBIT-3D Group 4</p>
+                <p class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-500">Shop Zone: Asia/Manila (UTC+8)</p>
+            </div>
         </div>
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

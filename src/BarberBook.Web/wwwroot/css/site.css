@@ -1,2 +1,171 @@
-/* BarberBook Base Styles */
+/* BarberBook Vintage-Modern Barbershop Styling & Barber Pole Animations */
 
+/* 1. Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --color-cream: #FBF7EE;
+    --color-leather: #0F172A;
+    --color-charcoal: #1E293B;
+    --color-gold: #B4832C;
+    --color-gold-light: #D4A359;
+    --color-barber-red: #D62828;
+    --color-barber-blue: #1D3557;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--color-cream);
+}
+
+.font-serif,
+.font-vintage {
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* 2. PURE CSS 3D ROTATING BARBER POLE COMPONENT */
+@keyframes barberPoleSpin {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 0 96px;
+    }
+}
+
+@keyframes barberPoleDividerAnim {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 68px 0;
+    }
+}
+
+/* Standard Compact Barber Pole Cylinder (for Navbars, Badges) */
+.barber-pole-icon {
+    position: relative;
+    display: inline-block;
+    width: 14px;
+    height: 30px;
+    border-radius: 9999px;
+    background: repeating-linear-gradient(
+        -45deg,
+        #D62828 0 10px,
+        #FFFFFF 10px 20px,
+        #1D3557 20px 30px,
+        #FFFFFF 30px 40px
+    );
+    background-size: 100% 56.5px;
+    animation: barberPoleSpin 2.2s linear infinite;
+    box-shadow: 
+        inset 3px 0 5px rgba(255, 255, 255, 0.45),
+        inset -3px 0 6px rgba(0, 0, 0, 0.6),
+        0 2px 8px rgba(0, 0, 0, 0.4);
+    border: 1.5px solid #d4a359;
+    flex-shrink: 0;
+}
+
+/* Metallic Brass End Caps */
+.barber-pole-icon::before,
+.barber-pole-icon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 17px;
+    height: 4px;
+    background: linear-gradient(90deg, #7a5119, #d4a359, #f5edd6, #b4832c, #5c3d14);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.barber-pole-icon::before {
+    top: -3px;
+}
+
+.barber-pole-icon::after {
+    bottom: -3px;
+}
+
+/* Medium Barber Pole (for Hero and Cards) */
+.barber-pole-md {
+    width: 18px;
+    height: 40px;
+    background-size: 100% 64px;
+}
+
+.barber-pole-md::before,
+.barber-pole-md::after {
+    width: 22px;
+    height: 5px;
+}
+
+/* Large Hero Centerpiece Barber Pole */
+.barber-pole-lg {
+    width: 28px;
+    height: 68px;
+    border-width: 2px;
+    background-size: 100% 80px;
+    box-shadow: 
+        inset 5px 0 8px rgba(255, 255, 255, 0.5),
+        inset -5px 0 10px rgba(0, 0, 0, 0.7),
+        0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.barber-pole-lg::before,
+.barber-pole-lg::after {
+    width: 36px;
+    height: 7px;
+}
+
+/* Animated Barber Pole Ribbon Divider (Header/Card tops) */
+.barber-pole-divider {
+    height: 4px;
+    width: 100%;
+    background: repeating-linear-gradient(
+        -45deg,
+        #D62828 0 12px,
+        #FFFFFF 12px 24px,
+        #1D3557 24px 36px,
+        #FFFFFF 36px 48px
+    );
+    background-size: 68px 100%;
+    animation: barberPoleDividerAnim 2.8s linear infinite;
+    display: block;
+}
+
+/* 3. VINTAGE GROOMING MENU & CARD ACCENTS */
+.menu-leader-dots {
+    flex-grow: 1;
+    border-bottom: 2px dotted #7a5119;
+    margin: 0 0.75rem;
+    position: relative;
+    top: -4px;
+    opacity: 0.35;
+}
+
+.vintage-gold-border {
+    border: 1px solid rgba(180, 131, 44, 0.3);
+    transition: all 0.3s ease;
+}
+
+.vintage-gold-border:hover {
+    border-color: rgba(212, 163, 89, 0.8);
+    box-shadow: 0 8px 24px -4px rgba(180, 131, 44, 0.15);
+}
+
+/* Image zoom & hover vignette */
+.vintage-img-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.vintage-img-container img {
+    transition: transform 0.5s ease;
+}
+
+.vintage-img-container:hover img {
+    transform: scale(1.05);
+}

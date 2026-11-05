@@ -5,28 +5,36 @@
 }
 
 <div class="max-w-2xl mx-auto px-4 py-12 sm:px-6">
-    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden">
-        <!-- Subtle gold background glow -->
-        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl relative">
+        <!-- Animated Barber Pole Ribbon Accent -->
+        <div class="barber-pole-divider"></div>
 
-        <!-- Success checkmark icon -->
-        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-6">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
+        <div class="p-6 sm:p-10 text-center relative">
+            <!-- Subtle gold background glow -->
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-50 tracking-tight">Booking Submitted!</h1>
-        <p class="mt-2 text-sm text-neutral-400">Your appointment request has been recorded successfully.</p>
+            <!-- Success checkmark icon -->
+            <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
 
-        <!-- Reference Code Highlight Box -->
-        <div class="mt-8 p-5 rounded-2xl bg-neutral-950 border border-neutral-800 max-w-sm mx-auto">
-            <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold block mb-1">Appointment Reference Code</span>
-            <span class="text-2xl sm:text-3xl font-mono font-extrabold text-amber-400 tracking-wider select-all" id="confirmation-ref-code">
-                @Model.ReferenceCode
-            </span>
-            <p class="text-[11px] text-neutral-400 mt-1.5">Save this code to track your booking.</p>
-        </div>
+            <h1 class="text-2xl sm:text-3xl font-serif font-black text-amber-50 tracking-tight">Booking Submitted!</h1>
+            <p class="mt-2 text-sm text-neutral-400">Your appointment request has been recorded successfully.</p>
+
+            <!-- Reference Code Highlight Box with Mini Barber Pole -->
+            <div class="mt-8 p-5 rounded-2xl bg-neutral-950 border border-amber-500/30 max-w-sm mx-auto shadow-inner">
+                <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold block mb-1.5">Appointment Reference Code</span>
+                <div class="flex items-center justify-center gap-3">
+                    <div class="barber-pole-icon" style="height: 24px; width: 11px;"></div>
+                    <span class="text-2xl sm:text-3xl font-mono font-extrabold text-amber-400 tracking-wider select-all" id="confirmation-ref-code">
+                        @Model.ReferenceCode
+                    </span>
+                    <div class="barber-pole-icon" style="height: 24px; width: 11px;"></div>
+                </div>
+                <p class="text-[11px] text-neutral-400 mt-2">Save this code to track your booking.</p>
+            </div>
 
         <!-- Status Banner -->
         <div class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">

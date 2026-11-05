@@ -1,110 +1,253 @@
 @model List<BarberBook.Data.Entities.Service>
 @{
     ViewData["Title"] = "BarberBook — Classic Cuts & Master Grooming";
+    var barbers = ViewBag.Barbers as List<BarberBook.Data.Entities.Barber> ?? new List<BarberBook.Data.Entities.Barber>();
+
+    // Reliable Unsplash images mapped to service types
+    string GetServiceImage(string name)
+    {
+        var lower = name.ToLowerInvariant();
+        if (lower.Contains("beard"))
+            return "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80"; // Beard sculpt
+        if (lower.Contains("color") || lower.Contains("treatment"))
+            return "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=800&q=80"; // Hair color/wash
+        if (lower.Contains("shave") || lower.Contains("fade"))
+            return "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80"; // Shave & fade
+        return "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=800&q=80"; // Classic scissor cut
+    }
+
+    // Curated barber portraits
+    string GetBarberImage(string name, string? existingUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(existingUrl) && existingUrl.StartsWith("http"))
+            return existingUrl;
+
+        var lower = name.ToLowerInvariant();
+        if (lower.Contains("ramon"))
+            return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"; // Master barber
+        if (lower.Contains("dennis"))
+            return "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80"; // Modern fade stylist
+        if (lower.Contains("miguel"))
+            return "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80"; // Creative colorist
+        return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80";
+    }
 }
 
-<div class="space-y-16 py-6">
-    <!-- Hero Section -->
-    <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white px-6 py-16 sm:px-12 sm:py-24 shadow-2xl border border-slate-800">
-        <div class="relative z-10 max-w-3xl">
-            <span class="inline-flex items-center gap-2 rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-300 border border-brand-500/30">
-                <span>Certified Master Barbers</span>
-                <span>•</span>
-                <span>Mon–Sat 9:00 AM – 6:00 PM</span>
-            </span>
-            <h1 class="mt-6 text-4xl font-extrabold tracking-tight sm:text-6xl text-white">
-                Sharp cuts. Classic craft. Zero waiting.
+<div class="space-y-20 py-4">
+    <!-- HERO SECTION -->
+    <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl border border-slate-800">
+        <!-- Background Image with Dark Vignette Overlay -->
+        <div class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1600&q=80');">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/80"></div>
+        </div>
+
+        <div class="relative z-10 px-6 py-16 sm:px-12 sm:py-24 max-w-4xl">
+            <!-- Brass Pill Badge with Animated Mini Barber Pole -->
+            <div class="inline-flex items-center gap-2.5 rounded-full bg-brand-500/15 px-4 py-1.5 text-xs font-semibold text-brand-300 border border-brand-500/30 backdrop-blur-sm shadow-inner">
+                <div class="barber-pole-icon" style="height: 18px; width: 10px;"></div>
+                <span class="tracking-widest uppercase">EST. 2026 &bull; MASTER GROOMING &bull; MANILA</span>
+            </div>
+
+            <!-- Vintage Serif Headline -->
+            <h1 class="mt-6 text-4xl font-serif font-black tracking-tight sm:text-6xl text-white leading-[1.15]">
+                The Art of Classic Grooming &amp; Precision Cuts.
             </h1>
-            <p class="mt-4 text-lg text-slate-300 leading-relaxed">
-                Welcome to BarberBook, your premier neighborhood barber shop. Book your preferred master barber in seconds with real-time slot scheduling and guaranteed appointments.
+
+            <p class="mt-5 text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-light">
+                Where timeless craftsmanship meets modern convenience. Book your preferred master barber in seconds with guaranteed real-time availability and zero waiting.
             </p>
+
+            <!-- CTA Actions -->
             <div class="mt-8 flex flex-wrap gap-4 items-center">
-                <a href="/book" class="inline-flex items-center justify-center rounded-xl bg-brand-500 px-6 py-3.5 text-base font-bold text-slate-900 shadow-lg hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 transition">
+                <a href="/book" class="inline-flex items-center justify-center rounded-xl bg-brand-500 px-7 py-4 text-base font-bold text-slate-950 shadow-xl hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 transition transform hover:-translate-y-0.5">
+                    <svg class="w-5 h-5 mr-2 -ml-1 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     Book an Appointment
                 </a>
-                <a href="/services" class="inline-flex items-center justify-center rounded-xl bg-slate-800 px-6 py-3.5 text-base font-semibold text-white border border-slate-700 hover:bg-slate-700 transition">
-                    Explore Services
+                <a href="/services" class="inline-flex items-center justify-center rounded-xl bg-slate-800/80 backdrop-blur-sm px-6 py-4 text-sm font-bold text-white border border-slate-700 hover:bg-slate-700 transition">
+                    Grooming Menu
                 </a>
-                <a href="/barbers" class="inline-flex items-center justify-center rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-300 hover:text-white transition">
+                <a href="/barbers" class="inline-flex items-center justify-center rounded-xl px-4 py-4 text-sm font-semibold text-brand-300 hover:text-brand-200 transition">
                     Meet Our Barbers &rarr;
                 </a>
             </div>
-        </div>
-        <!-- Decorative Background Accent -->
-        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    </div>
 
-    <!-- Features / Perks -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-            <div class="h-10 w-10 rounded-lg bg-brand-100 text-brand-800 flex items-center justify-center font-bold mb-4">
-                1
+            <!-- Shop Schedule Footnote -->
+            <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center gap-6 text-xs text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Shop Open: <strong class="text-slate-200">Mon&ndash;Sat 9:00 AM &ndash; 6:00 PM</strong></span>
+                </div>
+                <div>&bull;</div>
+                <div>In-Shop Settlement (Cash / Direct)</div>
+                <div>&bull;</div>
+                <div>30-Min Real-Time Grid</div>
             </div>
-            <h3 class="text-lg font-bold text-slate-900">Live 30-Min Availability</h3>
-            <p class="mt-2 text-sm text-slate-500 leading-relaxed">
-                Our real-time engine ensures zero double-bookings. Pick your slot and your appointment is instantly secured.
-            </p>
         </div>
-        <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-            <div class="h-10 w-10 rounded-lg bg-brand-100 text-brand-800 flex items-center justify-center font-bold mb-4">
-                2
-            </div>
-            <h3 class="text-lg font-bold text-slate-900">Master Craftsmen</h3>
-            <p class="mt-2 text-sm text-slate-500 leading-relaxed">
-                Choose from dedicated barbers specializing in precision fades, hot-towel shaves, beard trims, and color treatments.
-            </p>
-        </div>
-        <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-            <div class="h-10 w-10 rounded-lg bg-brand-100 text-brand-800 flex items-center justify-center font-bold mb-4">
-                3
-            </div>
-            <h3 class="text-lg font-bold text-slate-900">In-Shop Payment</h3>
-            <p class="mt-2 text-sm text-slate-500 leading-relaxed">
-                No credit card required upfront. Book online with confidence and settle payment comfortably when you visit our shop.
-            </p>
+
+        <!-- Decorative Spinning Barber Pole Cylinder in Corner -->
+        <div class="hidden lg:flex absolute right-12 top-1/2 -translate-y-1/2 flex-col items-center p-6 bg-slate-950/60 rounded-3xl border border-slate-800 backdrop-blur-md shadow-2xl">
+            <div class="barber-pole-lg shadow-2xl mb-3"></div>
+            <span class="text-[10px] font-mono tracking-widest uppercase text-brand-400 font-bold">BarberBook</span>
+            <span class="text-[9px] text-slate-400">Master Suite</span>
         </div>
     </div>
 
-    <!-- Service Highlights -->
-    <div class="space-y-6">
-        <div class="flex items-center justify-between">
+    <!-- SERVICES SHOWCASE ("Apothecary Grooming Menu") -->
+    <div class="space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
             <div>
-                <h2 class="text-2xl font-bold tracking-tight text-slate-900">Popular Services</h2>
-                <p class="text-sm text-slate-500">Premium grooming services crafted for your individual style.</p>
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                    <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                    <span>Service Catalog</span>
+                </div>
+                <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Handcrafted Grooming Menu</h2>
+                <p class="mt-1 text-sm text-slate-600">Every service includes personalized consultation, hot towel finish, and classic tonic styling.</p>
             </div>
-            <a href="/services" class="text-sm font-semibold text-brand-600 hover:text-brand-800 transition">View all services &rarr;</a>
+            <div class="mt-4 sm:mt-0">
+                <a href="/services" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                    <span>View All Services</span>
+                    <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
         </div>
 
-        @if (!Model.Any())
-        {
-            <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
-                No services available at this time.
-            </div>
-        }
-        else
-        {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach (var s in Model)
-                {
-                    <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between hover:border-brand-400 transition hover:shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @foreach (var svc in Model)
+            {
+                var imgUrl = GetServiceImage(svc.Name);
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:border-brand-500/60 hover:shadow-md transition group">
+                    <div class="sm:w-44 h-48 sm:h-auto vintage-img-container shrink-0 bg-slate-900">
+                        <img src="@imgUrl" alt="@svc.Name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
                         <div>
-                            <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-brand-700 border border-amber-200">
-                                @s.DurationMinutes mins
+                            <div class="flex items-baseline justify-between">
+                                <h3 class="text-xl font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
+                                    @svc.Name
+                                </h3>
+                                <span class="text-lg font-extrabold text-slate-900 ml-2 font-mono">
+                                    ₱@svc.Price.ToString("N2")
+                                </span>
+                            </div>
+                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">
+                                @svc.DurationMinutes mins
                             </span>
-                            <h3 class="mt-3 text-lg font-bold text-slate-900">@s.Name</h3>
-                            <p class="mt-2 text-xs text-slate-500 line-clamp-2">
-                                @(string.IsNullOrWhiteSpace(s.Description) ? "Professional barber service with precision finish." : s.Description)
+                            <p class="mt-3 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                @svc.Description
                             </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-lg font-black text-slate-900">@FormattingHelpers.FormatPeso(s.Price)</span>
-                            <a href="/book?serviceId=@s.Id" class="text-xs font-bold text-brand-600 hover:text-brand-900 uppercase tracking-wide">
-                                Book &rarr;
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400 italic">Snapshot price guaranteed</span>
+                            <a href="/book?serviceId=@svc.Id" class="inline-flex items-center text-xs font-bold text-brand-700 hover:text-brand-900">
+                                Book This Service &rarr;
                             </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MASTER BARBERS SHOWCASE -->
+    @if (barbers.Any())
+    {
+        <div class="space-y-8 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                        <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                        <span>The Artisans</span>
+                    </div>
+                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Meet Our Master Barbers</h2>
+                    <p class="mt-1 text-sm text-slate-600">Dedicated professionals with distinct grooming specialties and master techniques.</p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <a href="/barbers" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                        <span>View Profiles &amp; Weekly Schedules</span>
+                        <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach (var b in barbers)
+                {
+                    var barberPhoto = GetBarberImage(b.DisplayName, b.PhotoUrl);
+                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col hover:border-brand-500/60 hover:shadow-lg transition group">
+                        <div class="h-64 vintage-img-container bg-slate-900 relative">
+                            <img src="@barberPhoto" alt="@b.DisplayName" class="w-full h-full object-cover object-top opacity-95 group-hover:opacity-100" />
+                            <div class="absolute bottom-3 left-3 bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                <span>Active Staff</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-2xl font-serif font-bold text-slate-900">
+                                    @b.DisplayName
+                                </h3>
+                                <p class="text-xs text-brand-700 font-semibold mt-1">
+                                    @b.Specialties
+                                </p>
+                                <p class="mt-3 text-xs text-slate-500 leading-relaxed line-clamp-3">
+                                    @b.Bio
+                                </p>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                <a href="/barbers/@b.Id" class="text-xs font-semibold text-slate-600 hover:text-slate-900">
+                                    View Schedule
+                                </a>
+                                <a href="/book?barberId=@b.Id" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-sm transition">
+                                    Book with @b.DisplayName &rarr;
+                                </a>
+                            </div>
                         </div>
                     </div>
                 }
             </div>
-        }
+        </div>
+    }
+
+    <!-- THE BARBERBOOK STANDARD (Features / Perks) -->
+    <div class="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden shadow-2xl">
+        <div class="relative z-10 max-w-2xl mb-8">
+            <span class="text-xs uppercase tracking-widest text-brand-400 font-bold block mb-2">The BarberBook Standard</span>
+            <h3 class="text-2xl sm:text-3xl font-serif font-bold text-white">Why Our Customers Return</h3>
+            <p class="text-sm text-slate-300 mt-2">Built specifically for punctuality, craftsmanship, and transparent service.</p>
+        </div>
+
+        <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
+                    I
+                </div>
+                <h4 class="text-base font-bold text-white">Live Slot Availability</h4>
+                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
+                    Our database prevents overlapping appointments with mathematical certainty. When you book a slot, it is exclusively reserved for you.
+                </p>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
+                    II
+                </div>
+                <h4 class="text-base font-bold text-white">Direct In-Shop Settlement</h4>
+                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
+                    No online payment gateways, convenience fees, or transaction surcharges. Simply pay the exact snapshotted service price in shop.
+                </p>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
+                    III
+                </div>
+                <h4 class="text-base font-bold text-white">Reschedule Flexibility</h4>
+                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
+                    Plans changed? Reschedule your booking into any upcoming open slot or cancel directly from your customer portal with instant confirmation.
+                </p>
+            </div>
+        </div>
     </div>
 </div>

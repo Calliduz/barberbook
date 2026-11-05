@@ -38,9 +38,16 @@ public class HomeController : Controller
         var highlights = await _dbContext.Services
             .Where(s => s.IsActive)
             .OrderBy(s => s.Price)
-            .Take(4)
+            .Take(6)
             .ToListAsync();
 
+        var barbers = await _dbContext.Barbers
+            .Include(b => b.User)
+            .Where(b => b.IsActive && b.User.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        ViewBag.Barbers = barbers;
         return View(highlights);
     }
 
