@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Web.Middleware;
+using BarberBook.Web.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -78,8 +79,12 @@ builder.Services.AddAuthorization(options =>
 
 // 4. NodaTime Clock & Timezone
 builder.Services.AddSingleton<IClock>(SystemClock.Instance);
+builder.Services.AddSingleton<DateTimeZone>(DateTimeZoneProviders.Tzdb["Asia/Manila"]);
 
-// 5. Rate Limiter for sensitive auth endpoints
+// 5. Application Services
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
+
+// 6. Rate Limiter for sensitive auth endpoints
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
