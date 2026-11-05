@@ -37,3 +37,4 @@ public class ServiceListViewModel
     public string? SearchQuery { get; set; }
     public string StatusFilter { get; set; } = "all"; // all, active, inactive
 }
+

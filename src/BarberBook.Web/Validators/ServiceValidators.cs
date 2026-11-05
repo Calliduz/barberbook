@@ -42,3 +42,4 @@ public class UpdateServiceRequestValidator : AbstractValidator<UpdateServiceRequ
             .Must(d => d % 30 == 0).WithMessage("Duration must be a positive multiple of 30 minutes (e.g., 30, 60, 90).");
     }
 }
+

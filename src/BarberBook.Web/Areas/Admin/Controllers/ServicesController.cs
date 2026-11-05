@@ -273,3 +273,4 @@ public class ServicesController : Controller
                Request.Headers.Accept.ToString().Contains("application/json");
     }
 }
+
