@@ -20,7 +20,7 @@ builder.Services.AddDbContext<BarberBookDbContext>(options =>
 });
 
 // 2. ASP.NET Core Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
@@ -59,6 +59,14 @@ builder.Services.AddSingleton<IClock>(SystemClock.Instance);
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// CLI seed support: dotnet run -- --seed
+if (args.Contains("--seed"))
+{
+    using var seedScope = app.Services.CreateScope();
+    await BarberBook.Data.Seeding.DatabaseSeeder.SeedAsync(seedScope.ServiceProvider);
+    return;
+}
 
 // 6. Pipeline: Centralized Error Handler Middleware
 app.UseMiddleware<ApiExceptionMiddleware>();

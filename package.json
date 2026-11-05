@@ -1,0 +1,12 @@
+{
+  "name": "barberbook",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BarberBook - Barber Shop Management System",
+  "scripts": {
+    "db:seed": "dotnet run --project src/BarberBook.Web -- --seed",
+    "test": "dotnet test BarberBook.sln",
+    "test:e2e": "npm --prefix tests/BarberBook.E2E test"
+  }
+}
+
