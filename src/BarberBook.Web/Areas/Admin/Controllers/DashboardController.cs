@@ -14,18 +14,6 @@ public class DashboardController : Controller
         return View();
     }
 
-    [HttpGet("appointments")]
-    public IActionResult Appointments()
-    {
-        return View();
-    }
-
-    [HttpGet("history")]
-    public IActionResult History()
-    {
-        return View();
-    }
-
     [HttpGet("barbers")]
     public IActionResult Barbers()
     {

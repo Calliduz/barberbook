@@ -83,6 +83,7 @@ builder.Services.AddSingleton<DateTimeZone>(DateTimeZoneProviders.Tzdb["Asia/Man
 
 // 5. Application Services
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
+builder.Services.AddScoped<IAppointmentTransitionService, AppointmentTransitionService>();
 
 // 6. Rate Limiter for sensitive auth endpoints
 builder.Services.AddRateLimiter(options =>

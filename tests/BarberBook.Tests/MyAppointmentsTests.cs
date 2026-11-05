@@ -336,9 +336,9 @@ public class MyAppointmentsTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task TerminalStatuses_CannotBeCancelledOrRescheduled_Returns400()
+    public async Task TerminalStatuses_CannotBeCancelledOrRescheduled_Returns409()
     {
-        // Transition table §9: Completed, rejected and cancelled appointments cannot be cancelled or rescheduled.
+        // Transition table §9: Completed, rejected and cancelled appointments cannot be cancelled or rescheduled (409 INVALID_TRANSITION).
         await EnsureSeededAsync();
         var clientJuan = await CreateAuthenticatedClientAsync("juan@barberbook.local", "Demo@BarberBook2026!");
 
@@ -352,21 +352,21 @@ public class MyAppointmentsTests : IClassFixture<WebApplicationFactory<Program>>
             completedAppId = completedApp.Id;
         }
 
-        // 1. Try to cancel completed appointment -> 400 Bad Request
+        // 1. Try to cancel completed appointment -> 409 Conflict (INVALID_TRANSITION)
         var cancelResp = await clientJuan.PostAsJsonAsync($"/api/appointments/{completedAppId}/cancel", new CancelAppointmentRequest());
-        cancelResp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        cancelResp.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var cancelContent = await cancelResp.Content.ReadAsStringAsync();
-        cancelContent.Should().Contain("INVALID_STATUS_TRANSITION");
+        cancelContent.Should().Contain("INVALID_TRANSITION");
 
-        // 2. Try to reschedule completed appointment -> 400 Bad Request
+        // 2. Try to reschedule completed appointment -> 409 Conflict (INVALID_TRANSITION)
         var futureSlot = new LocalDate(2026, 12, 21).At(new LocalTime(10, 0)).InZoneStrictly(_zone).ToInstant();
         var reschedResp = await clientJuan.PostAsJsonAsync($"/api/appointments/{completedAppId}/reschedule", new RescheduleAppointmentRequest
         {
             StartsAt = futureSlot.ToString()
         });
-        reschedResp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        reschedResp.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var reschedContent = await reschedResp.Content.ReadAsStringAsync();
-        reschedContent.Should().Contain("INVALID_STATUS_TRANSITION");
+        reschedContent.Should().Contain("INVALID_TRANSITION");
     }
 
     [Fact]

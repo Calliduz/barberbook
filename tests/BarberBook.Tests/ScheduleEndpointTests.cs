@@ -63,8 +63,8 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         // Target: future Monday 2026-12-07
         var testDate = "2026-12-07";
 
-        // 1. Set Monday hours for Ramon (Barber 1) to 09:00 - 12:00 (single morning shift)
-        var updateHoursResponse = await adminClient.PutAsJsonAsync("/api/admin/barbers/1/working-hours", new SetWorkingHoursRequest
+        // 1. Set Monday hours for Miguel (Barber 3) to 09:00 - 12:00 (single morning shift)
+        var updateHoursResponse = await adminClient.PutAsJsonAsync("/api/admin/barbers/3/working-hours", new SetWorkingHoursRequest
         {
             Ranges = new List<WorkingHoursRangeDto>
             {
@@ -75,7 +75,7 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
 
         // Verify public availability immediately: Haircut (30m, id 1) on 2026-12-07
         var availBeforeDayOff = await anonClient.GetFromJsonAsync<PublicAvailabilityResponse>(
-            $"/api/barbers/1/availability?serviceId=1&date={testDate}");
+            $"/api/barbers/3/availability?serviceId=1&date={testDate}");
 
         availBeforeDayOff.Should().NotBeNull();
         availBeforeDayOff!.Slots.Should().NotBeEmpty();
@@ -83,7 +83,7 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         availBeforeDayOff.Slots.Last().Should().Be("11:30"); // ends at 12:00
 
         // 2. Add Day Off for 2026-12-07
-        var addDayOffResponse = await adminClient.PostAsJsonAsync("/api/admin/barbers/1/days-off", new CreateDayOffRequest
+        var addDayOffResponse = await adminClient.PostAsJsonAsync("/api/admin/barbers/3/days-off", new CreateDayOffRequest
         {
             StartDate = testDate,
             Reason = "Shop Maintenance Day"
@@ -92,7 +92,7 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
 
         // Verify public availability immediately: 0 slots!
         var availDuringDayOff = await anonClient.GetFromJsonAsync<PublicAvailabilityResponse>(
-            $"/api/barbers/1/availability?serviceId=1&date={testDate}");
+            $"/api/barbers/3/availability?serviceId=1&date={testDate}");
 
         availDuringDayOff.Should().NotBeNull();
         availDuringDayOff!.Slots.Should().BeEmpty("Adding day off must immediately clear availability (T-08)");
@@ -102,31 +102,31 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
             var localDate = new LocalDate(2026, 12, 7);
-            var dayOff = await db.DaysOff.FirstOrDefaultAsync(d => d.BarberId == 1 && d.Date == localDate);
+            var dayOff = await db.DaysOff.FirstOrDefaultAsync(d => d.BarberId == 3 && d.Date == localDate);
             if (dayOff != null)
             {
-                var deleteRes = await adminClient.DeleteAsync($"/api/admin/barbers/1/days-off/{dayOff.Id}");
+                var deleteRes = await adminClient.DeleteAsync($"/api/admin/barbers/3/days-off/{dayOff.Id}");
                 deleteRes.StatusCode.Should().Be(HttpStatusCode.OK);
             }
         }
 
         // Verify availability immediately restored
         var availAfterRemoval = await anonClient.GetFromJsonAsync<PublicAvailabilityResponse>(
-            $"/api/barbers/1/availability?serviceId=1&date={testDate}");
+            $"/api/barbers/3/availability?serviceId=1&date={testDate}");
 
         availAfterRemoval!.Slots.Should().NotBeEmpty("Removing day off must immediately restore availability");
 
-        // Restore default working hours for Ramon (Mon-Sat 9:00 - 18:00)
+        // Restore default working hours for Miguel (Mon-Sat 9:00 - 18:00)
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
-            var currentHours = await db.WorkingHours.Where(w => w.BarberId == 1).ToListAsync();
+            var currentHours = await db.WorkingHours.Where(w => w.BarberId == 3).ToListAsync();
             db.WorkingHours.RemoveRange(currentHours);
             for (int d = 1; d <= 6; d++)
             {
                 db.WorkingHours.Add(new WorkingHours
                 {
-                    BarberId = 1,
+                    BarberId = 3,
                     DayOfWeek = d,
                     StartTime = new LocalTime(9, 0),
                     EndTime = new LocalTime(18, 0)

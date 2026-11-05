@@ -6,6 +6,7 @@ using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Appointment;
+using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +22,17 @@ public class AppointmentsApiController : ControllerBase
     private readonly BarberBookDbContext _dbContext;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
+    private readonly IAppointmentTransitionService _transitionService;
 
     public AppointmentsApiController(
         BarberBookDbContext dbContext,
         IClock clock,
+        IAppointmentTransitionService transitionService,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
         _clock = clock;
+        _transitionService = transitionService;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
 
@@ -374,58 +378,28 @@ public class AppointmentsApiController : ControllerBase
             return Unauthorized();
         }
 
-        var appointment = await _dbContext.Appointments
-            .Include(a => a.Barber)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
-
-        if (appointment == null)
-        {
-            return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found."));
-        }
-
-        if (appointment.CustomerId != customerId)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new ApiErrorResponse("FORBIDDEN", "You are not authorized to cancel this appointment."));
-        }
-
-        // Rule BR-09: Allowed only for pending or confirmed
-        if (appointment.Status != AppointmentStatus.Pending && appointment.Status != AppointmentStatus.Confirmed)
-        {
-            return BadRequest(new ApiErrorResponse("INVALID_STATUS_TRANSITION",
-                $"Cannot cancel an appointment that is already {appointment.Status.ToString().ToLowerInvariant()}."));
-        }
-
-        var now = _clock.GetCurrentInstant();
-        var oldStatus = appointment.Status;
-
-        appointment.Status = AppointmentStatus.Cancelled;
-        appointment.UpdatedAt = now;
-
+        var actor = new TransitionActor(customerId, "Customer", CustomerId: customerId);
         var note = !string.IsNullOrWhiteSpace(request?.Reason)
             ? request.Reason.Trim()
             : "Cancelled by customer";
 
-        var statusHistory = new StatusHistory
-        {
-            AppointmentId = appointment.Id,
-            FromStatus = oldStatus,
-            ToStatus = AppointmentStatus.Cancelled,
-            ChangedById = customerId,
-            ChangedByRole = "Customer",
-            Note = note,
-            ChangedAt = now
-        };
+        var result = await _transitionService.TransitionAsync(
+            id,
+            AppointmentStatus.Cancelled,
+            actor,
+            note,
+            cancellationToken: cancellationToken);
 
-        _dbContext.StatusHistories.Add(statusHistory);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        if (!result.Success)
+        {
+            return StatusCode(result.StatusCode, new ApiErrorResponse(result.ErrorCode!, result.ErrorMessage!));
+        }
 
         return Ok(new
         {
             message = "Appointment cancelled successfully.",
-            appointmentId = appointment.Id,
-            referenceCode = appointment.ReferenceCode,
+            appointmentId = result.Appointment!.Id,
+            referenceCode = result.Appointment.ReferenceCode,
             status = "cancelled"
         });
     }
@@ -459,10 +433,10 @@ public class AppointmentsApiController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, new ApiErrorResponse("FORBIDDEN", "You are not authorized to reschedule this appointment."));
         }
 
-        // Rule BR-09: Allowed only for pending or confirmed
+        // Rule BR-09: Allowed only for pending or confirmed (§9)
         if (appointment.Status != AppointmentStatus.Pending && appointment.Status != AppointmentStatus.Confirmed)
         {
-            return BadRequest(new ApiErrorResponse("INVALID_STATUS_TRANSITION",
+            return Conflict(new ApiErrorResponse("INVALID_TRANSITION",
                 $"Cannot reschedule an appointment that is already {appointment.Status.ToString().ToLowerInvariant()}."));
         }
 
@@ -574,27 +548,27 @@ public class AppointmentsApiController : ControllerBase
                 return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked. Please choose another time."));
             }
 
-            // 6. Update appointment (BR-09: returns to pending; keeps service, barber, price snapshot intact)
-            var oldStatus = appointment.Status;
-            appointment.StartsAt = newStartsAtInstant;
-            appointment.EndsAt = newEndsAt;
-            appointment.Status = AppointmentStatus.Pending;
-            appointment.UpdatedAt = now;
+            // 6. Transition status through transition service
+            var actor = new TransitionActor(customerId, "Customer", CustomerId: customerId);
+            var note = $"Rescheduled to {FormattingHelpers.FormatDate(newStartsAtInstant)} {FormattingHelpers.FormatTime12h(timeOfDay)}";
 
-            // 7. Write status history entry
-            var statusHistory = new StatusHistory
+            var transitionResult = await _transitionService.TransitionAsync(
+                id,
+                AppointmentStatus.Pending,
+                actor,
+                note,
+                updateAction: app =>
+                {
+                    app.StartsAt = newStartsAtInstant;
+                    app.EndsAt = newEndsAt;
+                },
+                cancellationToken: cancellationToken);
+
+            if (!transitionResult.Success)
             {
-                AppointmentId = appointment.Id,
-                FromStatus = oldStatus,
-                ToStatus = AppointmentStatus.Pending,
-                ChangedById = customerId,
-                ChangedByRole = "Customer",
-                Note = $"Rescheduled to {FormattingHelpers.FormatDate(newStartsAtInstant)} {FormattingHelpers.FormatTime12h(timeOfDay)}",
-                ChangedAt = now
-            };
-
-            _dbContext.StatusHistories.Add(statusHistory);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+                await tx.RollbackAsync(cancellationToken);
+                return StatusCode(transitionResult.StatusCode, new ApiErrorResponse(transitionResult.ErrorCode!, transitionResult.ErrorMessage!));
+            }
 
             await tx.CommitAsync(cancellationToken);
 
