@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Identity
+@using BarberBook.Data.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="flex items-center space-x-3">
+@if (SignInManager.IsSignedIn(User))
+{
+    var role = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Barber") ? "Barber" : "Customer";
+    var portalLink = User.IsInRole("Admin") ? "/admin" : User.IsInRole("Barber") ? "/barber" : "/my-appointments";
+
+    <div class="flex items-center space-x-2 text-sm text-slate-300">
+        <span class="text-white font-medium">@User.Identity?.Name</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-500/20 text-brand-400 border border-brand-500/30">
+            @role
+        </span>
+    </div>
+    <a href="@portalLink" class="px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-800 transition">
+        Portal
+    </a>
+    <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="px-3 py-1.5 rounded-md text-sm font-medium text-red-400 hover:text-red-300 hover:bg-slate-800 transition">
+            Sign out
+        </button>
+    </form>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login" class="px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-800 transition">
+        Log in
+    </a>
+    <a asp-controller="Account" asp-action="Register" class="px-3 py-1.5 rounded-md text-sm font-medium bg-brand-600 text-white hover:bg-brand-500 transition shadow-sm">
+        Register
+    </a>
+}
+</div>

@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Admin Management Dashboard";
+}
+
+<div class="space-y-6">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <h1 class="text-2xl font-bold text-slate-900">Administrator Management Dashboard</h1>
+        <p class="mt-1 text-slate-600">Centralized control of appointments, barber accounts, services, reports, and shop inventory.</p>
+
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="/admin/appointments" class="p-5 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <span class="text-xs uppercase font-bold text-brand-600 tracking-wider">Scheduling</span>
+                <h3 class="font-semibold text-slate-900 mt-1">Bookings & Approvals</h3>
+                <p class="text-xs text-slate-600 mt-1">Confirm, reject, complete or cancel appointments.</p>
+            </a>
+            <a href="/admin/barbers" class="p-5 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <span class="text-xs uppercase font-bold text-brand-600 tracking-wider">Staff</span>
+                <h3 class="font-semibold text-slate-900 mt-1">Barber Accounts</h3>
+                <p class="text-xs text-slate-600 mt-1">Create and manage barber staff profiles.</p>
+            </a>
+            <a href="/admin/reports" class="p-5 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <span class="text-xs uppercase font-bold text-brand-600 tracking-wider">Analytics</span>
+                <h3 class="font-semibold text-slate-900 mt-1">Sales Reports</h3>
+                <p class="text-xs text-slate-600 mt-1">Daily/monthly sales and transaction journals.</p>
+            </a>
+            <a href="/admin/inventory" class="p-5 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <span class="text-xs uppercase font-bold text-brand-600 tracking-wider">Shop</span>
+                <h3 class="font-semibold text-slate-900 mt-1">Inventory & Equipment</h3>
+                <p class="text-xs text-slate-600 mt-1">Equipment monitoring and product retail.</p>
+            </a>
+        </div>
+    </div>
+</div>

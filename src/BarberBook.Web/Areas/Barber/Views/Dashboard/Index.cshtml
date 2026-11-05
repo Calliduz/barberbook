@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Barber Portal Dashboard";
+}
+
+<div class="space-y-6">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <h1 class="text-2xl font-bold text-slate-900">Welcome, Barber</h1>
+        <p class="mt-1 text-slate-600">Manage your daily schedule, appointment statuses, and working availability.</p>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/barber/schedule" class="p-4 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <h3 class="font-semibold text-slate-900">My Schedule</h3>
+                <p class="text-sm text-slate-600 mt-1">View your day and week appointment calendar.</p>
+            </a>
+            <a href="/barber/availability" class="p-4 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <h3 class="font-semibold text-slate-900">Availability & Days Off</h3>
+                <p class="text-sm text-slate-600 mt-1">Set weekly working hours and scheduled days off.</p>
+            </a>
+            <a href="/barber/transactions" class="p-4 rounded-lg border border-slate-200 hover:border-brand-500 hover:shadow-sm transition bg-slate-50 hover:bg-white block">
+                <h3 class="font-semibold text-slate-900">My Transactions</h3>
+                <p class="text-sm text-slate-600 mt-1">Review completed appointments and personal revenue.</p>
+            </a>
+        </div>
+    </div>
+</div>

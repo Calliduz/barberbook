@@ -2,6 +2,7 @@ using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Web.Middleware;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
@@ -42,6 +43,28 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
+
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api") || context.Request.Headers.Accept.ToString().Contains("application/json"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api") || context.Request.Headers.Accept.ToString().Contains("application/json"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
 });
 
 // 3. Authorization Policies (Roles: Customer, Barber, Admin)
@@ -55,7 +78,19 @@ builder.Services.AddAuthorization(options =>
 // 4. NodaTime Clock & Timezone
 builder.Services.AddSingleton<IClock>(SystemClock.Instance);
 
-// 5. MVC & Controllers
+// 5. Rate Limiter for sensitive auth endpoints
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("auth-policy", opt =>
+    {
+        opt.PermitLimit = 15;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+});
+
+// 6. MVC & Controllers
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -68,7 +103,7 @@ if (args.Contains("--seed"))
     return;
 }
 
-// 6. Pipeline: Centralized Error Handler Middleware
+// 7. Pipeline: Centralized Error Handler Middleware
 app.UseMiddleware<ApiExceptionMiddleware>();
 
 if (!app.Environment.IsDevelopment())
@@ -76,8 +111,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/StatusCodePage", "?code={0}");
+
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

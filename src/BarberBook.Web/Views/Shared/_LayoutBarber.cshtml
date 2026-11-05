@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BarberBook Barber Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fbf7ee',
+                            100: '#f5edd6',
+                            500: '#b4832c',
+                            600: '#9b6c20',
+                            700: '#7a5119',
+                            800: '#5c3d14',
+                            900: '#3c270d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex flex-col min-h-full text-slate-800 antialiased">
+    <header class="bg-slate-900 text-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-6">
+                    <a href="/barber" class="flex items-center space-x-2">
+                        <span class="text-2xl font-bold tracking-tight text-brand-500">Barber<span class="text-white">Book</span></span>
+                        <span class="text-xs uppercase px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 font-semibold border border-blue-700">Barber</span>
+                    </a>
+                    <nav class="hidden md:flex space-x-1">
+                        <a href="/barber" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Dashboard</a>
+                        <a href="/barber/schedule" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Schedule</a>
+                        <a href="/barber/appointments" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Appointments</a>
+                        <a href="/barber/availability" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Availability & Days Off</a>
+                        <a href="/barber/transactions" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Transactions</a>
+                        <a href="/barber/equipment" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Equipment</a>
+                    </nav>
+                </div>
+                <div>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-6 text-sm text-center border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; @DateTime.UtcNow.Year BarberBook — Barber Portal</p>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
