@@ -130,3 +130,4 @@ public class BarbersApiController : ControllerBase
         _ => "Unknown"
     };
 }
+

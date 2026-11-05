@@ -267,3 +267,4 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         schedule.WeeklyHours.Should().NotBeEmpty();
     }
 }
+

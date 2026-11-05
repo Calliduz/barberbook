@@ -28,3 +28,4 @@ public interface IAvailabilityService
     /// </summary>
     Task<bool> IsSlotAvailableAsync(int barberId, int serviceId, Instant startsAt, int? ignoreAppointmentId = null, CancellationToken cancellationToken = default);
 }
+

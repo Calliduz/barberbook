@@ -461,3 +461,4 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
         (await availabilityService.IsSlotAvailableAsync(barber.Id, s30.Id, validUtc)).Should().BeTrue();
     }
 }
+
