@@ -38,3 +38,4 @@ public class RegisterModel
     [JsonPropertyName("role")]
     public string? Role { get; set; }
 }
+

@@ -21,3 +21,4 @@ public class ChangePasswordModel
     [JsonPropertyName("confirm_password")]
     public string? ConfirmPassword { get; set; }
 }
+

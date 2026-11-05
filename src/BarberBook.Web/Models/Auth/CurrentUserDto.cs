@@ -22,3 +22,4 @@ public class CurrentUserDto
     [JsonPropertyName("is_active")]
     public bool IsActive { get; set; }
 }
+

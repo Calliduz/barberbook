@@ -31,3 +31,4 @@ public static class ClaimsPrincipalExtensions
         return principal.IsInRole(role.ToString());
     }
 }
+
