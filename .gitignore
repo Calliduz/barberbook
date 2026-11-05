@@ -1,0 +1,32 @@
+## .NET Core
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.idea/
+*.resharper
+[Dd]ebug/
+[Rr]elease/
+
+## User-specific / Local Environment
+.env
+.env.local
+appsettings.Local.json
+appsettings.Production.json
+
+## Node & Playwright
+node_modules/
+npm-debug.log
+yarn-error.log
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+## Logs & Temp
+*.log
+.system_generated/
+

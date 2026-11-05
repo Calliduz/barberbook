@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BarberBook</title>
+    <!-- Tailwind CSS CDN for instant styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fbf7ee',
+                            100: '#f5edd6',
+                            500: '#b4832c',
+                            600: '#9b6c20',
+                            700: '#7a5119',
+                            800: '#5c3d14',
+                            900: '#3c270d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex flex-col min-h-full text-slate-800 antialiased">
+    <header class="bg-slate-900 text-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <a asp-controller="Home" asp-action="Index" class="flex items-center space-x-2">
+                        <span class="text-2xl font-bold tracking-tight text-brand-500">Barber<span class="text-white">Book</span></span>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a asp-controller="Home" asp-action="Index" class="px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:text-white hover:bg-slate-800">Home</a>
+                    <a href="/health" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Health</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-6 text-sm text-center border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; @DateTime.UtcNow.Year BarberBook — Barber Shop Management System (SBIT-3D, Group 4).</p>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
