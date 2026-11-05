@@ -32,6 +32,8 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
+    [Route("login")]
+    [Route("Account/Login")]
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -118,6 +120,8 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
+    [Route("register")]
+    [Route("Account/Register")]
     public IActionResult Register(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
