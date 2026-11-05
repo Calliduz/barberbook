@@ -261,3 +261,4 @@ public class AdminAppointmentsApiController : ControllerBase
         _ => status.ToString()
     };
 }
+

@@ -36,3 +36,4 @@ public interface IAppointmentTransitionService
         Action<Appointment>? updateAction = null,
         CancellationToken cancellationToken = default);
 }
+

@@ -69,3 +69,4 @@ public class AdminAppointmentsViewModel
     public string InitialView { get; set; } = "list"; // list, day, week
     public string? InitialStatus { get; set; }
 }
+

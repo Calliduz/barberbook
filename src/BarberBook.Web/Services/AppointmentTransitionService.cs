@@ -161,3 +161,4 @@ public class AppointmentTransitionService : IAppointmentTransitionService
         return AppointmentTransitionResult.Ok(appointment);
     }
 }
+
