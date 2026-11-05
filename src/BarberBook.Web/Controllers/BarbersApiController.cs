@@ -31,6 +31,81 @@ public class BarbersApiController : ControllerBase
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var barbers = await _dbContext.Barbers
+            .Include(b => b.User)
+            .Include(b => b.WorkingHours)
+            .Where(b => b.IsActive && b.User.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        var dtoList = barbers.Select(b => new
+        {
+            id = b.Id,
+            displayName = b.DisplayName,
+            bio = b.Bio,
+            photoUrl = b.PhotoUrl,
+            specialties = b.Specialties,
+            weeklyScheduleText = FormattingHelpers.FormatWeeklySchedule(b.WorkingHours)
+        }).ToList();
+
+        return Ok(dtoList);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var barber = await _dbContext.Barbers
+            .Include(b => b.User)
+            .Include(b => b.WorkingHours)
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found or inactive."));
+        }
+
+        var today = _clock.GetCurrentInstant().InZone(_zone).Date;
+        var upcomingDaysOff = await _dbContext.DaysOff
+            .Where(d => d.BarberId == id && d.Date >= today)
+            .OrderBy(d => d.Date)
+            .Take(30)
+            .Select(d => new PublicDayOffDto
+            {
+                Date = d.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                Reason = d.Reason
+            })
+            .ToListAsync();
+
+        var weeklyHours = barber.WorkingHours
+            .OrderBy(w => w.DayOfWeek)
+            .ThenBy(w => w.StartTime)
+            .Select(w => new PublicWorkingHoursDto
+            {
+                DayOfWeek = w.DayOfWeek,
+                DayName = GetDayName(w.DayOfWeek),
+                StartTime = w.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
+                EndTime = w.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)
+            })
+            .ToList();
+
+        var dto = new
+        {
+            id = barber.Id,
+            displayName = barber.DisplayName,
+            bio = barber.Bio,
+            photoUrl = barber.PhotoUrl,
+            specialties = barber.Specialties,
+            weeklyScheduleText = FormattingHelpers.FormatWeeklySchedule(barber.WorkingHours),
+            weeklyHours = weeklyHours,
+            upcomingDaysOff = upcomingDaysOff
+        };
+
+        return Ok(dto);
+    }
+
     [HttpGet("{id:int}/schedule")]
     public async Task<IActionResult> GetSchedule(int id)
     {

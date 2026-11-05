@@ -186,13 +186,21 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+
+            var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == 1 && d.Date == conflictDate).ToListAsync();
+            db.DaysOff.RemoveRange(existingDaysOff);
+
+            var existingApps = await db.Appointments.Where(a => a.BarberId == 1 && a.ReferenceCode.StartsWith("BB-CONF-TEST")).ToListAsync();
+            db.Appointments.RemoveRange(existingApps);
+            await db.SaveChangesAsync();
+
             var customer = await db.Users.FirstAsync(u => u.Role == UserRole.Customer);
             var appStart = conflictDate.At(new LocalTime(10, 0)).InZoneStrictly(_zone).ToInstant();
             var appEnd = conflictDate.At(new LocalTime(10, 30)).InZoneStrictly(_zone).ToInstant();
 
             var app = new Appointment
             {
-                ReferenceCode = "BB-CONF-TEST-01",
+                ReferenceCode = $"BB-CONF-TEST-{Guid.NewGuid():N}"[..20],
                 CustomerId = customer.Id,
                 BarberId = 1,
                 ServiceId = 1,

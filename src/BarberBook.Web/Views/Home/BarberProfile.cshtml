@@ -1,0 +1,122 @@
+@model BarberBook.Data.Entities.Barber
+@{
+    ViewData["Title"] = $"{Model.DisplayName}'s Profile & Schedule";
+    var upcomingDaysOff = ViewData["UpcomingDaysOff"] as List<BarberBook.Data.Entities.DayOff> ?? new List<BarberBook.Data.Entities.DayOff>();
+    string[] dayNames = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+}
+
+<div class="max-w-4xl mx-auto py-6 space-y-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex text-sm text-slate-500 space-x-2">
+        <a href="/" class="hover:text-slate-700">Home</a>
+        <span>/</span>
+        <a href="/barbers" class="hover:text-slate-700">Barbers</a>
+        <span>/</span>
+        <span class="text-slate-900 font-medium">@Model.DisplayName</span>
+    </nav>
+
+    <!-- Barber Bio Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-center space-x-6">
+            @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
+            {
+                <img src="@Model.PhotoUrl" alt="@Model.DisplayName" class="h-24 w-24 rounded-full object-cover border-4 border-brand-500 shadow-md" />
+            }
+            else
+            {
+                <div class="h-24 w-24 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-3xl border-4 border-brand-200 shadow-md">
+                    @Model.DisplayName.Substring(0, Math.Min(1, Model.DisplayName.Length)).ToUpperInvariant()
+                </div>
+            }
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-900">@Model.DisplayName</h1>
+                <p class="text-sm text-brand-600 font-semibold tracking-wide uppercase mt-1">
+                    @(string.IsNullOrWhiteSpace(Model.Specialties) ? "Master Barber" : Model.Specialties)
+                </p>
+                <div class="mt-3 flex items-center text-xs text-slate-500 gap-1.5">
+                    <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Accepting Appointments</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <a href="/book?barberId=@Model.Id" class="inline-flex items-center justify-center rounded-2xl bg-brand-600 px-6 py-3.5 text-base font-bold text-white shadow-md hover:bg-brand-500 transition">
+                Book with @Model.DisplayName
+            </a>
+        </div>
+    </div>
+
+    <!-- Bio & Summary -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-4">
+        <h2 class="text-xl font-bold text-slate-900">About @Model.DisplayName</h2>
+        <p class="text-slate-600 leading-relaxed text-sm">
+            @(string.IsNullOrWhiteSpace(Model.Bio) ? "Experienced barber delivering quality grooming services and customized haircuts." : Model.Bio)
+        </p>
+    </div>
+
+    <!-- Schedule Grid: Weekly Hours & Days Off -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Weekly Hours -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Weekly Schedule</h3>
+                <p class="text-xs text-brand-700 font-medium mt-0.5">
+                    @FormattingHelpers.FormatWeeklySchedule(Model.WorkingHours)
+                </p>
+            </div>
+            <div class="divide-y divide-slate-100 text-sm">
+                @for (int dow = 1; dow <= 7; dow++)
+                {
+                    int dayIndex = dow == 7 ? 0 : dow;
+                    var ranges = Model.WorkingHours.Where(w => w.DayOfWeek == dayIndex).OrderBy(w => w.StartTime).ToList();
+                    <div class="py-2.5 flex items-center justify-between">
+                        <span class="font-medium text-slate-700">@dayNames[dayIndex]</span>
+                        @if (ranges.Any())
+                        {
+                            <span class="text-slate-900 font-semibold text-xs">
+                                @string.Join(", ", ranges.Select(r => $"{FormattingHelpers.FormatTime12h(r.StartTime)} – {FormattingHelpers.FormatTime12h(r.EndTime)}"))
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-slate-400 text-xs italic">Closed</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Upcoming Days Off -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Upcoming Days Off</h3>
+                <p class="text-xs text-slate-500">Dates when @Model.DisplayName will be out of shop.</p>
+            </div>
+            <div class="space-y-2">
+                @if (!upcomingDaysOff.Any())
+                {
+                    <div class="text-center py-8 text-xs text-slate-400">
+                        No upcoming days off scheduled. Available on regular weekly shifts!
+                    </div>
+                }
+                else
+                {
+                    @foreach (var doff in upcomingDaysOff)
+                    {
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
+                            <span class="font-semibold text-slate-800">
+                                @doff.Date.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)
+                            </span>
+                            <span class="text-slate-500 italic">
+                                @(string.IsNullOrWhiteSpace(doff.Reason) ? "Scheduled Day Off" : doff.Reason)
+                            </span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

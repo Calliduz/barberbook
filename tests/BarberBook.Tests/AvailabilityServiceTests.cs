@@ -184,6 +184,11 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
 
         var date = new LocalDate(2026, 11, 19);
 
+        // Clean up any existing day off on this date
+        var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == barber.Id && d.Date == date).ToListAsync();
+        db.DaysOff.RemoveRange(existingDaysOff);
+        await db.SaveChangesAsync();
+
         // Add day off
         db.DaysOff.Add(new DayOff
         {
@@ -262,6 +267,13 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
             EndTime = new LocalTime(18, 0)
         });
 
+        // Clean up any existing appointments for this test date
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+        await db.SaveChangesAsync();
+
         // Add an appointment from 10:00 to 10:30
         var appStartUtc = date.At(new LocalTime(10, 0)).InZoneStrictly(_zone).ToInstant();
         var appEndUtc = date.At(new LocalTime(10, 30)).InZoneStrictly(_zone).ToInstant();
@@ -269,7 +281,7 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
         var customer = await db.Users.FirstAsync(u => u.Role == UserRole.Customer);
         db.Appointments.Add(new Appointment
         {
-            ReferenceCode = $"BB-TEST-{Guid.NewGuid():N}"[..15],
+            ReferenceCode = $"BB-TEST-{Guid.NewGuid():N}"[..18],
             CustomerId = customer.Id,
             BarberId = barber.Id,
             ServiceId = s30.Id,
@@ -312,6 +324,13 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
             StartTime = new LocalTime(9, 0),
             EndTime = new LocalTime(18, 0)
         });
+
+        // Clean up any existing appointments for this test date
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+        await db.SaveChangesAsync();
 
         var customer = await db.Users.FirstAsync(u => u.Role == UserRole.Customer);
 
