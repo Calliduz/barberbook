@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Web.Middleware;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -92,6 +93,9 @@ builder.Services.AddRateLimiter(options =>
 
 // 6. MVC & Controllers
 builder.Services.AddControllersWithViews();
+
+// 7. FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 

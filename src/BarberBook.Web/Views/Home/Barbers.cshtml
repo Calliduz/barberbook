@@ -1,0 +1,57 @@
+@model List<BarberBook.Data.Entities.Barber>
+@{
+    ViewData["Title"] = "Our Barbers";
+}
+
+<div class="py-6 space-y-8">
+    <div class="text-center max-w-2xl mx-auto">
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">Meet Our Barbers</h1>
+        <p class="mt-3 text-lg text-slate-600">Experienced craftsmen dedicated to keeping you looking sharp and fresh.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-12 text-slate-400">
+            <p>No barbers are currently available. Please check back later.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var barber in Model)
+            {
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:border-brand-300 transition">
+                    <div>
+                        <div class="flex items-center space-x-4">
+                            @if (!string.IsNullOrWhiteSpace(barber.PhotoUrl))
+                            {
+                                <img src="@barber.PhotoUrl" alt="@barber.DisplayName" class="h-16 w-16 rounded-full object-cover border-2 border-brand-500" />
+                            }
+                            else
+                            {
+                                <div class="h-16 w-16 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-2xl border-2 border-brand-200">
+                                    @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
+                                </div>
+                            }
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-900">@barber.DisplayName</h2>
+                                <p class="text-xs text-brand-600 font-semibold tracking-wide uppercase mt-0.5">
+                                    @(string.IsNullOrWhiteSpace(barber.Specialties) ? "Master Barber" : barber.Specialties)
+                                </p>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-600 leading-relaxed">
+                            @(string.IsNullOrWhiteSpace(barber.Bio) ? "Experienced professional delivering classic and modern grooming cuts." : barber.Bio)
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs text-slate-400">Available Mon–Sat</span>
+                        <a href="/book?barberId=@barber.Id" class="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 transition">
+                            Book with @barber.DisplayName
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

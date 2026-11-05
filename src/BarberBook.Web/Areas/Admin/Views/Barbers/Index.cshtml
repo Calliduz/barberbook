@@ -1,0 +1,348 @@
+@model BarberBook.Web.Models.Admin.BarberListViewModel
+@{
+    ViewData["Title"] = "Barber Accounts";
+}
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Barber Accounts</h1>
+            <p class="mt-1 text-sm text-slate-500">Manage barber shop staff profiles, credentials, specialties, and active statuses.</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 transition">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Add New Barber
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="rounded-md bg-emerald-50 p-4 border border-emerald-200">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-emerald-800">@TempData["SuccessMessage"]</p>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="rounded-md bg-rose-50 p-4 border border-rose-200">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-rose-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-rose-800">@TempData["ErrorMessage"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Search & Filters -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <form method="get" action="/admin/barbers" class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="w-full sm:w-80 relative">
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by name, email, specialty..." class="w-full rounded-lg border-slate-300 pl-10 pr-4 py-2 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <label for="statusFilter" class="text-sm font-medium text-slate-600 whitespace-nowrap">Status:</label>
+                <select id="statusFilter" name="status" onchange="this.form.submit()" class="rounded-lg border-slate-300 py-2 pl-3 pr-8 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm">
+                    <option value="all" selected="@(Model.StatusFilter == "all")">All Barbers</option>
+                    <option value="active" selected="@(Model.StatusFilter == "active")">Active Only</option>
+                    <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive Only</option>
+                </select>
+                <button type="submit" class="rounded-lg bg-slate-100 hover:bg-slate-200 px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Barbers Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                    <tr>
+                        <th class="py-3.5 pl-6 pr-3">Barber</th>
+                        <th class="px-3 py-3.5">Email</th>
+                        <th class="px-3 py-3.5">Specialties</th>
+                        <th class="px-3 py-3.5">Completed Bookings</th>
+                        <th class="px-3 py-3.5">Status</th>
+                        <th class="py-3.5 pl-3 pr-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-slate-700">
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-slate-400">
+                                No barber accounts found matching the criteria.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var barber in Model.Items)
+                    {
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-4 pl-6 pr-3">
+                                <div class="flex items-center space-x-3">
+                                    <div class="h-10 w-10 flex-shrink-0 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-base">
+                                        @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-slate-900">@barber.DisplayName</div>
+                                        <div class="text-xs text-slate-500">@barber.FullName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-4 text-slate-600">@barber.Email</td>
+                            <td class="px-3 py-4 text-slate-600">
+                                @(string.IsNullOrWhiteSpace(barber.Specialties) ? "General Grooming" : barber.Specialties)
+                            </td>
+                            <td class="px-3 py-4">
+                                <span class="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                                    @barber.CompletedAppointmentsCount appointments
+                                </span>
+                            </td>
+                            <td class="px-3 py-4">
+                                @if (barber.IsActive)
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 border border-rose-200">
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap space-x-2">
+                                <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))')" class="text-brand-600 hover:text-brand-900 font-medium text-xs">Edit</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="text-slate-600 hover:text-slate-900 font-medium text-xs">Reset Password</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="@(barber.IsActive ? "text-rose-600 hover:text-rose-800" : "text-emerald-600 hover:text-emerald-800") font-medium text-xs">
+                                    @(barber.IsActive ? "Deactivate" : "Activate")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
+                <div class="text-sm text-slate-500">
+                    Showing <span class="font-medium">@((Model.Page - 1) * Model.PageSize + 1)</span> to <span class="font-medium">@(Math.Min(Model.Page * Model.PageSize, Model.TotalCount))</span> of <span class="font-medium">@Model.TotalCount</span> barbers
+                </div>
+                <div class="flex space-x-2">
+                    @if (Model.Page > 1)
+                    {
+                        <a href="/admin/barbers?page=@(Model.Page - 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="rounded-md border border-slate-300 bg-white px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50">Previous</a>
+                    }
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a href="/admin/barbers?page=@(Model.Page + 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="rounded-md border border-slate-300 bg-white px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50">Next</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Add Barber Modal / Drawer -->
+<div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-slate-900">Add New Barber Account</h3>
+            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form method="post" action="/admin/barbers" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Full Name *</label>
+                <input type="text" name="FullName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Ramon Bautista" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Display Name *</label>
+                <input type="text" name="DisplayName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Ramon" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Email Address *</label>
+                <input type="email" name="Email" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. ramon@barberbook.local" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Temporary Password *</label>
+                <input type="password" name="Password" required minlength="6" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Set temporary password" />
+                <p class="text-xs text-slate-400 mt-1">Admin provides this password to the barber. Barbers cannot self-register (LM-4).</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Specialties</label>
+                <input type="text" name="Specialties" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Fades, Beard Styling, Pompadour" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Bio</label>
+                <textarea name="Bio" rows="2" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Short introduction for customers..."></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Photo URL</label>
+                <input type="url" name="PhotoUrl" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="https://..." />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('createModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Create Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Barber Modal -->
+<div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-slate-900">Edit Barber Profile</h3>
+            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="editBarberForm" method="post" action="" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Full Name *</label>
+                <input type="text" id="editFullName" name="FullName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Display Name *</label>
+                <input type="text" id="editDisplayName" name="DisplayName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Specialties</label>
+                <input type="text" id="editSpecialties" name="Specialties" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Bio</label>
+                <textarea id="editBio" name="Bio" rows="2" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Photo URL</label>
+                <input type="url" id="editPhotoUrl" name="PhotoUrl" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('editModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-slate-900">Reset Password</h3>
+            <button type="button" onclick="closeModal('resetPasswordModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <p class="text-sm text-slate-600 mb-4">Set a new password for <span id="resetBarberName" class="font-semibold text-slate-900"></span>. (No email reset is supported, AS-21).</p>
+        <form id="resetPasswordForm" method="post" action="" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">New Password *</label>
+                <input type="password" name="NewPassword" required minlength="6" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Minimum 6 characters" />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('resetPasswordModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Update Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toggle Status Confirmation Dialog -->
+<div id="confirmStatusModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex items-center space-x-3 mb-4">
+            <div id="confirmIconContainer" class="p-2 rounded-full">
+                <!-- Icon inserted via JS -->
+            </div>
+            <h3 id="confirmStatusTitle" class="text-lg font-bold text-slate-900">Confirm Action</h3>
+        </div>
+        <p id="confirmStatusMessage" class="text-sm text-slate-600 mb-6"></p>
+        <form id="toggleStatusForm" method="post" action="" class="flex justify-end space-x-3">
+            <button type="button" onclick="closeModal('confirmStatusModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+            <button type="submit" id="confirmStatusBtn" class="rounded-lg px-4 py-2 text-sm font-semibold text-white transition"></button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+    }
+
+    function openEditModal(id, fullName, displayName, specialties, bio, photoUrl) {
+        document.getElementById('editBarberForm').action = '/admin/barbers/' + id + '/edit';
+        document.getElementById('editFullName').value = fullName;
+        document.getElementById('editDisplayName').value = displayName;
+        document.getElementById('editSpecialties').value = specialties;
+        document.getElementById('editBio').value = bio;
+        document.getElementById('editPhotoUrl').value = photoUrl;
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function openResetPasswordModal(id, displayName) {
+        document.getElementById('resetPasswordForm').action = '/admin/barbers/' + id + '/reset-password';
+        document.getElementById('resetBarberName').innerText = displayName;
+        document.getElementById('resetPasswordModal').classList.remove('hidden');
+    }
+
+    function confirmToggleStatus(id, displayName, isActive) {
+        document.getElementById('toggleStatusForm').action = '/admin/barbers/' + id + '/toggle-status';
+        const title = isActive ? 'Deactivate Barber Account' : 'Activate Barber Account';
+        const msg = isActive
+            ? 'Are you sure you want to deactivate ' + displayName + '? The barber will not be able to log in and will be hidden from customer bookings. Existing historical appointments remain intact (BR-13).'
+            : 'Are you sure you want to activate ' + displayName + '? The barber will be visible for customer bookings and able to log in.';
+        const btnClass = isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500';
+        const btnText = isActive ? 'Deactivate' : 'Activate';
+
+        document.getElementById('confirmStatusTitle').innerText = title;
+        document.getElementById('confirmStatusMessage').innerText = msg;
+        const confirmBtn = document.getElementById('confirmStatusBtn');
+        confirmBtn.className = 'rounded-lg px-4 py-2 text-sm font-semibold text-white transition ' + btnClass;
+        confirmBtn.innerText = btnText;
+
+        document.getElementById('confirmStatusModal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+</script>

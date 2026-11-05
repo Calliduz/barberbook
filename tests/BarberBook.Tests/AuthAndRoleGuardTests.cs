@@ -323,7 +323,10 @@ public class AuthAndRoleGuardTests : IClassFixture<WebApplicationFactory<Program
             // Admin portal routes or controllers in Admin area must have Admin role policy or authorize attribute
             var area = actionDescriptor?.RouteValues.TryGetValue("area", out var a) == true ? a : null;
             var isAreaAdmin = string.Equals(area, "Admin", StringComparison.OrdinalIgnoreCase);
-            if (isAreaAdmin || routePattern.Equals("admin", StringComparison.OrdinalIgnoreCase) || routePattern.StartsWith("admin/", StringComparison.OrdinalIgnoreCase))
+            if (isAreaAdmin ||
+                routePattern.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.StartsWith("admin/", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.StartsWith("api/admin", StringComparison.OrdinalIgnoreCase))
             {
                 var authorizeData = endpoint.Metadata.GetOrderedMetadata<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
                 authorizeData.Should().NotBeEmpty($"Route '{routePattern}' in admin portal must have an [Authorize] guard");
@@ -332,7 +335,11 @@ public class AuthAndRoleGuardTests : IClassFixture<WebApplicationFactory<Program
 
             // Barber portal routes or controllers in Barber area must have Barber role policy or authorize attribute
             var isAreaBarber = string.Equals(area, "Barber", StringComparison.OrdinalIgnoreCase);
-            if (isAreaBarber || routePattern.Equals("barber", StringComparison.OrdinalIgnoreCase) || routePattern.StartsWith("barber/", StringComparison.OrdinalIgnoreCase))
+            if (isAreaBarber ||
+                routePattern.Equals("barber", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.StartsWith("barber/", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.Equals("api/barber", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.StartsWith("api/barber/", StringComparison.OrdinalIgnoreCase))
             {
                 var authorizeData = endpoint.Metadata.GetOrderedMetadata<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
                 authorizeData.Should().NotBeEmpty($"Route '{routePattern}' in barber portal must have an [Authorize] guard");
