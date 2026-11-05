@@ -181,13 +181,6 @@ public class HomeController : Controller
     }
 
     [Authorize(Roles = "Customer")]
-    [HttpGet("book")]
-    public IActionResult Book()
-    {
-        return View();
-    }
-
-    [Authorize(Roles = "Customer")]
     [HttpGet("my-appointments")]
     public IActionResult MyAppointments()
     {

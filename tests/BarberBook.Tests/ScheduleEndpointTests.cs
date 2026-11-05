@@ -115,6 +115,25 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
             $"/api/barbers/1/availability?serviceId=1&date={testDate}");
 
         availAfterRemoval!.Slots.Should().NotBeEmpty("Removing day off must immediately restore availability");
+
+        // Restore default working hours for Ramon (Mon-Sat 9:00 - 18:00)
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var currentHours = await db.WorkingHours.Where(w => w.BarberId == 1).ToListAsync();
+            db.WorkingHours.RemoveRange(currentHours);
+            for (int d = 1; d <= 6; d++)
+            {
+                db.WorkingHours.Add(new WorkingHours
+                {
+                    BarberId = 1,
+                    DayOfWeek = d,
+                    StartTime = new LocalTime(9, 0),
+                    EndTime = new LocalTime(18, 0)
+                });
+            }
+            await db.SaveChangesAsync();
+        }
     }
 
     [Fact]

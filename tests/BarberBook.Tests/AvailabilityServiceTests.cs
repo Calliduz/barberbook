@@ -103,6 +103,13 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
         var date = new LocalDate(2026, 11, 17); // Tuesday
         int dow = 2;
 
+        var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == barber.Id && d.Date == date).ToListAsync();
+        db.DaysOff.RemoveRange(existingDaysOff);
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+
         var existingHours = await db.WorkingHours.Where(w => w.BarberId == barber.Id && w.DayOfWeek == dow).ToListAsync();
         db.WorkingHours.RemoveRange(existingHours);
         db.WorkingHours.Add(new WorkingHours

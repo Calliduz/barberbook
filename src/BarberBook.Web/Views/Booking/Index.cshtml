@@ -1,0 +1,502 @@
+@model BarberBook.Web.Models.Appointment.BookingWizardViewModel
+@{
+    Layout = "_LayoutCustomer";
+    ViewData["Title"] = "Book an Appointment";
+}
+
+<div class="max-w-3xl mx-auto px-4 py-8 sm:px-6">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold text-amber-50 tracking-tight sm:text-4xl">Book an Appointment</h1>
+        <p class="mt-2 text-sm text-neutral-400">Select your service, barber, date and preferred time slot.</p>
+    </div>
+
+    <!-- Stepper Indicator -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-neutral-800 -z-0"></div>
+            <div id="step-progress-bar" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-amber-500 transition-all duration-300 -z-0" style="width: 0%;"></div>
+
+            <!-- Step 1 Indicator -->
+            <button type="button" onclick="goToStep(1)" id="step-indicator-1" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-amber-500 text-neutral-950 border-amber-500">
+                1
+            </button>
+            <!-- Step 2 Indicator -->
+            <button type="button" onclick="goToStep(2)" id="step-indicator-2" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-neutral-900 text-neutral-400 border-neutral-700">
+                2
+            </button>
+            <!-- Step 3 Indicator -->
+            <button type="button" onclick="goToStep(3)" id="step-indicator-3" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-neutral-900 text-neutral-400 border-neutral-700">
+                3
+            </button>
+            <!-- Step 4 Indicator -->
+            <button type="button" onclick="goToStep(4)" id="step-indicator-4" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-neutral-900 text-neutral-400 border-neutral-700">
+                4
+            </button>
+        </div>
+        <div class="flex justify-between text-xs text-neutral-400 mt-2 px-1">
+            <span class="font-medium">1. Service</span>
+            <span class="font-medium">2. Barber</span>
+            <span class="font-medium">3. Date & Time</span>
+            <span class="font-medium">4. Review</span>
+        </div>
+    </div>
+
+    <!-- Error Alert Box -->
+    <div id="wizard-error-box" class="hidden mb-6 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-sm">
+        <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div id="wizard-error-message"></div>
+        </div>
+    </div>
+
+    <!-- Step 1: Choose Service -->
+    <div id="wizard-step-1" class="wizard-step">
+        <h2 class="text-xl font-bold text-amber-50 mb-4">Choose a Service</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @foreach (var svc in Model.Services)
+            {
+                <div class="service-card cursor-pointer p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-amber-500/60 transition-all duration-200"
+                     data-id="@svc.Id"
+                     data-name="@svc.Name"
+                     data-price="@svc.FormattedPrice"
+                     data-duration="@svc.DurationMinutes"
+                     onclick="selectService(@svc.Id, '@svc.Name', '@svc.FormattedPrice', @svc.DurationMinutes)">
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="text-lg font-bold text-neutral-100">@svc.Name</h3>
+                        <span class="text-amber-400 font-bold text-lg whitespace-nowrap">@svc.FormattedPrice</span>
+                    </div>
+                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">@svc.Description</p>
+                    <div class="mt-3 flex items-center text-xs text-neutral-400">
+                        <svg class="w-4 h-4 mr-1 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>@svc.DurationMinutes mins</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Step 2: Choose Barber -->
+    <div id="wizard-step-2" class="wizard-step hidden">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-amber-50">Choose a Barber</h2>
+            <button type="button" onclick="goToStep(1)" class="text-xs text-amber-400 hover:text-amber-300 font-medium">← Change Service</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @foreach (var barber in Model.Barbers)
+            {
+                <div class="barber-card cursor-pointer p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-amber-500/60 transition-all duration-200"
+                     data-id="@barber.Id"
+                     data-name="@barber.DisplayName"
+                     onclick="selectBarber(@barber.Id, '@barber.DisplayName')">
+                    <div class="flex items-center gap-4">
+                        @if (!string.IsNullOrEmpty(barber.PhotoUrl))
+                        {
+                            <img src="@barber.PhotoUrl" alt="@barber.DisplayName" class="w-14 h-14 rounded-full object-cover border-2 border-neutral-700" />
+                        }
+                        else
+                        {
+                            <div class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 border-2 border-amber-500/40 font-bold text-xl flex items-center justify-center shrink-0">
+                                @(string.IsNullOrEmpty(barber.DisplayName) ? "B" : barber.DisplayName[..1].ToUpperInvariant())
+                            </div>
+                        }
+                        <div>
+                            <h3 class="text-lg font-bold text-neutral-100">@barber.DisplayName</h3>
+                            <p class="text-xs text-amber-400 font-medium mt-0.5">@barber.Specialties</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-neutral-400 mt-3 line-clamp-2">@barber.Bio</p>
+                    <div class="mt-3 pt-3 border-t border-neutral-800/80 text-[11px] text-neutral-400 flex items-center">
+                        <svg class="w-3.5 h-3.5 mr-1 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span>@barber.WeeklyScheduleText</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Step 3: Select Date & Time -->
+    <div id="wizard-step-3" class="wizard-step hidden">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-amber-50">Select Date & Time</h2>
+            <button type="button" onclick="goToStep(2)" class="text-xs text-amber-400 hover:text-amber-300 font-medium">← Change Barber</button>
+        </div>
+
+        <div class="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-5 mb-6">
+            <label for="booking-date-picker" class="block text-sm font-semibold text-neutral-300 mb-2">Select Date</label>
+            <input type="date" id="booking-date-picker" min="@Model.TodayDateString" value="@Model.TodayDateString"
+                   onchange="onDateChanged()"
+                   class="w-full sm:w-64 px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-700 text-neutral-100 focus:outline-none focus:border-amber-500 font-medium text-sm" />
+            <p class="text-xs text-neutral-400 mt-1.5">Availability is computed live in Asia/Manila standard time.</p>
+        </div>
+
+        <div class="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-neutral-200 mb-3 flex items-center gap-2">
+                <span>Available Times</span>
+                <span id="slots-count-badge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold"></span>
+            </h3>
+
+            <!-- Loading Spinner -->
+            <div id="slots-loading" class="py-10 text-center hidden">
+                <div class="inline-block w-7 h-7 border-3 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"></div>
+                <p class="text-xs text-neutral-400 mt-2">Checking real-time barber availability...</p>
+            </div>
+
+            <!-- Empty Slots Message -->
+            <div id="slots-empty" class="py-10 text-center hidden">
+                <svg class="w-10 h-10 mx-auto text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm font-medium text-neutral-300">No available time slots on this date.</p>
+                <p class="text-xs text-neutral-400 mt-1">The barber may be off, fully booked, or remaining slots do not fit the service duration. Please pick another date.</p>
+            </div>
+
+            <!-- Slots Grid -->
+            <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                <!-- Dynamically rendered slot buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Review & Book -->
+    <div id="wizard-step-4" class="wizard-step hidden">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-amber-50">Review & Confirm Booking</h2>
+            <button type="button" onclick="goToStep(3)" class="text-xs text-amber-400 hover:text-amber-300 font-medium">← Change Time</button>
+        </div>
+
+        <div class="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 mb-6 divide-y divide-neutral-800">
+            <div class="pb-4 flex justify-between items-start">
+                <div>
+                    <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold">Service</span>
+                    <h3 id="review-service-name" class="text-lg font-bold text-neutral-100 mt-0.5"></h3>
+                    <p id="review-service-duration" class="text-xs text-neutral-400 mt-0.5"></p>
+                </div>
+                <span id="review-service-price" class="text-xl font-extrabold text-amber-400"></span>
+            </div>
+
+            <div class="py-4">
+                <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold">Barber</span>
+                <p id="review-barber-name" class="text-base font-bold text-neutral-100 mt-0.5"></p>
+            </div>
+
+            <div class="py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold">Date</span>
+                    <p id="review-date-str" class="text-base font-bold text-neutral-100 mt-0.5"></p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold">Time</span>
+                    <p id="review-time-str" class="text-base font-bold text-amber-400 mt-0.5"></p>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold">Customer Details</span>
+                <div class="text-xs text-neutral-300 mt-1 space-y-0.5">
+                    <p><span class="text-neutral-400">Name:</span> <strong class="text-neutral-100">@Model.CustomerName</strong></p>
+                    <p><span class="text-neutral-400">Email:</span> @Model.CustomerEmail</p>
+                    @if (!string.IsNullOrEmpty(Model.CustomerPhone))
+                    {
+                        <p><span class="text-neutral-400">Phone:</span> @Model.CustomerPhone</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Optional Notes -->
+        <div class="mb-6">
+            <label for="booking-notes" class="block text-sm font-semibold text-neutral-300 mb-1.5">Special Requests or Notes <span class="text-neutral-400 text-xs font-normal">(optional)</span></label>
+            <textarea id="booking-notes" rows="2" maxlength="500" placeholder="e.g. Skin fade with razor finish, sensitive skin..."
+                      class="w-full px-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-amber-500 text-sm"></textarea>
+            <p class="text-[11px] text-neutral-400 mt-1">Payment is settled directly in cash at the shop after your service.</p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="button" id="submit-booking-btn" onclick="submitBooking()"
+                class="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-extrabold text-base transition-colors shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
+            <span>Confirm & Book Appointment</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    // State
+    const state = {
+        serviceId: @(Model.PreSelectedServiceId.HasValue ? Model.PreSelectedServiceId.Value.ToString() : "null"),
+        serviceName: '',
+        servicePrice: '',
+        serviceDuration: 0,
+        barberId: @(Model.PreSelectedBarberId.HasValue ? Model.PreSelectedBarberId.Value.ToString() : "null"),
+        barberName: '',
+        date: '@Model.TodayDateString',
+        slotUtc: '',
+        slotFormattedTime: '',
+        currentStep: 1
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check for deep-linked query parameters or pre-selections
+        if (state.serviceId) {
+            const card = document.querySelector(`.service-card[data-id="${state.serviceId}"]`);
+            if (card) {
+                state.serviceName = card.dataset.name;
+                state.servicePrice = card.dataset.price;
+                state.serviceDuration = parseInt(card.dataset.duration, 10);
+                highlightCard(card, 'service');
+            }
+        }
+
+        if (state.barberId) {
+            const card = document.querySelector(`.barber-card[data-id="${state.barberId}"]`);
+            if (card) {
+                state.barberName = card.dataset.name;
+                highlightCard(card, 'barber');
+            }
+        }
+
+        // Determine initial step based on pre-selections
+        if (state.serviceId && state.barberId) {
+            goToStep(3);
+        } else if (state.serviceId) {
+            goToStep(2);
+        } else {
+            goToStep(1);
+        }
+    });
+
+    function showError(msg) {
+        const box = document.getElementById('wizard-error-box');
+        const text = document.getElementById('wizard-error-message');
+        text.innerText = msg;
+        box.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearError() {
+        const box = document.getElementById('wizard-error-box');
+        box.classList.add('hidden');
+    }
+
+    function goToStep(step) {
+        clearError();
+
+        if (step > 1 && !state.serviceId) {
+            showError('Please select a service first.');
+            return;
+        }
+        if (step > 2 && !state.barberId) {
+            showError('Please select a barber first.');
+            return;
+        }
+        if (step > 3 && (!state.slotUtc || !state.date)) {
+            showError('Please select a date and an available time slot.');
+            return;
+        }
+
+        state.currentStep = step;
+
+        // Hide all steps
+        for (let i = 1; i <= 4; i++) {
+            const el = document.getElementById(`wizard-step-${i}`);
+            if (el) el.classList.toggle('hidden', i !== step);
+
+            const ind = document.getElementById(`step-indicator-${i}`);
+            if (ind) {
+                if (i < step) {
+                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-amber-500/20 text-amber-400 border-amber-500';
+                } else if (i === step) {
+                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-amber-500 text-neutral-950 border-amber-500';
+                } else {
+                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-neutral-900 text-neutral-400 border-neutral-700';
+                }
+            }
+        }
+
+        const progressPercent = ((step - 1) / 3) * 100;
+        document.getElementById('step-progress-bar').style.width = `${progressPercent}%`;
+
+        if (step === 3) {
+            loadAvailability();
+        } else if (step === 4) {
+            populateReview();
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectService(id, name, price, duration) {
+        state.serviceId = id;
+        state.serviceName = name;
+        state.servicePrice = price;
+        state.serviceDuration = duration;
+
+        document.querySelectorAll('.service-card').forEach(c => {
+            c.classList.remove('border-amber-500', 'bg-neutral-800/80');
+            c.classList.add('border-neutral-800', 'bg-neutral-900/80');
+        });
+        const chosen = document.querySelector(`.service-card[data-id="${id}"]`);
+        if (chosen) highlightCard(chosen, 'service');
+
+        goToStep(2);
+    }
+
+    function selectBarber(id, name) {
+        state.barberId = id;
+        state.barberName = name;
+
+        document.querySelectorAll('.barber-card').forEach(c => {
+            c.classList.remove('border-amber-500', 'bg-neutral-800/80');
+            c.classList.add('border-neutral-800', 'bg-neutral-900/80');
+        });
+        const chosen = document.querySelector(`.barber-card[data-id="${id}"]`);
+        if (chosen) highlightCard(chosen, 'barber');
+
+        goToStep(3);
+    }
+
+    function highlightCard(card, type) {
+        card.classList.remove('border-neutral-800', 'bg-neutral-900/80');
+        card.classList.add('border-amber-500', 'bg-neutral-800/80');
+    }
+
+    function onDateChanged() {
+        const picker = document.getElementById('booking-date-picker');
+        state.date = picker.value;
+        state.slotUtc = '';
+        state.slotFormattedTime = '';
+        loadAvailability();
+    }
+
+    async function loadAvailability() {
+        clearError();
+        const datePicker = document.getElementById('booking-date-picker');
+        const selectedDate = datePicker.value || state.date;
+        state.date = selectedDate;
+
+        const loading = document.getElementById('slots-loading');
+        const empty = document.getElementById('slots-empty');
+        const grid = document.getElementById('slots-grid');
+        const countBadge = document.getElementById('slots-count-badge');
+
+        loading.classList.remove('hidden');
+        empty.classList.add('hidden');
+        grid.innerHTML = '';
+        countBadge.classList.add('hidden');
+
+        try {
+            const resp = await fetch(`/api/barbers/${state.barberId}/availability?serviceId=${state.serviceId}&date=${selectedDate}`);
+            loading.classList.add('hidden');
+
+            if (!resp.ok) {
+                const errData = await resp.json().catch(() => null);
+                showError(errData?.error?.message || 'Could not load slots for this date.');
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            const data = await resp.json();
+            const slots = data.slotDetails || [];
+
+            if (slots.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            countBadge.innerText = `${slots.length} open`;
+            countBadge.classList.remove('hidden');
+
+            slots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'slot-btn py-3 px-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:border-amber-500/80 hover:bg-neutral-900 text-neutral-200 font-bold text-sm transition-all text-center';
+                btn.innerText = slot.formattedTime;
+                btn.onclick = () => selectSlot(btn, slot.startsAtUtc, slot.formattedTime);
+                grid.appendChild(btn);
+            });
+        } catch (e) {
+            loading.classList.add('hidden');
+            showError('Network error checking availability. Please try again.');
+        }
+    }
+
+    function selectSlot(btn, startsAtUtc, formattedTime) {
+        state.slotUtc = startsAtUtc;
+        state.slotFormattedTime = formattedTime;
+
+        document.querySelectorAll('.slot-btn').forEach(b => {
+            b.className = 'slot-btn py-3 px-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:border-amber-500/80 hover:bg-neutral-900 text-neutral-200 font-bold text-sm transition-all text-center';
+        });
+
+        btn.className = 'slot-btn py-3 px-2 rounded-xl border-2 border-amber-500 bg-amber-500/20 text-amber-300 font-extrabold text-sm transition-all text-center';
+
+        setTimeout(() => goToStep(4), 250);
+    }
+
+    function populateReview() {
+        document.getElementById('review-service-name').innerText = state.serviceName;
+        document.getElementById('review-service-duration').innerText = `${state.serviceDuration} minutes duration`;
+        document.getElementById('review-service-price').innerText = state.servicePrice;
+        document.getElementById('review-barber-name').innerText = state.barberName;
+        document.getElementById('review-date-str').innerText = state.date;
+        document.getElementById('review-time-str').innerText = state.slotFormattedTime;
+    }
+
+    async function submitBooking() {
+        clearError();
+        const btn = document.getElementById('submit-booking-btn');
+        const notes = document.getElementById('booking-notes').value;
+
+        btn.disabled = true;
+        btn.innerHTML = `
+            <div class="inline-block w-5 h-5 border-2 border-neutral-950/40 border-t-neutral-950 rounded-full animate-spin"></div>
+            <span>Reserving Slot...</span>
+        `;
+
+        try {
+            const resp = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    serviceId: state.serviceId,
+                    barberId: state.barberId,
+                    startsAt: state.slotUtc,
+                    notes: notes
+                })
+            });
+
+            if (resp.status === 201) {
+                const data = await resp.json();
+                window.location.href = `/book/confirmation/${data.referenceCode}`;
+                return;
+            }
+
+            const err = await resp.json().catch(() => null);
+            const errCode = err?.error?.code;
+            const errMsg = err?.error?.message || 'Failed to complete booking. Please try again.';
+
+            if (errCode === 'SLOT_TAKEN') {
+                showError('That time slot was just booked by another customer. Please select another time.');
+                goToStep(3);
+                loadAvailability();
+            } else {
+                showError(errMsg);
+            }
+        } catch (e) {
+            showError('A network error occurred while submitting your booking.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>Confirm & Book Appointment</span>';
+        }
+    }
+</script>
+

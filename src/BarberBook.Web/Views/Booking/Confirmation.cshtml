@@ -1,0 +1,85 @@
+@model BarberBook.Web.Models.Appointment.AppointmentDetailDto
+@{
+    Layout = "_LayoutCustomer";
+    ViewData["Title"] = "Booking Confirmed";
+}
+
+<div class="max-w-2xl mx-auto px-4 py-12 sm:px-6">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden">
+        <!-- Subtle gold background glow -->
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Success checkmark icon -->
+        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-50 tracking-tight">Booking Submitted!</h1>
+        <p class="mt-2 text-sm text-neutral-400">Your appointment request has been recorded successfully.</p>
+
+        <!-- Reference Code Highlight Box -->
+        <div class="mt-8 p-5 rounded-2xl bg-neutral-950 border border-neutral-800 max-w-sm mx-auto">
+            <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold block mb-1">Appointment Reference Code</span>
+            <span class="text-2xl sm:text-3xl font-mono font-extrabold text-amber-400 tracking-wider select-all" id="confirmation-ref-code">
+                @Model.ReferenceCode
+            </span>
+            <p class="text-[11px] text-neutral-400 mt-1.5">Save this code to track your booking.</p>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Status: @Model.StatusDisplay</span>
+        </div>
+
+        <!-- Summary Details Card -->
+        <div class="mt-8 bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-5 text-left divide-y divide-neutral-800/80 text-sm">
+            <div class="pb-3 flex justify-between items-center">
+                <span class="text-neutral-400">Service</span>
+                <span class="font-bold text-neutral-100">@Model.ServiceName</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+                <span class="text-neutral-400">Barber</span>
+                <span class="font-bold text-neutral-100">@Model.BarberName</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+                <span class="text-neutral-400">Date</span>
+                <span class="font-bold text-neutral-100">@Model.FormattedDate</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+                <span class="text-neutral-400">Time (Asia/Manila)</span>
+                <span class="font-bold text-amber-400">@Model.FormattedTime</span>
+            </div>
+            <div class="py-3 flex justify-between items-center">
+                <span class="text-neutral-400">Estimated Price</span>
+                <span class="font-extrabold text-amber-400 text-base">@Model.FormattedPrice</span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="pt-3">
+                    <span class="text-neutral-400 block text-xs">Customer Notes:</span>
+                    <span class="text-neutral-300 text-xs mt-0.5 block italic">"@Model.Notes"</span>
+                </div>
+            }
+        </div>
+
+        <p class="text-xs text-neutral-400 mt-4">
+            Payment will be settled in cash at the barber shop upon service completion.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="/my-appointments"
+               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-sm transition-colors text-center shadow-md">
+                My Appointments
+            </a>
+            <a href="/book"
+               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-bold text-sm transition-colors text-center border border-neutral-700">
+                Book Another
+            </a>
+        </div>
+    </div>
+</div>
+
