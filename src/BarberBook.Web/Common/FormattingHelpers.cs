@@ -54,6 +54,15 @@ public static class FormattingHelpers
     }
 
     /// <summary>
+    /// Formats a NodaTime Instant into readable date and 12-hour time in Asia/Manila, e.g. "Sep 14, 2026, 9:00 AM".
+    /// </summary>
+    public static string FormatDateTime(Instant utcInstant)
+    {
+        var zonedDateTime = utcInstant.InZone(ManilaZone);
+        return zonedDateTime.ToString("MMM d, yyyy, h:mm tt", EnUsCulture);
+    }
+
+    /// <summary>
     /// Formats a NodaTime LocalTime into 12-hour time, e.g. "9:00 AM".
     /// </summary>
     public static string FormatTime12h(LocalTime time)

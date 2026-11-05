@@ -253,6 +253,12 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
             var appAfter = await db.Appointments.FindAsync(appointmentId);
             appAfter!.Status.Should().Be(AppointmentStatus.Pending, "Appointment must NEVER be auto-cancelled when a day off is set");
+
+            // Clean up test appointment and day off
+            db.Appointments.Remove(appAfter);
+            var testDayOff = await db.DaysOff.FirstOrDefaultAsync(d => d.BarberId == 1 && d.Date == conflictDate);
+            if (testDayOff != null) db.DaysOff.Remove(testDayOff);
+            await db.SaveChangesAsync();
         }
     }
 

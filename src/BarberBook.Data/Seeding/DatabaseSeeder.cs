@@ -242,6 +242,21 @@ public static class DatabaseSeeder
             var existing = await context.Appointments.FirstOrDefaultAsync(a => a.ReferenceCode == item.Ref);
             if (existing != null)
             {
+                var hasHistory = await context.StatusHistories.AnyAsync(h => h.AppointmentId == existing.Id);
+                if (!hasHistory)
+                {
+                    context.StatusHistories.Add(new StatusHistory
+                    {
+                        AppointmentId = existing.Id,
+                        FromStatus = existing.Status == AppointmentStatus.Pending ? null : AppointmentStatus.Pending,
+                        ToStatus = existing.Status,
+                        ChangedById = adminUser.Id,
+                        ChangedByRole = "Admin",
+                        Note = "Initial seeded appointment creation",
+                        ChangedAt = existing.UpdatedAt
+                    });
+                    await context.SaveChangesAsync();
+                }
                 continue;
             }
 

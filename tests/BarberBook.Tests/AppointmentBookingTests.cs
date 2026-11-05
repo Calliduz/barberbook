@@ -407,7 +407,7 @@ public class AppointmentBookingTests : IClassFixture<WebApplicationFactory<Progr
         var clientRamon = await CreateAuthenticatedClientAsync("ramon@barberbook.local", "Demo@BarberBook2026!");
         var clientAdmin = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
 
-        var testDate = new LocalDate(2026, 12, 15); // Tuesday
+        var testDate = new LocalDate(2026, 12, 22); // Tuesday
         var slotInstant = testDate.At(new LocalTime(15, 0)).InZoneStrictly(_zone).ToInstant();
 
         // Clean up prior test data
@@ -438,7 +438,8 @@ public class AppointmentBookingTests : IClassFixture<WebApplicationFactory<Progr
         };
 
         var postResp = await clientJuan.PostAsJsonAsync("/api/appointments", payload);
-        postResp.StatusCode.Should().Be(HttpStatusCode.Created);
+        var errText = await postResp.Content.ReadAsStringAsync();
+        postResp.StatusCode.Should().Be(HttpStatusCode.Created, errText);
         var created = await postResp.Content.ReadFromJsonAsync<AppointmentDetailDto>();
 
         // 1. Mark (another customer) tries to view Juan's appointment -> 403 Forbidden

@@ -350,7 +350,8 @@ public class AuthAndRoleGuardTests : IClassFixture<WebApplicationFactory<Program
             if (routePattern.Equals("book", StringComparison.OrdinalIgnoreCase) ||
                 routePattern.Equals("my-appointments", StringComparison.OrdinalIgnoreCase) ||
                 routePattern.Equals("profile", StringComparison.OrdinalIgnoreCase) ||
-                routePattern.Equals("api/me/profile", StringComparison.OrdinalIgnoreCase))
+                routePattern.Equals("api/me/profile", StringComparison.OrdinalIgnoreCase) ||
+                routePattern.Equals("api/me/appointments", StringComparison.OrdinalIgnoreCase))
             {
                 var authorizeData = endpoint.Metadata.GetOrderedMetadata<Microsoft.AspNetCore.Authorization.IAuthorizeData>();
                 authorizeData.Should().NotBeEmpty($"Route '{routePattern}' must have an [Authorize] guard");
