@@ -45,9 +45,18 @@ public class AccountController : Controller
         return View(new LoginModel { ReturnUrl = returnUrl });
     }
 
+    [HttpGet("api/auth/login")]
+    [AllowAnonymous]
+    public IActionResult ApiLoginGetRedirect(string? returnUrl = null)
+    {
+        var target = string.IsNullOrEmpty(returnUrl) ? "/login" : $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        return Redirect(target);
+    }
+
     [HttpPost]
     [AllowAnonymous]
     [EnableRateLimiting("auth-policy")]
+    [Route("login")]
     [Route("Account/Login")]
     [Route("api/auth/login")]
     public async Task<IActionResult> Login([FromBody] LoginModel? jsonModel, [FromForm] LoginModel? formModel)
@@ -133,9 +142,18 @@ public class AccountController : Controller
         return View(new RegisterModel());
     }
 
+    [HttpGet("api/auth/register")]
+    [AllowAnonymous]
+    public IActionResult ApiRegisterGetRedirect(string? returnUrl = null)
+    {
+        var target = string.IsNullOrEmpty(returnUrl) ? "/register" : $"/register?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        return Redirect(target);
+    }
+
     [HttpPost]
     [AllowAnonymous]
     [EnableRateLimiting("auth-policy")]
+    [Route("register")]
     [Route("Account/Register")]
     [Route("api/auth/register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel? jsonModel, [FromForm] RegisterModel? formModel)

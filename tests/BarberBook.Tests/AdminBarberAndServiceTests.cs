@@ -16,7 +16,7 @@ using Xunit;
 
 namespace BarberBook.Tests;
 
-public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Program>>
+public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory;
 
@@ -456,5 +456,41 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         servicePage.Should().NotBeNull();
         servicePage!.Items.Count.Should().Be(2);
         servicePage.TotalCount.Should().BeGreaterThanOrEqualTo(4);
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+
+        // Clean up test barbers (Id > 3)
+        var testBarbers = await db.Barbers
+            .Include(b => b.User)
+            .Where(b => b.Id > 3)
+            .ToListAsync();
+
+        if (testBarbers.Count > 0)
+        {
+            var userIds = testBarbers.Select(b => b.UserId).ToList();
+            db.Barbers.RemoveRange(testBarbers);
+            await db.SaveChangesAsync();
+
+            var testUsers = await db.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+            db.Users.RemoveRange(testUsers);
+            await db.SaveChangesAsync();
+        }
+
+        // Clean up test services (Id > 4)
+        var testServices = await db.Services
+            .Where(s => s.Id > 4)
+            .ToListAsync();
+
+        if (testServices.Count > 0)
+        {
+            db.Services.RemoveRange(testServices);
+            await db.SaveChangesAsync();
+        }
     }
 }

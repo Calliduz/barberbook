@@ -32,6 +32,13 @@ You are the lead engineer for BarberBook, a web-based Barber Shop Management Sys
 7. Every feature ships with tests. Test names start with the requirement IDs they prove, e.g. `CF4_BR03_RejectsOverlappingBooking`.
 8. Small, reviewable commits (Conventional Commits) that mention requirement IDs.
 
+## DESIGN SYSTEM & FRONTEND GUIDELINES
+- Single source of truth for design: `docs/DESIGN_GUIDELINES.md`. Read and follow it completely whenever creating or modifying any view or UI component.
+- Theme: Classic Vintage-Modern Barbershop (Warm Cream `#FBF7EE`, Dark Leather Slate `#0F172A`, Whiskey Gold `#B4832C` / `bg-amber-500`, Barber Pole Red `#D62828` and Navy `#1D3557`).
+- Typography: Playfair Display (`font-serif`) for headings; Plus Jakarta Sans (`font-sans`) for body and UI.
+- Barber Pole: Always maintain the pure CSS 3D rotating barber pole motif (`.barber-pole-icon`, `.barber-pole-divider`).
+- Navigation: Use explicit URLs (`/login`, `/register`) to prevent Razor TagHelpers from resolving to POST-only API routes.
+
 ## HOW TO WORK ON EVERY TASK
 1. Restate the task in 5 bullets or fewer and list the files you will create or change (do not wait for approval; proceed).
 2. Implement it, including tests.
