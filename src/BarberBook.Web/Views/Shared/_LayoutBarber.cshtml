@@ -61,11 +61,9 @@
                         <a href="/barber/account" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/account") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             Account
                         </a>
-                        <!-- P16 Placeholder: Disabled My Equipment -->
-                        <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-500 bg-slate-800/40 border border-slate-800 cursor-not-allowed opacity-60 select-none" title="Equipment tracking will be enabled in P16">
-                            <span>My Equipment</span>
-                            <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-slate-700">P16</span>
-                        </span>
+                        <a href="/barber/equipment" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            My Equipment
+                        </a>
                     </nav>
                 </div>
 
@@ -87,7 +85,7 @@
             <a href="/barber/availability" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/availability") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Availability</a>
             <a href="/barber/transactions" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Transactions</a>
             <a href="/barber/account" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/account") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Account</a>
-            <span class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-500 opacity-60 cursor-not-allowed">Equipment (P16)</span>
+            <a href="/barber/equipment" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Equipment</a>
         </div>
     </header>
 
