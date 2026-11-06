@@ -551,7 +551,7 @@ Report which T-IDs pass.
 ```
 
 **Done when**
-- [ ] `docs/TEST_MATRIX.md` exists, all T-01..T-22 are green, and CI runs unit, API and end-to-end tests.
+- [x] `docs/TEST_MATRIX.md` exists, all T-01..T-22 are green, and CI runs unit, API and end-to-end tests.
 
 ---
 

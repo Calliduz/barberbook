@@ -29,4 +29,5 @@ playwright/.cache/
 ## Logs & Temp
 *.log
 .system_generated/
+TestResults/
 

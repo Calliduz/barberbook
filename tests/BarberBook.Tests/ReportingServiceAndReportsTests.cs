@@ -46,6 +46,11 @@ public class ReportingServiceAndReportsTests : IClassFixture<WebApplicationFacto
             .ToListAsync();
         if (testNoise.Count > 0)
         {
+            var noiseIds = testNoise.Select(n => n.Id).ToList();
+            var noiseHistories = await db.StatusHistories
+                .Where(h => noiseIds.Contains(h.AppointmentId))
+                .ToListAsync();
+            db.StatusHistories.RemoveRange(noiseHistories);
             db.Appointments.RemoveRange(testNoise);
             await db.SaveChangesAsync();
         }
