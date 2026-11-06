@@ -1,0 +1,310 @@
+@model BarberBook.Web.Models.Barber.BarberAppointmentsViewModel
+@{
+    ViewData["Title"] = "Barber Appointments";
+}
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>STATUS WORKFLOW & TRANSITIONS</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Barber Appointments</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                Barber: <span class="font-bold text-slate-800">@Model.BarberName</span> &bull; Manage your clients and update appointment statuses (BF-4, OB-5).
+            </p>
+        </div>
+
+        <!-- Quick Status Pills -->
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="/barber/appointments" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition @(string.IsNullOrEmpty(Model.StatusFilter) ? "bg-slate-900 text-white border-slate-900 shadow-sm" : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50")">
+                All (@Model.TotalCount)
+            </a>
+            <a href="/barber/appointments?status=pending" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition @(Model.StatusFilter == "pending" ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm" : "bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100")">
+                Pending (@Model.PendingCount)
+            </a>
+            <a href="/barber/appointments?status=confirmed" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition @(Model.StatusFilter == "confirmed" ? "bg-blue-600 text-white border-blue-600 shadow-sm" : "bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100")">
+                Confirmed (@Model.ConfirmedCount)
+            </a>
+            <a href="/barber/appointments?status=completed" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition @(Model.StatusFilter == "completed" ? "bg-emerald-600 text-white border-emerald-600 shadow-sm" : "bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100")">
+                Completed (@Model.CompletedCount)
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
+        <form method="get" action="/barber/appointments" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div class="sm:col-span-2">
+                <input type="text" name="search" value="@Model.SearchTerm" placeholder="Search by customer name, ref code (BB-...), or service..."
+                       class="w-full px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+            </div>
+            <div>
+                <select name="status" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                    <option value="">All Statuses</option>
+                    <option value="pending" selected="@(Model.StatusFilter == "pending")">Pending</option>
+                    <option value="confirmed" selected="@(Model.StatusFilter == "confirmed")">Confirmed</option>
+                    <option value="completed" selected="@(Model.StatusFilter == "completed")">Completed</option>
+                    <option value="cancelled" selected="@(Model.StatusFilter == "cancelled")">Cancelled</option>
+                    <option value="rejected" selected="@(Model.StatusFilter == "rejected")">Rejected</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit" class="flex-1 py-2 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Filter
+                </button>
+                @if (!string.IsNullOrEmpty(Model.SearchTerm) || !string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <a href="/barber/appointments" class="py-2 px-3 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition">
+                        Reset
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+        @if (!Model.Appointments.Any())
+        {
+            <div class="py-16 text-center text-slate-400">
+                <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                <p class="text-base font-semibold text-slate-700">No appointments found matching your criteria.</p>
+                <p class="text-xs text-slate-400 mt-1">Try resetting the status filter or search parameters.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
+                        <tr>
+                            <th class="py-3.5 px-6">Reference / Date</th>
+                            <th class="py-3.5 px-6">Customer</th>
+                            <th class="py-3.5 px-6">Service</th>
+                            <th class="py-3.5 px-6">Fee</th>
+                            <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6 text-right">Workflow Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                        @foreach (var app in Model.Appointments)
+                        {
+                            var badgeClass = app.Status switch
+                            {
+                                BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+                                BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+                                BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+                                BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+                                BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
+                                _ => "bg-slate-100 text-slate-700"
+                            };
+
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="py-4 px-6">
+                                    <div class="font-mono font-bold text-amber-800 text-xs">@app.ReferenceCode</div>
+                                    <div class="font-bold text-slate-900 mt-0.5">@app.ScheduledDateFormatted</div>
+                                    <div class="text-[11px] text-slate-500">@app.ScheduledTime12h</div>
+                                </td>
+                                <td class="py-4 px-6 text-slate-900">
+                                    <div class="font-bold text-slate-900">@app.CustomerName</div>
+                                    <div class="text-[11px] text-slate-500">@app.CustomerPhone</div>
+                                    <div class="text-[10px] text-slate-400">@app.CustomerEmail</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="font-bold text-slate-800">@app.ServiceName</div>
+                                    @if (!string.IsNullOrWhiteSpace(app.Notes))
+                                    {
+                                        <div class="text-[11px] text-slate-500 italic mt-0.5 truncate max-w-xs" title="@app.Notes">
+                                            "@app.Notes"
+                                        </div>
+                                    }
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">
+                                    @app.FormattedPrice
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border @badgeClass capitalize">
+                                        @app.StatusString
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                        @if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
+                                        {
+                                            <!-- Confirm Action -->
+                                            <form method="post" action="/barber/appointments/@app.Id/status" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="to" value="confirmed" />
+                                                <button type="submit" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs">
+                                                    Confirm
+                                                </button>
+                                            </form>
+
+                                            <!-- Reject Action -->
+                                            <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'rejected')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition">
+                                                Reject
+                                            </button>
+
+                                            <!-- Cancel Action -->
+                                            <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                                                Cancel
+                                            </button>
+                                        }
+                                        else if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Confirmed)
+                                        {
+                                            <!-- Complete Action -->
+                                            <form method="post" action="/barber/appointments/@app.Id/status" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="to" value="completed" />
+                                                <button type="submit" class="px-3 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-xs">
+                                                    Complete Service
+                                                </button>
+                                            </form>
+
+                                            <!-- Cancel Action -->
+                                            <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                                                Cancel
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-[11px] font-semibold text-slate-400 italic">Terminal</span>
+                                        }
+
+                                        <!-- View History Drawer Button -->
+                                        <button type="button" onclick="openHistoryModal(@app.Id)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition" title="View Audit Timeline">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal for Reason / Note (Reject / Cancel) -->
+<div id="actionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+        <h3 id="modalTitle" class="text-xl font-serif font-bold text-slate-900">Update Status</h3>
+        <p id="modalDescription" class="text-xs text-slate-600 mt-1">Please provide an optional reason or note for this status change.</p>
+
+        <form id="actionForm" method="post" action="" class="mt-4 space-y-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="modalTargetStatus" name="to" value="" />
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reason / Note (optional)</label>
+                <textarea name="note" rows="3" placeholder="e.g. Client requested cancellation or scheduling conflict..."
+                          class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeActionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Back
+                </button>
+                <button type="submit" id="modalSubmitBtn" class="px-4 py-2 rounded-xl text-xs font-bold text-white transition">
+                    Confirm Action
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for Audit Timeline -->
+<div id="historyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[85vh] flex flex-col">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+                <h3 class="text-xl font-serif font-bold text-slate-900">Status History Timeline</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Audit log of all transitions on this appointment</p>
+            </div>
+            <button type="button" onclick="closeHistoryModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <div id="historyTimelineContent" class="py-6 overflow-y-auto flex-1 space-y-4">
+            <!-- Dynamically populated via JS -->
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 text-right">
+            <button type="button" onclick="closeHistoryModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const appointmentsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Appointments.Select(a => new {
+        id = a.Id,
+        refCode = a.ReferenceCode,
+        histories = a.StatusHistories
+    })));
+
+    function openActionModal(id, refCode, targetStatus) {
+        const form = document.getElementById('actionForm');
+        form.action = `/barber/appointments/${id}/status`;
+        document.getElementById('modalTargetStatus').value = targetStatus;
+
+        const title = document.getElementById('modalTitle');
+        const submitBtn = document.getElementById('modalSubmitBtn');
+
+        if (targetStatus === 'rejected') {
+            title.textContent = `Reject Appointment #${refCode}`;
+            submitBtn.textContent = 'Reject Booking';
+            submitBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white shadow-sm';
+        } else if (targetStatus === 'cancelled') {
+            title.textContent = `Cancel Appointment #${refCode}`;
+            submitBtn.textContent = 'Cancel Booking';
+            submitBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white shadow-sm';
+        }
+
+        document.getElementById('actionModal').classList.remove('hidden');
+    }
+
+    function closeActionModal() {
+        document.getElementById('actionModal').classList.add('hidden');
+    }
+
+    function openHistoryModal(id) {
+        const app = appointmentsData.find(a => a.id === id);
+        const container = document.getElementById('historyTimelineContent');
+        container.innerHTML = '';
+
+        if (!app || !app.histories || app.histories.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No historical status records found.</p>';
+        } else {
+            let html = '<div class="space-y-4 relative border-l-2 border-slate-200 ml-4 pl-4">';
+            app.histories.forEach(h => {
+                html += `
+                    <div class="relative">
+                        <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-amber-500 border-2 border-white shadow-xs"></div>
+                        <div class="text-xs font-bold text-slate-900">
+                            Transition: <span class="capitalize text-slate-600">${h.FromStatus}</span> &rarr; <span class="capitalize text-amber-800 font-extrabold">${h.ToStatus}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">
+                            By ${h.ChangedByRole} &bull; ${h.TimestampFormatted}
+                        </div>
+                        ${h.Note ? `<div class="mt-1 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 italic">"${h.Note}"</div>` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        document.getElementById('historyModal').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+        document.getElementById('historyModal').classList.add('hidden');
+    }
+</script>

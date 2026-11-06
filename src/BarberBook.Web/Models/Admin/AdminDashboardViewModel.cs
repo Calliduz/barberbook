@@ -40,3 +40,4 @@ public class AdminDashboardBarberItem
     public string FormattedRevenue { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }
+

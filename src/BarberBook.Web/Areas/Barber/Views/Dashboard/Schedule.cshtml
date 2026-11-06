@@ -1,0 +1,199 @@
+@model BarberBook.Web.Models.Barber.BarberScheduleViewModel
+@{
+    ViewData["Title"] = "My Schedule Calendar";
+}
+
+<div class="space-y-6">
+    <!-- Header with Date Controls & View Switcher -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>APPOINTMENT CALENDAR</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">My Work Schedule</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                Barber: <span class="font-bold text-slate-800">@Model.BarberName</span> &bull; Current Hours: <span class="font-semibold text-amber-700">@Model.WorkingHoursToday</span>
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- View Mode Switcher -->
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-bold">
+                <a href="/barber/schedule?date=@Model.SelectedDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)&view=day"
+                   class="px-4 py-2 rounded-lg transition @(Model.ViewMode == "day" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900")">
+                    Day View
+                </a>
+                <a href="/barber/schedule?date=@Model.SelectedDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)&view=week"
+                   class="px-4 py-2 rounded-lg transition @(Model.ViewMode == "week" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900")">
+                    Week View
+                </a>
+            </div>
+
+            <!-- Date Stepper -->
+            <div class="flex items-center gap-1.5">
+                <a href="/barber/schedule?date=@Model.PrevDateString&view=@Model.ViewMode"
+                   class="p-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition"
+                   title="Previous @(Model.ViewMode == "week" ? "Week" : "Day")">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                </a>
+                <a href="/barber/schedule?date=@Model.TodayDateString&view=@Model.ViewMode"
+                   class="px-3.5 py-2 rounded-xl text-xs font-bold border border-amber-500/40 bg-amber-50 text-amber-900 hover:bg-amber-100 transition">
+                    Today
+                </a>
+                <a href="/barber/schedule?date=@Model.NextDateString&view=@Model.ViewMode"
+                   class="p-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition"
+                   title="Next @(Model.ViewMode == "week" ? "Week" : "Day")">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ViewMode == "day")
+    {
+        <!-- Day View -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
+                <div>
+                    <span class="text-xs uppercase tracking-wider font-bold text-amber-700">Selected Day</span>
+                    <h2 class="text-2xl font-serif font-bold text-slate-900">@Model.SelectedDateFormatted</h2>
+                </div>
+                <div class="text-xs font-medium text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200">
+                    Total Bookings: <span class="font-bold text-slate-900">@Model.DayAppointments.Count</span>
+                </div>
+            </div>
+
+            @if (!Model.DayAppointments.Any())
+            {
+                <div class="py-16 text-center text-slate-400">
+                    <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p class="text-base font-semibold text-slate-700">No appointments scheduled for this date.</p>
+                    <p class="text-xs text-slate-400 mt-1">Check another date or adjust your availability settings.</p>
+                </div>
+            }
+            else
+            {
+                <div class="divide-y divide-slate-100">
+                    @foreach (var app in Model.DayAppointments)
+                    {
+                        var badgeClass = app.Status switch
+                        {
+                            BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
+                            _ => "bg-slate-100 text-slate-700"
+                        };
+
+                        <div class="p-6 hover:bg-slate-50/70 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="px-3 py-2 rounded-xl bg-slate-900 text-amber-300 font-bold text-xs text-center shrink-0 border border-slate-800">
+                                    <div class="text-[10px] text-slate-400 font-normal">SLOT</div>
+                                    @app.ScheduledTime12h
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-base font-bold text-slate-900">@app.ServiceName</h3>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border @badgeClass capitalize">
+                                            @app.StatusString
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 mt-1">
+                                        Client: <span class="font-bold text-slate-800">@app.CustomerName</span>
+                                        <span class="text-slate-400">&bull;</span>
+                                        Phone: <span class="font-medium text-slate-700">@app.CustomerPhone</span>
+                                        <span class="text-slate-400">&bull;</span>
+                                        Ref: <code class="text-amber-800 font-mono font-bold">@app.ReferenceCode</code>
+                                    </p>
+                                    @if (!string.IsNullOrWhiteSpace(app.Notes))
+                                    {
+                                        <p class="text-xs text-slate-500 italic mt-1 bg-amber-50/60 border border-amber-200/50 rounded-lg px-2.5 py-1 inline-block">
+                                            Note: @app.Notes
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4 shrink-0 sm:self-center">
+                                <span class="text-base font-bold text-slate-900">@app.FormattedPrice</span>
+                                <a href="/barber/appointments?search=@app.ReferenceCode"
+                                   class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                                    Manage
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Week View -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between text-xs text-slate-500 px-2">
+                <span>Week of <strong class="text-slate-800">@Model.WeekStartDateFormatted &ndash; @Model.WeekEndDateFormatted</strong></span>
+                <span>Click any day to view details</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
+                @foreach (var day in Model.WeekDays)
+                {
+                    <div class="bg-white rounded-2xl border @(day.IsSelected ? "border-amber-500 ring-2 ring-amber-500/20" : day.IsToday ? "border-slate-800" : "border-slate-200/90") shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-3 border-b @(day.IsSelected ? "bg-amber-50 text-amber-900" : day.IsToday ? "bg-slate-900 text-white" : "bg-slate-50 text-slate-700") flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wider">@day.DayName.Substring(0, 3)</p>
+                                <p class="text-sm font-serif font-black">@day.DateFormatted</p>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-full @(day.Appointments.Any() ? "bg-amber-500 text-slate-950" : "bg-slate-200 text-slate-600")">
+                                @day.Appointments.Count
+                            </span>
+                        </div>
+
+                        <div class="p-3 space-y-2 flex-1 min-h-[160px] bg-slate-50/30">
+                            @if (!day.Appointments.Any())
+                            {
+                                <p class="text-[11px] text-slate-400 text-center py-6">No cuts scheduled</p>
+                            }
+                            else
+                            {
+                                @foreach (var app in day.Appointments)
+                                {
+                                    var badgeBg = app.Status switch
+                                    {
+                                        BarberBook.Data.Enums.AppointmentStatus.Pending => "border-amber-300 bg-amber-50 text-amber-900",
+                                        BarberBook.Data.Enums.AppointmentStatus.Confirmed => "border-blue-300 bg-blue-50 text-blue-900",
+                                        BarberBook.Data.Enums.AppointmentStatus.Completed => "border-emerald-300 bg-emerald-50 text-emerald-900",
+                                        _ => "border-slate-200 bg-white text-slate-700"
+                                    };
+
+                                    <div class="p-2.5 rounded-xl border @badgeBg text-xs shadow-xs space-y-1">
+                                        <div class="font-bold text-[11px] text-slate-900 truncate">
+                                            @app.ScheduledTime12h
+                                        </div>
+                                        <div class="font-semibold text-slate-800 truncate" title="@app.CustomerName">
+                                            @app.CustomerName
+                                        </div>
+                                        <div class="text-[10px] text-slate-500 truncate">
+                                            @app.ServiceName
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="p-2 bg-white border-t border-slate-100 text-center">
+                            <a href="/barber/schedule?date=@day.Date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)&view=day"
+                               class="text-[11px] font-bold text-amber-700 hover:text-amber-900 transition">
+                                Open Day View &rarr;
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+

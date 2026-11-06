@@ -146,3 +146,4 @@ public class AdminCustomerItemViewModel
     public string FormattedTotalSpent { get; set; } = string.Empty;
     public string LastVisit { get; set; } = string.Empty;
 }
+

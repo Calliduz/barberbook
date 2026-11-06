@@ -1,0 +1,141 @@
+@model BarberBook.Web.Models.Barber.BarberEquipmentViewModel
+@{
+    ViewData["Title"] = "My Equipment";
+}
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>EQUIPMENT MONITORING (BF-6, HW-1, HW-3)</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">My Assigned Equipment</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                Barber: <span class="font-bold text-slate-800">@Model.BarberName</span> &bull; Monitor your workstation clippers, shears, and chairs and record inspections (HW-3).
+            </p>
+        </div>
+
+        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-3 text-xs text-amber-900 font-medium">
+            Assigned Tools: <span class="font-bold text-amber-800">@Model.Items.Count items</span>
+        </div>
+    </div>
+
+    <!-- Equipment Cards Grid -->
+    @if (!Model.Items.Any())
+    {
+        <div class="bg-white rounded-3xl p-16 text-center text-slate-400 border border-slate-200/90 shadow-sm">
+            <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.07a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.118.58.094 1.193-.07 1.743" /></svg>
+            <p class="text-base font-semibold text-slate-700">No equipment currently assigned to you.</p>
+            <p class="text-xs text-slate-400 mt-1">Please consult your shop administrator to register tool assignments.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var item in Model.Items)
+            {
+                var condLower = item.Condition.ToLowerInvariant();
+                var badgeClass = condLower.Contains("good")
+                    ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    : condLower.Contains("fair")
+                        ? "bg-amber-100 text-amber-800 border-amber-300"
+                        : "bg-red-100 text-red-800 border-red-300";
+
+                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:border-amber-500/40 transition">
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <span class="font-mono text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    @item.SerialNumber
+                                </span>
+                                <h3 class="text-lg font-serif font-bold text-slate-900 mt-2">@item.Name</h3>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border @badgeClass shrink-0 capitalize">
+                                @item.Condition
+                            </span>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-xs space-y-1.5 text-slate-600">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Last Inspection:</span>
+                                <span class="font-semibold text-slate-800">@item.LastInspectionDate</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Next Due Date:</span>
+                                <span class="font-semibold text-amber-800">@item.NextInspectionDue</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(item.LastNotes))
+                            {
+                                <div class="pt-1.5 border-t border-slate-200/60 text-[11px] italic text-slate-500">
+                                    "@item.LastNotes"
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-[11px] text-slate-400 font-medium">Assigned to: @item.AssignedToBarber</span>
+                        <button type="button" onclick="openInspectionModal(@item.Id, '@item.Name', '@item.SerialNumber')"
+                                class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-xs">
+                            Log Check
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Log Inspection Modal -->
+<div id="inspectionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+        <h3 id="inspectModalTitle" class="text-xl font-serif font-bold text-slate-900">Equipment Inspection</h3>
+        <p id="inspectModalSubtitle" class="text-xs text-slate-600 mt-1">Record a condition audit on this tool (HW-3).</p>
+
+        <form id="inspectionForm" method="post" action="" class="mt-5 space-y-4">
+            @Html.AntiForgeryToken()
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Equipment Condition</label>
+                <select name="condition" required class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                    <option value="Good">Good &mdash; Fully operational and sanitized</option>
+                    <option value="Fair">Fair &mdash; Minor wear, acceptable for service</option>
+                    <option value="Needs Maintenance">Needs Maintenance &mdash; Dull blades or requires service</option>
+                    <option value="Poor">Poor &mdash; Out of service</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Audit Notes / Sanitization Log (optional)</label>
+                <textarea name="notes" rows="3" placeholder="e.g. Cleaned, oiled blades, tension adjusted..."
+                          class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeInspectionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Record Inspection
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openInspectionModal(id, name, serial) {
+        const form = document.getElementById('inspectionForm');
+        form.action = `/barber/equipment/${id}/inspect`;
+        document.getElementById('inspectModalTitle').textContent = `Log Inspection: ${name}`;
+        document.getElementById('inspectModalSubtitle').textContent = `Serial No: ${serial}`;
+        document.getElementById('inspectionModal').classList.remove('hidden');
+    }
+
+    function closeInspectionModal() {
+        document.getElementById('inspectionModal').classList.add('hidden');
+    }
+</script>
+

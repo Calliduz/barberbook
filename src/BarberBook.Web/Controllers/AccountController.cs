@@ -256,14 +256,19 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    [HttpGet]
     [HttpPost]
-    [Authorize]
+    [AllowAnonymous]
+    [Route("logout")]
     [Route("Account/Logout")]
     [Route("api/auth/logout")]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
-        _logger.LogInformation("User logged out");
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out");
+        }
 
         if (IsApiOrJsonRequest())
         {
@@ -373,6 +378,12 @@ public class AccountController : Controller
         var path = Request.Path.Value ?? string.Empty;
         var accept = Request.Headers.Accept.ToString();
         var contentType = Request.ContentType ?? string.Empty;
+
+        // If client explicitly requests HTML in a browser navigation, treat as web navigation
+        if (accept.Contains("text/html") && !accept.Contains("application/json"))
+        {
+            return false;
+        }
 
         return path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase) ||
                accept.Contains("application/json") ||

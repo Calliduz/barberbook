@@ -1,23 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-[#FBF7EE]">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BarberBook Barber Portal</title>
+    
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                    },
                     colors: {
                         brand: {
                             50: '#fbf7ee',
                             100: '#f5edd6',
+                            200: '#eddcb2',
+                            300: '#e1c587',
+                            400: '#d4a359',
                             500: '#b4832c',
                             600: '#9b6c20',
                             700: '#7a5119',
                             800: '#5c3d14',
                             900: '#3c270d'
+                        },
+                        barber: {
+                            red: '#D62828',
+                            blue: '#1D3557',
+                            cream: '#FBF7EE',
+                            leather: '#0F172A',
+                            charcoal: '#1E293B',
+                            gold: '#B4832C'
                         }
                     }
                 }
@@ -27,44 +49,117 @@
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="flex flex-col min-h-full text-slate-800 antialiased bg-slate-50">
+<body class="flex flex-col min-h-full text-slate-800 antialiased font-sans selection:bg-brand-500 selection:text-white bg-[#FBF7EE]">
+    <!-- Animated Barber Pole Ribbon Divider -->
     <div class="barber-pole-divider"></div>
-    <header class="bg-slate-900 text-white shadow sticky top-0 z-50">
+
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-6">
-                    <a href="/barber" class="flex items-center space-x-2.5">
-                        <div class="barber-pole-icon" style="height: 20px; width: 10px;"></div>
-                        <span class="text-2xl font-serif font-black tracking-tight text-brand-400">Barber<span class="text-white font-sans font-bold">Book</span></span>
-                        <span class="text-xs uppercase px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 font-semibold border border-blue-700">Barber</span>
+            <div class="flex items-center justify-between h-18 py-3">
+                <div class="flex items-center space-x-6 lg:space-x-8">
+                    <!-- Brand with Spinning Barber Pole Icon -->
+                    <a href="/barber" class="flex items-center space-x-3 group">
+                        <div class="barber-pole-icon shadow-lg group-hover:scale-105 transition-transform"></div>
+                        <div class="flex flex-col">
+                            <span class="text-2xl font-serif font-black tracking-tight text-brand-400 group-hover:text-brand-300 transition-colors">
+                                Barber<span class="text-white font-sans font-extrabold">Book</span>
+                            </span>
+                            <span class="text-[9px] uppercase tracking-widest text-brand-400/80 font-bold -mt-1 flex items-center gap-1">
+                                <span>Barber Craftsman Portal</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                            </span>
+                        </div>
                     </a>
-                    <nav class="hidden md:flex space-x-1">
-                        <a href="/barber" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Dashboard</a>
-                        <a href="/barber/schedule" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Schedule</a>
-                        <a href="/barber/appointments" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Appointments</a>
-                        <a href="/barber/availability" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Availability & Days Off</a>
-                        <a href="/barber/transactions" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Transactions</a>
-                        <a href="/barber/equipment" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">My Equipment</a>
+
+                    <!-- Barber Navigation Links -->
+                    @{
+                        var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? "";
+                    }
+                    <nav class="hidden xl:flex space-x-1 items-center">
+                        <a href="/barber" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath == "/barber" ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            Dashboard
+                        </a>
+                        <a href="/barber/schedule" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/schedule") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            My Schedule
+                        </a>
+                        <a href="/barber/appointments" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/appointments") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            Appointments
+                        </a>
+                        <a href="/barber/availability" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/availability") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            Availability & Days Off
+                        </a>
+                        <a href="/barber/transactions" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            My Transactions
+                        </a>
+                        <a href="/barber/equipment" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                            My Equipment
+                        </a>
                     </nav>
                 </div>
-                <div>
+
+                <div class="flex items-center space-x-3">
+                    <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition">
+                        <span>View Shop</span>
+                        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                    </a>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </div>
+
+        <!-- Sub-nav on medium screens -->
+        <div class="xl:hidden bg-slate-950/90 border-t border-slate-800 px-4 py-2 overflow-x-auto flex gap-2">
+            <a href="/barber" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath == "/barber" ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Dashboard</a>
+            <a href="/barber/schedule" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/schedule") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Schedule</a>
+            <a href="/barber/appointments" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/appointments") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Appointments</a>
+            <a href="/barber/availability" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/availability") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Availability</a>
+            <a href="/barber/transactions" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Transactions</a>
+            <a href="/barber/equipment" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Equipment</a>
+        </div>
     </header>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center shadow-sm">
+                <svg class="h-5 w-5 text-emerald-500 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-semibold flex items-center shadow-sm">
+                <svg class="h-5 w-5 text-red-500 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>@TempData["ErrorMessage"]</span>
+            </div>
+        </div>
+    }
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @RenderBody()
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 text-sm text-center border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; @DateTime.UtcNow.Year BarberBook — Barber Portal</p>
+    <footer class="bg-slate-900 text-slate-400 py-8 text-xs border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <div class="barber-pole-icon" style="height: 18px; width: 10px;"></div>
+                <span class="font-serif font-bold text-brand-400">Barber<span class="text-white font-sans">Book</span></span>
+                <span class="text-slate-600">&bull;</span>
+                <span class="text-slate-400">Barber Portal &bull; Shop Zone Asia/Manila (UTC+8)</span>
+            </div>
+            <div>
+                &copy; @DateTime.UtcNow.Year BarberBook Management System. Group 4 SBIT-3D.
+            </div>
         </div>
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

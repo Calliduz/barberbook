@@ -1,5 +1,6 @@
 using BarberBook.Data;
 using BarberBook.Web.Common;
+using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace BarberBook.Web.Areas.Admin.Controllers;
 public class InventoryController : Controller
 {
     private readonly BarberBookDbContext _dbContext;
+    private readonly IEquipmentService _equipmentService;
 
-    public InventoryController(BarberBookDbContext dbContext)
+    public InventoryController(BarberBookDbContext dbContext, IEquipmentService equipmentService)
     {
         _dbContext = dbContext;
+        _equipmentService = equipmentService;
     }
 
     [HttpGet("admin/inventory")]
@@ -22,16 +25,17 @@ public class InventoryController : Controller
     {
         var barbers = await _dbContext.Barbers.Where(b => b.IsActive).OrderBy(b => b.DisplayName).ToListAsync();
 
-        // Sample initial equipment assignment catalog per HW-1/HW-3 reference
-        var equipmentList = new List<AdminEquipmentItem>
+        var equipmentItems = _equipmentService.GetAll();
+        var equipmentList = equipmentItems.Select(e => new AdminEquipmentItem
         {
-            new() { Id = 1, Name = "Wahl Magic Clip Cordless", SerialNumber = "EQ-WMC-01", AssignedToBarber = "Ramon", Condition = "Good", LastInspectionDate = "Oct 28, 2026", NextInspectionDue = "Nov 28, 2026" },
-            new() { Id = 2, Name = "Andis Master Cordless Clipper", SerialNumber = "EQ-AMC-02", AssignedToBarber = "Dennis", Condition = "Good", LastInspectionDate = "Nov 02, 2026", NextInspectionDue = "Dec 02, 2026" },
-            new() { Id = 3, Name = "BaBylissPRO GoldFX Trimmer", SerialNumber = "EQ-BGT-03", AssignedToBarber = "Miguel", Condition = "Good", LastInspectionDate = "Nov 01, 2026", NextInspectionDue = "Dec 01, 2026" },
-            new() { Id = 4, Name = "Kamisori Classic Japanese Shears", SerialNumber = "EQ-KJS-04", AssignedToBarber = "Ramon", Condition = "Fair", LastInspectionDate = "Oct 15, 2026", NextInspectionDue = "Nov 15, 2026" },
-            new() { Id = 5, Name = "Feather Artist Club DX Straight Razor", SerialNumber = "EQ-FAR-05", AssignedToBarber = "Dennis", Condition = "Good", LastInspectionDate = "Oct 22, 2026", NextInspectionDue = "Nov 22, 2026" },
-            new() { Id = 6, Name = "Takara Belmont Vintage Barber Chair #1", SerialNumber = "EQ-CH-01", AssignedToBarber = "Ramon", Condition = "Good", LastInspectionDate = "Oct 01, 2026", NextInspectionDue = "Dec 01, 2026" }
-        };
+            Id = e.Id,
+            Name = e.Name,
+            SerialNumber = e.SerialNumber,
+            AssignedToBarber = e.AssignedToBarber,
+            Condition = e.Condition,
+            LastInspectionDate = e.LastInspectionDate,
+            NextInspectionDue = e.NextInspectionDue
+        }).ToList();
 
         // Retail product inventory per HW-2 reference
         var productList = new List<AdminRetailProductItem>
@@ -87,3 +91,4 @@ public class AdminRetailProductItem
     public string FormattedPrice { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
 }
+
