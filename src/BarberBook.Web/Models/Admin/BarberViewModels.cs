@@ -4,7 +4,26 @@ namespace BarberBook.Web.Models.Admin;
 
 public class CreateBarberRequest
 {
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
     public string FullName { get; set; } = string.Empty;
+
+    public string ResolvedFullName
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(FullName))
+                return FullName.Trim();
+
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(FirstName)) parts.Add(FirstName.Trim());
+            if (!string.IsNullOrWhiteSpace(MiddleName)) parts.Add(MiddleName.Trim());
+            if (!string.IsNullOrWhiteSpace(LastName)) parts.Add(LastName.Trim());
+            return string.Join(" ", parts);
+        }
+    }
+
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
@@ -15,7 +34,26 @@ public class CreateBarberRequest
 
 public class UpdateBarberRequest
 {
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
     public string FullName { get; set; } = string.Empty;
+
+    public string ResolvedFullName
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(FullName))
+                return FullName.Trim();
+
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(FirstName)) parts.Add(FirstName.Trim());
+            if (!string.IsNullOrWhiteSpace(MiddleName)) parts.Add(MiddleName.Trim());
+            if (!string.IsNullOrWhiteSpace(LastName)) parts.Add(LastName.Trim());
+            return string.Join(" ", parts);
+        }
+    }
+
     public string DisplayName { get; set; } = string.Empty;
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }

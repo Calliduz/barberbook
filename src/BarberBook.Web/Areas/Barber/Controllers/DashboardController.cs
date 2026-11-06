@@ -564,7 +564,10 @@ public class DashboardController : Controller
             CustomerName = tx.Customer,
             ServiceName = tx.Service,
             Price = tx.Amount,
-            FormattedPrice = tx.FormattedAmount
+            FormattedPrice = tx.FormattedAmount,
+            CommissionRate = tx.CommissionRate,
+            CommissionAmount = tx.CommissionAmount,
+            FormattedCommissionAmount = tx.FormattedCommissionAmount
         }).ToList();
 
         var model = new BarberTransactionsViewModel
@@ -574,6 +577,11 @@ public class DashboardController : Controller
             TotalCompletedCount = report.CompletedCount,
             TotalRevenue = report.TotalSales,
             FormattedTotalRevenue = report.FormattedTotalSales,
+            CommissionRate = report.CommissionRate,
+            TotalCommission = report.TotalCommission,
+            FormattedTotalCommission = report.FormattedTotalCommission,
+            ShopShare = report.ShopNetShare,
+            FormattedShopShare = report.FormattedShopNetShare,
             AverageTicket = avgTicket,
             FormattedAverageTicket = FormattingHelpers.FormatPeso(avgTicket),
             StartDate = startDate,

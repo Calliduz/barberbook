@@ -164,6 +164,8 @@ public class InventoryController : Controller
     }
 
     [HttpGet("admin/equipment/quality")]
+    [HttpGet("admin/equipment/monitoring")]
+    [HttpGet("admin/inventory/equipment/monitoring")]
     public async Task<IActionResult> EquipmentQuality()
     {
         var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();

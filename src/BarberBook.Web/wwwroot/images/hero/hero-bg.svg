@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%">
+  <defs>
+    <radialGradient id="vignette" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="60%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <pattern id="barberStripe" width="80" height="80" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="80" stroke="#B4832C" stroke-width="8" opacity="0.04" />
+      <line x1="40" y1="0" x2="40" y2="80" stroke="#D62828" stroke-width="8" opacity="0.03" />
+      <line x1="60" y1="0" x2="60" y2="80" stroke="#1D3557" stroke-width="8" opacity="0.03" />
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+  <rect width="1600" height="900" fill="url(#barberStripe)"/>
+  <circle cx="800" cy="400" r="320" fill="none" stroke="#F59E0B" stroke-width="1.5" opacity="0.1"/>
+  <circle cx="800" cy="400" r="460" fill="none" stroke="#F59E0B" stroke-width="1" opacity="0.05"/>
+</svg>

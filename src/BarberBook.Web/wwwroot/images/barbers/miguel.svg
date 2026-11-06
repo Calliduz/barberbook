@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgMiguel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="amberGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="100" fill="url(#bgMiguel)"/>
+  <circle cx="100" cy="100" r="94" fill="none" stroke="url(#amberGold)" stroke-width="3" opacity="0.4"/>
+  <!-- Head & Torso -->
+  <circle cx="100" cy="74" r="32" fill="#F1F5F9"/>
+  <!-- Textured Crop Hairstyle -->
+  <path d="M 68 72 C 67 48, 86 36, 102 36 C 122 36, 134 48, 132 72 C 124 64, 115 62, 100 62 C 85 62, 76 66, 68 72 Z" fill="#3B0764"/>
+  <!-- Clean Stubble & Goatee -->
+  <path d="M 88 88 C 96 92, 104 92, 112 88 C 110 98, 106 104, 100 106 C 94 104, 90 98, 88 88 Z" fill="#1E293B"/>
+  <!-- Apron & Shirt -->
+  <path d="M 40 180 C 44 135, 70 120, 100 120 C 130 120, 156 135, 160 180 Z" fill="#1E293B"/>
+  <path d="M 75 125 L 125 125 L 132 180 L 68 180 Z" fill="#475569"/>
+  <path d="M 85 120 L 80 180 M 115 120 L 120 180" stroke="url(#amberGold)" stroke-width="2"/>
+</svg>

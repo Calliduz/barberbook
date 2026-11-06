@@ -8,6 +8,7 @@ using BarberBook.Data.Seeding;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Auth;
+using BarberBook.Web.Models.Reports;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -456,6 +457,57 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         servicePage.Should().NotBeNull();
         servicePage!.Items.Count.Should().Be(2);
         servicePage.TotalCount.Should().BeGreaterThanOrEqualTo(4);
+    }
+
+    [Fact]
+    public async Task AF2_AdminCreatesBarber_WithSeparateFirstMiddleLastName_ResolvesProperFullName()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var uniqueEmail = $"barber_separate_names_{Guid.NewGuid():N}@barberbook.local";
+        var createRequest = new CreateBarberRequest
+        {
+            FirstName = "Juan",
+            MiddleName = "Crisostomo",
+            LastName = "Ibarra",
+            DisplayName = "Crisostomo",
+            Email = uniqueEmail,
+            Password = "TempPassword123!",
+            Specialties = "Classic Shave, Gentlemen Cut"
+        };
+
+        var response = await adminClient.PostAsJsonAsync("/api/admin/barbers", createRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createdBarber = await response.Content.ReadFromJsonAsync<AdminBarberItemDto>();
+        createdBarber.Should().NotBeNull();
+        createdBarber!.FullName.Should().Be("Juan Crisostomo Ibarra");
+        createdBarber.DisplayName.Should().Be("Crisostomo");
+    }
+
+    [Fact]
+    public async Task RP4_BF5_BarberTransactionsReport_IncludesFiftyPercentCommissionSplit()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/api/reports/barbers/1");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var report = await response.Content.ReadFromJsonAsync<BarberTransactionsReportDto>();
+        report.Should().NotBeNull();
+        report!.CommissionRate.Should().Be(0.50m);
+        report.TotalCommission.Should().Be(report.TotalSales * 0.50m);
+        report.ShopNetShare.Should().Be(report.TotalSales - report.TotalCommission);
+
+        if (report.Transactions.Any())
+        {
+            var firstTx = report.Transactions.First();
+            firstTx.CommissionRate.Should().Be(0.50m);
+            firstTx.CommissionAmount.Should().Be(firstTx.Amount * 0.50m);
+            firstTx.ShopShare.Should().Be(firstTx.Amount - firstTx.CommissionAmount);
+        }
     }
 
     public Task InitializeAsync() => Task.CompletedTask;

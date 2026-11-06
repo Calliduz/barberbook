@@ -378,6 +378,8 @@ public class ReportingService : IReportingService
         var items = appointments.Select(a =>
         {
             var zoned = a.StartsAt.InZone(_zone);
+            var commission = a.Price * 0.50m;
+            var shopShare = a.Price - commission;
             return new BarberTransactionItemDto
             {
                 AppointmentId = a.Id,
@@ -388,11 +390,18 @@ public class ReportingService : IReportingService
                 Customer = a.Customer.FullName,
                 Service = a.ServiceName,
                 Amount = a.Price,
-                FormattedAmount = FormattingHelpers.FormatPeso(a.Price)
+                FormattedAmount = FormattingHelpers.FormatPeso(a.Price),
+                CommissionRate = 0.50m,
+                CommissionAmount = commission,
+                FormattedCommissionAmount = FormattingHelpers.FormatPeso(commission),
+                ShopShare = shopShare,
+                FormattedShopShare = FormattingHelpers.FormatPeso(shopShare)
             };
         }).ToList();
 
         var totalSales = items.Sum(i => i.Amount);
+        var totalCommission = totalSales * 0.50m;
+        var shopNetShare = totalSales - totalCommission;
 
         return new BarberTransactionsReportDto
         {
@@ -400,6 +409,11 @@ public class ReportingService : IReportingService
             BarberName = barber?.DisplayName ?? "Unknown Barber",
             TotalSales = totalSales,
             FormattedTotalSales = FormattingHelpers.FormatPeso(totalSales),
+            CommissionRate = 0.50m,
+            TotalCommission = totalCommission,
+            FormattedTotalCommission = FormattingHelpers.FormatPeso(totalCommission),
+            ShopNetShare = shopNetShare,
+            FormattedShopNetShare = FormattingHelpers.FormatPeso(shopNetShare),
             CompletedCount = items.Count,
             Transactions = items
         };

@@ -8,8 +8,19 @@ public class CreateBarberRequestValidator : AbstractValidator<CreateBarberReques
     public CreateBarberRequestValidator()
     {
         RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Full name is required.")
-            .MaximumLength(150).WithMessage("Full name must not exceed 150 characters.");
+            .Must((req, _) => !string.IsNullOrWhiteSpace(req.ResolvedFullName))
+            .WithMessage("Full name (or First and Last name) is required.")
+            .Must((req, _) => req.ResolvedFullName.Length <= 150)
+            .WithMessage("Full name must not exceed 150 characters.");
+
+        RuleFor(x => x.FirstName)
+            .MaximumLength(50).WithMessage("First name must not exceed 50 characters.");
+
+        RuleFor(x => x.MiddleName)
+            .MaximumLength(50).WithMessage("Middle name must not exceed 50 characters.");
+
+        RuleFor(x => x.LastName)
+            .MaximumLength(50).WithMessage("Last name must not exceed 50 characters.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email address is required.")
@@ -40,8 +51,19 @@ public class UpdateBarberRequestValidator : AbstractValidator<UpdateBarberReques
     public UpdateBarberRequestValidator()
     {
         RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Full name is required.")
-            .MaximumLength(150).WithMessage("Full name must not exceed 150 characters.");
+            .Must((req, _) => !string.IsNullOrWhiteSpace(req.ResolvedFullName))
+            .WithMessage("Full name (or First and Last name) is required.")
+            .Must((req, _) => req.ResolvedFullName.Length <= 150)
+            .WithMessage("Full name must not exceed 150 characters.");
+
+        RuleFor(x => x.FirstName)
+            .MaximumLength(50).WithMessage("First name must not exceed 50 characters.");
+
+        RuleFor(x => x.MiddleName)
+            .MaximumLength(50).WithMessage("Middle name must not exceed 50 characters.");
+
+        RuleFor(x => x.LastName)
+            .MaximumLength(50).WithMessage("Last name must not exceed 50 characters.");
 
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage("Display name is required.")

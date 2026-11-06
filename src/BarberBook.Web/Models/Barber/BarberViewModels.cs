@@ -129,6 +129,14 @@ public class BarberTransactionsViewModel
     public string FormattedTotalRevenue { get; set; } = "₱0.00";
     public decimal AverageTicket { get; set; }
     public string FormattedAverageTicket { get; set; } = "₱0.00";
+
+    // Commission fields (50% split)
+    public decimal CommissionRate { get; set; } = 0.50m;
+    public decimal TotalCommission { get; set; }
+    public string FormattedTotalCommission { get; set; } = "₱0.00";
+    public decimal ShopShare { get; set; }
+    public string FormattedShopShare { get; set; } = "₱0.00";
+
     public string? StartDate { get; set; }
     public string? EndDate { get; set; }
     public List<BarberTransactionItemViewModel> Transactions { get; set; } = new();
@@ -144,6 +152,9 @@ public class BarberTransactionItemViewModel
     public string ServiceName { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public string FormattedPrice { get; set; } = string.Empty;
+    public decimal CommissionRate { get; set; } = 0.50m;
+    public decimal CommissionAmount { get; set; }
+    public string FormattedCommissionAmount { get; set; } = "₱0.00";
 }
 
 public class BarberEquipmentViewModel

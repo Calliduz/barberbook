@@ -103,9 +103,16 @@
                         <tr class="hover:bg-slate-50 transition">
                             <td class="py-4 pl-6 pr-3">
                                 <div class="flex items-center space-x-3">
-                                    <div class="h-10 w-10 flex-shrink-0 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-base">
-                                        @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
-                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(barber.PhotoUrl))
+                                    {
+                                        <img src="@barber.PhotoUrl" alt="@barber.DisplayName" class="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-slate-200" />
+                                    }
+                                    else
+                                    {
+                                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-base">
+                                            @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
+                                        </div>
+                                    }
                                     <div>
                                         <div class="font-semibold text-slate-900">@barber.DisplayName</div>
                                         <div class="text-xs text-slate-500">@barber.FullName</div>
@@ -183,35 +190,46 @@
                 </svg>
             </button>
         </div>
-        <form method="post" action="/admin/barbers" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Full Name *</label>
-                <input type="text" name="FullName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Ramon Bautista" />
+        <form method="post" action="/admin/barbers" enctype="multipart/form-data" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">First Name *</label>
+                    <input type="text" name="FirstName" id="createFirstName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Ramon" oninput="updateCreateNamePreview()" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Middle Name</label>
+                    <input type="text" name="MiddleName" id="createMiddleName" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Santos" oninput="updateCreateNamePreview()" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Last Name *</label>
+                    <input type="text" name="LastName" id="createLastName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Bautista" oninput="updateCreateNamePreview()" />
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Display Name *</label>
-                <input type="text" name="DisplayName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Ramon" />
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Display Name / Nickname *</label>
+                <input type="text" name="DisplayName" id="createDisplayName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Master Ramon" oninput="this.dataset.manuallyEdited='true'" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Email Address *</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Email Address *</label>
                 <input type="email" name="Email" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. ramon@barberbook.local" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Temporary Password *</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Temporary Password *</label>
                 <input type="password" name="Password" required minlength="6" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Set temporary password" />
                 <p class="text-xs text-slate-400 mt-1">Admin provides this password to the barber. Barbers cannot self-register (LM-4).</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Specialties</label>
-                <input type="text" name="Specialties" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Fades, Beard Styling, Pompadour" />
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Specialties</label>
+                <input type="text" name="Specialties" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="e.g. Classic Taper, Pompadour, Beard Fade" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Bio</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Bio</label>
                 <textarea name="Bio" rows="2" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Short introduction for customers..."></textarea>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Photo URL</label>
-                <input type="url" name="PhotoUrl" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="https://..." />
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Barber Photo</label>
+                <input type="file" name="photoFile" accept="image/*" class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 shadow-sm" />
+                <p class="text-[11px] text-slate-400 mt-1">Upload a portrait image (PNG, JPG, SVG). Stored locally in /uploads/barbers/.</p>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
                 <button type="button" onclick="closeModal('createModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
@@ -232,26 +250,38 @@
                 </svg>
             </button>
         </div>
-        <form id="editBarberForm" method="post" action="" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Full Name *</label>
-                <input type="text" id="editFullName" name="FullName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+        <form id="editBarberForm" method="post" action="" enctype="multipart/form-data" class="space-y-4">
+            <input type="hidden" id="editPhotoUrl" name="PhotoUrl" />
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">First Name *</label>
+                    <input type="text" id="editFirstName" name="FirstName" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Middle Name</label>
+                    <input type="text" id="editMiddleName" name="MiddleName" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Last Name *</label>
+                    <input type="text" id="editLastName" name="LastName" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Display Name *</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Display Name *</label>
                 <input type="text" id="editDisplayName" name="DisplayName" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Specialties</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Specialties</label>
                 <input type="text" id="editSpecialties" name="Specialties" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Bio</label>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Bio</label>
                 <textarea id="editBio" name="Bio" rows="2" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm"></textarea>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Photo URL</label>
-                <input type="url" id="editPhotoUrl" name="PhotoUrl" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Change Barber Photo</label>
+                <input type="file" name="photoFile" accept="image/*" class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 shadow-sm" />
+                <p class="text-[11px] text-slate-400 mt-1">Leave empty to keep current photo. Stored locally in /uploads/barbers/.</p>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
                 <button type="button" onclick="closeModal('editModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
@@ -305,12 +335,39 @@
 
 <script>
     function openCreateModal() {
+        document.getElementById('createFirstName').value = '';
+        document.getElementById('createMiddleName').value = '';
+        document.getElementById('createLastName').value = '';
+        const dn = document.getElementById('createDisplayName');
+        dn.value = '';
+        delete dn.dataset.manuallyEdited;
         document.getElementById('createModal').classList.remove('hidden');
+    }
+
+    function updateCreateNamePreview() {
+        const fn = document.getElementById('createFirstName').value.trim();
+        const dn = document.getElementById('createDisplayName');
+        if (!dn.dataset.manuallyEdited && fn) {
+            dn.value = fn;
+        }
     }
 
     function openEditModal(id, fullName, displayName, specialties, bio, photoUrl) {
         document.getElementById('editBarberForm').action = '/admin/barbers/' + id + '/edit';
-        document.getElementById('editFullName').value = fullName;
+        const parts = (fullName || '').trim().split(/\s+/);
+        if (parts.length === 1) {
+            document.getElementById('editFirstName').value = parts[0] || '';
+            document.getElementById('editMiddleName').value = '';
+            document.getElementById('editLastName').value = '';
+        } else if (parts.length === 2) {
+            document.getElementById('editFirstName').value = parts[0] || '';
+            document.getElementById('editMiddleName').value = '';
+            document.getElementById('editLastName').value = parts[1] || '';
+        } else {
+            document.getElementById('editFirstName').value = parts[0] || '';
+            document.getElementById('editMiddleName').value = parts.slice(1, -1).join(' ');
+            document.getElementById('editLastName').value = parts[parts.length - 1] || '';
+        }
         document.getElementById('editDisplayName').value = displayName;
         document.getElementById('editSpecialties').value = specialties;
         document.getElementById('editBio').value = bio;

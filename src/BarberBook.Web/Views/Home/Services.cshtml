@@ -6,12 +6,12 @@
     {
         var lower = name.ToLowerInvariant();
         if (lower.Contains("beard"))
-            return "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80"; // Beard sculpt
+            return "/images/services/beard.svg";
         if (lower.Contains("color") || lower.Contains("treatment"))
-            return "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=800&q=80"; // Hair color/wash
-        if (lower.Contains("shave") || lower.Contains("fade"))
-            return "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80"; // Shave & fade
-        return "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=800&q=80"; // Classic scissor cut
+            return "/images/services/color.svg";
+        if (lower.Contains("shave"))
+            return "/images/services/shave.svg";
+        return "/images/services/haircut.svg";
     }
 }
 

@@ -20,6 +20,7 @@ public class BarbersController : Controller
     private readonly BarberBookDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IClock _clock;
+    private readonly IWebHostEnvironment _env;
     private readonly IValidator<CreateBarberRequest> _createValidator;
     private readonly IValidator<UpdateBarberRequest> _updateValidator;
     private readonly IValidator<ResetBarberPasswordRequest> _resetPasswordValidator;
@@ -28,6 +29,7 @@ public class BarbersController : Controller
         BarberBookDbContext dbContext,
         UserManager<ApplicationUser> userManager,
         IClock clock,
+        IWebHostEnvironment env,
         IValidator<CreateBarberRequest> createValidator,
         IValidator<UpdateBarberRequest> updateValidator,
         IValidator<ResetBarberPasswordRequest> resetPasswordValidator)
@@ -35,6 +37,7 @@ public class BarbersController : Controller
         _dbContext = dbContext;
         _userManager = userManager;
         _clock = clock;
+        _env = env;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
         _resetPasswordValidator = resetPasswordValidator;
@@ -154,18 +157,61 @@ public class BarbersController : Controller
         return Ok(dto);
     }
 
-    [HttpPost("admin/barbers")]
-    [HttpPost("api/admin/barbers")]
-    public async Task<IActionResult> Create([FromBody] CreateBarberRequest? jsonRequest, [FromForm] CreateBarberRequest? formRequest)
+    private async Task<string?> HandlePhotoUploadAsync(IFormFile? file, string? fallbackUrl)
     {
-        var request = jsonRequest ?? formRequest ?? new CreateBarberRequest();
+        if (file == null || file.Length == 0)
+        {
+            return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+        }
 
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".webp", ".svg" };
+        if (!allowedExts.Contains(ext))
+        {
+            return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+        }
+
+        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "barbers");
+        if (!Directory.Exists(uploadsDir))
+        {
+            Directory.CreateDirectory(uploadsDir);
+        }
+
+        var fileName = $"barber_{Guid.NewGuid():N}{ext}";
+        var filePath = Path.Combine(uploadsDir, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return $"/uploads/barbers/{fileName}";
+    }
+
+    [HttpPost("admin/barbers")]
+    public async Task<IActionResult> CreateForm([FromForm] CreateBarberRequest request, IFormFile? photoFile)
+    {
+        if (photoFile != null && photoFile.Length > 0)
+        {
+            request.PhotoUrl = await HandlePhotoUploadAsync(photoFile, request.PhotoUrl);
+        }
+        return await ProcessCreateAsync(request, isApi: false);
+    }
+
+    [HttpPost("api/admin/barbers")]
+    public async Task<IActionResult> CreateApi([FromBody] CreateBarberRequest request)
+    {
+        return await ProcessCreateAsync(request, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessCreateAsync(CreateBarberRequest request, bool isApi)
+    {
         // 1. FluentValidation
         var validationResult = await _createValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (IsJsonRequest())
+            if (isApi || IsJsonRequest())
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
@@ -179,7 +225,7 @@ public class BarbersController : Controller
         var existingUser = await _userManager.FindByEmailAsync(cleanEmail);
         if (existingUser != null)
         {
-            if (IsJsonRequest())
+            if (isApi || IsJsonRequest())
             {
                 return BadRequest(new ApiErrorResponse("DUPLICATE_EMAIL", $"An account with email '{cleanEmail}' already exists."));
             }
@@ -189,11 +235,12 @@ public class BarbersController : Controller
         }
 
         // 3. Create ApplicationUser
+        var resolvedFullName = request.ResolvedFullName;
         var user = new ApplicationUser
         {
             UserName = cleanEmail,
             Email = cleanEmail,
-            FullName = request.FullName.Trim(),
+            FullName = resolvedFullName,
             Role = UserRole.Barber,
             IsActive = true,
             CreatedAt = _clock.GetCurrentInstant()
@@ -203,7 +250,7 @@ public class BarbersController : Controller
         if (!identityResult.Succeeded)
         {
             var errorMsg = string.Join(" ", identityResult.Errors.Select(e => e.Description));
-            if (IsJsonRequest())
+            if (isApi || IsJsonRequest())
             {
                 return BadRequest(new ApiErrorResponse("IDENTITY_ERROR", errorMsg));
             }
@@ -242,7 +289,7 @@ public class BarbersController : Controller
             CompletedAppointmentsCount = 0
         };
 
-        if (IsJsonRequest())
+        if (isApi || IsJsonRequest())
         {
             return CreatedAtAction(nameof(Details), new { id = barber.Id }, resultDto);
         }
@@ -252,17 +299,29 @@ public class BarbersController : Controller
     }
 
     [HttpPost("admin/barbers/{id:int}/edit")]
-    [HttpPut("api/admin/barbers/{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateBarberRequest? jsonRequest, [FromForm] UpdateBarberRequest? formRequest)
+    public async Task<IActionResult> UpdateForm(int id, [FromForm] UpdateBarberRequest request, IFormFile? photoFile)
     {
-        var request = jsonRequest ?? formRequest ?? new UpdateBarberRequest();
+        if (photoFile != null && photoFile.Length > 0)
+        {
+            request.PhotoUrl = await HandlePhotoUploadAsync(photoFile, request.PhotoUrl);
+        }
+        return await ProcessUpdateAsync(id, request, isApi: false);
+    }
 
+    [HttpPut("api/admin/barbers/{id:int}")]
+    public async Task<IActionResult> UpdateApi(int id, [FromBody] UpdateBarberRequest request)
+    {
+        return await ProcessUpdateAsync(id, request, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessUpdateAsync(int id, UpdateBarberRequest request, bool isApi)
+    {
         // 1. FluentValidation
         var validationResult = await _updateValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (IsJsonRequest())
+            if (isApi || IsJsonRequest())
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
@@ -278,7 +337,7 @@ public class BarbersController : Controller
 
         if (barber == null)
         {
-            return IsJsonRequest()
+            return (isApi || IsJsonRequest())
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found."))
                 : NotFound();
         }
@@ -286,10 +345,13 @@ public class BarbersController : Controller
         // 3. Update barber & user details
         barber.DisplayName = request.DisplayName.Trim();
         barber.Bio = string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio.Trim();
-        barber.PhotoUrl = string.IsNullOrWhiteSpace(request.PhotoUrl) ? null : request.PhotoUrl.Trim();
+        if (!string.IsNullOrWhiteSpace(request.PhotoUrl))
+        {
+            barber.PhotoUrl = request.PhotoUrl.Trim();
+        }
         barber.Specialties = string.IsNullOrWhiteSpace(request.Specialties) ? null : request.Specialties.Trim();
 
-        barber.User.FullName = request.FullName.Trim();
+        barber.User.FullName = request.ResolvedFullName;
 
         await _dbContext.SaveChangesAsync();
 
@@ -306,7 +368,7 @@ public class BarbersController : Controller
             IsActive = barber.IsActive && barber.User.IsActive
         };
 
-        if (IsJsonRequest())
+        if (isApi || IsJsonRequest())
         {
             return Ok(resultDto);
         }

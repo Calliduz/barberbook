@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="colorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#261A33"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="250" rx="16" fill="url(#colorGrad)"/>
+  <circle cx="200" cy="125" r="70" fill="#3B2652" opacity="0.4"/>
+  <!-- Hair Treatment & Color Brush Motif -->
+  <g transform="translate(155, 75) scale(1.3)" stroke="#A855F7" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 25 65 L 45 20 L 55 25 L 35 70 Z" fill="#4B5563"/>
+    <path d="M 45 20 L 60 10 L 68 18 L 55 25 Z" fill="#F59E0B" stroke="#D97706"/>
+  </g>
+  <text x="200" y="210" font-family="'Playfair Display', Georgia, serif" font-size="16" font-weight="bold" fill="#FBF7EE" text-anchor="middle" letter-spacing="1">COLOR &amp; LUXURY HAIR WASH</text>
+</svg>

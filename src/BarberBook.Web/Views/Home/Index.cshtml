@@ -3,33 +3,31 @@
     ViewData["Title"] = "BarberBook — Classic Cuts & Master Grooming";
     var barbers = ViewBag.Barbers as List<BarberBook.Data.Entities.Barber> ?? new List<BarberBook.Data.Entities.Barber>();
 
-    // Reliable Unsplash images mapped to service types
+    // Local offline vectors and uploaded portraits mapped to service types
     string GetServiceImage(string name)
     {
         var lower = name.ToLowerInvariant();
         if (lower.Contains("beard"))
-            return "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80"; // Beard sculpt
+            return "/images/services/beard.svg";
         if (lower.Contains("color") || lower.Contains("treatment"))
-            return "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=800&q=80"; // Hair color/wash
-        if (lower.Contains("shave") || lower.Contains("fade"))
-            return "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80"; // Shave & fade
-        return "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=800&q=80"; // Classic scissor cut
+            return "/images/services/color.svg";
+        if (lower.Contains("shave"))
+            return "/images/services/shave.svg";
+        return "/images/services/haircut.svg";
     }
 
-    // Curated barber portraits
+    // Local barber portraits and uploads
     string GetBarberImage(string name, string? existingUrl)
     {
-        if (!string.IsNullOrWhiteSpace(existingUrl) && existingUrl.StartsWith("http"))
+        if (!string.IsNullOrWhiteSpace(existingUrl))
             return existingUrl;
 
         var lower = name.ToLowerInvariant();
         if (lower.Contains("ramon"))
-            return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"; // Master barber
+            return "/images/barbers/ramon.svg";
         if (lower.Contains("dennis"))
-            return "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80"; // Modern fade stylist
-        if (lower.Contains("miguel"))
-            return "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80"; // Creative colorist
-        return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80";
+            return "/images/barbers/dennis.svg";
+        return "/images/barbers/default-barber.svg";
     }
 }
 
@@ -37,7 +35,7 @@
     <!-- HERO SECTION -->
     <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl border border-slate-800">
         <!-- Background Image with Dark Vignette Overlay -->
-        <div class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1600&q=80');">
+        <div class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: url('/images/hero/hero-bg.svg');">
             <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/80"></div>
         </div>
 

@@ -95,7 +95,7 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.AddFixedWindowLimiter("auth-policy", opt =>
     {
-        opt.PermitLimit = 15;
+        opt.PermitLimit = builder.Environment.IsProduction() ? 15 : 2000;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueLimit = 0;
     });

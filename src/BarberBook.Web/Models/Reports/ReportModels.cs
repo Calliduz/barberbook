@@ -124,6 +124,14 @@ public class BarberTransactionsReportDto
     public decimal TotalSales { get; set; }
     public string FormattedTotalSales { get; set; } = "₱0.00";
     public int CompletedCount { get; set; }
+
+    // Barber commission computation (standard 50% split)
+    public decimal CommissionRate { get; set; } = 0.50m;
+    public decimal TotalCommission { get; set; }
+    public string FormattedTotalCommission { get; set; } = "₱0.00";
+    public decimal ShopNetShare { get; set; }
+    public string FormattedShopNetShare { get; set; } = "₱0.00";
+
     public List<BarberTransactionItemDto> Transactions { get; set; } = new();
 }
 
@@ -138,5 +146,12 @@ public class BarberTransactionItemDto
     public string Service { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public string FormattedAmount { get; set; } = string.Empty;
+
+    // Commission per transaction
+    public decimal CommissionRate { get; set; } = 0.50m;
+    public decimal CommissionAmount { get; set; }
+    public string FormattedCommissionAmount { get; set; } = "₱0.00";
+    public decimal ShopShare { get; set; }
+    public string FormattedShopShare { get; set; } = "₱0.00";
 }
 
