@@ -13,7 +13,7 @@
                 <span>AUDIT & REVENUE JOURNALS · §7</span>
             </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Sales & Transaction Reports</h1>
-            <p class="mt-1 text-sm text-slate-600 font-sans">Automated financial journals generated strictly from completed customer appointments (BR-07).</p>
+            <p class="mt-1 text-sm text-slate-600 font-sans">Automated financial journals generated strictly from completed customer appointments (BR-07, BR-08, BR-11).</p>
         </div>
         <div class="mt-4 sm:mt-0 flex gap-2">
             <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm flex items-center gap-1.5 transition">
@@ -33,11 +33,11 @@
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition @(Model.ActiveTab == "monthly" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
             📊 Monthly Sales (RP-2)
         </a>
-        <a href="/admin/reports?tab=customers"
+        <a href="/admin/reports?tab=customers&customerId=@Model.SelectedCustomerId"
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition @(Model.ActiveTab == "customers" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
             👤 Customer Transactions (RP-3)
         </a>
-        <a href="/admin/reports?tab=barbers"
+        <a href="/admin/reports?tab=barbers&barberId=@Model.SelectedBarberId"
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition @(Model.ActiveTab == "barbers" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
             ✂️ Barber Transactions (RP-4)
         </a>
@@ -59,7 +59,7 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right">
                         <span class="text-xs uppercase font-bold text-slate-500 block">Daily Total Sales</span>
-                        <span class="text-2xl font-serif font-black text-amber-700">@Model.FormattedDailyTotalSales</span>
+                        <span class="text-2xl font-serif font-black text-amber-700">@Model.DailyReport.FormattedTotalSales</span>
                     </div>
                 </div>
             </div>
@@ -68,36 +68,43 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Report Scope</span>
-                    <h3 class="text-lg font-bold text-slate-900 mt-1">@Model.SelectedDateFormatted</h3>
-                    <p class="text-xs text-slate-500 mt-1">@Model.DailyTotalCount Completed Appointments</p>
+                    <h3 class="text-lg font-bold text-slate-900 mt-1">@Model.DailyReport.DateFormatted</h3>
+                    <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.CompletedCount Completed Appointments</p>
                 </div>
 
                 <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Gross Revenue</span>
-                    <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.FormattedDailyTotalSales</h3>
+                    <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.DailyReport.FormattedTotalSales</h3>
                     <p class="text-xs text-slate-500 mt-1">In-shop cash settlement (LM-1)</p>
                 </div>
 
                 <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 sm:col-span-2 lg:col-span-1">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Average Ticket Size</span>
                     <h3 class="text-2xl font-serif font-black text-slate-900 mt-1">
-                        @(Model.DailyTotalCount > 0 ? FormattingHelpers.FormatPeso(Model.DailyTotalSales / Model.DailyTotalCount) : "₱0.00")
+                        @(Model.DailyReport.CompletedCount > 0 ? FormattingHelpers.FormatPeso(Model.DailyReport.TotalSales / Model.DailyReport.CompletedCount) : "₱0.00")
                     </h3>
                     <p class="text-xs text-slate-500 mt-1">Per completed client visit</p>
                 </div>
             </div>
 
-            <!-- Daily Journal Table -->
+            <!-- Daily Journal Table matching paper sample: No., Time, Customer, Barber, Service, Amount -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-base font-serif font-bold text-slate-900">Completed Service Transactions</h2>
-                    <span class="text-xs text-slate-500 font-medium">@Model.DailyRows.Count entries logged</span>
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Report &mdash; @Model.DailyReport.DateFormatted</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Line-item journal layout matching reference §7.3</p>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">@Model.DailyReport.Items.Count entries logged</span>
                 </div>
 
-                @if (!Model.DailyRows.Any())
+                @if (!Model.DailyReport.Items.Any())
                 {
                     <div class="p-12 text-center text-slate-400 text-sm">
-                        No completed appointments recorded for @Model.SelectedDateFormatted.
+                        <div class="inline-flex p-3 rounded-full bg-slate-100 mb-2">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <p class="font-semibold text-slate-600">No completed sales recorded for @Model.DailyReport.DateFormatted.</p>
+                        <p class="text-xs text-slate-400 mt-1">Per BR-07, only completed appointments generate financial records.</p>
                     </div>
                 }
                 else
@@ -106,43 +113,44 @@
                         <table class="w-full text-left text-sm text-slate-600">
                             <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
                                 <tr>
+                                    <th class="py-3 px-6 w-12 text-center">No.</th>
                                     <th class="py-3 px-6">Time</th>
-                                    <th class="py-3 px-6">Reference</th>
                                     <th class="py-3 px-6">Customer</th>
                                     <th class="py-3 px-6">Barber</th>
-                                    <th class="py-3 px-6">Service Rendered</th>
-                                    <th class="py-3 px-6 text-right">Price</th>
+                                    <th class="py-3 px-6">Service</th>
+                                    <th class="py-3 px-6 text-right">Amount (₱)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach (var row in Model.DailyRows)
+                                @foreach (var row in Model.DailyReport.Items)
                                 {
                                     <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="py-3.5 px-6 font-semibold text-slate-900 whitespace-nowrap">
-                                            @row.TimeFormatted
+                                        <td class="py-3.5 px-6 text-center font-bold text-slate-400">
+                                            @row.No
                                         </td>
-                                        <td class="py-3.5 px-6 font-mono font-bold text-xs text-amber-800">
-                                            @row.ReferenceCode
+                                        <td class="py-3.5 px-6 font-semibold text-slate-900 whitespace-nowrap">
+                                            @row.Time
                                         </td>
                                         <td class="py-3.5 px-6 font-medium text-slate-900">
-                                            @row.CustomerName
+                                            @row.Customer
+                                            <span class="block text-[11px] font-mono text-amber-800">@row.ReferenceCode</span>
                                         </td>
                                         <td class="py-3.5 px-6 font-medium text-slate-700">
-                                            @row.BarberName
+                                            @row.Barber
                                         </td>
                                         <td class="py-3.5 px-6 text-slate-600">
-                                            @row.ServiceName
+                                            @row.Service
                                         </td>
                                         <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 whitespace-nowrap">
-                                            @row.FormattedPrice
+                                            @row.FormattedAmount
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                             <tfoot class="bg-slate-50/90 font-bold border-t-2 border-slate-200 text-slate-900">
                                 <tr>
-                                    <td colspan="5" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Sales:</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.FormattedDailyTotalSales</td>
+                                    <td colspan="5" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Sales</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.DailyReport.FormattedTotalSales</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -150,40 +158,54 @@
                 }
             </div>
 
-            <!-- Breakdown By Barber & Service -->
+            <!-- Breakdown By Barber & Service (RP-1) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Per Barber -->
                 <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-4">Breakdown by Master Barber</h3>
-                    <div class="space-y-3">
-                        @foreach (var b in Model.DailyBarberBreakdown)
-                        {
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                                <div>
-                                    <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
-                                    <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                    @if (!Model.DailyReport.ByBarber.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No barber activity on this date.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var b in Model.DailyReport.ByBarber)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
                                 </div>
-                                <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <!-- Per Service -->
                 <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-4">Breakdown by Service</h3>
-                    <div class="space-y-3">
-                        @foreach (var s in Model.DailyServiceBreakdown)
-                        {
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                                <div>
-                                    <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
-                                    <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                    @if (!Model.DailyReport.ByService.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No services rendered on this date.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var s in Model.DailyReport.ByService)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
                                 </div>
-                                <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -212,20 +234,218 @@
 
                 <div class="text-right">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Monthly Total Sales</span>
-                    <span class="text-2xl font-serif font-black text-amber-700">@Model.FormattedMonthlyTotalSales</span>
+                    <span class="text-2xl font-serif font-black text-amber-700">@Model.MonthlyReport.FormattedTotalSales</span>
                 </div>
             </div>
 
+            <!-- Visual Bar Chart (Income at a glance) -->
+            @{
+                var maxDaySales = Model.MonthlyReport.DailyTotals.Any() ? Model.MonthlyReport.DailyTotals.Max(d => d.TotalSales) : 0m;
+                if (maxDaySales == 0) maxDaySales = 1m; // Avoid division by zero
+            }
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Income at a Glance &mdash; @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
+                    <span class="text-xs text-slate-500 font-medium">Daily Revenue Distribution</span>
+                </div>
+                <div class="flex items-end gap-1 sm:gap-2 h-36 pt-6 border-b border-slate-200 overflow-x-auto pb-2">
+                    @foreach (var d in Model.MonthlyReport.DailyTotals)
+                    {
+                        var heightPct = (int)Math.Round((d.TotalSales / maxDaySales) * 100);
+                        var barColor = d.TotalSales > 0 ? "bg-amber-500 hover:bg-amber-600" : "bg-slate-100";
+                        <div class="flex-1 min-w-[20px] flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@d.Date.ToString("yyyy-MM-dd", null)'">
+                            <div class="w-full @barColor rounded-t transition-all" style="height: @(Math.Max(heightPct, 4))%;"></div>
+                            <span class="text-[10px] text-slate-400 mt-1 font-semibold">@d.Day</span>
+                            <!-- Hover Tooltip -->
+                            <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-10 whitespace-nowrap">
+                                <div class="bg-slate-900 text-white text-[10px] rounded px-2 py-1 shadow-md">
+                                    <div class="font-bold">@d.DateFormatted</div>
+                                    <div>@d.FormattedTotalSales (@d.CompletedCount visits)</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Day-by-Day Table (RP-2: includes all days, zero days included) -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-base font-serif font-bold text-slate-900">Day-by-Day Sales Summary (@monthNames[Model.SelectedMonth] @Model.SelectedYear)</h2>
-                    <span class="text-xs text-slate-500 font-medium">@Model.MonthlyTotalCount appointments completed</span>
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Day-by-Day Sales Summary (@monthNames[Model.SelectedMonth] @Model.SelectedYear)</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Sum of daily totals equals monthly total: @Model.MonthlyReport.FormattedTotalSales (BR-11)</p>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">@Model.MonthlyReport.CompletedCount total appointments</span>
                 </div>
 
-                @if (!Model.MonthlyDailyRows.Any())
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-6">Date</th>
+                                <th class="py-3 px-6 text-center">Day of Week</th>
+                                <th class="py-3 px-6 text-center">Completed Appointments</th>
+                                <th class="py-3 px-6 text-right">Daily Sales Total</th>
+                                <th class="py-3 px-6 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var day in Model.MonthlyReport.DailyTotals)
+                            {
+                                <tr class="hover:bg-slate-50/80 transition @(day.TotalSales > 0 ? "bg-amber-50/20" : "")">
+                                    <td class="py-3 px-6 font-bold text-slate-900">
+                                        @day.DateFormatted
+                                    </td>
+                                    <td class="py-3 px-6 text-center text-xs font-semibold text-slate-500">
+                                        @day.DayOfWeek
+                                    </td>
+                                    <td class="py-3 px-6 text-center font-medium @(day.CompletedCount > 0 ? "text-slate-900 font-bold" : "text-slate-400")">
+                                        @day.CompletedCount
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-bold @(day.TotalSales > 0 ? "text-amber-800 font-bold" : "text-slate-400")">
+                                        @day.FormattedTotalSales
+                                    </td>
+                                    <td class="py-3 px-6 text-right">
+                                        @if (day.CompletedCount > 0)
+                                        {
+                                            <a href="/admin/reports?tab=daily&date=@day.Date.ToString("yyyy-MM-dd", null)" class="text-xs font-bold text-amber-700 hover:underline">
+                                                View Line Items →
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-xs text-slate-400">No visits</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tr>
+                                <td colspan="2" class="py-3.5 px-6 uppercase text-xs tracking-wider">Total For @monthNames[Model.SelectedMonth] @Model.SelectedYear:</td>
+                                <td class="py-3.5 px-6 text-center font-serif text-base">@Model.MonthlyReport.CompletedCount</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.MonthlyReport.FormattedTotalSales</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Monthly Breakdowns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Per Barber -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-4">Monthly Breakdown by Barber</h3>
+                    @if (!Model.MonthlyReport.ByBarber.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No barber sales recorded this month.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var b in Model.MonthlyReport.ByBarber)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Per Service -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-4">Monthly Breakdown by Service</h3>
+                    @if (!Model.MonthlyReport.ByService.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No services rendered this month.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var s in Model.MonthlyReport.ByService)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.ActiveTab == "customers")
+    {
+        <!-- CUSTOMER TRANSACTIONS VIEW (RP-3) -->
+        <div class="space-y-6">
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <form method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <input type="hidden" name="tab" value="customers" />
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">Select Client:</label>
+                        <select name="customerId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                            @foreach (var c in Model.Customers)
+                            {
+                                <option value="@c.Id" selected="@(c.Id == Model.SelectedCustomerId)">@c.FullName (@c.Email)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">From:</label>
+                        <input type="date" name="startDate" value="@Model.StartDateString"
+                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">To:</label>
+                        <input type="date" name="endDate" value="@Model.EndDateString"
+                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                    </div>
+
+                    <div class="pt-5">
+                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                            Apply Filter
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-right">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Total Spent</span>
+                    <span class="text-2xl font-serif font-black text-amber-700">@Model.CustomerReport.FormattedTotalSpent</span>
+                    <span class="text-xs text-slate-500">@Model.CustomerReport.CompletedCount transactions</span>
+                </div>
+            </div>
+
+            <!-- Customer Transaction Record (RP-3: Date, Service, Barber, Status, Amount) -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record &mdash; @Model.CustomerReport.CustomerName</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Completed appointments (newest first) matching reference §7.3 layout</p>
+                    </div>
+                    @if (Model.SelectedCustomerId > 0)
+                    {
+                        <a href="/admin/customers/@Model.SelectedCustomerId" class="text-xs font-bold text-amber-700 hover:underline">
+                            View Customer Profile →
+                        </a>
+                    }
+                </div>
+
+                @if (!Model.CustomerReport.Transactions.Any())
                 {
                     <div class="p-12 text-center text-slate-400 text-sm">
-                        No completed sales recorded in @monthNames[Model.SelectedMonth] @Model.SelectedYear.
+                        No completed transactions recorded for @Model.CustomerReport.CustomerName.
                     </div>
                 }
                 else
@@ -235,38 +455,35 @@
                             <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
                                 <tr>
                                     <th class="py-3 px-6">Date</th>
-                                    <th class="py-3 px-6 text-center">Completed Appointments</th>
-                                    <th class="py-3 px-6 text-right">Daily Sales Total</th>
-                                    <th class="py-3 px-6 text-right">Action</th>
+                                    <th class="py-3 px-6">Service</th>
+                                    <th class="py-3 px-6">Barber</th>
+                                    <th class="py-3 px-6">Status</th>
+                                    <th class="py-3 px-6 text-right">Amount (₱)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach (var day in Model.MonthlyDailyRows)
+                                @foreach (var tx in Model.CustomerReport.Transactions)
                                 {
                                     <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="py-3.5 px-6 font-bold text-slate-900">
-                                            @day.DateFormatted
+                                        <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">
+                                            @tx.DateFormatted
+                                            <span class="block text-[11px] font-mono text-amber-800">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
                                         </td>
-                                        <td class="py-3.5 px-6 text-center font-medium text-slate-700">
-                                            @day.CompletedCount
+                                        <td class="py-3.5 px-6 font-semibold text-slate-800">@tx.Service</td>
+                                        <td class="py-3.5 px-6 text-slate-700">@tx.Barber</td>
+                                        <td class="py-3.5 px-6">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                @tx.Status
+                                            </span>
                                         </td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">
-                                            @day.FormattedTotalSales
-                                        </td>
-                                        <td class="py-3.5 px-6 text-right">
-                                            <a href="/admin/reports?tab=daily&date=@day.Date" class="text-xs font-bold text-amber-700 hover:underline">
-                                                View Day Detail →
-                                            </a>
-                                        </td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedAmount</td>
                                     </tr>
                                 }
                             </tbody>
                             <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
                                 <tr>
-                                    <td class="py-3.5 px-6 uppercase text-xs tracking-wider">Total For @monthNames[Model.SelectedMonth]:</td>
-                                    <td class="py-3.5 px-6 text-center font-serif text-base">@Model.MonthlyTotalCount</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.FormattedMonthlyTotalSales</td>
-                                    <td></td>
+                                    <td colspan="4" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Spent</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.CustomerReport.FormattedTotalSpent</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -275,113 +492,100 @@
             </div>
         </div>
     }
-    else if (Model.ActiveTab == "customers")
-    {
-        <!-- CUSTOMER TRANSACTIONS VIEW (RP-3) -->
-        <div class="space-y-6">
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <form method="get" action="/admin/reports" class="flex items-center gap-3 w-full sm:w-auto">
-                    <input type="hidden" name="tab" value="customers" />
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Filter by Client:</label>
-                    <select name="customerId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 shadow-sm">
-                        <option value="">All Customers</option>
-                        @foreach (var c in Model.Customers)
-                        {
-                            <option value="@c.Id" selected="@(c.Id == Model.SelectedCustomerId)">@c.FullName (@c.Email)</option>
-                        }
-                    </select>
-                </form>
-
-                <div class="text-right">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Total Volume Spent</span>
-                    <span class="text-2xl font-serif font-black text-amber-700">@Model.FormattedCustomerTotalSpent</span>
-                </div>
-            </div>
-
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
-                            <tr>
-                                <th class="py-3 px-6">Date & Time</th>
-                                <th class="py-3 px-6">Reference</th>
-                                <th class="py-3 px-6">Customer</th>
-                                <th class="py-3 px-6">Barber</th>
-                                <th class="py-3 px-6">Service</th>
-                                <th class="py-3 px-6 text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @foreach (var tx in Model.CustomerTransactions)
-                            {
-                                <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">@tx.DateFormatted</td>
-                                    <td class="py-3.5 px-6 font-mono font-bold text-xs text-amber-800">@tx.ReferenceCode</td>
-                                    <td class="py-3.5 px-6 font-bold text-slate-900">@tx.CustomerName</td>
-                                    <td class="py-3.5 px-6 text-slate-700">@tx.BarberName</td>
-                                    <td class="py-3.5 px-6 text-slate-600">@tx.ServiceName</td>
-                                    <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedPrice</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
     else if (Model.ActiveTab == "barbers")
     {
         <!-- BARBER TRANSACTIONS VIEW (RP-4) -->
         <div class="space-y-6">
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <form method="get" action="/admin/reports" class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <form method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <input type="hidden" name="tab" value="barbers" />
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Filter by Barber:</label>
-                    <select name="barberId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 shadow-sm">
-                        <option value="">All Barbers</option>
-                        @foreach (var b in Model.Barbers)
-                        {
-                            <option value="@b.Id" selected="@(b.Id == Model.SelectedBarberId)">@b.DisplayName</option>
-                        }
-                    </select>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">Select Barber:</label>
+                        <select name="barberId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                            @foreach (var b in Model.Barbers)
+                            {
+                                <option value="@b.Id" selected="@(b.Id == Model.SelectedBarberId)">@b.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">From:</label>
+                        <input type="date" name="startDate" value="@Model.StartDateString"
+                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">To:</label>
+                        <input type="date" name="endDate" value="@Model.EndDateString"
+                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                    </div>
+
+                    <div class="pt-5">
+                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                            Apply Filter
+                        </button>
+                    </div>
                 </form>
 
                 <div class="text-right">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Total Revenue Generated</span>
-                    <span class="text-2xl font-serif font-black text-amber-700">@Model.FormattedBarberTotalGenerated</span>
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Total Sales</span>
+                    <span class="text-2xl font-serif font-black text-amber-700">@Model.BarberReport.FormattedTotalSales</span>
+                    <span class="text-xs text-slate-500">@Model.BarberReport.CompletedCount transactions</span>
                 </div>
             </div>
 
+            <!-- Barber Transaction Record (RP-4: Date, Customer, Service, Amount) -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
-                            <tr>
-                                <th class="py-3 px-6">Date & Time</th>
-                                <th class="py-3 px-6">Reference</th>
-                                <th class="py-3 px-6">Barber</th>
-                                <th class="py-3 px-6">Customer</th>
-                                <th class="py-3 px-6">Service</th>
-                                <th class="py-3 px-6 text-right">Price</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @foreach (var tx in Model.BarberTransactions)
-                            {
-                                <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">@tx.DateFormatted</td>
-                                    <td class="py-3.5 px-6 font-mono font-bold text-xs text-amber-800">@tx.ReferenceCode</td>
-                                    <td class="py-3.5 px-6 font-bold text-slate-900">@tx.BarberName</td>
-                                    <td class="py-3.5 px-6 text-slate-700">@tx.CustomerName</td>
-                                    <td class="py-3.5 px-6 text-slate-600">@tx.ServiceName</td>
-                                    <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedPrice</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record &mdash; Master Barber @Model.BarberReport.BarberName</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Completed services (newest first) with total sales</p>
+                    </div>
                 </div>
+
+                @if (!Model.BarberReport.Transactions.Any())
+                {
+                    <div class="p-12 text-center text-slate-400 text-sm">
+                        No completed transactions recorded for @Model.BarberReport.BarberName.
+                    </div>
+                }
+                else
+                {
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-6">Date</th>
+                                    <th class="py-3 px-6">Customer</th>
+                                    <th class="py-3 px-6">Service</th>
+                                    <th class="py-3 px-6 text-right">Amount (₱)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach (var tx in Model.BarberReport.Transactions)
+                                {
+                                    <tr class="hover:bg-slate-50/80 transition">
+                                        <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">
+                                            @tx.DateFormatted
+                                            <span class="block text-[11px] font-mono text-amber-800">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
+                                        </td>
+                                        <td class="py-3.5 px-6 font-bold text-slate-900">@tx.Customer</td>
+                                        <td class="py-3.5 px-6 text-slate-700">@tx.Service</td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedAmount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                                <tr>
+                                    <td colspan="3" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Sales</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.BarberReport.FormattedTotalSales</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
             </div>
         </div>
     }
 </div>
-

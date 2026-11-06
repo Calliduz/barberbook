@@ -1,6 +1,9 @@
+using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
+using BarberBook.Web.Models.Reports;
+using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,23 +13,27 @@ using NodaTime.Text;
 namespace BarberBook.Web.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Barber")]
 public class ReportsController : Controller
 {
+    private readonly IReportingService _reportingService;
     private readonly BarberBookDbContext _dbContext;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
     public ReportsController(
+        IReportingService reportingService,
         BarberBookDbContext dbContext,
         IClock clock,
         DateTimeZone? zone = null)
     {
+        _reportingService = reportingService;
         _dbContext = dbContext;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("admin/reports")]
     public async Task<IActionResult> Index(
         [FromQuery] string tab = "daily",
@@ -34,198 +41,198 @@ public class ReportsController : Controller
         [FromQuery] int? year = null,
         [FromQuery] int? month = null,
         [FromQuery] int? barberId = null,
-        [FromQuery] int? customerId = null)
+        [FromQuery] int? customerId = null,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
     {
         var now = _clock.GetCurrentInstant();
         var localNow = now.InZone(_zone);
         var today = localNow.Date;
 
-        // Parse requested daily date or fallback to today
+        // Parse date for daily view (fallback to today, or if seed day available fallback cleanly)
         LocalDate selectedDate = today;
         if (!string.IsNullOrEmpty(date) && LocalDatePattern.Iso.Parse(date).TryGetValue(today, out var parsedDate))
         {
             selectedDate = parsedDate;
         }
 
-        // Parse requested monthly year/month or fallback to current
+        // Parse year & month for monthly view
         int selectedYear = year ?? today.Year;
         int selectedMonth = month ?? today.Month;
         if (selectedMonth < 1 || selectedMonth > 12) selectedMonth = today.Month;
 
-        // Common seed/active barber and customer lists for filter dropdowns
-        var barbers = await _dbContext.Barbers.OrderBy(b => b.DisplayName).ToListAsync();
-        var customers = await _dbContext.Users.Where(u => u.Role == UserRole.Customer).OrderBy(u => u.FullName).ToListAsync();
+        // Parse optional date range filters
+        LocalDate? parsedStart = null;
+        if (!string.IsNullOrEmpty(startDate) && LocalDatePattern.Iso.Parse(startDate).TryGetValue(today, out var sDate))
+        {
+            parsedStart = sDate;
+        }
 
-        // 1. Daily Sales Query (Rule BR-07: Only completed appointments count in sales)
-        var dayStartUtc = selectedDate.AtStartOfDayInZone(_zone).ToInstant();
-        var nextDayStartUtc = selectedDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        LocalDate? parsedEnd = null;
+        if (!string.IsNullOrEmpty(endDate) && LocalDatePattern.Iso.Parse(endDate).TryGetValue(today, out var eDate))
+        {
+            parsedEnd = eDate;
+        }
 
-        var dailyAppointmentsRaw = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
-            .Where(a => a.Status == AppointmentStatus.Completed &&
-                        a.StartsAt >= dayStartUtc && a.StartsAt < nextDayStartUtc)
-            .OrderBy(a => a.StartsAt)
+        // Dropdowns for Barbers and Customers
+        var barbers = await _dbContext.Barbers
+            .AsNoTracking()
+            .OrderBy(b => b.DisplayName)
             .ToListAsync();
 
-        var dailyItems = dailyAppointmentsRaw.Select(a => new ReportDailyRowItem
-        {
-            AppointmentId = a.Id,
-            ReferenceCode = a.ReferenceCode,
-            TimeFormatted = a.StartsAt.InZone(_zone).ToString("h:mm tt", null),
-            CustomerName = a.Customer.FullName,
-            BarberName = a.Barber.DisplayName,
-            ServiceName = a.ServiceName,
-            Price = a.Price,
-            FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
-        }).ToList();
-
-        var dailyTotalSales = dailyItems.Sum(i => i.Price);
-
-        // Daily per-barber breakdown
-        var dailyBarberBreakdown = dailyAppointmentsRaw
-            .GroupBy(a => a.Barber.DisplayName)
-            .Select(g => new ReportGroupBreakdown
-            {
-                Name = g.Key,
-                Count = g.Count(),
-                TotalSales = g.Sum(a => a.Price),
-                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
-            }).ToList();
-
-        // Daily per-service breakdown
-        var dailyServiceBreakdown = dailyAppointmentsRaw
-            .GroupBy(a => a.ServiceName)
-            .Select(g => new ReportGroupBreakdown
-            {
-                Name = g.Key,
-                Count = g.Count(),
-                TotalSales = g.Sum(a => a.Price),
-                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
-            }).ToList();
-
-        // 2. Monthly Sales Query (RP-2)
-        var monthStart = new LocalDate(selectedYear, selectedMonth, 1);
-        var nextMonthStart = monthStart.PlusMonths(1);
-        var monthStartUtc = monthStart.AtStartOfDayInZone(_zone).ToInstant();
-        var nextMonthStartUtc = nextMonthStart.AtStartOfDayInZone(_zone).ToInstant();
-
-        var monthlyAppointmentsRaw = await _dbContext.Appointments
-            .Where(a => a.Status == AppointmentStatus.Completed &&
-                        a.StartsAt >= monthStartUtc && a.StartsAt < nextMonthStartUtc)
+        var customers = await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Role == UserRole.Customer)
+            .OrderBy(u => u.FullName)
             .ToListAsync();
 
-        // Group by day of month
-        var daysInMonth = monthStart.Calendar.GetDaysInMonth(selectedYear, selectedMonth);
-        var monthlyDailyRows = new List<ReportMonthDayRow>();
-        for (int d = 1; d <= daysInMonth; d++)
-        {
-            var dayDate = new LocalDate(selectedYear, selectedMonth, d);
-            var dStartUtc = dayDate.AtStartOfDayInZone(_zone).ToInstant();
-            var dEndUtc = dayDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var effectiveCustomerId = customerId ?? customers.FirstOrDefault()?.Id ?? 0;
+        var effectiveBarberId = barberId ?? barbers.FirstOrDefault()?.Id ?? 0;
 
-            var dayAppts = monthlyAppointmentsRaw.Where(a => a.StartsAt >= dStartUtc && a.StartsAt < dEndUtc).ToList();
-            if (dayAppts.Count > 0)
+        // 1. Daily Sales
+        var dailyReport = await _reportingService.GetDailySalesAsync(selectedDate);
+
+        // 2. Monthly Sales
+        var monthlyReport = await _reportingService.GetMonthlySalesAsync(selectedYear, selectedMonth);
+
+        // 3. Customer Transactions
+        var customerReport = effectiveCustomerId > 0
+            ? await _reportingService.GetCustomerTransactionsAsync(effectiveCustomerId, parsedStart, parsedEnd)
+            : new CustomerTransactionsReportDto();
+
+        // 4. Barber Transactions
+        var barberReport = effectiveBarberId > 0
+            ? await _reportingService.GetBarberTransactionsAsync(effectiveBarberId, parsedStart, parsedEnd)
+            : new BarberTransactionsReportDto();
+
+        var model = new AdminReportsViewModel
+        {
+            ActiveTab = tab.ToLowerInvariant(),
+            SelectedDateString = selectedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            SelectedDateFormatted = selectedDate.ToString("MMMM d, yyyy", CultureInfo.InvariantCulture),
+            SelectedYear = selectedYear,
+            SelectedMonth = selectedMonth,
+            SelectedBarberId = effectiveBarberId,
+            SelectedCustomerId = effectiveCustomerId,
+            StartDateString = parsedStart?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            EndDateString = parsedEnd?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            Barbers = barbers,
+            Customers = customers,
+            DailyReport = dailyReport,
+            MonthlyReport = monthlyReport,
+            CustomerReport = customerReport,
+            BarberReport = barberReport
+        };
+
+        return View(model);
+    }
+
+    #region REST API Endpoints
+
+    /// <summary>
+    /// RP-1: REST API endpoint for Daily Sales report
+    /// </summary>
+    [Authorize(Roles = "Admin")]
+    [HttpGet("api/admin/reports/daily")]
+    [HttpGet("api/reports/daily")]
+    public async Task<IActionResult> ApiDailySales([FromQuery] string? date = null)
+    {
+        var localNow = _clock.GetCurrentInstant().InZone(_zone).Date;
+        var targetDate = localNow;
+        if (!string.IsNullOrEmpty(date) && LocalDatePattern.Iso.Parse(date).TryGetValue(localNow, out var parsed))
+        {
+            targetDate = parsed;
+        }
+
+        var report = await _reportingService.GetDailySalesAsync(targetDate);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// RP-2: REST API endpoint for Monthly Sales report
+    /// </summary>
+    [Authorize(Roles = "Admin")]
+    [HttpGet("api/admin/reports/monthly")]
+    [HttpGet("api/reports/monthly")]
+    public async Task<IActionResult> ApiMonthlySales([FromQuery] int? year = null, [FromQuery] int? month = null)
+    {
+        var localNow = _clock.GetCurrentInstant().InZone(_zone).Date;
+        int targetYear = year ?? localNow.Year;
+        int targetMonth = month ?? localNow.Month;
+        if (targetMonth < 1 || targetMonth > 12) targetMonth = localNow.Month;
+
+        var report = await _reportingService.GetMonthlySalesAsync(targetYear, targetMonth);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// RP-3: REST API endpoint for Customer Transactions
+    /// </summary>
+    [Authorize(Roles = "Admin")]
+    [HttpGet("api/admin/reports/customers/{customerId:int}")]
+    [HttpGet("api/reports/customers/{customerId:int}")]
+    public async Task<IActionResult> ApiCustomerTransactions(
+        int customerId,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
+    {
+        var localNow = _clock.GetCurrentInstant().InZone(_zone).Date;
+        LocalDate? sDate = null;
+        if (!string.IsNullOrEmpty(startDate) && LocalDatePattern.Iso.Parse(startDate).TryGetValue(localNow, out var parsedStart))
+        {
+            sDate = parsedStart;
+        }
+
+        LocalDate? eDate = null;
+        if (!string.IsNullOrEmpty(endDate) && LocalDatePattern.Iso.Parse(endDate).TryGetValue(localNow, out var parsedEnd))
+        {
+            eDate = parsedEnd;
+        }
+
+        var report = await _reportingService.GetCustomerTransactionsAsync(customerId, sDate, eDate);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// RP-4, BF-5: REST API endpoint for Barber Transactions.
+    /// Admins can read any barber's transactions; barbers can read only their own.
+    /// </summary>
+    [Authorize(Roles = "Admin,Barber")]
+    [HttpGet("api/admin/reports/barbers/{barberId:int}")]
+    [HttpGet("api/reports/barbers/{barberId:int}")]
+    public async Task<IActionResult> ApiBarberTransactions(
+        int barberId,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
+    {
+        if (User.IsInRole("Barber"))
+        {
+            var userId = User.GetUserId();
+            var barber = await _dbContext.Barbers.FirstOrDefaultAsync(b => b.UserId == userId);
+            if (barber == null || barber.Id != barberId)
             {
-                var daySum = dayAppts.Sum(a => a.Price);
-                monthlyDailyRows.Add(new ReportMonthDayRow
-                {
-                    Date = dayDate.ToString("yyyy-MM-dd", null),
-                    DateFormatted = dayDate.ToString("MMM d, yyyy (ddd)", null),
-                    CompletedCount = dayAppts.Count,
-                    TotalSales = daySum,
-                    FormattedTotalSales = FormattingHelpers.FormatPeso(daySum)
-                });
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiErrorResponse("FORBIDDEN", "A barber can read only their own transactions."));
             }
         }
 
-        var monthlyTotalSales = monthlyAppointmentsRaw.Sum(a => a.Price);
-
-        // 3. Customer Transactions Query (RP-3)
-        var customerQuery = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
-            .Where(a => a.Status == AppointmentStatus.Completed);
-
-        if (customerId.HasValue && customerId.Value > 0)
+        var localNow = _clock.GetCurrentInstant().InZone(_zone).Date;
+        LocalDate? sDate = null;
+        if (!string.IsNullOrEmpty(startDate) && LocalDatePattern.Iso.Parse(startDate).TryGetValue(localNow, out var parsedStart))
         {
-            customerQuery = customerQuery.Where(a => a.CustomerId == customerId.Value);
+            sDate = parsedStart;
         }
 
-        var customerTxRaw = await customerQuery.OrderByDescending(a => a.StartsAt).Take(50).ToListAsync();
-        var customerTxItems = customerTxRaw.Select(a => new ReportTransactionRow
+        LocalDate? eDate = null;
+        if (!string.IsNullOrEmpty(endDate) && LocalDatePattern.Iso.Parse(endDate).TryGetValue(localNow, out var parsedEnd))
         {
-            ReferenceCode = a.ReferenceCode,
-            DateFormatted = a.StartsAt.InZone(_zone).ToString("MMM d, yyyy · h:mm tt", null),
-            CustomerName = a.Customer.FullName,
-            BarberName = a.Barber.DisplayName,
-            ServiceName = a.ServiceName,
-            Price = a.Price,
-            FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
-        }).ToList();
-
-        // 4. Barber Transactions Query (RP-4)
-        var barberQuery = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
-            .Where(a => a.Status == AppointmentStatus.Completed);
-
-        if (barberId.HasValue && barberId.Value > 0)
-        {
-            barberQuery = barberQuery.Where(a => a.BarberId == barberId.Value);
+            eDate = parsedEnd;
         }
 
-        var barberTxRaw = await barberQuery.OrderByDescending(a => a.StartsAt).Take(50).ToListAsync();
-        var barberTxItems = barberTxRaw.Select(a => new ReportTransactionRow
-        {
-            ReferenceCode = a.ReferenceCode,
-            DateFormatted = a.StartsAt.InZone(_zone).ToString("MMM d, yyyy · h:mm tt", null),
-            CustomerName = a.Customer.FullName,
-            BarberName = a.Barber.DisplayName,
-            ServiceName = a.ServiceName,
-            Price = a.Price,
-            FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
-        }).ToList();
-
-        var viewModel = new AdminReportsViewModel
-        {
-            ActiveTab = tab.ToLower(),
-            SelectedDateString = selectedDate.ToString("yyyy-MM-dd", null),
-            SelectedDateFormatted = selectedDate.ToString("MMMM d, yyyy", null),
-            SelectedYear = selectedYear,
-            SelectedMonth = selectedMonth,
-            SelectedBarberId = barberId,
-            SelectedCustomerId = customerId,
-            Barbers = barbers,
-            Customers = customers,
-
-            // Daily Sales
-            DailyRows = dailyItems,
-            DailyTotalCount = dailyItems.Count,
-            DailyTotalSales = dailyTotalSales,
-            FormattedDailyTotalSales = FormattingHelpers.FormatPeso(dailyTotalSales),
-            DailyBarberBreakdown = dailyBarberBreakdown,
-            DailyServiceBreakdown = dailyServiceBreakdown,
-
-            // Monthly Sales
-            MonthlyDailyRows = monthlyDailyRows,
-            MonthlyTotalCount = monthlyAppointmentsRaw.Count,
-            MonthlyTotalSales = monthlyTotalSales,
-            FormattedMonthlyTotalSales = FormattingHelpers.FormatPeso(monthlyTotalSales),
-
-            // Customer Transactions
-            CustomerTransactions = customerTxItems,
-            CustomerTotalSpent = customerTxItems.Sum(t => t.Price),
-            FormattedCustomerTotalSpent = FormattingHelpers.FormatPeso(customerTxItems.Sum(t => t.Price)),
-
-            // Barber Transactions
-            BarberTransactions = barberTxItems,
-            BarberTotalGenerated = barberTxItems.Sum(t => t.Price),
-            FormattedBarberTotalGenerated = FormattingHelpers.FormatPeso(barberTxItems.Sum(t => t.Price))
-        };
-
-        return View(viewModel);
+        var report = await _reportingService.GetBarberTransactionsAsync(barberId, sDate, eDate);
+        return Ok(report);
     }
+
+    #endregion
 }
 
 public class AdminReportsViewModel
@@ -235,73 +242,16 @@ public class AdminReportsViewModel
     public string SelectedDateFormatted { get; set; } = string.Empty;
     public int SelectedYear { get; set; }
     public int SelectedMonth { get; set; }
-    public int? SelectedBarberId { get; set; }
-    public int? SelectedCustomerId { get; set; }
+    public int SelectedBarberId { get; set; }
+    public int SelectedCustomerId { get; set; }
+    public string? StartDateString { get; set; }
+    public string? EndDateString { get; set; }
 
     public List<BarberBook.Data.Entities.Barber> Barbers { get; set; } = new();
     public List<BarberBook.Data.Entities.ApplicationUser> Customers { get; set; } = new();
 
-    // Daily
-    public List<ReportDailyRowItem> DailyRows { get; set; } = new();
-    public int DailyTotalCount { get; set; }
-    public decimal DailyTotalSales { get; set; }
-    public string FormattedDailyTotalSales { get; set; } = "₱0.00";
-    public List<ReportGroupBreakdown> DailyBarberBreakdown { get; set; } = new();
-    public List<ReportGroupBreakdown> DailyServiceBreakdown { get; set; } = new();
-
-    // Monthly
-    public List<ReportMonthDayRow> MonthlyDailyRows { get; set; } = new();
-    public int MonthlyTotalCount { get; set; }
-    public decimal MonthlyTotalSales { get; set; }
-    public string FormattedMonthlyTotalSales { get; set; } = "₱0.00";
-
-    // Customer Tx
-    public List<ReportTransactionRow> CustomerTransactions { get; set; } = new();
-    public decimal CustomerTotalSpent { get; set; }
-    public string FormattedCustomerTotalSpent { get; set; } = "₱0.00";
-
-    // Barber Tx
-    public List<ReportTransactionRow> BarberTransactions { get; set; } = new();
-    public decimal BarberTotalGenerated { get; set; }
-    public string FormattedBarberTotalGenerated { get; set; } = "₱0.00";
-}
-
-public class ReportDailyRowItem
-{
-    public int AppointmentId { get; set; }
-    public string ReferenceCode { get; set; } = string.Empty;
-    public string TimeFormatted { get; set; } = string.Empty;
-    public string CustomerName { get; set; } = string.Empty;
-    public string BarberName { get; set; } = string.Empty;
-    public string ServiceName { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public string FormattedPrice { get; set; } = string.Empty;
-}
-
-public class ReportGroupBreakdown
-{
-    public string Name { get; set; } = string.Empty;
-    public int Count { get; set; }
-    public decimal TotalSales { get; set; }
-    public string FormattedTotalSales { get; set; } = string.Empty;
-}
-
-public class ReportMonthDayRow
-{
-    public string Date { get; set; } = string.Empty;
-    public string DateFormatted { get; set; } = string.Empty;
-    public int CompletedCount { get; set; }
-    public decimal TotalSales { get; set; }
-    public string FormattedTotalSales { get; set; } = string.Empty;
-}
-
-public class ReportTransactionRow
-{
-    public string ReferenceCode { get; set; } = string.Empty;
-    public string DateFormatted { get; set; } = string.Empty;
-    public string CustomerName { get; set; } = string.Empty;
-    public string BarberName { get; set; } = string.Empty;
-    public string ServiceName { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public string FormattedPrice { get; set; } = string.Empty;
+    public DailySalesReportDto DailyReport { get; set; } = new();
+    public MonthlySalesReportDto MonthlyReport { get; set; } = new();
+    public CustomerTransactionsReportDto CustomerReport { get; set; } = new();
+    public BarberTransactionsReportDto BarberReport { get; set; } = new();
 }

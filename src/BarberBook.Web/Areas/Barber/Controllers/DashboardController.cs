@@ -21,6 +21,7 @@ public class DashboardController : Controller
     private readonly BarberBookDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IAppointmentTransitionService _transitionService;
+    private readonly IReportingService _reportingService;
     private readonly IEquipmentService _equipmentService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
@@ -29,6 +30,7 @@ public class DashboardController : Controller
         BarberBookDbContext dbContext,
         UserManager<ApplicationUser> userManager,
         IAppointmentTransitionService transitionService,
+        IReportingService reportingService,
         IEquipmentService equipmentService,
         IClock clock,
         DateTimeZone? zone = null)
@@ -36,6 +38,7 @@ public class DashboardController : Controller
         _dbContext = dbContext;
         _userManager = userManager;
         _transitionService = transitionService;
+        _reportingService = reportingService;
         _equipmentService = equipmentService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
@@ -468,64 +471,44 @@ public class DashboardController : Controller
         var barber = await GetCurrentBarberAsync();
         if (barber == null) return Forbid();
 
-        // BR-07: Only appointments with status "completed" count in sales and transactions
-        // T-13: Scoped strictly to the logged-in barber
-        var query = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Where(a => a.BarberId == barber.Id && a.Status == AppointmentStatus.Completed)
-            .AsQueryable();
-
+        // BR-07, BR-12, BF-5: Derived strictly from the session, computed by ReportingService
+        LocalDate? sDate = null;
         if (!string.IsNullOrWhiteSpace(startDate))
         {
             var parseStart = LocalDatePattern.CreateWithInvariantCulture("yyyy-MM-dd").Parse(startDate);
-            if (parseStart.Success)
-            {
-                var startInstant = parseStart.Value.AtStartOfDayInZone(_zone).ToInstant();
-                query = query.Where(a => a.StartsAt >= startInstant);
-            }
+            if (parseStart.Success) sDate = parseStart.Value;
         }
 
+        LocalDate? eDate = null;
         if (!string.IsNullOrWhiteSpace(endDate))
         {
             var parseEnd = LocalDatePattern.CreateWithInvariantCulture("yyyy-MM-dd").Parse(endDate);
-            if (parseEnd.Success)
-            {
-                var endInstant = parseEnd.Value.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
-                query = query.Where(a => a.StartsAt < endInstant);
-            }
+            if (parseEnd.Success) eDate = parseEnd.Value;
         }
 
-        var completedAppointments = await query
-            .OrderByDescending(a => a.StartsAt)
-            .ToListAsync();
+        var report = await _reportingService.GetBarberTransactionsAsync(barber.Id, sDate, eDate);
 
-        var totalRevenue = completedAppointments.Sum(a => a.Price);
-        var avgTicket = completedAppointments.Any() ? totalRevenue / completedAppointments.Count : 0m;
+        var avgTicket = report.CompletedCount > 0 ? report.TotalSales / report.CompletedCount : 0m;
 
-        var items = completedAppointments.Select(a =>
+        var items = report.Transactions.Select(tx => new BarberTransactionItemViewModel
         {
-            var manilaTime = a.StartsAt.InZone(_zone);
-            return new BarberTransactionItemViewModel
-            {
-                AppointmentId = a.Id,
-                ReferenceCode = a.ReferenceCode,
-                DateFormatted = manilaTime.Date.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture),
-                TimeFormatted = manilaTime.TimeOfDay.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture),
-                CustomerName = a.Customer.FullName,
-                ServiceName = a.ServiceName,
-                Price = a.Price,
-                FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
-            };
+            AppointmentId = tx.AppointmentId,
+            ReferenceCode = tx.ReferenceCode,
+            DateFormatted = tx.DateFormatted,
+            TimeFormatted = tx.TimeFormatted,
+            CustomerName = tx.Customer,
+            ServiceName = tx.Service,
+            Price = tx.Amount,
+            FormattedPrice = tx.FormattedAmount
         }).ToList();
 
         var model = new BarberTransactionsViewModel
         {
             BarberId = barber.Id,
             BarberName = barber.DisplayName,
-            TotalCompletedCount = completedAppointments.Count,
-            TotalRevenue = totalRevenue,
-            FormattedTotalRevenue = FormattingHelpers.FormatPeso(totalRevenue),
+            TotalCompletedCount = report.CompletedCount,
+            TotalRevenue = report.TotalSales,
+            FormattedTotalRevenue = report.FormattedTotalSales,
             AverageTicket = avgTicket,
             FormattedAverageTicket = FormattingHelpers.FormatPeso(avgTicket),
             StartDate = startDate,
@@ -534,6 +517,31 @@ public class DashboardController : Controller
         };
 
         return View(model);
+    }
+
+    [HttpGet("/api/barber/transactions")]
+    [HttpGet("/api/me/transactions")]
+    public async Task<IActionResult> ApiTransactions([FromQuery] string? startDate = null, [FromQuery] string? endDate = null)
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        LocalDate? sDate = null;
+        if (!string.IsNullOrWhiteSpace(startDate))
+        {
+            var parseStart = LocalDatePattern.CreateWithInvariantCulture("yyyy-MM-dd").Parse(startDate);
+            if (parseStart.Success) sDate = parseStart.Value;
+        }
+
+        LocalDate? eDate = null;
+        if (!string.IsNullOrWhiteSpace(endDate))
+        {
+            var parseEnd = LocalDatePattern.CreateWithInvariantCulture("yyyy-MM-dd").Parse(endDate);
+            if (parseEnd.Success) eDate = parseEnd.Value;
+        }
+
+        var report = await _reportingService.GetBarberTransactionsAsync(barber.Id, sDate, eDate);
+        return Ok(report);
     }
 
     [HttpGet("equipment")]

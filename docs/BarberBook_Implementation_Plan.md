@@ -373,8 +373,8 @@ Tests using the seed:
 ```
 
 **Done when**
-- [ ] T-10 to T-14 pass against the seed and the screens match the paper's sample layouts.
-- [ ] Barbers can read only their own transactions through the shared service.
+- [x] T-10 to T-14 pass against the seed and the screens match the paper's sample layouts.
+- [x] Barbers can read only their own transactions through the shared service.
 
 ---
 
