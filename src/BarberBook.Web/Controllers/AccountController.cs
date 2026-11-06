@@ -394,7 +394,37 @@ public class AccountController : Controller
     {
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
-            return returnUrl;
+            var cleanUrl = returnUrl.Trim().ToLowerInvariant();
+
+            // Guard: Admin should not be redirected to customer-only pages (e.g. /book, /my-appointments)
+            if (role == UserRole.Admin)
+            {
+                if (cleanUrl.StartsWith("/admin"))
+                {
+                    return returnUrl;
+                }
+                return "/admin";
+            }
+
+            // Guard: Barber should not be redirected to customer-only pages (e.g. /book, /my-appointments)
+            if (role == UserRole.Barber)
+            {
+                if (cleanUrl.StartsWith("/barber"))
+                {
+                    return returnUrl;
+                }
+                return "/barber";
+            }
+
+            // Customer: should not be redirected to admin or barber portals
+            if (role == UserRole.Customer)
+            {
+                if (!cleanUrl.StartsWith("/admin") && !cleanUrl.StartsWith("/barber"))
+                {
+                    return returnUrl;
+                }
+                return "/";
+            }
         }
 
         return role switch

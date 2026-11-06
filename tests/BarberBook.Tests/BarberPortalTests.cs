@@ -103,7 +103,7 @@ public class BarberPortalTests : IClassFixture<WebApplicationFactory<Program>>
     private async Task<Appointment> CreateIsolatedAppointmentAsync(
         AppointmentStatus status,
         int barberId = 1,
-        int customerId = 5,
+        int customerId = 6,
         string serviceName = "Classic Haircut",
         decimal price = 250.00m)
     {
@@ -142,6 +142,18 @@ public class BarberPortalTests : IClassFixture<WebApplicationFactory<Program>>
 
         db.Appointments.Add(app);
         await db.SaveChangesAsync();
+
+        db.StatusHistories.Add(new StatusHistory
+        {
+            AppointmentId = app.Id,
+            FromStatus = null,
+            ToStatus = status,
+            ChangedByRole = "Customer",
+            ChangedAt = clock.GetCurrentInstant(),
+            Note = "Initial booking"
+        });
+        await db.SaveChangesAsync();
+
         return app;
     }
 

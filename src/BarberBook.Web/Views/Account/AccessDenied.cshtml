@@ -1,21 +1,84 @@
+@using Microsoft.AspNetCore.Identity
+@using BarberBook.Data.Entities
+@inject SignInManager<ApplicationUser> SignInManager
 @{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = "Access Restricted";
+    var returnUrl = Context.Request.Query["ReturnUrl"].ToString();
+    var isAdmin = User.IsInRole("Admin");
+    var isBarber = User.IsInRole("Barber");
+    var isCustomer = User.IsInRole("Customer");
 }
 
-<div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
-    <div class="inline-flex items-center justify-center p-3 bg-red-100 rounded-full mb-4">
-        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+<div class="max-w-lg mx-auto my-12 bg-white rounded-3xl shadow-xl border border-slate-200/90 p-8 sm:p-10 text-center space-y-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 mx-auto">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
     </div>
-    <h1 class="text-2xl font-bold text-slate-900">403 — Access Denied</h1>
-    <p class="mt-2 text-slate-600">
-        You do not have the required permissions to view this portal or perform this operation.
-    </p>
-    <div class="mt-6">
-        <a href="/" class="inline-flex items-center px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
-            Return to Home
-        </a>
+
+    <div>
+        <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+            <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+            <span>PORTAL ACCESS GUARD</span>
+        </div>
+        <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Access Restricted</h1>
+
+        @if (isAdmin)
+        {
+            <div class="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left text-xs text-amber-900 space-y-2">
+                <p class="font-bold text-sm text-slate-900">Signed in as: Administrator</p>
+                <p>
+                    You are logged in with the <strong>Shop Administrator</strong> account. Client-facing features (such as customer online booking at <code>/book</code>) are reserved for customer accounts to preserve booking data integrity.
+                </p>
+                <p class="text-amber-800">
+                    To manage shop appointments, review calendar schedules, or manage services and barbers, please use the Admin Dashboard.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                <a href="/admin" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md">
+                    Go to Admin Dashboard
+                </a>
+                <a href="/admin/appointments" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                    View Shop Appointments
+                </a>
+            </div>
+        }
+        else if (isBarber)
+        {
+            <div class="mt-4 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-left text-xs text-blue-900 space-y-2">
+                <p class="font-bold text-sm text-slate-900">Signed in as: Master Barber</p>
+                <p>
+                    You are logged in with a <strong>Barber Staff</strong> account. Client-facing features (such as booking at <code>/book</code>) are reserved for customer accounts.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                <a href="/barber" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md">
+                    Go to Barber Portal
+                </a>
+                <a href="/barber/schedule" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                    View My Schedule
+                </a>
+            </div>
+        }
+        else
+        {
+            <p class="mt-2 text-xs sm:text-sm text-slate-600">
+                You do not have permission to view this resource. This area is reserved for staff or specific account roles.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                <a href="/" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md">
+                    Return to Home
+                </a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a href="/login" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                        Sign In
+                    </a>
+                }
+            </div>
+        }
     </div>
 </div>
-
