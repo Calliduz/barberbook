@@ -17,5 +17,8 @@ public class Equipment
     public EquipmentStatus Status { get; set; } = EquipmentStatus.InService;
     public int InspectionIntervalDays { get; set; } = 30;
     public string? Notes { get; set; }
+
+    public ICollection<EquipmentAssignment> Assignments { get; set; } = new List<EquipmentAssignment>();
+    public ICollection<EquipmentCheck> Checks { get; set; } = new List<EquipmentCheck>();
 }
 

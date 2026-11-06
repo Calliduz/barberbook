@@ -17,6 +17,8 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<Product> Products => Set<Product>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<Equipment> Equipment => Set<Equipment>();
+    public DbSet<EquipmentAssignment> EquipmentAssignments => Set<EquipmentAssignment>();
+    public DbSet<EquipmentCheck> EquipmentChecks => Set<EquipmentCheck>();
 
     public BarberBookDbContext(DbContextOptions<BarberBookDbContext> options)
         : base(options)
@@ -299,6 +301,69 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.HasIndex(e => e.AssetTag).IsUnique();
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
+        });
+
+        // 11. Equipment Assignments (HW-1, SC-10, AF-9, INV-01)
+        builder.Entity<EquipmentAssignment>(entity =>
+        {
+            entity.ToTable("equipment_assignments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.EquipmentId).HasColumnName("equipment_id").IsRequired();
+            entity.Property(e => e.BarberId).HasColumnName("barber_id").IsRequired();
+            entity.Property(e => e.AssignedAt).HasColumnName("assigned_at").IsRequired();
+            entity.Property(e => e.ReturnedAt).HasColumnName("returned_at");
+            entity.Property(e => e.Notes).HasColumnName("notes").HasMaxLength(500);
+
+            entity.HasOne(e => e.Equipment)
+                .WithMany(eq => eq.Assignments)
+                .HasForeignKey(e => e.EquipmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Barber)
+                .WithMany(b => b.EquipmentAssignments)
+                .HasForeignKey(e => e.BarberId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Partial unique index: one active assignment per equipment where returned_at IS NULL (INV-01)
+            entity.HasIndex(e => e.EquipmentId)
+                .HasFilter("returned_at IS NULL")
+                .IsUnique();
+
+            entity.HasIndex(e => e.BarberId);
+        });
+
+        // 12. Equipment Checks (HW-3, SC-12, AF-13, INV-02)
+        builder.Entity<EquipmentCheck>(entity =>
+        {
+            entity.ToTable("equipment_checks");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.EquipmentId).HasColumnName("equipment_id").IsRequired();
+            entity.Property(e => e.CheckedById).HasColumnName("checked_by_id");
+            entity.Property(e => e.CheckedAt).HasColumnName("checked_at").IsRequired();
+            entity.Property(e => e.Condition)
+                .HasColumnName("condition")
+                .HasConversion(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => Enum.Parse<EquipmentCondition>(v, true))
+                .HasMaxLength(20)
+                .IsRequired();
+            entity.Property(e => e.Notes).HasColumnName("notes").HasMaxLength(1000);
+            entity.Property(e => e.NextCheckDue).HasColumnName("next_check_due").IsRequired();
+
+            entity.HasOne(e => e.Equipment)
+                .WithMany(eq => eq.Checks)
+                .HasForeignKey(e => e.EquipmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.CheckedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CheckedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => new { e.EquipmentId, e.CheckedAt });
+            entity.HasIndex(e => e.NextCheckDue);
         });
     }
 }

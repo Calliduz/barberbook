@@ -293,7 +293,7 @@ public class BarberPortalTests : IClassFixture<WebApplicationFactory<Program>>
         getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var html = await getResponse.Content.ReadAsStringAsync();
         html.Should().Contain("My Assigned Equipment");
-        html.Should().Contain("Wahl Magic Clip Cordless"); // Assigned to Ramon
+        html.Should().Contain("Cordless Senior Clipper"); // Assigned to Ramon (EQ-001)
 
         // 2. Post inspection log for Ramon's tool (Id = 1)
         var inspectForm = new FormUrlEncodedContent(new[]

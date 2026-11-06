@@ -13,6 +13,8 @@ public class AdminDashboardDto
     public List<AdminDashboardBarberScheduleDto> TodayAppointmentsByBarber { get; set; } = new();
     public int ActiveBarbersCount { get; set; }
     public int TotalCustomersCount { get; set; }
+    public int FlaggedEquipmentCount { get; set; }
+    public List<BarberBook.Web.Models.Inventory.EquipmentMonitoringItemDto> FlaggedEquipmentAlerts { get; set; } = new();
 }
 
 public class TodayCountsDto

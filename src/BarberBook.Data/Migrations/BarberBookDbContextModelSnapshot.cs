@@ -356,6 +356,94 @@ namespace BarberBook.Data.Migrations
                     b.ToTable("equipment", (string)null);
                 });
 
+            modelBuilder.Entity("BarberBook.Data.Entities.EquipmentAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Instant>("AssignedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("assigned_at");
+
+                    b.Property<int>("BarberId")
+                        .HasColumnType("integer")
+                        .HasColumnName("barber_id");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipment_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
+                    b.Property<Instant?>("ReturnedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("returned_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberId");
+
+                    b.HasIndex("EquipmentId")
+                        .IsUnique()
+                        .HasFilter("returned_at IS NULL");
+
+                    b.ToTable("equipment_assignments", (string)null);
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.EquipmentCheck", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Instant>("CheckedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("checked_at");
+
+                    b.Property<int?>("CheckedById")
+                        .HasColumnType("integer")
+                        .HasColumnName("checked_by_id");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("condition");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipment_id");
+
+                    b.Property<LocalDate>("NextCheckDue")
+                        .HasColumnType("date")
+                        .HasColumnName("next_check_due");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CheckedById");
+
+                    b.HasIndex("NextCheckDue");
+
+                    b.HasIndex("EquipmentId", "CheckedAt");
+
+                    b.ToTable("equipment_checks", (string)null);
+                });
+
             modelBuilder.Entity("BarberBook.Data.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -783,6 +871,43 @@ namespace BarberBook.Data.Migrations
                     b.Navigation("Barber");
                 });
 
+            modelBuilder.Entity("BarberBook.Data.Entities.EquipmentAssignment", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.Barber", "Barber")
+                        .WithMany("EquipmentAssignments")
+                        .HasForeignKey("BarberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BarberBook.Data.Entities.Equipment", "Equipment")
+                        .WithMany("Assignments")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Barber");
+
+                    b.Navigation("Equipment");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.EquipmentCheck", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.ApplicationUser", "CheckedBy")
+                        .WithMany()
+                        .HasForeignKey("CheckedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BarberBook.Data.Entities.Equipment", "Equipment")
+                        .WithMany("Checks")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CheckedBy");
+
+                    b.Navigation("Equipment");
+                });
+
             modelBuilder.Entity("BarberBook.Data.Entities.StatusHistory", b =>
                 {
                     b.HasOne("BarberBook.Data.Entities.Appointment", "Appointment")
@@ -899,7 +1024,16 @@ namespace BarberBook.Data.Migrations
 
                     b.Navigation("DaysOff");
 
+                    b.Navigation("EquipmentAssignments");
+
                     b.Navigation("WorkingHours");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Equipment", b =>
+                {
+                    b.Navigation("Assignments");
+
+                    b.Navigation("Checks");
                 });
 
             modelBuilder.Entity("BarberBook.Data.Entities.Product", b =>

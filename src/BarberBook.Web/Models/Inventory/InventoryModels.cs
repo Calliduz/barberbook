@@ -206,6 +206,30 @@ public class EquipmentDto
 
     [JsonPropertyName("notes")]
     public string? Notes { get; set; }
+
+    [JsonPropertyName("current_barber_id")]
+    public int? CurrentBarberId { get; set; }
+
+    [JsonPropertyName("current_barber_name")]
+    public string? CurrentBarberName { get; set; }
+
+    [JsonPropertyName("last_inspected_at")]
+    public string? LastInspectedAt { get; set; }
+
+    [JsonPropertyName("next_check_due")]
+    public string? NextInspectionDue { get; set; }
+
+    [JsonPropertyName("days_overdue")]
+    public int DaysOverdue { get; set; }
+
+    [JsonPropertyName("is_overdue")]
+    public bool IsOverdue => DaysOverdue > 0;
+
+    [JsonPropertyName("is_flagged")]
+    public bool IsFlagged { get; set; }
+
+    [JsonPropertyName("flag_reasons")]
+    public List<string> FlagReasons { get; set; } = new();
 }
 
 public class CreateEquipmentRequest
@@ -307,5 +331,7 @@ public class AdminInventoryViewModel
     public string ActiveTab { get; set; } = "products";
     public List<string> ProductCategories { get; set; } = new();
     public List<string> EquipmentCategories { get; set; } = new();
+    public List<BarberEquipmentSelectionItem> Barbers { get; set; } = new();
+    public EquipmentMonitoringResponse Monitoring { get; set; } = new();
 }
 

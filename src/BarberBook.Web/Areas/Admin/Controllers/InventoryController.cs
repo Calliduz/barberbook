@@ -6,6 +6,8 @@ using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
+using NodaTime.Text;
 
 namespace BarberBook.Web.Areas.Admin.Controllers;
 
@@ -14,15 +16,18 @@ namespace BarberBook.Web.Areas.Admin.Controllers;
 public class InventoryController : Controller
 {
     private readonly IInventoryService _inventoryService;
+    private readonly IEquipmentService _equipmentService;
     private readonly BarberBookDbContext _dbContext;
     private readonly ILogger<InventoryController> _logger;
 
     public InventoryController(
         IInventoryService inventoryService,
+        IEquipmentService equipmentService,
         BarberBookDbContext dbContext,
         ILogger<InventoryController> logger)
     {
         _inventoryService = inventoryService;
+        _equipmentService = equipmentService;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -50,6 +55,29 @@ public class InventoryController : Controller
             status: tab == "equipment" ? status : null,
             condition: tab == "equipment" ? condition : null);
 
+        // Fetch live monitoring and active barber assignments (P16, HW-1, HW-3)
+        var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();
+        var monitoringMap = monitoring.PoorCondition
+            .Concat(monitoring.UnderMaintenanceOrOutOfService)
+            .Concat(monitoring.OverdueForInspection)
+            .Concat(monitoring.Healthy)
+            .GroupBy(i => i.Id)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        foreach (var eq in equipment)
+        {
+            if (monitoringMap.TryGetValue(eq.Id, out var m))
+            {
+                eq.CurrentBarberId = m.CurrentBarberId;
+                eq.CurrentBarberName = m.CurrentBarberName;
+                eq.LastInspectedAt = m.LastInspectedAt;
+                eq.NextInspectionDue = m.NextCheckDue;
+                eq.DaysOverdue = m.DaysOverdue;
+                eq.IsFlagged = m.IsFlagged;
+                eq.FlagReasons = m.FlagReasons;
+            }
+        }
+
         var productCategories = await _dbContext.Products
             .Select(p => p.Category)
             .Distinct()
@@ -62,6 +90,18 @@ public class InventoryController : Controller
             .OrderBy(c => c)
             .ToListAsync();
 
+        var activeBarbers = await _dbContext.Barbers
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .Select(b => new BarberEquipmentSelectionItem
+            {
+                Id = b.Id,
+                DisplayName = b.DisplayName,
+                Specialties = b.Specialties,
+                ActiveToolCount = b.EquipmentAssignments.Count(a => a.ReturnedAt == null)
+            })
+            .ToListAsync();
+
         var model = new AdminInventoryViewModel
         {
             Products = products.ToList(),
@@ -71,7 +111,67 @@ public class InventoryController : Controller
             TotalEquipment = equipment.Count(e => e.Status != "retired"),
             ActiveTab = tab.ToLowerInvariant() == "equipment" ? "equipment" : "products",
             ProductCategories = productCategories,
-            EquipmentCategories = equipmentCategories
+            EquipmentCategories = equipmentCategories,
+            Barbers = activeBarbers,
+            Monitoring = monitoring
+        };
+
+        return View(model);
+    }
+
+    [HttpGet("admin/equipment/per-barber")]
+    public async Task<IActionResult> EquipmentPerBarber([FromQuery] int? barberId = null)
+    {
+        var activeBarbers = await _dbContext.Barbers
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .Select(b => new BarberEquipmentSelectionItem
+            {
+                Id = b.Id,
+                DisplayName = b.DisplayName,
+                Specialties = b.Specialties,
+                ActiveToolCount = b.EquipmentAssignments.Count(a => a.ReturnedAt == null)
+            })
+            .ToListAsync();
+
+        int selectedId = barberId ?? activeBarbers.FirstOrDefault()?.Id ?? 0;
+
+        var activeAssignments = selectedId > 0
+            ? await _equipmentService.GetBarberAssignmentsAsync(selectedId, activeOnly: true)
+            : new List<EquipmentAssignmentDto>();
+
+        var pastAssignments = selectedId > 0
+            ? (await _equipmentService.GetBarberAssignmentsAsync(selectedId, activeOnly: false))
+                .Where(a => !a.IsActive)
+                .ToList()
+            : new List<EquipmentAssignmentDto>();
+
+        var unassigned = await _equipmentService.GetUnassignedEquipmentAsync();
+
+        var model = new AdminEquipmentPerBarberViewModel
+        {
+            SelectedBarberId = selectedId,
+            Barbers = activeBarbers,
+            ActiveAssignments = activeAssignments.ToList(),
+            PastAssignments = pastAssignments,
+            UnassignedEquipment = unassigned.ToList()
+        };
+
+        return View(model);
+    }
+
+    [HttpGet("admin/equipment/quality")]
+    public async Task<IActionResult> EquipmentQuality()
+    {
+        var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();
+        var recentChecks = await _equipmentService.GetRecentChecksAsync(30);
+        var allEquipment = await _inventoryService.GetEquipmentAsync();
+
+        var model = new AdminEquipmentQualityViewModel
+        {
+            Monitoring = monitoring,
+            RecentChecks = recentChecks.ToList(),
+            AllEquipment = allEquipment.Where(e => e.Status != "retired").ToList()
         };
 
         return View(model);
@@ -223,6 +323,68 @@ public class InventoryController : Controller
         else
         {
             TempData["SuccessMessage"] = "Equipment marked as retired.";
+        }
+
+        return RedirectToAction(nameof(Index), new { tab = "equipment" });
+    }
+
+    [HttpPost("admin/inventory/equipment/{id:int}/assign")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignEquipment(int id, [FromForm] int barberId, [FromForm] string? notes = null)
+    {
+        var (success, error, _) = await _equipmentService.AssignEquipmentAsync(id, barberId, notes);
+        if (!success)
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to assign equipment.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Equipment assigned successfully.";
+        }
+
+        return RedirectToAction(nameof(Index), new { tab = "equipment" });
+    }
+
+    [HttpPost("admin/inventory/equipment/{id:int}/return")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReturnEquipment(int id, [FromForm] string? notes = null)
+    {
+        var (success, error) = await _equipmentService.ReturnEquipmentAsync(id, notes);
+        if (!success)
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to return equipment.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Equipment returned to shop storage.";
+        }
+
+        return RedirectToAction(nameof(Index), new { tab = "equipment" });
+    }
+
+    [HttpPost("admin/inventory/equipment/{id:int}/inspect")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> InspectEquipment(
+        int id,
+        [FromForm] EquipmentCondition condition,
+        [FromForm] string? notes = null,
+        [FromForm] string? nextCheckDue = null)
+    {
+        var userId = User.GetUserId();
+        LocalDate? nextDue = null;
+        if (!string.IsNullOrWhiteSpace(nextCheckDue) && LocalDatePattern.Iso.Parse(nextCheckDue.Trim()).TryGetValue(LocalDate.MinIsoValue, out var parsed))
+        {
+            nextDue = parsed;
+        }
+
+        var (success, error, _) = await _equipmentService.LogInspectionAsync(id, condition, notes, nextDue, userId);
+        if (!success)
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to record equipment inspection.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Equipment inspection logged successfully.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -412,6 +574,114 @@ public class InventoryController : Controller
             return NotFound(new ApiErrorResponse("EQUIPMENT_NOT_FOUND", $"Equipment with ID {id} not found."));
         }
         return Ok(new { message = "Equipment retired successfully." });
+    }
+
+    // ==========================================
+    // 3. Equipment Assignments & Checks APIs (P16)
+    // ==========================================
+
+    [HttpPost("api/admin/equipment/{id:int}/assign")]
+    public async Task<IActionResult> AssignEquipmentApi(int id, [FromBody] AssignEquipmentRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", ModelState));
+        }
+
+        var (success, error, assignment) = await _equipmentService.AssignEquipmentAsync(id, request.BarberId, request.Notes);
+        if (!success)
+        {
+            if (error?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return NotFound(new ApiErrorResponse("NOT_FOUND", error));
+            }
+            return BadRequest(new ApiErrorResponse("ASSIGNMENT_ERROR", error ?? "Failed to assign equipment."));
+        }
+
+        return Ok(assignment);
+    }
+
+    [HttpPost("api/admin/equipment/{id:int}/return")]
+    public async Task<IActionResult> ReturnEquipmentApi(int id, [FromBody] ReturnEquipmentRequest? request = null)
+    {
+        var (success, error) = await _equipmentService.ReturnEquipmentAsync(id, request?.Notes);
+        if (!success)
+        {
+            return BadRequest(new ApiErrorResponse("RETURN_ERROR", error ?? "Failed to return equipment."));
+        }
+
+        return Ok(new { message = "Equipment returned successfully." });
+    }
+
+    [HttpGet("api/admin/equipment/{id:int}/assignments")]
+    public async Task<IActionResult> GetEquipmentAssignmentsApi(int id)
+    {
+        var equipment = await _inventoryService.GetEquipmentByIdAsync(id);
+        if (equipment == null)
+        {
+            return NotFound(new ApiErrorResponse("EQUIPMENT_NOT_FOUND", $"Equipment with ID {id} not found."));
+        }
+
+        var history = await _equipmentService.GetEquipmentAssignmentHistoryAsync(id);
+        return Ok(history);
+    }
+
+    [HttpPost("api/admin/equipment/{id:int}/inspect")]
+    public async Task<IActionResult> InspectEquipmentApi(int id, [FromBody] LogEquipmentCheckRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", ModelState));
+        }
+
+        LocalDate? nextDue = null;
+        if (!string.IsNullOrWhiteSpace(request.NextCheckDue) &&
+            LocalDatePattern.Iso.Parse(request.NextCheckDue.Trim()).TryGetValue(LocalDate.MinIsoValue, out var parsed))
+        {
+            nextDue = parsed;
+        }
+
+        var userId = User.GetUserId();
+        var (success, error, check) = await _equipmentService.LogInspectionAsync(id, request.Condition, request.Notes, nextDue, userId);
+        if (!success)
+        {
+            return NotFound(new ApiErrorResponse("INSPECTION_ERROR", error ?? "Failed to record inspection."));
+        }
+
+        return Ok(check);
+    }
+
+    [HttpGet("api/admin/equipment/{id:int}/checks")]
+    public async Task<IActionResult> GetEquipmentChecksApi(int id)
+    {
+        var equipment = await _inventoryService.GetEquipmentByIdAsync(id);
+        if (equipment == null)
+        {
+            return NotFound(new ApiErrorResponse("EQUIPMENT_NOT_FOUND", $"Equipment with ID {id} not found."));
+        }
+
+        var checks = await _equipmentService.GetEquipmentChecksAsync(id);
+        return Ok(checks);
+    }
+
+    [HttpGet("api/admin/equipment/monitoring")]
+    public async Task<IActionResult> GetEquipmentMonitoringApi()
+    {
+        var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();
+        return Ok(monitoring);
+    }
+
+    [HttpGet("api/admin/barbers/{barberId:int}/equipment")]
+    public async Task<IActionResult> GetBarberEquipmentApi(int barberId)
+    {
+        var barber = await _dbContext.Barbers.FirstOrDefaultAsync(b => b.Id == barberId);
+        if (barber == null)
+        {
+            return NotFound(new ApiErrorResponse("BARBER_NOT_FOUND", $"Barber with ID {barberId} not found."));
+        }
+
+        var assignments = await _equipmentService.GetBarberAssignmentsAsync(barberId, activeOnly: false);
+        return Ok(assignments);
     }
 }
 

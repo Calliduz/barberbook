@@ -19,6 +19,7 @@ public class DashboardController : Controller
     private readonly BarberBookDbContext _dbContext;
     private readonly IReportingService _reportingService;
     private readonly IAppointmentTransitionService _transitionService;
+    private readonly IEquipmentService _equipmentService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
@@ -26,12 +27,14 @@ public class DashboardController : Controller
         BarberBookDbContext dbContext,
         IReportingService reportingService,
         IAppointmentTransitionService transitionService,
+        IEquipmentService equipmentService,
         IClock clock,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
         _reportingService = reportingService;
         _transitionService = transitionService;
+        _equipmentService = equipmentService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -174,11 +177,22 @@ public class DashboardController : Controller
             };
         }).ToList();
 
+        // 7. Equipment monitoring alerts (P16, HW-3, INV-02)
+        var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();
+        var flaggedAlerts = monitoring.PoorCondition
+            .Concat(monitoring.UnderMaintenanceOrOutOfService)
+            .Concat(monitoring.OverdueForInspection)
+            .GroupBy(i => i.Id)
+            .Select(g => g.First())
+            .ToList();
+
         var model = new AdminDashboardViewModel
         {
             TodayCounts = todayCounts,
             ActiveBarbersCount = activeBarbersCount,
             TotalCustomersCount = totalCustomersCount,
+            FlaggedEquipmentCount = monitoring.TotalFlaggedCount,
+            FlaggedEquipmentAlerts = flaggedAlerts,
             TodayCompletedSales = dailyReport.TotalSales,
             FormattedTodayCompletedSales = dailyReport.FormattedTotalSales,
             MonthToDateCompletedSales = monthlyReport.TotalSales,
@@ -303,6 +317,15 @@ public class DashboardController : Controller
             };
         }).ToList();
 
+        // Equipment monitoring alerts (P16, HW-3, INV-02)
+        var monitoring = await _equipmentService.GetEquipmentMonitoringAsync();
+        var flaggedAlerts = monitoring.PoorCondition
+            .Concat(monitoring.UnderMaintenanceOrOutOfService)
+            .Concat(monitoring.OverdueForInspection)
+            .GroupBy(i => i.Id)
+            .Select(g => g.First())
+            .ToList();
+
         var dto = new AdminDashboardDto
         {
             TodayCounts = todayCounts,
@@ -313,7 +336,9 @@ public class DashboardController : Controller
             FormattedThisMonthServiceSales = monthlyReport.FormattedTotalSales,
             TodayAppointmentsByBarber = todayByBarber,
             ActiveBarbersCount = activeBarbersCount,
-            TotalCustomersCount = totalCustomersCount
+            TotalCustomersCount = totalCustomersCount,
+            FlaggedEquipmentCount = monitoring.TotalFlaggedCount,
+            FlaggedEquipmentAlerts = flaggedAlerts
         };
 
         return Ok(dto);

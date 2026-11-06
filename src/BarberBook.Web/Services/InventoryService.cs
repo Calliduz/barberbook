@@ -423,12 +423,30 @@ public class InventoryService : IInventoryService
             SerialNo = e.SerialNo,
             PurchaseDate = e.PurchaseDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             PurchaseCost = e.PurchaseCost,
-            Condition = e.Condition.ToString().ToLowerInvariant(),
-            Status = e.Status.ToString().ToLowerInvariant(),
+            Condition = FormatEquipmentCondition(e.Condition),
+            Status = FormatEquipmentStatus(e.Status),
             InspectionIntervalDays = e.InspectionIntervalDays,
             Notes = e.Notes
         };
     }
+
+    private static string FormatEquipmentStatus(EquipmentStatus status) => status switch
+    {
+        EquipmentStatus.InService => "in_service",
+        EquipmentStatus.UnderMaintenance => "under_maintenance",
+        EquipmentStatus.OutOfService => "out_of_service",
+        EquipmentStatus.Retired => "retired",
+        _ => status.ToString().ToLowerInvariant()
+    };
+
+    private static string FormatEquipmentCondition(EquipmentCondition condition) => condition switch
+    {
+        EquipmentCondition.Excellent => "excellent",
+        EquipmentCondition.Good => "good",
+        EquipmentCondition.Fair => "fair",
+        EquipmentCondition.Poor => "poor",
+        _ => condition.ToString().ToLowerInvariant()
+    };
 
     private static LocalDate? ParseLocalDate(string? dateStr)
     {

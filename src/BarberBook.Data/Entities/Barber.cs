@@ -16,5 +16,6 @@ public class Barber
     public ICollection<WorkingHours> WorkingHours { get; set; } = new List<WorkingHours>();
     public ICollection<DayOff> DaysOff { get; set; } = new List<DayOff>();
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+    public ICollection<EquipmentAssignment> EquipmentAssignments { get; set; } = new List<EquipmentAssignment>();
 }
 

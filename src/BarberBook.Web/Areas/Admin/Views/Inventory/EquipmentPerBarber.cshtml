@@ -1,0 +1,145 @@
+@model BarberBook.Web.Models.Inventory.AdminEquipmentPerBarberViewModel
+@{
+    ViewData["Title"] = "Equipment per Barber";
+}
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>EQUIPMENT PER BARBER (HW-1, AF-9, INV-01, T-16)</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Equipment per Barber</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                View active tools assigned to each barber, inspect assignment timelines, and allocate shop equipment.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                &larr; Back to Equipment
+            </a>
+            <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                Quality Monitoring &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Barber Selection Bar -->
+    <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm flex flex-wrap items-center gap-3">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Barber:</span>
+        <div class="flex flex-wrap gap-2">
+            @foreach (var b in Model.Barbers)
+            {
+                var isSelected = b.Id == Model.SelectedBarberId;
+                <a href="/admin/equipment/per-barber?barberId=@b.Id"
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 @(isSelected ? "bg-slate-900 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
+                    <span>@b.DisplayName</span>
+                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black @(isSelected ? "bg-amber-500 text-slate-950" : "bg-slate-300 text-slate-800")">
+                        @b.ActiveToolCount
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Active Equipment Assigned to Selected Barber -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+                <h2 class="text-lg font-serif font-bold text-slate-900 tracking-tight">
+                    Currently Assigned Tools (@Model.ActiveAssignments.Count items)
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Active equipment assigned to this barber station (INV-01)</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-4">Asset Tag</th>
+                        <th class="py-3 px-4">Equipment Name</th>
+                        <th class="py-3 px-4">Assigned Since</th>
+                        <th class="py-3 px-4">Notes</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @if (Model.ActiveAssignments.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-slate-400 text-xs italic">
+                                No active equipment currently assigned to this barber.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var a in Model.ActiveAssignments)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700">@a.AssetTag</td>
+                            <td class="py-3.5 px-4 font-bold text-slate-900">@a.EquipmentName</td>
+                            <td class="py-3.5 px-4 font-mono text-xs text-slate-600">@a.AssignedAt</td>
+                            <td class="py-3.5 px-4 text-xs text-slate-500">@(a.Notes ?? "—")</td>
+                            <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
+                                <form method="post" action="/admin/inventory/equipment/@a.EquipmentId/return" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="py-1 px-3 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                        Return to Storage
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Assignment History for Selected Barber -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+                <h2 class="text-base font-serif font-bold text-slate-900 tracking-tight">Past Equipment History</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Audited history of tools previously assigned and returned</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-4">Asset Tag</th>
+                        <th class="py-3 px-4">Equipment Name</th>
+                        <th class="py-3 px-4">Assigned At</th>
+                        <th class="py-3 px-4">Returned At</th>
+                        <th class="py-3 px-4">Notes</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @if (Model.PastAssignments.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="py-6 text-center text-slate-400 text-xs italic">
+                                No past assignment history found for this barber.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var p in Model.PastAssignments)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition text-xs opacity-75">
+                            <td class="py-3 px-4 font-mono font-bold text-slate-600">@p.AssetTag</td>
+                            <td class="py-3 px-4 font-medium text-slate-800">@p.EquipmentName</td>
+                            <td class="py-3 px-4 font-mono text-slate-500">@p.AssignedAt</td>
+                            <td class="py-3 px-4 font-mono text-slate-500">@p.ReturnedAt</td>
+                            <td class="py-3 px-4 text-slate-500 italic">@(p.Notes ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

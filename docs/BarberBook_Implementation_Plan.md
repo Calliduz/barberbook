@@ -486,7 +486,7 @@ Tests: assigning an already-assigned item closes the previous assignment; a barb
 ```
 
 **Done when**
-- [ ] T-16 and T-17 pass; flagged equipment shows on the admin dashboard.
+- [x] T-16 and T-17 pass; flagged equipment shows on the admin dashboard. (Verified by 6 tests in `AdminEquipmentAndQualityTests.cs` and full test suite 170/170 passing)
 
 ---
 

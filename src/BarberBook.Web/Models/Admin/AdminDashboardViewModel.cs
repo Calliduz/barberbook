@@ -9,6 +9,8 @@ public class AdminDashboardViewModel
     public int PendingApprovalsCount => TodayCounts.Pending;
     public int ActiveBarbersCount { get; set; }
     public int TotalCustomersCount { get; set; }
+    public int FlaggedEquipmentCount { get; set; }
+    public List<BarberBook.Web.Models.Inventory.EquipmentMonitoringItemDto> FlaggedEquipmentAlerts { get; set; } = new();
     public decimal TodayCompletedSales { get; set; }
     public decimal MonthToDateCompletedSales { get; set; }
     public string FormattedTodayCompletedSales { get; set; } = "₱0.00";

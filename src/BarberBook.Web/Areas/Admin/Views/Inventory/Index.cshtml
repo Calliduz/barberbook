@@ -237,6 +237,27 @@
         <!-- TAB 2: EQUIPMENT INVENTORY                -->
         <!-- ========================================== -->
         <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden space-y-4 p-5">
+            <!-- Sub-Navigation Links for Equipment Modules -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-xs">
+                        All Assets Directory
+                    </span>
+                    <a href="/admin/equipment/per-barber" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        Equipment per Barber (HW-1)
+                    </a>
+                    <a href="/admin/equipment/quality" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        Quality Monitoring (HW-3)
+                    </a>
+                </div>
+                <div>
+                    <button onclick="openModal('addEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        <span>Add Equipment</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Search & Actions Bar -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-3 flex-1">
@@ -282,13 +303,6 @@
                         </a>
                     }
                 </form>
-
-                <div>
-                    <button onclick="openModal('addEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                        <span>Add Equipment</span>
-                    </button>
-                </div>
             </div>
 
             <!-- Equipment Table -->
@@ -299,10 +313,10 @@
                             <th class="py-3 px-4">Asset Tag</th>
                             <th class="py-3 px-4">Equipment Name</th>
                             <th class="py-3 px-4">Category</th>
-                            <th class="py-3 px-4">Brand / Model</th>
-                            <th class="py-3 px-4">Serial No</th>
+                            <th class="py-3 px-4">Assigned Barber</th>
                             <th class="py-3 px-4 text-center">Condition</th>
                             <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-center">Next Due</th>
                             <th class="py-3 px-4 text-right">Cost</th>
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
@@ -319,23 +333,28 @@
                         @foreach (var eq in Model.Equipment)
                         {
                             var isRetired = eq.Status == "retired";
-                            <tr class="hover:bg-slate-50/80 transition @(isRetired ? "opacity-60 bg-slate-50/50" : "")">
+                            <tr class="hover:bg-slate-50/80 transition @(isRetired ? "opacity-60 bg-slate-50/50" : (eq.IsFlagged ? "bg-amber-50/30" : ""))">
                                 <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700">@eq.AssetTag</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-900">
                                     <div>@eq.Name</div>
-                                    @if (!string.IsNullOrEmpty(eq.Notes))
-                                    {
-                                        <span class="text-[10px] text-slate-400 font-normal">@eq.Notes</span>
-                                    }
+                                    <div class="text-[10px] text-slate-400 font-normal">
+                                        @(eq.BrandModel ?? "Standard") @(string.IsNullOrEmpty(eq.SerialNo) ? "" : $"• SN: {eq.SerialNo}")
+                                    </div>
                                 </td>
                                 <td class="py-3.5 px-4 text-xs">
                                     <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">@eq.Category</span>
                                 </td>
-                                <td class="py-3.5 px-4 text-xs text-slate-700 font-medium">
-                                    @(eq.BrandModel ?? "—")
-                                </td>
-                                <td class="py-3.5 px-4 font-mono text-xs text-slate-500">
-                                    @(eq.SerialNo ?? "—")
+                                <td class="py-3.5 px-4 text-xs">
+                                    @if (!string.IsNullOrEmpty(eq.CurrentBarberName))
+                                    {
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                            @eq.CurrentBarberName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs text-slate-400 italic">Unassigned (Shop)</span>
+                                    }
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
                                     @switch (eq.Condition)
@@ -371,18 +390,51 @@
                                             break;
                                     }
                                 </td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <div class="font-mono text-xs @(eq.IsOverdue ? "text-rose-600 font-bold" : "text-slate-600")">
+                                        @(eq.NextInspectionDue ?? "—")
+                                    </div>
+                                    @if (eq.IsOverdue)
+                                    {
+                                        <span class="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-100 text-rose-800">Overdue</span>
+                                    }
+                                </td>
                                 <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-700">
                                     @(eq.FormattedPurchaseCost ?? "—")
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
-                                    <button onclick="openEditEquipmentModal(@eq.Id, '@eq.Name', '@eq.Category', '@(eq.BrandModel ?? "")', '@(eq.SerialNo ?? "")', '@(eq.PurchaseDate ?? "")', '@(eq.PurchaseCost ?? 0)', '@eq.Condition', '@eq.Status', @eq.InspectionIntervalDays, '@(eq.Notes ?? "")')"
+                                    @if (!isRetired)
+                                    {
+                                        <button onclick="openAssignModal(@eq.Id, '@eq.Name', '@eq.AssetTag', @(eq.CurrentBarberId ?? 0))"
+                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                            @(eq.CurrentBarberId.HasValue ? "Reassign" : "Assign")
+                                        </button>
+                                        @if (eq.CurrentBarberId.HasValue)
+                                        {
+                                            <form method="post" action="/admin/inventory/equipment/@eq.Id/return" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition" title="Return to Shop Storage">
+                                                    Return
+                                                </button>
+                                            </form>
+                                        }
+                                        <button onclick="openAdminInspectModal(@eq.Id, '@eq.Name', '@eq.AssetTag')"
+                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                            Inspect
+                                        </button>
+                                    }
+                                    <button onclick="openEquipmentTimelineDrawer(@eq.Id, '@eq.Name', '@eq.AssetTag')"
                                             class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
+                                        History
+                                    </button>
+                                    <button onclick="openEditEquipmentModal(@eq.Id, '@eq.Name', '@eq.Category', '@(eq.BrandModel ?? "")', '@(eq.SerialNo ?? "")', '@(eq.PurchaseDate ?? "")', '@(eq.PurchaseCost ?? 0)', '@eq.Condition', '@eq.Status', @eq.InspectionIntervalDays, '@(eq.Notes ?? "")')"
+                                            class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700 transition">
                                         Edit
                                     </button>
                                     @if (!isRetired)
                                     {
                                         <button onclick="openRetireModal(@eq.Id, '@eq.Name', '@eq.AssetTag')"
-                                                class="py-1 px-2.5 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition">
+                                                class="py-1 px-2 rounded-lg text-xs font-medium text-rose-500 hover:text-rose-800 transition">
                                             Retire
                                         </button>
                                     }
@@ -742,6 +794,107 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MODAL: ASSIGN EQUIPMENT (HW-1, AF-9)       -->
+<!-- ========================================== -->
+<div id="assignEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+            <div>
+                <h3 class="text-lg font-serif font-black text-slate-900">Assign Equipment</h3>
+                <p id="assignModalSubtitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
+            </div>
+            <button onclick="closeModal('assignEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+        </div>
+
+        <form id="assignEquipmentForm" method="post" action="" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Select Barber Station *</label>
+                <select id="assignBarberSelect" name="barberId" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                    <option value="">-- Choose Barber --</option>
+                    @foreach (var b in Model.Barbers)
+                    {
+                        <option value="@b.Id">@b.DisplayName (@b.ActiveToolCount active tools)</option>
+                    }
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1">If already assigned, the previous assignment will be closed automatically (INV-01).</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Assignment Notes / Workstation</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Primary station clipper kit..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('assignEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Confirm Assignment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: ADMIN INSPECT (HW-3, AF-13)         -->
+<!-- ========================================== -->
+<div id="adminInspectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+            <div>
+                <h3 class="text-lg font-serif font-black text-slate-900">Record Inspection Audit</h3>
+                <p id="adminInspectSubtitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
+            </div>
+            <button onclick="closeModal('adminInspectModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+        </div>
+
+        <form id="adminInspectForm" method="post" action="" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Equipment Condition *</label>
+                <select name="condition" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                    <option value="Good">Good &mdash; Fully operational and sanitized</option>
+                    <option value="Excellent">Excellent &mdash; Mint condition</option>
+                    <option value="Fair">Fair &mdash; Minor wear, acceptable for service</option>
+                    <option value="Poor">Poor &mdash; Defective or out of service (Flagged)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Custom Next Check Due Date (optional)</label>
+                <input type="date" name="nextCheckDue" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Audit Notes / Sanitization Log</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Motor tested, oiled, tension adjusted..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('adminInspectModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Save Inspection</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- DRAWER: EQUIPMENT TIMELINE HISTORY         -->
+<!-- ========================================== -->
+<div id="eqTimelineBackdrop" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeEqTimeline()"></div>
+<div id="eqTimelineDrawer" class="hidden fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl border-l border-slate-200 flex flex-col transform transition-transform duration-300">
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-serif font-black text-slate-900">Equipment History</h3>
+            <p id="eqTimelineSubtitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
+        </div>
+        <button onclick="closeEqTimeline()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+    </div>
+
+    <div id="eqTimelineContent" class="flex-1 overflow-y-auto p-5 space-y-4">
+        <div class="text-center py-10 text-xs text-slate-400">Loading audit history...</div>
+    </div>
+</div>
+
 <!-- Scripts for Interactivity -->
 <script>
     let currentStockValue = 0;
@@ -753,6 +906,101 @@
 
     function closeModal(id) {
         document.getElementById(id).classList.add('hidden');
+    }
+
+    function openAssignModal(id, name, tag, currentBarberId) {
+        document.getElementById('assignEquipmentForm').action = '/admin/inventory/equipment/' + id + '/assign';
+        document.getElementById('assignModalSubtitle').innerText = name + ' (' + tag + ')';
+        if (currentBarberId > 0) {
+            document.getElementById('assignBarberSelect').value = currentBarberId;
+        } else {
+            document.getElementById('assignBarberSelect').selectedIndex = 0;
+        }
+        openModal('assignEquipmentModal');
+    }
+
+    function openAdminInspectModal(id, name, tag) {
+        document.getElementById('adminInspectForm').action = '/admin/inventory/equipment/' + id + '/inspect';
+        document.getElementById('adminInspectSubtitle').innerText = name + ' (' + tag + ')';
+        openModal('adminInspectModal');
+    }
+
+    async function openEquipmentTimelineDrawer(id, name, tag) {
+        document.getElementById('eqTimelineSubtitle').innerText = name + ' (' + tag + ')';
+        document.getElementById('eqTimelineContent').innerHTML = '<div class="text-center py-10 text-xs text-slate-400">Loading history...</div>';
+
+        document.getElementById('eqTimelineBackdrop').classList.remove('hidden');
+        document.getElementById('eqTimelineDrawer').classList.remove('hidden');
+
+        try {
+            const [assignResp, checksResp] = await Promise.all([
+                fetch('/api/admin/equipment/' + id + '/assignments'),
+                fetch('/api/admin/equipment/' + id + '/checks')
+            ]);
+
+            const assignments = await assignResp.json();
+            const checks = await checksResp.json();
+
+            let html = '<div class="space-y-4">';
+
+            html += '<div><h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Assignment History</h4>';
+            if (!assignments || assignments.length === 0) {
+                html += '<p class="text-xs text-slate-400 italic">No assignments recorded yet.</p>';
+            } else {
+                html += '<div class="space-y-2">';
+                assignments.forEach(a => {
+                    const activePill = a.is_active
+                        ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">Active</span>'
+                        : '<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">Returned</span>';
+
+                    html += `
+                        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-800">${a.barber_name}</span>
+                                ${activePill}
+                            </div>
+                            <div class="text-[11px] text-slate-500 font-mono">Assigned: ${a.assigned_at}</div>
+                            ${a.returned_at ? `<div class="text-[11px] text-slate-500 font-mono">Returned: ${a.returned_at}</div>` : ''}
+                            ${a.notes ? `<div class="text-[11px] text-slate-600 italic">Notes: ${a.notes}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+
+            html += '<div class="pt-3 border-t border-slate-200"><h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Inspection History</h4>';
+            if (!checks || checks.length === 0) {
+                html += '<p class="text-xs text-slate-400 italic">No inspection checks recorded yet.</p>';
+            } else {
+                html += '<div class="space-y-2">';
+                checks.forEach(c => {
+                    const condClass = c.condition === 'poor' ? 'bg-rose-100 text-rose-800' : (c.condition === 'fair' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800');
+                    html += `
+                        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${condClass}">${c.condition}</span>
+                                <span class="font-mono text-slate-400 text-[11px]">${c.checked_at}</span>
+                            </div>
+                            <div class="text-[11px] text-slate-600">Audited by: <span class="font-semibold">${c.checked_by_name || 'Staff'}</span></div>
+                            <div class="text-[11px] text-slate-500">Next check due: <span class="font-mono font-semibold">${c.next_check_due}</span></div>
+                            ${c.notes ? `<div class="text-[11px] text-slate-600 italic">Notes: ${c.notes}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            html += '</div></div>';
+
+            document.getElementById('eqTimelineContent').innerHTML = html;
+        } catch (e) {
+            document.getElementById('eqTimelineContent').innerHTML = '<div class="text-rose-600 text-xs text-center py-6">Error loading history: ' + e.message + '</div>';
+        }
+    }
+
+    function closeEqTimeline() {
+        document.getElementById('eqTimelineBackdrop').classList.add('hidden');
+        document.getElementById('eqTimelineDrawer').classList.add('hidden');
     }
 
     function openEditProductModal(id, name, category, unit, sellPrice, costPrice, reorderLevel) {

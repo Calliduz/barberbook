@@ -615,7 +615,18 @@ public class DashboardController : Controller
         var barber = await GetCurrentBarberAsync();
         if (barber == null) return Forbid();
 
-        var items = _equipmentService.GetByBarber(barber.DisplayName);
+        var dbItems = await _equipmentService.GetBarberActiveEquipmentAsync(barber.Id);
+        var items = dbItems.Select(e => new EquipmentItem
+        {
+            Id = e.Id,
+            Name = e.Name,
+            SerialNumber = e.SerialNo ?? e.AssetTag,
+            AssignedToBarber = barber.DisplayName,
+            Condition = e.Condition,
+            LastInspectionDate = e.LastInspectedAt ?? "None",
+            NextInspectionDue = e.NextCheckDue ?? "Not scheduled",
+            LastNotes = e.LatestNotes ?? (e.FlagReasons.Any() ? string.Join(", ", e.FlagReasons) : null)
+        }).ToList();
 
         var model = new BarberEquipmentViewModel
         {
@@ -636,17 +647,54 @@ public class DashboardController : Controller
         var barber = await GetCurrentBarberAsync();
         if (barber == null) return Forbid();
 
-        var success = _equipmentService.LogInspection(id, condition, notes, barber.DisplayName);
+        if (!Enum.TryParse<EquipmentCondition>(condition, true, out var condEnum))
+        {
+            condEnum = EquipmentCondition.Good;
+        }
+
+        var userId = User.GetUserId();
+        var (success, error, _) = await _equipmentService.LogBarberInspectionAsync(id, barber.Id, condEnum, notes, userId);
         if (success)
         {
             TempData["SuccessMessage"] = "Equipment inspection logged successfully.";
         }
         else
         {
-            TempData["ErrorMessage"] = "Could not record inspection for the specified tool.";
+            TempData["ErrorMessage"] = error ?? "Could not record inspection for the specified tool.";
         }
 
         return RedirectToAction(nameof(Equipment));
+    }
+
+    [HttpGet("/api/barber/equipment")]
+    public async Task<IActionResult> ApiGetMyEquipment()
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        var items = await _equipmentService.GetBarberActiveEquipmentAsync(barber.Id);
+        return Ok(items);
+    }
+
+    [HttpPost("/api/barber/equipment/{id:int}/inspect")]
+    public async Task<IActionResult> ApiInspectEquipment(
+        [FromRoute] int id,
+        [FromBody] BarberBook.Web.Models.Inventory.LogEquipmentCheckRequest request)
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        var userId = User.GetUserId();
+        var (success, error, check) = await _equipmentService.LogBarberInspectionAsync(
+            id, barber.Id, request.Condition, request.Notes, userId);
+
+        if (!success)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ApiErrorResponse("FORBIDDEN", error ?? "You cannot inspect this equipment."));
+        }
+
+        return Ok(check);
     }
 
     [HttpGet("account")]

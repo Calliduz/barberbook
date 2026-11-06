@@ -383,6 +383,68 @@ public static class DatabaseSeeder
             }
         }
 
+        // 9. Seed Equipment Assignments & Initial Checks (HW-1, HW-3, AF-9, AF-13, INV-01, INV-02)
+        var ramon = barberMap["Ramon"];
+        var dennis = barberMap["Dennis"];
+        var miguel = barberMap["Miguel"];
+
+        var eq1 = await context.Equipment.FirstOrDefaultAsync(e => e.AssetTag == "EQ-001");
+        var eq2 = await context.Equipment.FirstOrDefaultAsync(e => e.AssetTag == "EQ-002");
+        var eq4 = await context.Equipment.FirstOrDefaultAsync(e => e.AssetTag == "EQ-004");
+
+        if (eq1 != null && !await context.EquipmentAssignments.AnyAsync(a => a.EquipmentId == eq1.Id))
+        {
+            context.EquipmentAssignments.Add(new EquipmentAssignment
+            {
+                EquipmentId = eq1.Id,
+                BarberId = ramon.Id,
+                AssignedAt = now.Minus(Duration.FromDays(20)),
+                Notes = "Station 1 primary clipper"
+            });
+            context.EquipmentChecks.Add(new EquipmentCheck
+            {
+                EquipmentId = eq1.Id,
+                CheckedById = adminUser.Id,
+                CheckedAt = now.Minus(Duration.FromDays(5)),
+                Condition = EquipmentCondition.Good,
+                Notes = "Sanitized and oiled blades",
+                NextCheckDue = new LocalDate(2026, 12, 1)
+            });
+        }
+
+        if (eq2 != null && !await context.EquipmentAssignments.AnyAsync(a => a.EquipmentId == eq2.Id))
+        {
+            context.EquipmentAssignments.Add(new EquipmentAssignment
+            {
+                EquipmentId = eq2.Id,
+                BarberId = dennis.Id,
+                AssignedAt = now.Minus(Duration.FromDays(15)),
+                Notes = "Station 2 detail trimmer"
+            });
+            context.EquipmentChecks.Add(new EquipmentCheck
+            {
+                EquipmentId = eq2.Id,
+                CheckedById = adminUser.Id,
+                CheckedAt = now.Minus(Duration.FromDays(10)),
+                Condition = EquipmentCondition.Excellent,
+                Notes = "Blade zero-gap calibration verified",
+                NextCheckDue = new LocalDate(2026, 12, 5)
+            });
+        }
+
+        if (eq4 != null && !await context.EquipmentAssignments.AnyAsync(a => a.EquipmentId == eq4.Id))
+        {
+            context.EquipmentAssignments.Add(new EquipmentAssignment
+            {
+                EquipmentId = eq4.Id,
+                BarberId = miguel.Id,
+                AssignedAt = now.Minus(Duration.FromDays(10)),
+                Notes = "Station 3 precision shears"
+            });
+        }
+
+        await context.SaveChangesAsync();
+
         logger.LogInformation("Database seeding completed successfully.");
     }
 }
