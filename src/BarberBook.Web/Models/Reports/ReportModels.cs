@@ -8,10 +8,25 @@ public class DailySalesReportDto
     public string DateFormatted { get; set; } = string.Empty;
     public decimal TotalSales { get; set; }
     public string FormattedTotalSales { get; set; } = "₱0.00";
+    public decimal ServiceSales { get => TotalSales; set => TotalSales = value; }
+    public string FormattedServiceSales => FormattedTotalSales;
     public int CompletedCount { get; set; }
     public List<GroupSalesBreakdownDto> ByService { get; set; } = new();
     public List<GroupSalesBreakdownDto> ByBarber { get; set; } = new();
     public List<DailySalesLineItemDto> Items { get; set; } = new();
+
+    // HW-2, INV-06: Product sales reported separately beside service sales; Grand total = both
+    public ProductSalesSummaryDto ProductSales { get; set; } = new();
+    public decimal GrandTotal { get; set; }
+    public string FormattedGrandTotal { get; set; } = "₱0.00";
+}
+
+public class ProductSalesSummaryDto
+{
+    public decimal Total { get; set; }
+    public string FormattedTotal { get; set; } = "₱0.00";
+    public int Count { get; set; }
+    public List<GroupSalesBreakdownDto> PerProduct { get; set; } = new();
 }
 
 public class DailySalesLineItemDto
@@ -42,10 +57,20 @@ public class MonthlySalesReportDto
     public string MonthName { get; set; } = string.Empty;
     public decimal TotalSales { get; set; }
     public string FormattedTotalSales { get; set; } = "₱0.00";
+    public decimal ServiceSales { get => TotalSales; set => TotalSales = value; }
+    public string FormattedServiceSales => FormattedTotalSales;
     public int CompletedCount { get; set; }
     public List<MonthlyDaySalesDto> DailyTotals { get; set; } = new();
     public List<GroupSalesBreakdownDto> ByService { get; set; } = new();
     public List<GroupSalesBreakdownDto> ByBarber { get; set; } = new();
+
+    // HW-2, INV-06: Product sales reported separately beside service sales; Grand total = both
+    public decimal ProductSales { get; set; }
+    public string FormattedProductSales { get; set; } = "₱0.00";
+    public int ProductSalesCount { get; set; }
+    public List<GroupSalesBreakdownDto> ProductSalesPerProduct { get; set; } = new();
+    public decimal GrandTotal { get; set; }
+    public string FormattedGrandTotal { get; set; } = "₱0.00";
 }
 
 public class MonthlyDaySalesDto
@@ -57,6 +82,14 @@ public class MonthlyDaySalesDto
     public int CompletedCount { get; set; }
     public decimal TotalSales { get; set; }
     public string FormattedTotalSales { get; set; } = "₱0.00";
+    public decimal ServiceSales { get => TotalSales; set => TotalSales = value; }
+    public string FormattedServiceSales => FormattedTotalSales;
+
+    // HW-2, INV-06
+    public decimal ProductSales { get; set; }
+    public string FormattedProductSales { get; set; } = "₱0.00";
+    public decimal GrandTotal { get; set; }
+    public string FormattedGrandTotal { get; set; } = "₱0.00";
 }
 
 public class CustomerTransactionsReportDto

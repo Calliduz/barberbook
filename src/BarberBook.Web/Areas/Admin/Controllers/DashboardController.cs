@@ -20,6 +20,7 @@ public class DashboardController : Controller
     private readonly IReportingService _reportingService;
     private readonly IAppointmentTransitionService _transitionService;
     private readonly IEquipmentService _equipmentService;
+    private readonly IInventoryService _inventoryService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
@@ -28,6 +29,7 @@ public class DashboardController : Controller
         IReportingService reportingService,
         IAppointmentTransitionService transitionService,
         IEquipmentService equipmentService,
+        IInventoryService inventoryService,
         IClock clock,
         DateTimeZone? zone = null)
     {
@@ -35,6 +37,7 @@ public class DashboardController : Controller
         _reportingService = reportingService;
         _transitionService = transitionService;
         _equipmentService = equipmentService;
+        _inventoryService = inventoryService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -186,6 +189,10 @@ public class DashboardController : Controller
             .Select(g => g.First())
             .ToList();
 
+        // 8. Low-stock products alert (HW-1, INV-05)
+        var products = await _inventoryService.GetProductsAsync(includeInactive: false);
+        var lowStock = products.Where(p => p.IsLowStock).ToList();
+
         var model = new AdminDashboardViewModel
         {
             TodayCounts = todayCounts,
@@ -197,6 +204,16 @@ public class DashboardController : Controller
             FormattedTodayCompletedSales = dailyReport.FormattedTotalSales,
             MonthToDateCompletedSales = monthlyReport.TotalSales,
             FormattedMonthToDateCompletedSales = monthlyReport.FormattedTotalSales,
+            TodayProductSales = dailyReport.ProductSales.Total,
+            FormattedTodayProductSales = dailyReport.ProductSales.FormattedTotal,
+            MonthToDateProductSales = monthlyReport.ProductSales,
+            FormattedMonthToDateProductSales = monthlyReport.FormattedProductSales,
+            TodayGrandTotal = dailyReport.GrandTotal,
+            FormattedTodayGrandTotal = dailyReport.FormattedGrandTotal,
+            MonthToDateGrandTotal = monthlyReport.GrandTotal,
+            FormattedMonthToDateGrandTotal = monthlyReport.FormattedGrandTotal,
+            LowStockProductsCount = lowStock.Count,
+            LowStockProducts = lowStock,
             PendingBookings = pendingBookings,
             TodayAppointmentsByBarber = todayByBarber,
             RecentAppointments = recentAppts
@@ -326,6 +343,10 @@ public class DashboardController : Controller
             .Select(g => g.First())
             .ToList();
 
+        // Low-stock products alert (HW-1, INV-05)
+        var products = await _inventoryService.GetProductsAsync(includeInactive: false);
+        var lowStock = products.Where(p => p.IsLowStock).ToList();
+
         var dto = new AdminDashboardDto
         {
             TodayCounts = todayCounts,
@@ -334,11 +355,21 @@ public class DashboardController : Controller
             FormattedTodayServiceSales = dailyReport.FormattedTotalSales,
             ThisMonthServiceSales = monthlyReport.TotalSales,
             FormattedThisMonthServiceSales = monthlyReport.FormattedTotalSales,
+            TodayProductSales = dailyReport.ProductSales.Total,
+            FormattedTodayProductSales = dailyReport.ProductSales.FormattedTotal,
+            ThisMonthProductSales = monthlyReport.ProductSales,
+            FormattedThisMonthProductSales = monthlyReport.FormattedProductSales,
+            TodayGrandTotal = dailyReport.GrandTotal,
+            FormattedTodayGrandTotal = dailyReport.FormattedGrandTotal,
+            ThisMonthGrandTotal = monthlyReport.GrandTotal,
+            FormattedThisMonthGrandTotal = monthlyReport.FormattedGrandTotal,
             TodayAppointmentsByBarber = todayByBarber,
             ActiveBarbersCount = activeBarbersCount,
             TotalCustomersCount = totalCustomersCount,
             FlaggedEquipmentCount = monitoring.TotalFlaggedCount,
-            FlaggedEquipmentAlerts = flaggedAlerts
+            FlaggedEquipmentAlerts = flaggedAlerts,
+            LowStockProductsCount = lowStock.Count,
+            LowStockProducts = lowStock
         };
 
         return Ok(dto);

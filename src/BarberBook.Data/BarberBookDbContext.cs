@@ -19,6 +19,10 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<Equipment> Equipment => Set<Equipment>();
     public DbSet<EquipmentAssignment> EquipmentAssignments => Set<EquipmentAssignment>();
     public DbSet<EquipmentCheck> EquipmentChecks => Set<EquipmentCheck>();
+    public DbSet<Purchase> Purchases => Set<Purchase>();
+    public DbSet<PurchaseItem> PurchaseItems => Set<PurchaseItem>();
+    public DbSet<ProductSale> ProductSales => Set<ProductSale>();
+    public DbSet<ProductSaleItem> ProductSaleItems => Set<ProductSaleItem>();
 
     public BarberBookDbContext(DbContextOptions<BarberBookDbContext> options)
         : base(options)
@@ -364,6 +368,113 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
 
             entity.HasIndex(e => new { e.EquipmentId, e.CheckedAt });
             entity.HasIndex(e => e.NextCheckDue);
+        });
+
+        // 13. Purchases (HW-2, SC-11, AF-11, INV-03)
+        builder.Entity<Purchase>(entity =>
+        {
+            entity.ToTable("purchases");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.SupplierName).HasColumnName("supplier_name").HasMaxLength(200).IsRequired();
+            entity.Property(e => e.PurchasedAt).HasColumnName("purchased_at").IsRequired();
+            entity.Property(e => e.TotalCost).HasColumnName("total_cost").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.Notes).HasColumnName("notes").HasMaxLength(1000);
+            entity.Property(e => e.CreatedById).HasColumnName("created_by_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+
+            entity.HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.Items)
+                .WithOne(i => i.Purchase)
+                .HasForeignKey(i => i.PurchaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.PurchasedAt);
+        });
+
+        // 14. Purchase Items (HW-2, AF-11)
+        builder.Entity<PurchaseItem>(entity =>
+        {
+            entity.ToTable("purchase_items");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PurchaseId).HasColumnName("purchase_id").IsRequired();
+            entity.Property(e => e.ProductId).HasColumnName("product_id").IsRequired();
+            entity.Property(e => e.Quantity).HasColumnName("quantity").IsRequired();
+            entity.Property(e => e.UnitCost).HasColumnName("unit_cost").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.LineTotal).HasColumnName("line_total").HasColumnType("numeric(10,2)").IsRequired();
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.PurchaseId);
+            entity.HasIndex(e => e.ProductId);
+        });
+
+        // 15. Product Sales (HW-2, SC-11, AF-12, INV-03, INV-04, INV-06)
+        builder.Entity<ProductSale>(entity =>
+        {
+            entity.ToTable("product_sales");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.SoldAt).HasColumnName("sold_at").IsRequired();
+            entity.Property(e => e.TotalAmount).HasColumnName("total_amount").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
+            entity.Property(e => e.Notes).HasColumnName("notes").HasMaxLength(1000);
+            entity.Property(e => e.RecordedById).HasColumnName("recorded_by_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+
+            entity.HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Appointment)
+                .WithMany()
+                .HasForeignKey(e => e.AppointmentId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.RecordedBy)
+                .WithMany()
+                .HasForeignKey(e => e.RecordedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.Items)
+                .WithOne(i => i.ProductSale)
+                .HasForeignKey(i => i.ProductSaleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.SoldAt);
+            entity.HasIndex(e => e.CustomerId);
+        });
+
+        // 16. Product Sale Items (HW-2, AF-12, INV-04)
+        builder.Entity<ProductSaleItem>(entity =>
+        {
+            entity.ToTable("product_sale_items");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ProductSaleId).HasColumnName("product_sale_id").IsRequired();
+            entity.Property(e => e.ProductId).HasColumnName("product_id").IsRequired();
+            entity.Property(e => e.ProductName).HasColumnName("product_name").HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Quantity).HasColumnName("quantity").IsRequired();
+            entity.Property(e => e.UnitPrice).HasColumnName("unit_price").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.LineTotal).HasColumnName("line_total").HasColumnType("numeric(10,2)").IsRequired();
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.ProductSaleId);
+            entity.HasIndex(e => e.ProductId);
         });
     }
 }

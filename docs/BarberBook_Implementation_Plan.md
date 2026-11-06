@@ -508,8 +508,8 @@ Tests: a purchase raises stock; a sale lowers it; an oversell is refused with no
 ```
 
 **Done when**
-- [ ] T-18 and T-19 pass; service-sales figures are identical before and after product sales are recorded.
-- [ ] Every handwritten addition (HW-1, HW-2, HW-3) is usable from the admin dashboard.
+- [x] T-18 and T-19 pass; service-sales figures are identical before and after product sales are recorded.
+- [x] Every handwritten addition (HW-1, HW-2, HW-3) is usable from the admin dashboard.
 
 ---
 

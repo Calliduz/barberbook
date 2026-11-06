@@ -16,6 +16,20 @@ public class AdminDashboardViewModel
     public string FormattedTodayCompletedSales { get; set; } = "₱0.00";
     public string FormattedMonthToDateCompletedSales { get; set; } = "₱0.00";
 
+    // HW-2, INV-06: Product sales and grand totals
+    public decimal TodayProductSales { get; set; }
+    public string FormattedTodayProductSales { get; set; } = "₱0.00";
+    public decimal MonthToDateProductSales { get; set; }
+    public string FormattedMonthToDateProductSales { get; set; } = "₱0.00";
+    public decimal TodayGrandTotal { get; set; }
+    public string FormattedTodayGrandTotal { get; set; } = "₱0.00";
+    public decimal MonthToDateGrandTotal { get; set; }
+    public string FormattedMonthToDateGrandTotal { get; set; } = "₱0.00";
+
+    // HW-1, INV-05: Low-stock product alerts
+    public int LowStockProductsCount { get; set; }
+    public List<BarberBook.Web.Models.Inventory.ProductDto> LowStockProducts { get; set; } = new();
+
     // Needs action (pending bookings, oldest first, up to 10)
     public List<AdminDashboardPendingItemDto> PendingBookings { get; set; } = new();
 

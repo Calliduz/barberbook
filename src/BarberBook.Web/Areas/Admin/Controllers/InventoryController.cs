@@ -17,17 +17,20 @@ public class InventoryController : Controller
 {
     private readonly IInventoryService _inventoryService;
     private readonly IEquipmentService _equipmentService;
+    private readonly IPurchaseSaleService _purchaseSaleService;
     private readonly BarberBookDbContext _dbContext;
     private readonly ILogger<InventoryController> _logger;
 
     public InventoryController(
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
+        IPurchaseSaleService purchaseSaleService,
         BarberBookDbContext dbContext,
         ILogger<InventoryController> logger)
     {
         _inventoryService = inventoryService;
         _equipmentService = equipmentService;
+        _purchaseSaleService = purchaseSaleService;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -682,6 +685,231 @@ public class InventoryController : Controller
 
         var assignments = await _equipmentService.GetBarberAssignmentsAsync(barberId, activeOnly: false);
         return Ok(assignments);
+    }
+
+    // ==========================================
+    // Purchases View & Form Handlers (HW-2, AF-11)
+    // ==========================================
+
+    [HttpGet("admin/purchases")]
+    public async Task<IActionResult> Purchases(
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
+    {
+        var start = ParseLocalDate(startDate);
+        var end = ParseLocalDate(endDate);
+
+        var purchases = await _purchaseSaleService.GetPurchasesAsync(start, end);
+        var activeProducts = await _inventoryService.GetProductsAsync(includeInactive: false);
+
+        var totalCost = purchases.Sum(p => p.TotalCost);
+
+        var model = new AdminPurchasesViewModel
+        {
+            Purchases = purchases,
+            ActiveProducts = activeProducts,
+            TotalPurchasedCost = totalCost,
+            FormattedTotalPurchasedCost = FormattingHelpers.FormatPeso(totalCost),
+            StartDate = startDate,
+            EndDate = endDate
+        };
+
+        return View("Purchases", model);
+    }
+
+    [HttpPost("admin/purchases")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreatePurchaseMvc([FromBody] CreatePurchaseRequest request)
+    {
+        var userId = User.GetUserId();
+        var (success, error, purchase) = await _purchaseSaleService.CreatePurchaseAsync(request, userId);
+        if (!success)
+        {
+            return BadRequest(new { error = error ?? "Failed to record purchase." });
+        }
+
+        TempData["SuccessMessage"] = $"Purchase from {purchase?.SupplierName} recorded successfully. Inventory updated.";
+        return Ok(new { success = true, purchaseId = purchase?.Id });
+    }
+
+    // ==========================================
+    // Product Sales View & Form Handlers (HW-2, AF-12)
+    // ==========================================
+
+    [HttpGet("admin/product-sales")]
+    public async Task<IActionResult> ProductSales(
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
+        [FromQuery] int? productId = null)
+    {
+        var start = ParseLocalDate(startDate);
+        var end = ParseLocalDate(endDate);
+
+        var sales = await _purchaseSaleService.GetProductSalesAsync(start, end, productId);
+        var activeProducts = await _inventoryService.GetProductsAsync(includeInactive: false);
+        var perProductSummary = await _purchaseSaleService.GetProductSalesSummaryAsync(start, end);
+
+        var customers = await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Role == UserRole.Customer && u.IsActive)
+            .OrderBy(u => u.FullName)
+            .Select(u => new CustomerLookupDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                Phone = u.PhoneNumber
+            })
+            .ToListAsync();
+
+        var totalSales = sales.Sum(s => s.TotalAmount);
+
+        var model = new AdminProductSalesViewModel
+        {
+            Sales = sales,
+            Products = activeProducts,
+            Customers = customers,
+            TotalSalesAmount = totalSales,
+            FormattedTotalSalesAmount = FormattingHelpers.FormatPeso(totalSales),
+            PerProductSummary = perProductSummary,
+            FilterProductId = productId,
+            StartDate = startDate,
+            EndDate = endDate
+        };
+
+        return View("ProductSales", model);
+    }
+
+    [HttpPost("admin/product-sales")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateProductSaleMvc([FromBody] CreateProductSaleRequest request)
+    {
+        var userId = User.GetUserId();
+        var (success, error, errorCode, sale) = await _purchaseSaleService.CreateProductSaleAsync(request, userId);
+        if (!success)
+        {
+            if (errorCode == "INSUFFICIENT_STOCK")
+            {
+                return StatusCode(StatusCodes.Status409Conflict, new { error, code = errorCode });
+            }
+            return BadRequest(new { error = error ?? "Failed to record product sale.", code = errorCode });
+        }
+
+        TempData["SuccessMessage"] = $"Counter product sale recorded successfully ({FormattingHelpers.FormatPeso(sale?.TotalAmount ?? 0)}).";
+        return Ok(new { success = true, saleId = sale?.Id });
+    }
+
+    // ==========================================
+    // Purchases JSON API (Admin Only) (HW-2, AF-11)
+    // ==========================================
+
+    [HttpPost("api/admin/purchases")]
+    public async Task<IActionResult> CreatePurchaseApi([FromBody] CreatePurchaseRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new ApiErrorResponse("BAD_REQUEST", "Request body cannot be null."));
+        }
+
+        var userId = User.GetUserId();
+        var (success, error, purchase) = await _purchaseSaleService.CreatePurchaseAsync(request, userId);
+        if (!success)
+        {
+            return BadRequest(new ApiErrorResponse("PURCHASE_FAILED", error ?? "Could not record purchase."));
+        }
+
+        return StatusCode(StatusCodes.Status201Created, purchase);
+    }
+
+    [HttpGet("api/admin/purchases")]
+    public async Task<IActionResult> GetPurchasesApi(
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
+    {
+        var start = ParseLocalDate(startDate);
+        var end = ParseLocalDate(endDate);
+        var purchases = await _purchaseSaleService.GetPurchasesAsync(start, end);
+        return Ok(purchases);
+    }
+
+    [HttpGet("api/admin/purchases/{id:int}")]
+    public async Task<IActionResult> GetPurchaseByIdApi(int id)
+    {
+        var purchase = await _purchaseSaleService.GetPurchaseByIdAsync(id);
+        if (purchase == null)
+        {
+            return NotFound(new ApiErrorResponse("PURCHASE_NOT_FOUND", $"Purchase with ID {id} not found."));
+        }
+        return Ok(purchase);
+    }
+
+    // ==========================================
+    // Product Sales JSON API (Admin Only) (HW-2, AF-12)
+    // ==========================================
+
+    [HttpPost("api/admin/product-sales")]
+    public async Task<IActionResult> CreateProductSaleApi([FromBody] CreateProductSaleRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new ApiErrorResponse("BAD_REQUEST", "Request body cannot be null."));
+        }
+
+        var userId = User.GetUserId();
+        var (success, error, errorCode, sale) = await _purchaseSaleService.CreateProductSaleAsync(request, userId);
+        if (!success)
+        {
+            if (errorCode == "INSUFFICIENT_STOCK")
+            {
+                return StatusCode(StatusCodes.Status409Conflict,
+                    new ApiErrorResponse("INSUFFICIENT_STOCK", error ?? "Requested quantity exceeds available stock."));
+            }
+            return BadRequest(new ApiErrorResponse(errorCode ?? "SALE_FAILED", error ?? "Could not record product sale."));
+        }
+
+        return StatusCode(StatusCodes.Status201Created, sale);
+    }
+
+    [HttpGet("api/admin/product-sales")]
+    public async Task<IActionResult> GetProductSalesApi(
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
+        [FromQuery] int? productId = null)
+    {
+        var start = ParseLocalDate(startDate);
+        var end = ParseLocalDate(endDate);
+        var sales = await _purchaseSaleService.GetProductSalesAsync(start, end, productId);
+        return Ok(sales);
+    }
+
+    [HttpGet("api/admin/product-sales/{id:int}")]
+    public async Task<IActionResult> GetProductSaleByIdApi(int id)
+    {
+        var sale = await _purchaseSaleService.GetProductSaleByIdAsync(id);
+        if (sale == null)
+        {
+            return NotFound(new ApiErrorResponse("SALE_NOT_FOUND", $"Product sale with ID {id} not found."));
+        }
+        return Ok(sale);
+    }
+
+    [HttpGet("api/admin/product-sales/summary")]
+    public async Task<IActionResult> GetProductSalesSummaryApi(
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null)
+    {
+        var start = ParseLocalDate(startDate);
+        var end = ParseLocalDate(endDate);
+        var summary = await _purchaseSaleService.GetProductSalesSummaryAsync(start, end);
+        return Ok(summary);
+    }
+
+    private static LocalDate? ParseLocalDate(string? dateStr)
+    {
+        if (string.IsNullOrWhiteSpace(dateStr)) return null;
+        var pattern = LocalDatePattern.Iso;
+        var parseResult = pattern.Parse(dateStr.Trim());
+        return parseResult.Success ? parseResult.Value : null;
     }
 }
 

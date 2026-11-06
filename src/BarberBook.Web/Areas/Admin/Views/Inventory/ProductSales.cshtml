@@ -1,0 +1,502 @@
+@model BarberBook.Web.Models.Inventory.AdminProductSalesViewModel
+@{
+    ViewData["Title"] = "Sell Products & Counter Sales (HW-2, AF-12, SC-11)";
+}
+
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>PRODUCT SALES & COUNTER CHECKOUT · HW-2 / AF-12 / SC-11 / INV-04 / INV-06</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Sell Products & Counter Sales</h1>
+            <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
+                Record in-shop retail grooming product sales, snapshot unit prices, and update real-time stock levels.
+            </p>
+        </div>
+
+        <button onclick="openSaleModal()" class="py-2.5 px-5 rounded-2xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            <span>Record Product Sale</span>
+        </button>
+    </div>
+
+    <!-- Alert / Flash Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 font-bold">&times;</button>
+        </div>
+    }
+
+    <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
+    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
+        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Retail Products
+        </a>
+        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Buy (Purchases)
+        </a>
+        <span class="px-4 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
+            Sell (Product Sales)
+        </span>
+        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Equipment Assets
+        </a>
+        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Equipment per Barber
+        </a>
+        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Quality Monitoring
+        </a>
+    </div>
+
+    <!-- Stat Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Total Retail Revenue</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-amber-700">@Model.FormattedTotalSalesAmount</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Separately audited from appointment service sales (INV-06)</p>
+        </div>
+
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Completed Sales</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.Sales.Count</span>
+                <span class="text-xs text-slate-500 font-medium">transactions</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">In-shop counter settlements (LM-1, LM-2)</p>
+        </div>
+
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Units Dispensed</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.PerProductSummary.Sum(p => p.QuantitySold)</span>
+                <span class="text-xs text-slate-500 font-medium">products</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Grooming items sold and handed to customers</p>
+        </div>
+    </div>
+
+    <!-- Sales History Table & Filter Bar -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <form method="get" action="/admin/product-sales" class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">From:</label>
+                    <input type="date" name="startDate" value="@Model.StartDate"
+                           class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">To:</label>
+                    <input type="date" name="endDate" value="@Model.EndDate"
+                           class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Product:</label>
+                    <select name="productId" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                        <option value="">All Products</option>
+                        @foreach (var prod in Model.Products)
+                        {
+                            <option value="@prod.Id" selected="@(Model.FilterProductId == prod.Id)">@prod.Name (@prod.Sku)</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="py-1.5 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                    Filter
+                </button>
+                @if (!string.IsNullOrEmpty(Model.StartDate) || !string.IsNullOrEmpty(Model.EndDate) || Model.FilterProductId.HasValue)
+                {
+                    <a href="/admin/product-sales" class="text-xs text-slate-400 hover:text-slate-600 underline">Clear</a>
+                }
+            </form>
+        </div>
+
+        @if (!Model.Sales.Any())
+        {
+            <div class="p-12 text-center text-slate-400 text-sm">
+                <p class="font-semibold text-slate-600">No product sales recorded yet.</p>
+                <p class="text-xs text-slate-400 mt-1">Click "Record Product Sale" above to log a counter sale.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">Sale Date</th>
+                            <th class="py-3 px-4">Receipt / Ref</th>
+                            <th class="py-3 px-4">Customer</th>
+                            <th class="py-3 px-4 text-center">Items</th>
+                            <th class="py-3 px-4 text-right">Total Amount (₱)</th>
+                            <th class="py-3 px-4">Recorded By</th>
+                            <th class="py-3 px-4">Notes</th>
+                            <th class="py-3 px-4 text-right">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var s in Model.Sales)
+                        {
+                            <tr class="hover:bg-slate-50/80 transition">
+                                <td class="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">
+                                    @s.SoldAt
+                                </td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">
+                                    #PS-@s.Id.ToString("D5")
+                                </td>
+                                <td class="py-3 px-4 font-medium text-slate-800">
+                                    @(s.CustomerName ?? "Walk-in Customer")
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+                                        @s.Items.Count item@(s.Items.Count > 1 ? "s" : "")
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-right font-serif font-bold text-amber-800 whitespace-nowrap">
+                                    @s.FormattedTotalAmount
+                                </td>
+                                <td class="py-3 px-4 text-xs text-slate-600">
+                                    @(s.RecordedByName ?? "Administrator")
+                                </td>
+                                <td class="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
+                                    @(s.Notes ?? "—")
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button type="button" onclick="showSaleItems(@s.Id)"
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                        View Items
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Hidden Line Items Row -->
+                            <tr id="sale-details-@s.Id" class="hidden bg-slate-50/90 border-b border-slate-200">
+                                <td colspan="8" class="p-4">
+                                    <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Items Sold</h4>
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100">
+                                                <tr>
+                                                    <th class="py-1.5">Product</th>
+                                                    <th class="py-1.5 text-center">Quantity</th>
+                                                    <th class="py-1.5 text-right">Snapshot Price</th>
+                                                    <th class="py-1.5 text-right">Line Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                @foreach (var item in s.Items)
+                                                {
+                                                    <tr>
+                                                        <td class="py-2 font-bold text-slate-900">@item.ProductName</td>
+                                                        <td class="py-2 text-center font-bold text-slate-800">@item.Quantity</td>
+                                                        <td class="py-2 text-right">@item.FormattedUnitPrice</td>
+                                                        <td class="py-2 text-right font-serif font-bold text-slate-900">@item.FormattedLineTotal</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <!-- Product Sales Breakdown / Summary Card -->
+    @if (Model.PerProductSummary.Any())
+    {
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Product Sales Volume & Revenue Summary</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-slate-50 uppercase font-bold text-slate-500 border-b border-slate-200">
+                        <tr>
+                            <th class="py-2.5 px-3">Product Name</th>
+                            <th class="py-2.5 px-3 text-center">Units Sold</th>
+                            <th class="py-2.5 px-3 text-right">Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var row in Model.PerProductSummary)
+                        {
+                            <tr class="hover:bg-slate-50/60 transition">
+                                <td class="py-2 px-3 font-semibold text-slate-900">@row.ProductName</td>
+                                <td class="py-2 px-3 text-center font-bold text-slate-800">@row.QuantitySold</td>
+                                <td class="py-2 px-3 text-right font-serif font-bold text-amber-800">@row.FormattedTotalRevenue</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ========================================== -->
+<!-- RECORD PRODUCT SALE MODAL                 -->
+<!-- ========================================== -->
+<div id="saleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-serif font-bold text-slate-900">Record Counter Product Sale</h3>
+        <p class="text-xs text-slate-600 mt-1">Dispense retail products at the counter and deduct live inventory stock (HW-2, AF-12).</p>
+
+        <form id="saleForm" onsubmit="submitSale(event)" class="mt-5 space-y-4">
+            @Html.AntiForgeryToken()
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Customer</label>
+                    <select id="sCustomerId" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                        <option value="">Walk-in Customer (No Account)</option>
+                        @foreach (var c in Model.Customers)
+                        {
+                            <option value="@c.Id">@c.FullName (@c.Email)</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sale Date</label>
+                    <input type="date" id="sSoldAt"
+                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                </div>
+            </div>
+
+            <!-- Line Items Editor -->
+            <div class="space-y-2 pt-2">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Sale Items *</label>
+                    <button type="button" onclick="addSaleLine()" class="text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1">
+                        + Add Product Line
+                    </button>
+                </div>
+
+                <div id="saleLinesContainer" class="space-y-2">
+                    <!-- Dynamic Line Item Rows will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Running Total Display -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-500">Settled in shop at counter (LM-1, LM-2)</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Due</span>
+                    <span id="sTotalAmountDisplay" class="text-lg font-serif font-black text-amber-700">₱0.00</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sale Notes (Optional)</label>
+                <textarea id="sNotes" rows="2" placeholder="e.g. Paid in cash, paired with pomade restock"
+                          class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
+            </div>
+
+            <div id="saleError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold"></div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeSaleModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Cancel
+                </button>
+                <button type="submit" id="sSubmitBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Complete Counter Sale
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const activeProducts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(p => new {
+        id = p.Id,
+        name = p.Name,
+        sku = p.Sku,
+        sellPrice = p.SellPrice,
+        stock = p.CurrentStock,
+        unit = p.Unit
+    })));
+
+    let saleLines = [];
+
+    function openSaleModal() {
+        saleLines = [];
+        document.getElementById('saleLinesContainer').innerHTML = '';
+        document.getElementById('sCustomerId').value = '';
+        document.getElementById('sSoldAt').value = new Date().toISOString().split('T')[0];
+        document.getElementById('sNotes').value = '';
+        document.getElementById('saleError').classList.add('hidden');
+        addSaleLine();
+        document.getElementById('saleModal').classList.remove('hidden');
+    }
+
+    function closeSaleModal() {
+        document.getElementById('saleModal').classList.add('hidden');
+    }
+
+    function addSaleLine() {
+        if (!activeProducts || activeProducts.length === 0) {
+            alert('No active products found in inventory. Please add products first.');
+            return;
+        }
+
+        const defaultProduct = activeProducts.find(p => p.stock > 0) || activeProducts[0];
+        saleLines.push({
+            productId: defaultProduct.id,
+            quantity: defaultProduct.stock > 0 ? 1 : 0,
+            unitPrice: defaultProduct.sellPrice,
+            stock: defaultProduct.stock
+        });
+
+        renderSaleLines();
+    }
+
+    function removeSaleLine(index) {
+        if (saleLines.length <= 1) return;
+        saleLines.splice(index, 1);
+        renderSaleLines();
+    }
+
+    function onProductSelected(index, selectElem) {
+        const pId = parseInt(selectElem.value);
+        const prod = activeProducts.find(p => p.id === pId);
+        if (prod) {
+            saleLines[index].productId = pId;
+            saleLines[index].unitPrice = prod.sellPrice;
+            saleLines[index].stock = prod.stock;
+            if (saleLines[index].quantity > prod.stock) {
+                saleLines[index].quantity = Math.max(1, prod.stock);
+            }
+            renderSaleLines();
+        }
+    }
+
+    function onQtyChanged(index, val) {
+        const qty = parseInt(val) || 0;
+        saleLines[index].quantity = qty;
+        calculateTotal();
+    }
+
+    function renderSaleLines() {
+        const container = document.getElementById('saleLinesContainer');
+        container.innerHTML = '';
+
+        saleLines.forEach((line, i) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200';
+
+            let optionsHtml = '';
+            activeProducts.forEach(p => {
+                optionsHtml += `<option value="${p.id}" ${p.id === line.productId ? 'selected' : ''}>${p.name} (${p.sku}) — Stock: ${p.stock}</option>`;
+            });
+
+            const lineTotal = (line.quantity || 0) * (line.unitPrice || 0);
+
+            row.innerHTML = `
+                <div class="flex-1">
+                    <select onchange="onProductSelected(${i}, this)" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="w-20">
+                    <input type="number" min="1" max="${line.stock}" value="${line.quantity}" oninput="onQtyChanged(${i}, this.value)"
+                           placeholder="Qty" class="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-300 text-center font-bold" />
+                </div>
+                <div class="w-28 text-right font-serif text-xs font-semibold text-slate-700">
+                    ₱${line.unitPrice.toFixed(2)}
+                </div>
+                <div class="w-28 text-right font-serif font-bold text-amber-800 text-xs">
+                    ₱${lineTotal.toFixed(2)}
+                </div>
+                <div>
+                    <button type="button" onclick="removeSaleLine(${i})" class="text-rose-500 hover:text-rose-700 p-1 font-bold text-sm" title="Remove">&times;</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        saleLines.forEach(l => {
+            total += (l.quantity || 0) * (l.unitPrice || 0);
+        });
+        document.getElementById('sTotalAmountDisplay').textContent = `₱${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    async function submitSale(e) {
+        e.preventDefault();
+        const errDiv = document.getElementById('saleError');
+        errDiv.classList.add('hidden');
+
+        const validItems = saleLines.filter(l => l.quantity > 0 && l.productId > 0);
+        if (validItems.length === 0) {
+            errDiv.textContent = 'Please specify at least one item with quantity greater than zero.';
+            errDiv.classList.remove('hidden');
+            return;
+        }
+
+        const customerIdVal = document.getElementById('sCustomerId').value;
+        const payload = {
+            soldAt: document.getElementById('sSoldAt').value || null,
+            customerId: customerIdVal ? parseInt(customerIdVal) : null,
+            notes: document.getElementById('sNotes').value.trim() || null,
+            items: validItems.map(l => ({
+                productId: l.productId,
+                quantity: l.quantity
+            }))
+        };
+
+        const btn = document.getElementById('sSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Processing Sale...';
+
+        try {
+            const resp = await fetch('/admin/product-sales', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                const data = await resp.json();
+                if (resp.status === 409 || data.code === 'INSUFFICIENT_STOCK') {
+                    errDiv.textContent = `Insufficient stock: ${data.error || 'Requested quantity exceeds available stock.'}`;
+                } else {
+                    errDiv.textContent = data.error || 'Failed to record product sale.';
+                }
+                errDiv.classList.remove('hidden');
+            }
+        } catch (err) {
+            errDiv.textContent = 'Network or server error while completing counter sale.';
+            errDiv.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Complete Counter Sale';
+        }
+    }
+
+    function showSaleItems(id) {
+        const row = document.getElementById(`sale-details-${id}`);
+        if (row) {
+            row.classList.toggle('hidden');
+        }
+    }
+</script>

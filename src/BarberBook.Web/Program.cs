@@ -87,6 +87,7 @@ builder.Services.AddScoped<IAppointmentTransitionService, AppointmentTransitionS
 builder.Services.AddScoped<IReportingService, ReportingService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+builder.Services.AddScoped<IPurchaseSaleService, PurchaseSaleService>();
 
 // 6. Rate Limiter for sensitive auth endpoints
 builder.Services.AddRateLimiter(options =>

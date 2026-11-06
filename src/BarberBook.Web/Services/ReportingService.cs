@@ -84,6 +84,31 @@ public class ReportingService : IReportingService
             .ThenBy(g => g.Name)
             .ToList();
 
+        // HW-2, INV-06: Query product sales on that day in Asia/Manila
+        var daySales = await _dbContext.ProductSales
+            .AsNoTracking()
+            .Include(s => s.Items)
+            .Where(s => s.SoldAt >= dayStartUtc && s.SoldAt < nextDayStartUtc)
+            .ToListAsync(ct);
+
+        var productSalesItems = daySales.SelectMany(s => s.Items).ToList();
+        var productSalesTotal = productSalesItems.Sum(i => i.LineTotal);
+
+        var productSalesPerProduct = productSalesItems
+            .GroupBy(i => i.ProductName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Sum(x => x.Quantity),
+                TotalSales = g.Sum(x => x.LineTotal),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(x => x.LineTotal))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        var grandTotal = totalSales + productSalesTotal;
+
         return new DailySalesReportDto
         {
             Date = date,
@@ -93,7 +118,16 @@ public class ReportingService : IReportingService
             CompletedCount = items.Count,
             ByService = byService,
             ByBarber = byBarber,
-            Items = items
+            Items = items,
+            ProductSales = new ProductSalesSummaryDto
+            {
+                Total = productSalesTotal,
+                FormattedTotal = FormattingHelpers.FormatPeso(productSalesTotal),
+                Count = daySales.Count,
+                PerProduct = productSalesPerProduct
+            },
+            GrandTotal = grandTotal,
+            FormattedGrandTotal = FormattingHelpers.FormatPeso(grandTotal)
         };
     }
 
@@ -124,6 +158,17 @@ public class ReportingService : IReportingService
             .GroupBy(a => a.StartsAt.InZone(_zone).Date)
             .ToDictionary(g => g.Key, g => g.ToList());
 
+        // HW-2, INV-06: Query product sales in month
+        var monthProductSales = await _dbContext.ProductSales
+            .AsNoTracking()
+            .Include(s => s.Items)
+            .Where(s => s.SoldAt >= monthStartUtc && s.SoldAt < nextMonthStartUtc)
+            .ToListAsync(ct);
+
+        var productSalesByDate = monthProductSales
+            .GroupBy(s => s.SoldAt.InZone(_zone).Date)
+            .ToDictionary(g => g.Key, g => g.SelectMany(s => s.Items).ToList());
+
         // Day-by-day totals for EVERY day of the month (zero days included)
         var daysInMonth = monthStart.Calendar.GetDaysInMonth(year, month);
         var dailyTotals = new List<MonthlyDaySalesDto>(daysInMonth);
@@ -131,33 +176,37 @@ public class ReportingService : IReportingService
         for (int d = 1; d <= daysInMonth; d++)
         {
             var dayDate = new LocalDate(year, month, d);
+            decimal dayServiceSales = 0m;
+            int dayApptsCount = 0;
+
             if (appointmentsByDate.TryGetValue(dayDate, out var dayAppts) && dayAppts.Count > 0)
             {
-                var daySum = dayAppts.Sum(a => a.Price);
-                dailyTotals.Add(new MonthlyDaySalesDto
-                {
-                    Day = d,
-                    Date = dayDate,
-                    DateFormatted = dayDate.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
-                    DayOfWeek = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
-                    CompletedCount = dayAppts.Count,
-                    TotalSales = daySum,
-                    FormattedTotalSales = FormattingHelpers.FormatPeso(daySum)
-                });
+                dayServiceSales = dayAppts.Sum(a => a.Price);
+                dayApptsCount = dayAppts.Count;
             }
-            else
+
+            decimal dayProductSales = 0m;
+            if (productSalesByDate.TryGetValue(dayDate, out var dayPItems) && dayPItems.Count > 0)
             {
-                dailyTotals.Add(new MonthlyDaySalesDto
-                {
-                    Day = d,
-                    Date = dayDate,
-                    DateFormatted = dayDate.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
-                    DayOfWeek = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
-                    CompletedCount = 0,
-                    TotalSales = 0m,
-                    FormattedTotalSales = "₱0.00"
-                });
+                dayProductSales = dayPItems.Sum(i => i.LineTotal);
             }
+
+            var dayGrandTotal = dayServiceSales + dayProductSales;
+
+            dailyTotals.Add(new MonthlyDaySalesDto
+            {
+                Day = d,
+                Date = dayDate,
+                DateFormatted = dayDate.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
+                DayOfWeek = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
+                CompletedCount = dayApptsCount,
+                TotalSales = dayServiceSales,
+                FormattedTotalSales = FormattingHelpers.FormatPeso(dayServiceSales),
+                ProductSales = dayProductSales,
+                FormattedProductSales = FormattingHelpers.FormatPeso(dayProductSales),
+                GrandTotal = dayGrandTotal,
+                FormattedGrandTotal = FormattingHelpers.FormatPeso(dayGrandTotal)
+            });
         }
 
         // The month total must equal the sum of the daily totals (BR-11)
@@ -190,6 +239,24 @@ public class ReportingService : IReportingService
             .ThenBy(g => g.Name)
             .ToList();
 
+        // Product sales breakdowns
+        var allMonthPItems = monthProductSales.SelectMany(s => s.Items).ToList();
+        var monthProductSalesTotal = allMonthPItems.Sum(i => i.LineTotal);
+        var monthGrandTotal = totalSales + monthProductSalesTotal;
+
+        var productSalesPerProduct = allMonthPItems
+            .GroupBy(i => i.ProductName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Sum(x => x.Quantity),
+                TotalSales = g.Sum(x => x.LineTotal),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(x => x.LineTotal))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
         return new MonthlySalesReportDto
         {
             Year = year,
@@ -200,7 +267,13 @@ public class ReportingService : IReportingService
             CompletedCount = totalCompleted,
             DailyTotals = dailyTotals,
             ByService = byService,
-            ByBarber = byBarber
+            ByBarber = byBarber,
+            ProductSales = monthProductSalesTotal,
+            FormattedProductSales = FormattingHelpers.FormatPeso(monthProductSalesTotal),
+            ProductSalesCount = monthProductSales.Count,
+            ProductSalesPerProduct = productSalesPerProduct,
+            GrandTotal = monthGrandTotal,
+            FormattedGrandTotal = FormattingHelpers.FormatPeso(monthGrandTotal)
         };
     }
 

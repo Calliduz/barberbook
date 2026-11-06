@@ -507,6 +507,184 @@ namespace BarberBook.Data.Migrations
                     b.ToTable("products", (string)null);
                 });
 
+            modelBuilder.Entity("BarberBook.Data.Entities.ProductSale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("appointment_id");
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("customer_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("RecordedById")
+                        .HasColumnType("integer")
+                        .HasColumnName("recorded_by_id");
+
+                    b.Property<Instant>("SoldAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sold_at");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("total_amount");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("RecordedById");
+
+                    b.HasIndex("SoldAt");
+
+                    b.ToTable("product_sales", (string)null);
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.ProductSaleItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("LineTotal")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("line_total");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("product_name");
+
+                    b.Property<int>("ProductSaleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_sale_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("unit_price");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductSaleId");
+
+                    b.ToTable("product_sale_items", (string)null);
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Purchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("integer")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<Instant>("PurchasedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("purchased_at");
+
+                    b.Property<string>("SupplierName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("supplier_name");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("total_cost");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("PurchasedAt");
+
+                    b.ToTable("purchases", (string)null);
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.PurchaseItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("LineTotal")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("line_total");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<int>("PurchaseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("purchase_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("unit_cost");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("PurchaseId");
+
+                    b.ToTable("purchase_items", (string)null);
+                });
+
             modelBuilder.Entity("BarberBook.Data.Entities.Service", b =>
                 {
                     b.Property<int>("Id")
@@ -908,6 +1086,78 @@ namespace BarberBook.Data.Migrations
                     b.Navigation("Equipment");
                 });
 
+            modelBuilder.Entity("BarberBook.Data.Entities.ProductSale", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BarberBook.Data.Entities.ApplicationUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BarberBook.Data.Entities.ApplicationUser", "RecordedBy")
+                        .WithMany()
+                        .HasForeignKey("RecordedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("RecordedBy");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.ProductSaleItem", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BarberBook.Data.Entities.ProductSale", "ProductSale")
+                        .WithMany("Items")
+                        .HasForeignKey("ProductSaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductSale");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Purchase", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.PurchaseItem", b =>
+                {
+                    b.HasOne("BarberBook.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BarberBook.Data.Entities.Purchase", "Purchase")
+                        .WithMany("Items")
+                        .HasForeignKey("PurchaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Purchase");
+                });
+
             modelBuilder.Entity("BarberBook.Data.Entities.StatusHistory", b =>
                 {
                     b.HasOne("BarberBook.Data.Entities.Appointment", "Appointment")
@@ -1039,6 +1289,16 @@ namespace BarberBook.Data.Migrations
             modelBuilder.Entity("BarberBook.Data.Entities.Product", b =>
                 {
                     b.Navigation("StockMovements");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.ProductSale", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Purchase", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("BarberBook.Data.Entities.Service", b =>

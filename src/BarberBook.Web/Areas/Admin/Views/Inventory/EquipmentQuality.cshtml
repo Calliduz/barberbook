@@ -28,6 +28,28 @@
         </div>
     </div>
 
+    <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
+    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
+        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Retail Products
+        </a>
+        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Buy (Purchases)
+        </a>
+        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Sell (Product Sales)
+        </a>
+        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Equipment Assets
+        </a>
+        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            Equipment per Barber
+        </a>
+        <span class="px-4 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
+            Quality Monitoring
+        </span>
+    </div>
+
     <!-- Alert Banner if Flagged Items Exist -->
     @if (m.TotalFlaggedCount > 0)
     {
