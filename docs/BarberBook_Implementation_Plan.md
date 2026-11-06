@@ -584,7 +584,7 @@ Task P21 — Final paper-compliance audit and demo script. Do not add features. 
 ```
 
 **Done when**
-- [ ] `docs/COMPLIANCE.md` has no "not done" rows, open [A] items are listed for your adviser, and the demo script runs cleanly.
+- [x] `docs/COMPLIANCE.md` has no "not done" rows, open [A] items are listed for your adviser, and the demo script runs cleanly.
 
 ---
 
