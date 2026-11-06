@@ -566,7 +566,7 @@ Documentation: README (what BarberBook is, features by role, setup, scripts, env
 ```
 
 **Done when**
-- [ ] The route-table test covers every route; `docker compose` brings up the production build; the README lets a classmate run the project from scratch.
+- [x] The route-table test covers every route; `docker compose` brings up the production build; the README lets a classmate run the project from scratch.
 
 ---
 

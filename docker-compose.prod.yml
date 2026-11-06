@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: barberbook-web-prod
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=barberbook_prod;Username=barberbook;Password=${DB_PASSWORD:-barberbook_prod_secret_2026}
+      - ShopTimeZone=Asia/Manila
+      - Admin__Email=${ADMIN_EMAIL:-admin@barberbook.local}
+      - Admin__Password=${ADMIN_PASSWORD:-Admin@BarberBook2026!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: barberbook-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: barberbook
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-barberbook_prod_secret_2026}
+      POSTGRES_DB: barberbook_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - barberbook_prod_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barberbook -d barberbook_prod"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  barberbook_prod_pgdata:
+    driver: local
+

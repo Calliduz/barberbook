@@ -359,4 +359,26 @@ public class AuthAndRoleGuardTests : IClassFixture<WebApplicationFactory<Program
             }
         }
     }
+
+    [Fact]
+    public async Task P20_SecurityHeaders_EmittedOnEveryResponse()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/");
+
+        // Assert
+        response.Headers.Contains("X-Content-Type-Options").Should().BeTrue();
+        response.Headers.GetValues("X-Content-Type-Options").Should().Contain("nosniff");
+
+        response.Headers.Contains("X-Frame-Options").Should().BeTrue();
+        response.Headers.GetValues("X-Frame-Options").Should().Contain("DENY");
+
+        response.Headers.Contains("Referrer-Policy").Should().BeTrue();
+        response.Headers.GetValues("Referrer-Policy").Should().Contain("strict-origin-when-cross-origin");
+
+        response.Headers.Contains("Content-Security-Policy").Should().BeTrue();
+    }
 }

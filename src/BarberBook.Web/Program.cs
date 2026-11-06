@@ -27,9 +27,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<BarberBookDbContext>()
@@ -43,7 +43,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.ExpireTimeSpan = TimeSpan.FromHours(4);
     options.SlidingExpiration = true;
 
     options.Events.OnRedirectToLogin = context =>
@@ -101,10 +101,22 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// 6. MVC & Controllers
+// Strict CORS Policy for AJAX Endpoints
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("StrictCorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5000", "https://localhost:5001", "http://127.0.0.1:5000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// 7. MVC & Controllers
 builder.Services.AddControllersWithViews();
 
-// 7. FluentValidation
+// 8. FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
@@ -117,7 +129,8 @@ if (args.Contains("--seed"))
     return;
 }
 
-// 7. Pipeline: Centralized Error Handler Middleware
+// Security Headers & Centralized Error Handler Middleware
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ApiExceptionMiddleware>();
 
 if (!app.Environment.IsDevelopment())
@@ -130,6 +143,7 @@ app.UseStatusCodePagesWithReExecute("/Home/StatusCodePage", "?code={0}");
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseCors("StrictCorsPolicy");
 app.UseRateLimiter();
 
 app.UseAuthentication();
