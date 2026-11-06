@@ -58,11 +58,22 @@ public class AccountController : Controller
     [EnableRateLimiting("auth-policy")]
     [Route("login")]
     [Route("Account/Login")]
-    [Route("api/auth/login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel? jsonModel, [FromForm] LoginModel? formModel)
+    public async Task<IActionResult> Login([FromForm] LoginModel formModel)
     {
-        var model = jsonModel ?? formModel ?? new LoginModel();
-        var isApi = IsApiOrJsonRequest();
+        return await ProcessLoginAsync(formModel, isApi: false);
+    }
+
+    [HttpPost("api/auth/login")]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth-policy")]
+    public async Task<IActionResult> ApiLogin([FromBody] LoginModel jsonModel)
+    {
+        return await ProcessLoginAsync(jsonModel, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessLoginAsync(LoginModel? inputModel, bool isApi)
+    {
+        var model = inputModel ?? new LoginModel();
 
         if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
         {
@@ -71,7 +82,7 @@ public class AccountController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Email and password are required."));
             }
             ModelState.AddModelError(string.Empty, "Email and password are required.");
-            return View(model);
+            return View("Login", model);
         }
 
         var user = await _userManager.FindByEmailAsync(model.Email);
@@ -83,7 +94,7 @@ public class AccountController : Controller
                 return Unauthorized(new ApiErrorResponse("INVALID_CREDENTIALS", "Invalid email or password."));
             }
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
-            return View(model);
+            return View("Login", model);
         }
 
         // BR-13: Inactive users cannot log in
@@ -95,7 +106,7 @@ public class AccountController : Controller
                 return Unauthorized(new ApiErrorResponse("ACCOUNT_INACTIVE", "Account is deactivated. Please contact an administrator."));
             }
             ModelState.AddModelError(string.Empty, "Your account has been deactivated. Please contact support.");
-            return View(model);
+            return View("Login", model);
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -107,7 +118,7 @@ public class AccountController : Controller
                 return Unauthorized(new ApiErrorResponse("INVALID_CREDENTIALS", "Invalid email or password."));
             }
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
-            return View(model);
+            return View("Login", model);
         }
 
         _logger.LogInformation("User {Email} logged in successfully with role {Role}", user.Email, user.Role);
@@ -155,11 +166,22 @@ public class AccountController : Controller
     [EnableRateLimiting("auth-policy")]
     [Route("register")]
     [Route("Account/Register")]
-    [Route("api/auth/register")]
-    public async Task<IActionResult> Register([FromBody] RegisterModel? jsonModel, [FromForm] RegisterModel? formModel)
+    public async Task<IActionResult> Register([FromForm] RegisterModel formModel)
     {
-        var model = jsonModel ?? formModel ?? new RegisterModel();
-        var isApi = IsApiOrJsonRequest();
+        return await ProcessRegisterAsync(formModel, isApi: false);
+    }
+
+    [HttpPost("api/auth/register")]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth-policy")]
+    public async Task<IActionResult> ApiRegister([FromBody] RegisterModel jsonModel)
+    {
+        return await ProcessRegisterAsync(jsonModel, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessRegisterAsync(RegisterModel? inputModel, bool isApi)
+    {
+        var model = inputModel ?? new RegisterModel();
 
         if (string.IsNullOrWhiteSpace(model.FullName) ||
             string.IsNullOrWhiteSpace(model.Email) ||
@@ -170,7 +192,7 @@ public class AccountController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Full name, email, and password are required."));
             }
             ModelState.AddModelError(string.Empty, "Full name, email, and password are required.");
-            return View(model);
+            return View("Register", model);
         }
 
         // Check if email is already taken
@@ -182,7 +204,7 @@ public class AccountController : Controller
                 return Conflict(new ApiErrorResponse("DUPLICATE_EMAIL", "An account with this email already exists."));
             }
             ModelState.AddModelError(nameof(model.Email), "An account with this email already exists.");
-            return View(model);
+            return View("Register", model);
         }
 
         // HARD BOUNDARY: Register action creates CUSTOMER ONLY.
@@ -213,7 +235,7 @@ public class AccountController : Controller
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-            return View(model);
+            return View("Register", model);
         }
 
         await _userManager.AddToRoleAsync(newUser, "Customer");
@@ -273,14 +295,23 @@ public class AccountController : Controller
         return Ok(ToDto(user));
     }
 
-    [HttpPost]
+    [HttpPost("Account/ChangePassword")]
     [Authorize]
-    [Route("Account/ChangePassword")]
-    [Route("api/auth/change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel? jsonModel, [FromForm] ChangePasswordModel? formModel)
+    public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordModel formModel)
     {
-        var model = jsonModel ?? formModel ?? new ChangePasswordModel();
-        var isApi = IsApiOrJsonRequest();
+        return await ProcessChangePasswordAsync(formModel, isApi: false);
+    }
+
+    [HttpPost("api/auth/change-password")]
+    [Authorize]
+    public async Task<IActionResult> ApiChangePassword([FromBody] ChangePasswordModel jsonModel)
+    {
+        return await ProcessChangePasswordAsync(jsonModel, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessChangePasswordAsync(ChangePasswordModel? inputModel, bool isApi)
+    {
+        var model = inputModel ?? new ChangePasswordModel();
 
         var userId = User.GetRequiredUserId();
         var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -296,7 +327,7 @@ public class AccountController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Current password and new password are required."));
             }
             ModelState.AddModelError(string.Empty, "Current password and new password are required.");
-            return View(model);
+            return View("ChangePassword", model);
         }
 
         var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
@@ -311,7 +342,7 @@ public class AccountController : Controller
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-            return View(model);
+            return View("ChangePassword", model);
         }
 
         await _signInManager.RefreshSignInAsync(user);
