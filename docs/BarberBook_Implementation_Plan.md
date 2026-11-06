@@ -432,8 +432,8 @@ Task P14 — Checkpoint: audit everything the printed paper defines. Do not add 
 ```
 
 **Done when**
-- [ ] `docs/CHECKPOINT_CORE.md` shows every [P] ID as done with a test, and the hard-boundary search is clean.
-- [ ] You could demo the whole printed paper at this point.
+- [x] `docs/CHECKPOINT_CORE.md` shows every [P] ID as done with a test, and the hard-boundary search is clean.
+- [x] You could demo the whole printed paper at this point.
 
 ---
 

@@ -39,3 +39,4 @@ public interface IReportingService
         LocalDate? endDate = null,
         CancellationToken ct = default);
 }
+

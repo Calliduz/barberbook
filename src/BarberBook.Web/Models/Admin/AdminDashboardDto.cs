@@ -61,3 +61,4 @@ public class AdminDashboardScheduleItemDto
     public decimal Price { get; set; }
     public string FormattedPrice { get; set; } = string.Empty;
 }
+

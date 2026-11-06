@@ -106,3 +106,4 @@ public class BarberTransactionItemDto
     public decimal Amount { get; set; }
     public string FormattedAmount { get; set; } = string.Empty;
 }
+
