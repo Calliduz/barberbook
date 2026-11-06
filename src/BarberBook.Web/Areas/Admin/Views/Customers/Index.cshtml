@@ -1,0 +1,161 @@
+@model BarberBook.Web.Areas.Admin.Controllers.AdminCustomerListViewModel
+@{
+    ViewData["Title"] = "Customer Registry";
+}
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
+                <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
+                <span>CLIENT DIRECTORY · EST. 2026</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Customer Registry</h1>
+            <p class="mt-1 text-sm text-slate-600 font-sans">Browse registered customer profiles, track loyalty visit counts, and manage account statuses.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 flex items-center gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                Total Clients: @Model.TotalCustomers
+            </span>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="rounded-xl bg-emerald-50 p-4 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="rounded-xl bg-rose-50 p-4 border border-rose-200 text-rose-800 text-sm flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <!-- Search & Filter Bar -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5">
+        <form method="get" action="/admin/customers" class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="w-full sm:w-80 relative">
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search customer by name, email, phone..."
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <a href="/admin/customers?status=all@(string.IsNullOrEmpty(Model.SearchQuery) ? "" : $"&q={Uri.EscapeDataString(Model.SearchQuery)}")"
+                   class="px-3.5 py-2 rounded-xl text-xs font-bold transition @(Model.StatusFilter == "all" ? "bg-slate-900 text-amber-300 border border-amber-500/30" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
+                    All Clients
+                </a>
+                <a href="/admin/customers?status=active@(string.IsNullOrEmpty(Model.SearchQuery) ? "" : $"&q={Uri.EscapeDataString(Model.SearchQuery)}")"
+                   class="px-3.5 py-2 rounded-xl text-xs font-bold transition @(Model.StatusFilter == "active" ? "bg-slate-900 text-amber-300 border border-amber-500/30" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
+                    Active
+                </a>
+                <a href="/admin/customers?status=inactive@(string.IsNullOrEmpty(Model.SearchQuery) ? "" : $"&q={Uri.EscapeDataString(Model.SearchQuery)}")"
+                   class="px-3.5 py-2 rounded-xl text-xs font-bold transition @(Model.StatusFilter == "inactive" ? "bg-slate-900 text-amber-300 border border-amber-500/30" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
+                    Deactivated
+                </a>
+                @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.StatusFilter != "all")
+                {
+                    <a href="/admin/customers" class="text-xs text-amber-700 hover:underline font-semibold ml-2">Reset</a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+        @if (!Model.Items.Any())
+        {
+            <div class="p-16 text-center text-slate-500">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">No customers found</h3>
+                <p class="text-xs text-slate-500 mt-1">Try refining your search terms or filter criteria.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-6">Customer</th>
+                            <th class="py-3 px-6">Contact Info</th>
+                            <th class="py-3 px-6">Member Since</th>
+                            <th class="py-3 px-6 text-center">Visits</th>
+                            <th class="py-3 px-6">Total Spent</th>
+                            <th class="py-3 px-6">Status</th>
+                            <th class="py-3 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var c in Model.Items)
+                        {
+                            <tr class="hover:bg-slate-50/80 transition">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-slate-900 text-amber-300 font-serif font-bold flex items-center justify-center text-sm border border-amber-500/30 flex-shrink-0">
+                                            @c.FullName.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight">@c.FullName</span>
+                                            <span class="text-xs text-slate-400">ID: #@c.Id</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6 text-xs space-y-0.5">
+                                    <span class="block text-slate-800 font-medium">@c.Email</span>
+                                    <span class="block text-slate-500 font-mono">@c.Phone</span>
+                                </td>
+                                <td class="py-4 px-6 text-xs text-slate-600 whitespace-nowrap">
+                                    @c.MemberSince
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-800 text-xs font-bold">
+                                        @c.CompletedVisits
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-serif font-bold text-slate-900 whitespace-nowrap">
+                                    @c.FormattedTotalSpent
+                                </td>
+                                <td class="py-4 px-6 whitespace-nowrap">
+                                    @if (c.IsActive)
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                            Deactivated
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-4 px-6 text-right whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-2">
+                                        <a href="/admin/history?q=@Uri.EscapeDataString(c.FullName)" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                            History
+                                        </a>
+                                        <form method="post" action="/admin/customers/@c.Id/toggle-status" class="inline" onsubmit="return confirm('Are you sure you want to @(c.IsActive ? "deactivate" : "reactivate") this customer account?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition @(c.IsActive ? "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200")">
+                                                @(c.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

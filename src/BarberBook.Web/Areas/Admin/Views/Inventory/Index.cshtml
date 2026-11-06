@@ -1,0 +1,156 @@
+@model BarberBook.Web.Areas.Admin.Controllers.AdminInventoryViewModel
+@{
+    ViewData["Title"] = "Inventory & Equipment";
+}
+
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="sm:flex sm:items-center sm:justify-between pb-4 border-b border-slate-200">
+        <div>
+            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
+                <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
+                <span>SHOP ASSETS & RETAIL STOCK · HW-1 / HW-2 / HW-3</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Shop Inventory & Equipment</h1>
+            <p class="mt-1 text-sm text-slate-600 font-sans">Monitor retail grooming products, stock levels, equipment assigned per barber, and quality maintenance.</p>
+        </div>
+    </div>
+
+    <!-- Overview Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Retail Products</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.TotalRetailSKUs</span>
+                <span class="text-xs text-slate-500 font-medium">active SKUs</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Styling, beard care, and shave essentials</p>
+        </div>
+
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Low Stock Alerts</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-rose-600">@Model.LowStockCount</span>
+                <span class="text-xs text-rose-600 font-medium">below reorder level</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Requires restocking purchase (HW-2)</p>
+        </div>
+
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 block">Assigned Equipment</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.TotalAssignedTools</span>
+                <span class="text-xs text-slate-500 font-medium">tools in active service</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Assigned per barber with quality logs (HW-1)</p>
+        </div>
+    </div>
+
+    <!-- Section 1: Retail Product Inventory -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-serif font-bold text-slate-900 tracking-tight">Retail Products & Inventory Levels (HW-2)</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Counter retail products for customer purchase and salon stocking</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-6">SKU</th>
+                        <th class="py-3 px-6">Product Name</th>
+                        <th class="py-3 px-6">Category</th>
+                        <th class="py-3 px-6 text-center">Stock Level</th>
+                        <th class="py-3 px-6 text-center">Reorder At</th>
+                        <th class="py-3 px-6 text-right">Retail Price</th>
+                        <th class="py-3 px-6 text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var p in Model.Products)
+                    {
+                        var isLow = p.StockQuantity <= p.ReorderLevel;
+                        <tr class="hover:bg-slate-50/80 transition @(isLow ? "bg-rose-50/30" : "")">
+                            <td class="py-3.5 px-6 font-mono font-bold text-xs text-slate-500">@p.Sku</td>
+                            <td class="py-3.5 px-6 font-bold text-slate-900">@p.Name</td>
+                            <td class="py-3.5 px-6 text-xs text-slate-600">
+                                <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">@p.Category</span>
+                            </td>
+                            <td class="py-3.5 px-6 text-center font-bold text-sm @(isLow ? "text-rose-600" : "text-slate-800")">
+                                @p.StockQuantity units
+                            </td>
+                            <td class="py-3.5 px-6 text-center text-xs text-slate-500 font-medium">
+                                @p.ReorderLevel units
+                            </td>
+                            <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">
+                                @p.FormattedPrice
+                            </td>
+                            <td class="py-3.5 px-6 text-right whitespace-nowrap">
+                                @if (isLow)
+                                {
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                        Low Stock
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        In Stock
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 2: Equipment per Barber & Quality Monitoring -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-serif font-bold text-slate-900 tracking-tight">Equipment Assigned per Barber (HW-1 / HW-3)</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Asset serial numbers, barber assignments, and quality inspection schedules</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-6">Serial #</th>
+                        <th class="py-3 px-6">Equipment / Tool Name</th>
+                        <th class="py-3 px-6">Assigned To</th>
+                        <th class="py-3 px-6">Condition</th>
+                        <th class="py-3 px-6">Last Inspection</th>
+                        <th class="py-3 px-6">Next Due</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var eq in Model.Equipment)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-3.5 px-6 font-mono font-bold text-xs text-slate-500">@eq.SerialNumber</td>
+                            <td class="py-3.5 px-6 font-bold text-slate-900">@eq.Name</td>
+                            <td class="py-3.5 px-6 font-medium text-amber-800">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200/60">
+                                    ✂️ @eq.AssignedToBarber
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold @(eq.Condition == "Good" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">
+                                    @eq.Condition
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6 text-xs text-slate-600">@eq.LastInspectionDate</td>
+                            <td class="py-3.5 px-6 text-xs text-slate-600">@eq.NextInspectionDue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

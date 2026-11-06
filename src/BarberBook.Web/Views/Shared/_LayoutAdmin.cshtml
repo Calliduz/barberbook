@@ -3,12 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BarberBook Admin Management Dashboard</title>
+    <title>@ViewData["Title"] - BarberBook Executive Admin</title>
+
+    <!-- Google Fonts: Playfair Display + Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
+                    },
                     colors: {
                         brand: {
                             50: '#fbf7ee',
@@ -27,47 +38,187 @@
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="flex flex-col min-h-full text-slate-800 antialiased bg-slate-50">
+<body class="flex flex-col min-h-full font-sans text-slate-800 antialiased bg-slate-50/70">
+    <!-- Top Barber Pole Animated Border Divider -->
     <div class="barber-pole-divider"></div>
-    <header class="bg-slate-900 text-white shadow sticky top-0 z-50">
+
+    <!-- Admin Header -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
+                <!-- Brand & Logo -->
                 <div class="flex items-center space-x-6">
-                    <a href="/admin" class="flex items-center space-x-2.5">
-                        <div class="barber-pole-icon" style="height: 20px; width: 10px;"></div>
-                        <span class="text-2xl font-serif font-black tracking-tight text-brand-400">Barber<span class="text-white font-sans font-bold">Book</span></span>
-                        <span class="text-xs uppercase px-2 py-0.5 rounded bg-amber-900/60 text-amber-300 font-semibold border border-amber-700">Admin</span>
+                    <a href="/admin" class="flex items-center space-x-2.5 group">
+                        <div class="barber-pole-icon" style="height: 22px; width: 11px;"></div>
+                        <div class="flex flex-col">
+                            <span class="text-xl font-serif font-black tracking-tight text-amber-400 group-hover:text-amber-300 transition">Barber<span class="text-white font-sans font-bold">Book</span></span>
+                            <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold -mt-1">ADMINISTRATOR</span>
+                        </div>
                     </a>
-                    <nav class="hidden xl:flex space-x-1">
-                        <a href="/admin" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Dashboard</a>
-                        <a href="/admin/appointments" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Bookings</a>
-                        <a href="/admin/history" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">History</a>
-                        <a href="/admin/barbers" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Barbers</a>
-                        <a href="/admin/schedules" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Schedules</a>
-                        <a href="/admin/services" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Services</a>
-                        <a href="/admin/customers" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Customers</a>
-                        <a href="/admin/reports" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Reports</a>
-                        <a href="/admin/inventory" class="px-2.5 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">Inventory</a>
+
+                    <!-- Desktop Grouped Nav -->
+                    <nav class="hidden lg:flex items-center space-x-1 text-sm font-medium">
+                        <!-- Dashboard Link -->
+                        <a href="/admin" class="px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1.5 font-semibold">
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                            <span>Dashboard</span>
+                        </a>
+
+                        <!-- Dropdown 1: Appointments -->
+                        <div class="relative group">
+                            <button type="button" class="px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1 font-semibold">
+                                <span>Appointments</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                            </button>
+                            <div class="absolute left-0 mt-1 w-56 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl py-2 hidden group-hover:block transition-all duration-200 z-50 divide-y divide-slate-800/50">
+                                <a href="/admin/appointments" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+                                    <div>
+                                        <span class="block">Bookings & Approvals</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Active schedule calendar</span>
+                                    </div>
+                                </a>
+                                <a href="/admin/history" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <div>
+                                        <span class="block">Complete History</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Audit timeline & filters</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 2: Shop Management -->
+                        <div class="relative group">
+                            <button type="button" class="px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1 font-semibold">
+                                <span>Shop Management</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                            </button>
+                            <div class="absolute left-0 mt-1 w-60 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl py-2 hidden group-hover:block transition-all duration-200 z-50 divide-y divide-slate-800/50">
+                                <a href="/admin/barbers" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <span class="text-base">✂️</span>
+                                    <div>
+                                        <span class="block">Master Barbers</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Staff profiles & access</span>
+                                    </div>
+                                </a>
+                                <a href="/admin/schedules" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <span class="text-base">⏰</span>
+                                    <div>
+                                        <span class="block">Working Hours & Days Off</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Shift windows (30m grid)</span>
+                                    </div>
+                                </a>
+                                <a href="/admin/services" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <span class="text-base">💈</span>
+                                    <div>
+                                        <span class="block">Services & Fixed Pricing</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Philippine Peso (₱) menu</span>
+                                    </div>
+                                </a>
+                                <a href="/admin/customers" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <span class="text-base">👥</span>
+                                    <div>
+                                        <span class="block">Customer Registry</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Registered client accounts</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown 3: Business & Records -->
+                        <div class="relative group">
+                            <button type="button" class="px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1 font-semibold">
+                                <span>Business & Analytics</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                            </button>
+                            <div class="absolute left-0 mt-1 w-64 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl py-2 hidden group-hover:block transition-all duration-200 z-50 divide-y divide-slate-800/50">
+                                <a href="/admin/reports" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <div>
+                                        <span class="block">Sales Reports (Daily/Monthly)</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Completed sales journals (§7)</span>
+                                    </div>
+                                </a>
+                                <a href="/admin/inventory" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:text-amber-300 hover:bg-slate-800/60 transition">
+                                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                                    <div>
+                                        <span class="block">Inventory & Equipment</span>
+                                        <span class="text-[10px] text-slate-400 font-normal">Stock alerts & tool maintenance</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </nav>
                 </div>
-                <div>
+
+                <!-- Right Nav: Shop Front & User Profile -->
+                <div class="flex items-center space-x-3">
+                    <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition">
+                        <span>View Shop Front</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                    </a>
+
                     <partial name="_LoginPartial" />
+
+                    <!-- Mobile Menu Button -->
+                    <button type="button" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-slate-900 border-t border-slate-800 px-4 pt-3 pb-6 space-y-3">
+            <a href="/admin" class="block px-3 py-2 rounded-xl text-sm font-semibold text-amber-400 bg-slate-800/80">Dashboard</a>
+            
+            <div class="pt-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">Appointments</span>
+                <div class="mt-1 space-y-1">
+                    <a href="/admin/appointments" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Bookings & Approvals</a>
+                    <a href="/admin/history" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Complete History</a>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">Shop Management</span>
+                <div class="mt-1 space-y-1">
+                    <a href="/admin/barbers" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Master Barbers</a>
+                    <a href="/admin/schedules" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Schedules & Hours</a>
+                    <a href="/admin/services" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Services & Pricing</a>
+                    <a href="/admin/customers" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Customer Registry</a>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">Business & Analytics</span>
+                <div class="mt-1 space-y-1">
+                    <a href="/admin/reports" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Sales Reports</a>
+                    <a href="/admin/inventory" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Inventory & Equipment</a>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @RenderBody()
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 text-sm text-center border-t border-slate-800">
+    <!-- Admin Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-xs text-center border-t border-slate-800 mt-auto">
         <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; @DateTime.UtcNow.Year BarberBook — Administrator Dashboard</p>
+            <p>&copy; @DateTime.UtcNow.Year BarberBook Management System — SBIT-3D Group 4</p>
         </div>
     </footer>
 
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
