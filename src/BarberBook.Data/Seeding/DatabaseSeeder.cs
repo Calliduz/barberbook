@@ -302,6 +302,87 @@ public static class DatabaseSeeder
             await context.SaveChangesAsync();
         }
 
+        // 7. Seed Products and Initial Stock Movements (HW-1, AF-10, INV-03, INV-05)
+        var productsSeed = new[]
+        {
+            new { Sku = "PRD-POM-01", Name = "Classic High-Shine Pomade (100g)", Category = "Styling", Unit = "pcs", SellPrice = 450.00m, CostPrice = 250.00m, ReorderLevel = 10, InitialStock = 24 },
+            new { Sku = "PRD-BOIL-02", Name = "Artisanal Cedarwood Beard Oil (50ml)", Category = "Beard Care", Unit = "btl", SellPrice = 380.00m, CostPrice = 190.00m, ReorderLevel = 8, InitialStock = 15 },
+            new { Sku = "PRD-CLAY-03", Name = "Matte Texture Clay (85g)", Category = "Styling", Unit = "pcs", SellPrice = 420.00m, CostPrice = 230.00m, ReorderLevel = 10, InitialStock = 6 }, // Low stock (6 <= 10)
+            new { Sku = "PRD-SHAV-04", Name = "Eucalyptus Hot Towel Shave Cream (150ml)", Category = "Shaving", Unit = "tub", SellPrice = 320.00m, CostPrice = 160.00m, ReorderLevel = 5, InitialStock = 18 },
+            new { Sku = "PRD-TON-05", Name = "Bay Rum Soothing Aftershave Tonic (120ml)", Category = "Aftercare", Unit = "btl", SellPrice = 390.00m, CostPrice = 210.00m, ReorderLevel = 8, InitialStock = 4 } // Low stock (4 <= 8)
+        };
+
+        foreach (var pSeed in productsSeed)
+        {
+            var product = await context.Products.FirstOrDefaultAsync(p => p.Sku == pSeed.Sku);
+            if (product == null)
+            {
+                product = new Product
+                {
+                    Sku = pSeed.Sku,
+                    Name = pSeed.Name,
+                    Category = pSeed.Category,
+                    Unit = pSeed.Unit,
+                    SellPrice = pSeed.SellPrice,
+                    CostPrice = pSeed.CostPrice,
+                    ReorderLevel = pSeed.ReorderLevel,
+                    IsActive = true
+                };
+                context.Products.Add(product);
+                await context.SaveChangesAsync();
+
+                if (pSeed.InitialStock > 0)
+                {
+                    var initialMovement = new StockMovement
+                    {
+                        ProductId = product.Id,
+                        Type = StockMovementType.Adjustment,
+                        Quantity = pSeed.InitialStock,
+                        UnitAmount = product.CostPrice,
+                        Reason = "Initial baseline inventory count",
+                        CreatedById = adminUser.Id,
+                        CreatedAt = now
+                    };
+                    context.StockMovements.Add(initialMovement);
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
+        // 8. Seed Equipment (HW-1, SC-10, AF-9, AF-10)
+        var equipmentSeed = new[]
+        {
+            new { Tag = "EQ-001", Name = "Cordless Senior Clipper", Category = "Clippers", Brand = "Wahl 5-Star", Serial = "WHL-SN-9921", Cost = 6500.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 30, Notes = "Primary station clipper" },
+            new { Tag = "EQ-002", Name = "Skeleton FX Trimmer", Category = "Trimmers", Brand = "BaBylissPRO", Serial = "BBL-FX-4402", Cost = 5200.00m, Condition = EquipmentCondition.Excellent, Status = EquipmentStatus.InService, Interval = 30, Notes = "Zero-gapped blade" },
+            new { Tag = "EQ-003", Name = "Master Pro Clipper", Category = "Clippers", Brand = "Andis Master", Serial = "AND-MP-1048", Cost = 7200.00m, Condition = EquipmentCondition.Fair, Status = EquipmentStatus.UnderMaintenance, Interval = 30, Notes = "Motor alignment check required" },
+            new { Tag = "EQ-004", Name = "Handcrafted Japanese Shears 6.0\"", Category = "Shears", Brand = "Kashiwa Steel", Serial = "KSH-SH-0881", Cost = 8900.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 60, Notes = "Convex edge precision shears" },
+            new { Tag = "EQ-005", Name = "Vintage Heavy-Duty Barber Chair", Category = "Furniture", Brand = "Takara Belmont Classic", Serial = "TKB-CH-0012", Cost = 45000.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 90, Notes = "Hydraulic pump serviced recently" }
+        };
+
+        foreach (var eqSeed in equipmentSeed)
+        {
+            var existingEq = await context.Equipment.FirstOrDefaultAsync(e => e.AssetTag == eqSeed.Tag);
+            if (existingEq == null)
+            {
+                var eq = new Equipment
+                {
+                    AssetTag = eqSeed.Tag,
+                    Name = eqSeed.Name,
+                    Category = eqSeed.Category,
+                    BrandModel = eqSeed.Brand,
+                    SerialNo = eqSeed.Serial,
+                    PurchaseDate = new LocalDate(2026, 1, 15),
+                    PurchaseCost = eqSeed.Cost,
+                    Condition = eqSeed.Condition,
+                    Status = eqSeed.Status,
+                    InspectionIntervalDays = eqSeed.Interval,
+                    Notes = eqSeed.Notes
+                };
+                context.Equipment.Add(eq);
+                await context.SaveChangesAsync();
+            }
+        }
+
         logger.LogInformation("Database seeding completed successfully.");
     }
 }

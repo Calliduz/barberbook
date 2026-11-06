@@ -461,7 +461,7 @@ Tests: stock derivation from movements, refusal of negative stock, the low-stock
 ```
 
 **Done when**
-- [ ] Admin can maintain products and equipment, see derived stock and low-stock badges, and adjust stock with a reason.
+- [x] Admin can maintain products and equipment, see derived stock and low-stock badges, and adjust stock with a reason. (Verified by 9 tests in `AdminInventoryTests.cs` and full test suite 164/164 passing)
 
 ---
 

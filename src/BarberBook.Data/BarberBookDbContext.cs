@@ -14,6 +14,9 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<DayOff> DaysOff => Set<DayOff>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<StatusHistory> StatusHistories => Set<StatusHistory>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<Equipment> Equipment => Set<Equipment>();
 
     public BarberBookDbContext(DbContextOptions<BarberBookDbContext> options)
         : base(options)
@@ -206,6 +209,96 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
                 .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.AppointmentId);
+        });
+
+        // 8. Products (HW-1, SC-10, AF-10)
+        builder.Entity<Product>(entity =>
+        {
+            entity.ToTable("products");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Sku).HasColumnName("sku").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Category).HasColumnName("category").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Unit).HasColumnName("unit").HasMaxLength(30).IsRequired();
+            entity.Property(e => e.SellPrice).HasColumnName("sell_price").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.CostPrice).HasColumnName("cost_price").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.ReorderLevel).HasColumnName("reorder_level").HasDefaultValue(5).IsRequired();
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+
+            entity.HasIndex(e => e.Sku).IsUnique();
+            entity.HasIndex(e => e.Category);
+        });
+
+        // 9. Stock Movements (HW-1, INV-03, INV-04)
+        builder.Entity<StockMovement>(entity =>
+        {
+            entity.ToTable("stock_movements");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id").IsRequired();
+            entity.Property(e => e.Type)
+                .HasColumnName("type")
+                .HasConversion(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => Enum.Parse<StockMovementType>(v, true))
+                .HasMaxLength(20)
+                .IsRequired();
+            entity.Property(e => e.Quantity).HasColumnName("quantity").IsRequired();
+            entity.Property(e => e.UnitAmount).HasColumnName("unit_amount").HasColumnType("numeric(10,2)");
+            entity.Property(e => e.RefType).HasColumnName("ref_type").HasMaxLength(50);
+            entity.Property(e => e.RefId).HasColumnName("ref_id");
+            entity.Property(e => e.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(e => e.CreatedById).HasColumnName("created_by_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.StockMovements)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        // 10. Equipment (HW-1, SC-10, AF-9)
+        builder.Entity<Equipment>(entity =>
+        {
+            entity.ToTable("equipment");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AssetTag).HasColumnName("asset_tag").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Category).HasColumnName("category").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.BrandModel).HasColumnName("brand_model").HasMaxLength(150);
+            entity.Property(e => e.SerialNo).HasColumnName("serial_no").HasMaxLength(100);
+            entity.Property(e => e.PurchaseDate).HasColumnName("purchase_date");
+            entity.Property(e => e.PurchaseCost).HasColumnName("purchase_cost").HasColumnType("numeric(10,2)");
+            entity.Property(e => e.Condition)
+                .HasColumnName("condition")
+                .HasConversion(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => Enum.Parse<EquipmentCondition>(v, true))
+                .HasMaxLength(20)
+                .IsRequired();
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasConversion(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => Enum.Parse<EquipmentStatus>(v, true))
+                .HasMaxLength(30)
+                .IsRequired();
+            entity.Property(e => e.InspectionIntervalDays).HasColumnName("inspection_interval_days").HasDefaultValue(30).IsRequired();
+            entity.Property(e => e.Notes).HasColumnName("notes").HasMaxLength(1000);
+
+            entity.HasIndex(e => e.AssetTag).IsUnique();
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Status);
         });
     }
 }
