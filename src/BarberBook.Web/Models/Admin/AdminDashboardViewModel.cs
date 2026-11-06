@@ -4,8 +4,9 @@ namespace BarberBook.Web.Models.Admin;
 
 public class AdminDashboardViewModel
 {
-    public int TodayAppointmentsCount { get; set; }
-    public int PendingApprovalsCount { get; set; }
+    public TodayCountsDto TodayCounts { get; set; } = new();
+    public int TodayAppointmentsCount => TodayCounts.Total;
+    public int PendingApprovalsCount => TodayCounts.Pending;
     public int ActiveBarbersCount { get; set; }
     public int TotalCustomersCount { get; set; }
     public decimal TodayCompletedSales { get; set; }
@@ -13,6 +14,13 @@ public class AdminDashboardViewModel
     public string FormattedTodayCompletedSales { get; set; } = "₱0.00";
     public string FormattedMonthToDateCompletedSales { get; set; } = "₱0.00";
 
+    // Needs action (pending bookings, oldest first, up to 10)
+    public List<AdminDashboardPendingItemDto> PendingBookings { get; set; } = new();
+
+    // Today's schedule grouped by barber
+    public List<AdminDashboardBarberScheduleDto> TodayAppointmentsByBarber { get; set; } = new();
+
+    // Live recent activity
     public List<AdminDashboardAppointmentItem> RecentAppointments { get; set; } = new();
     public List<AdminDashboardBarberItem> Barbers { get; set; } = new();
 }
@@ -40,4 +48,3 @@ public class AdminDashboardBarberItem
     public string FormattedRevenue { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }
-

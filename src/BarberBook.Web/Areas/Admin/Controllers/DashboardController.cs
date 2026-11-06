@@ -1,7 +1,9 @@
+using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
+using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,63 +17,140 @@ namespace BarberBook.Web.Areas.Admin.Controllers;
 public class DashboardController : Controller
 {
     private readonly BarberBookDbContext _dbContext;
+    private readonly IReportingService _reportingService;
+    private readonly IAppointmentTransitionService _transitionService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
     public DashboardController(
         BarberBookDbContext dbContext,
+        IReportingService reportingService,
+        IAppointmentTransitionService transitionService,
         IClock clock,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
+        _reportingService = reportingService;
+        _transitionService = transitionService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
 
+    /// <summary>
+    /// Admin landing page /admin:
+    /// Shows summary cards, "Needs action" pending list with inline Confirm/Reject,
+    /// today's schedule grouped by barber, quick links, and Alerts area placeholder (P13, AF-1, OB-4).
+    /// </summary>
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        var now = _clock.GetCurrentInstant();
-        var localNow = now.InZone(_zone);
+        var localNow = _clock.GetCurrentInstant().InZone(_zone);
         var today = localNow.Date;
 
-        // Today range in UTC
         var todayStartUtc = today.AtStartOfDayInZone(_zone).ToInstant();
         var tomorrowStartUtc = today.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
 
-        // Month range in UTC
-        var monthStart = new LocalDate(today.Year, today.Month, 1);
-        var nextMonthStart = monthStart.PlusMonths(1);
-        var monthStartUtc = monthStart.AtStartOfDayInZone(_zone).ToInstant();
-        var nextMonthStartUtc = nextMonthStart.AtStartOfDayInZone(_zone).ToInstant();
-
-        // 1. Appointments query
+        // 1. Today's appointments query
         var todayAppointments = await _dbContext.Appointments
+            .AsNoTracking()
+            .Include(a => a.Customer)
+            .Include(a => a.Barber)
             .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
+            .OrderBy(a => a.StartsAt)
             .ToListAsync();
 
-        var pendingApprovalsCount = await _dbContext.Appointments
-            .CountAsync(a => a.Status == AppointmentStatus.Pending);
+        var todayCounts = new TodayCountsDto
+        {
+            Pending = todayAppointments.Count(a => a.Status == AppointmentStatus.Pending),
+            Confirmed = todayAppointments.Count(a => a.Status == AppointmentStatus.Confirmed),
+            Completed = todayAppointments.Count(a => a.Status == AppointmentStatus.Completed),
+            Cancelled = todayAppointments.Count(a => a.Status == AppointmentStatus.Cancelled),
+            Rejected = todayAppointments.Count(a => a.Status == AppointmentStatus.Rejected),
+            Total = todayAppointments.Count
+        };
 
-        // 2. Sales calculations (Rule BR-07: Only completed appointments count in sales)
-        var todayCompletedSales = todayAppointments
-            .Where(a => a.Status == AppointmentStatus.Completed)
-            .Sum(a => a.Price);
+        // 2. Pending bookings needing action (oldest first, up to 10) across all dates
+        var pendingRaw = await _dbContext.Appointments
+            .AsNoTracking()
+            .Include(a => a.Customer)
+            .Include(a => a.Barber)
+            .Where(a => a.Status == AppointmentStatus.Pending)
+            .OrderBy(a => a.CreatedAt)
+            .Take(10)
+            .ToListAsync();
 
-        var monthCompletedSales = await _dbContext.Appointments
-            .Where(a => a.Status == AppointmentStatus.Completed &&
-                        a.StartsAt >= monthStartUtc && a.StartsAt < nextMonthStartUtc)
-            .SumAsync(a => a.Price);
+        var pendingBookings = pendingRaw.Select(a =>
+        {
+            var startsAtLocal = a.StartsAt.InZone(_zone);
+            var createdAtLocal = a.CreatedAt.InZone(_zone);
+            return new AdminDashboardPendingItemDto
+            {
+                Id = a.Id,
+                ReferenceCode = a.ReferenceCode,
+                CustomerName = a.Customer.FullName,
+                CustomerPhone = a.Customer.PhoneNumber,
+                BarberName = a.Barber.DisplayName,
+                ServiceName = a.ServiceName,
+                Price = a.Price,
+                FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
+                ScheduledDateFormatted = startsAtLocal.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
+                ScheduledTime = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                CreatedAtFormatted = createdAtLocal.ToString("MMM d, yyyy · h:mm tt", CultureInfo.InvariantCulture),
+                Notes = a.Notes
+            };
+        }).ToList();
 
-        // 3. Entity counts
+        // 3. Financial figures strictly from IReportingService (BR-07, BR-11, RP-1, RP-2)
+        var dailyReport = await _reportingService.GetDailySalesAsync(today);
+        var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
+
+        // 4. Entity counts
         var activeBarbersCount = await _dbContext.Barbers
             .CountAsync(b => b.IsActive && b.User.IsActive);
 
         var totalCustomersCount = await _dbContext.Users
             .CountAsync(u => u.Role == UserRole.Customer);
 
-        // 4. Recent appointments feed (latest 8)
+        // 5. Today's appointments grouped by barber
+        var barbersRaw = await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        var todayByBarber = barbersRaw.Select(b =>
+        {
+            var bAppts = todayAppointments
+                .Where(a => a.BarberId == b.Id)
+                .Select(a =>
+                {
+                    var startsAtLocal = a.StartsAt.InZone(_zone);
+                    return new AdminDashboardScheduleItemDto
+                    {
+                        Id = a.Id,
+                        ReferenceCode = a.ReferenceCode,
+                        TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                        CustomerName = a.Customer.FullName,
+                        ServiceName = a.ServiceName,
+                        Status = a.Status,
+                        StatusString = a.Status.ToString(),
+                        Price = a.Price,
+                        FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
+                    };
+                }).ToList();
+
+            return new AdminDashboardBarberScheduleDto
+            {
+                BarberId = b.Id,
+                BarberName = b.DisplayName,
+                Specialty = b.Specialties ?? "Master Craftsman",
+                Appointments = bAppts
+            };
+        }).ToList();
+
+        // 6. Recent appointments live feed
         var recentApptsRaw = await _dbContext.Appointments
+            .AsNoTracking()
             .Include(a => a.Customer)
             .Include(a => a.Barber)
             .OrderByDescending(a => a.StartsAt)
@@ -90,48 +169,194 @@ public class DashboardController : Controller
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
-                StartsAtFormatted = startsAtLocal.ToString("MMM d, yyyy · h:mm tt", null),
+                StartsAtFormatted = startsAtLocal.ToString("MMM d, yyyy · h:mm tt", CultureInfo.InvariantCulture),
                 Status = a.Status
-            };
-        }).ToList();
-
-        // 5. Barber performance breakdown
-        var barbersRaw = await _dbContext.Barbers
-            .Include(b => b.Appointments)
-            .Where(b => b.IsActive)
-            .OrderBy(b => b.DisplayName)
-            .ToListAsync();
-
-        var barberStats = barbersRaw.Select(b =>
-        {
-            var completed = b.Appointments.Where(a => a.Status == AppointmentStatus.Completed).ToList();
-            var rev = completed.Sum(a => a.Price);
-            return new AdminDashboardBarberItem
-            {
-                Id = b.Id,
-                DisplayName = b.DisplayName,
-                Specialties = b.Specialties ?? "Master Craftsman",
-                CompletedAppointmentsCount = completed.Count,
-                TotalRevenueGenerated = rev,
-                FormattedRevenue = FormattingHelpers.FormatPeso(rev),
-                IsActive = b.IsActive
             };
         }).ToList();
 
         var model = new AdminDashboardViewModel
         {
-            TodayAppointmentsCount = todayAppointments.Count,
-            PendingApprovalsCount = pendingApprovalsCount,
+            TodayCounts = todayCounts,
             ActiveBarbersCount = activeBarbersCount,
             TotalCustomersCount = totalCustomersCount,
-            TodayCompletedSales = todayCompletedSales,
-            MonthToDateCompletedSales = monthCompletedSales,
-            FormattedTodayCompletedSales = FormattingHelpers.FormatPeso(todayCompletedSales),
-            FormattedMonthToDateCompletedSales = FormattingHelpers.FormatPeso(monthCompletedSales),
-            RecentAppointments = recentAppts,
-            Barbers = barberStats
+            TodayCompletedSales = dailyReport.TotalSales,
+            FormattedTodayCompletedSales = dailyReport.FormattedTotalSales,
+            MonthToDateCompletedSales = monthlyReport.TotalSales,
+            FormattedMonthToDateCompletedSales = monthlyReport.FormattedTotalSales,
+            PendingBookings = pendingBookings,
+            TodayAppointmentsByBarber = todayByBarber,
+            RecentAppointments = recentAppts
         };
 
         return View(model);
+    }
+
+    /// <summary>
+    /// GET /api/admin/dashboard:
+    /// Returns in one call: today's appointment counts by status, pending bookings (oldest first, up to 10),
+    /// today's service sales, this month's service sales, and today's appointments grouped by barber (P13).
+    /// </summary>
+    [HttpGet("/api/admin/dashboard")]
+    public async Task<IActionResult> ApiDashboard()
+    {
+        var localNow = _clock.GetCurrentInstant().InZone(_zone);
+        var today = localNow.Date;
+
+        var todayStartUtc = today.AtStartOfDayInZone(_zone).ToInstant();
+        var tomorrowStartUtc = today.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+
+        // 1. Today's appointments query
+        var todayAppointments = await _dbContext.Appointments
+            .AsNoTracking()
+            .Include(a => a.Customer)
+            .Include(a => a.Barber)
+            .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
+            .OrderBy(a => a.StartsAt)
+            .ToListAsync();
+
+        var todayCounts = new TodayCountsDto
+        {
+            Pending = todayAppointments.Count(a => a.Status == AppointmentStatus.Pending),
+            Confirmed = todayAppointments.Count(a => a.Status == AppointmentStatus.Confirmed),
+            Completed = todayAppointments.Count(a => a.Status == AppointmentStatus.Completed),
+            Cancelled = todayAppointments.Count(a => a.Status == AppointmentStatus.Cancelled),
+            Rejected = todayAppointments.Count(a => a.Status == AppointmentStatus.Rejected),
+            Total = todayAppointments.Count
+        };
+
+        // 2. Pending bookings (oldest first, up to 10)
+        var pendingRaw = await _dbContext.Appointments
+            .AsNoTracking()
+            .Include(a => a.Customer)
+            .Include(a => a.Barber)
+            .Where(a => a.Status == AppointmentStatus.Pending)
+            .OrderBy(a => a.CreatedAt)
+            .Take(10)
+            .ToListAsync();
+
+        var pendingBookings = pendingRaw.Select(a =>
+        {
+            var startsAtLocal = a.StartsAt.InZone(_zone);
+            var createdAtLocal = a.CreatedAt.InZone(_zone);
+            return new AdminDashboardPendingItemDto
+            {
+                Id = a.Id,
+                ReferenceCode = a.ReferenceCode,
+                CustomerName = a.Customer.FullName,
+                CustomerPhone = a.Customer.PhoneNumber,
+                BarberName = a.Barber.DisplayName,
+                ServiceName = a.ServiceName,
+                Price = a.Price,
+                FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
+                ScheduledDateFormatted = startsAtLocal.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
+                ScheduledTime = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                CreatedAtFormatted = createdAtLocal.ToString("MMM d, yyyy · h:mm tt", CultureInfo.InvariantCulture),
+                Notes = a.Notes
+            };
+        }).ToList();
+
+        // 3. Financial figures via IReportingService
+        var dailyReport = await _reportingService.GetDailySalesAsync(today);
+        var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
+
+        // 4. Entity counts
+        var activeBarbersCount = await _dbContext.Barbers
+            .CountAsync(b => b.IsActive && b.User.IsActive);
+
+        var totalCustomersCount = await _dbContext.Users
+            .CountAsync(u => u.Role == UserRole.Customer);
+
+        // 5. Today's appointments grouped by barber
+        var barbersRaw = await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        var todayByBarber = barbersRaw.Select(b =>
+        {
+            var bAppts = todayAppointments
+                .Where(a => a.BarberId == b.Id)
+                .Select(a =>
+                {
+                    var startsAtLocal = a.StartsAt.InZone(_zone);
+                    return new AdminDashboardScheduleItemDto
+                    {
+                        Id = a.Id,
+                        ReferenceCode = a.ReferenceCode,
+                        TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                        CustomerName = a.Customer.FullName,
+                        ServiceName = a.ServiceName,
+                        Status = a.Status,
+                        StatusString = a.Status.ToString(),
+                        Price = a.Price,
+                        FormattedPrice = FormattingHelpers.FormatPeso(a.Price)
+                    };
+                }).ToList();
+
+            return new AdminDashboardBarberScheduleDto
+            {
+                BarberId = b.Id,
+                BarberName = b.DisplayName,
+                Specialty = b.Specialties ?? "Master Craftsman",
+                Appointments = bAppts
+            };
+        }).ToList();
+
+        var dto = new AdminDashboardDto
+        {
+            TodayCounts = todayCounts,
+            PendingBookings = pendingBookings,
+            TodayServiceSales = dailyReport.TotalSales,
+            FormattedTodayServiceSales = dailyReport.FormattedTotalSales,
+            ThisMonthServiceSales = monthlyReport.TotalSales,
+            FormattedThisMonthServiceSales = monthlyReport.FormattedTotalSales,
+            TodayAppointmentsByBarber = todayByBarber,
+            ActiveBarbersCount = activeBarbersCount,
+            TotalCustomersCount = totalCustomersCount
+        };
+
+        return Ok(dto);
+    }
+
+    /// <summary>
+    /// Inline Confirm and Reject action from Admin Dashboard
+    /// </summary>
+    [HttpPost("appointments/{id:int}/status")]
+    public async Task<IActionResult> InlineStatusAction(
+        int id,
+        [FromForm] string to,
+        [FromForm] string? note = null)
+    {
+        if (!Enum.TryParse<AppointmentStatus>(to, true, out var targetStatus))
+        {
+            TempData["ErrorMessage"] = $"Invalid status '{to}'.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var adminUserId = User.GetUserId() ?? 1;
+        var actor = new TransitionActor(adminUserId, "Admin", CustomerId: null, BarberId: null);
+
+        var result = await _transitionService.TransitionAsync(id, targetStatus, actor, note);
+
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Status update failed.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = $"Appointment #{id} marked as {targetStatus.ToString().ToLowerInvariant()} successfully.";
+        }
+
+        if (Request.Headers.Accept.ToString().Contains("application/json"))
+        {
+            if (!result.Success)
+            {
+                return StatusCode(result.StatusCode, new ApiErrorResponse(result.ErrorCode!, result.ErrorMessage!));
+            }
+            return Ok(new { success = true, appointmentId = id, status = targetStatus.ToString().ToLowerInvariant() });
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 }

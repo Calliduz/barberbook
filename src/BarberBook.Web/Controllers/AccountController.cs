@@ -300,6 +300,21 @@ public class AccountController : Controller
         return Ok(ToDto(user));
     }
 
+    [HttpGet("Account/ChangePassword")]
+    [Authorize]
+    public IActionResult GetChangePassword()
+    {
+        if (User.IsInRole("Barber"))
+        {
+            return RedirectToAction("Account", "Dashboard", new { area = "Barber" });
+        }
+        if (User.IsInRole("Customer"))
+        {
+            return RedirectToAction("Profile", "Home");
+        }
+        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+    }
+
     [HttpPost("Account/ChangePassword")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordModel formModel)

@@ -397,8 +397,8 @@ Tests: barber A cannot read or modify barber B's appointments, hours, days off o
 ```
 
 **Done when**
-- [ ] A barber can run FL-B end to end: login -> schedule and bookings -> availability / day off -> update status -> own transactions.
-- [ ] Cross-barber access is denied everywhere.
+- [x] A barber can run FL-B end to end: login -> schedule and bookings -> availability / day off -> update status -> own transactions.
+- [x] Cross-barber access is denied everywhere.
 
 ---
 
@@ -414,7 +414,7 @@ Tests: the counts match the seed data; only admins can call the endpoint.
 ```
 
 **Done when**
-- [ ] The admin lands on a dashboard that shows pending bookings, today's and this month's sales, and can act on pending bookings in one click.
+- [x] The admin lands on a dashboard that shows pending bookings, today's and this month's sales, and can act on pending bookings in one click.
 
 ---
 # ✔ Checkpoint — the printed paper is complete

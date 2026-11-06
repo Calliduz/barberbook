@@ -334,5 +334,129 @@ public class BarberPortalTests : IClassFixture<WebApplicationFactory<Program>>
             ((int)res.StatusCode).Should().BeOneOf((int)HttpStatusCode.Forbidden, (int)HttpStatusCode.Redirect);
         }
     }
+
+    [Fact]
+    public async Task BF4_CrossBarberAppointmentAccess_IsRefused()
+    {
+        await EnsureSeededAsync();
+        var dennisClient = await CreateAuthenticatedClientAsync("dennis@barberbook.local", DemoPassword);
+        var ramonApp = await CreateIsolatedAppointmentAsync(AppointmentStatus.Pending, barberId: 1);
+
+        // 1. Dennis tries to read Ramon's appointment detail via API (expect 404 / 403)
+        var apiRes = await dennisClient.GetAsync($"/api/barber/appointments/{ramonApp.Id}");
+        ((int)apiRes.StatusCode).Should().BeOneOf((int)HttpStatusCode.NotFound, (int)HttpStatusCode.Forbidden);
+
+        // 2. Dennis tries to read Ramon's appointment detail via MVC view (expect redirect to appointments)
+        var mvcRes = await dennisClient.GetAsync($"/barber/appointments/{ramonApp.Id}");
+        mvcRes.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        mvcRes.Headers.Location!.ToString().Should().Contain("/barber/appointments");
+    }
+
+    [Fact]
+    public async Task BF3_BarberCannotModifyAnotherBarbersDaysOffOrHours()
+    {
+        await EnsureSeededAsync();
+        var ramonClient = await CreateAuthenticatedClientAsync("ramon@barberbook.local", DemoPassword);
+        var dennisClient = await CreateAuthenticatedClientAsync("dennis@barberbook.local", DemoPassword);
+
+        // Ramon creates or gets a day off
+        int ramonDayOffId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var targetDate = new LocalDate(2028, 5, 20);
+            var existing = await db.DaysOff.FirstOrDefaultAsync(d => d.BarberId == 1 && d.Date == targetDate);
+            if (existing != null)
+            {
+                ramonDayOffId = existing.Id;
+            }
+            else
+            {
+                var dOff = new DayOff
+                {
+                    BarberId = 1,
+                    Date = targetDate,
+                    Reason = "Ramon Private Day"
+                };
+                db.DaysOff.Add(dOff);
+                await db.SaveChangesAsync();
+                ramonDayOffId = dOff.Id;
+            }
+        }
+
+        // Dennis tries to delete Ramon's day off via DELETE /api/barber/days-off/{id}
+        var deleteRes = await dennisClient.DeleteAsync($"/api/barber/days-off/{ramonDayOffId}");
+        ((int)deleteRes.StatusCode).Should().BeOneOf((int)HttpStatusCode.NotFound, (int)HttpStatusCode.Forbidden);
+
+        // Verify Ramon's day off is still present
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var stillExists = await db.DaysOff.AnyAsync(d => d.Id == ramonDayOffId);
+            stillExists.Should().BeTrue();
+        }
+    }
+
+    [Fact]
+    public async Task BarberCannotAccessAdminEndpoints_Returns403()
+    {
+        await EnsureSeededAsync();
+        var barberClient = await CreateAuthenticatedClientAsync("ramon@barberbook.local", DemoPassword);
+
+        // API admin endpoint
+        var apiRes = await barberClient.GetAsync("/api/admin/dashboard");
+        apiRes.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        // Web admin landing page
+        var webRes = await barberClient.GetAsync("/admin");
+        ((int)webRes.StatusCode).Should().BeOneOf((int)HttpStatusCode.Forbidden, (int)HttpStatusCode.Redirect);
+    }
+
+    [Fact]
+    public async Task BF3_T08_ChangingAvailability_ImmediatelyChangesPublicAvailability()
+    {
+        await EnsureSeededAsync();
+        var client = _factory.CreateClient();
+        var ramonClient = await CreateAuthenticatedClientAsync("ramon@barberbook.local", DemoPassword);
+
+        // Target a specific future Monday
+        var testDate = new LocalDate(2028, 7, 10);
+        var dateString = testDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+        // Clean up any existing day off for test date
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var existing = await db.DaysOff.Where(d => d.BarberId == 1 && d.Date == testDate).ToListAsync();
+            if (existing.Count > 0)
+            {
+                db.DaysOff.RemoveRange(existing);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        // 1. Check Ramon's public availability before day off
+        var beforeRes = await client.GetAsync($"/api/barbers/1/availability?serviceId=1&date={dateString}");
+        beforeRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var beforeBody = await beforeRes.Content.ReadAsStringAsync();
+        beforeBody.Should().NotContain("\"slots\":[]");
+
+        // 2. Ramon schedules a day off for that date
+        var form = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("date", dateString),
+            new KeyValuePair<string, string>("reason", "Vacation Master Cut")
+        });
+        var addRes = await ramonClient.PostAsync("/barber/availability/days-off", form);
+        addRes.StatusCode.Should().Be(HttpStatusCode.Redirect);
+
+        // 3. Immediately re-query public availability (T-08)
+        var afterRes = await client.GetAsync($"/api/barbers/1/availability?serviceId=1&date={dateString}");
+        afterRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var afterBody = await afterRes.Content.ReadAsStringAsync();
+
+        // Must show 0 available slots because the day is off
+        afterBody.Should().Contain("\"slots\":[]");
+    }
 }
 

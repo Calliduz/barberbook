@@ -274,6 +274,53 @@ public class DashboardController : Controller
         return View(model);
     }
 
+    [HttpGet("appointments/{id:int}")]
+    public async Task<IActionResult> AppointmentDetail([FromRoute] int id)
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        var app = await _dbContext.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Service)
+            .Include(a => a.StatusHistories)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (app == null || app.BarberId != barber.Id)
+        {
+            if (Request.Headers.Accept.ToString().Contains("application/json"))
+            {
+                return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found or not assigned to you."));
+            }
+            TempData["ErrorMessage"] = "Appointment not found or not assigned to you.";
+            return RedirectToAction(nameof(Appointments));
+        }
+
+        var model = MapToItem(app);
+        return View("AppointmentDetail", model);
+    }
+
+    [HttpGet("/api/barber/appointments/{id:int}")]
+    public async Task<IActionResult> ApiAppointmentDetail([FromRoute] int id)
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        var app = await _dbContext.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Service)
+            .Include(a => a.StatusHistories)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (app == null || app.BarberId != barber.Id)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found or not assigned to you."));
+        }
+
+        var model = MapToItem(app);
+        return Ok(model);
+    }
+
     [HttpPost("appointments/{id:int}/status")]
     public async Task<IActionResult> UpdateStatus(
         [FromRoute] int id,
@@ -434,6 +481,16 @@ public class DashboardController : Controller
             return RedirectToAction(nameof(Availability));
         }
 
+        // Check for conflicts with existing pending/confirmed appointments (WARN, NEVER AUTO-CANCEL)
+        var dayStartUtc = selectedDate.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = selectedDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+
+        var conflictCount = await _dbContext.Appointments
+            .CountAsync(a => a.BarberId == barber.Id &&
+                        (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed) &&
+                        a.StartsAt < dayEndUtc &&
+                        a.EndsAt > dayStartUtc);
+
         _dbContext.DaysOff.Add(new DayOff
         {
             BarberId = barber.Id,
@@ -442,7 +499,15 @@ public class DashboardController : Controller
         });
 
         await _dbContext.SaveChangesAsync();
-        TempData["SuccessMessage"] = $"Day off for {selectedDate:MMM dd, yyyy} scheduled successfully.";
+
+        if (conflictCount > 0)
+        {
+            TempData["WarningMessage"] = $"Day off for {selectedDate:MMM dd, yyyy} scheduled. Warning: {conflictCount} existing booking(s) conflict with this date (not auto-cancelled).";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = $"Day off for {selectedDate:MMM dd, yyyy} scheduled successfully.";
+        }
         return RedirectToAction(nameof(Availability));
     }
 
@@ -582,6 +647,26 @@ public class DashboardController : Controller
         }
 
         return RedirectToAction(nameof(Equipment));
+    }
+
+    [HttpGet("account")]
+    public async Task<IActionResult> Account()
+    {
+        var barber = await GetCurrentBarberAsync();
+        if (barber == null) return Forbid();
+
+        var model = new BarberAccountViewModel
+        {
+            BarberId = barber.Id,
+            DisplayName = barber.DisplayName,
+            Email = barber.User.Email ?? string.Empty,
+            PhoneNumber = barber.User.PhoneNumber ?? string.Empty,
+            Specialties = barber.Specialties,
+            PhotoUrl = barber.PhotoUrl,
+            IsActive = barber.IsActive
+        };
+
+        return View(model);
     }
 
     private BarberAppointmentItemViewModel MapToItem(Appointment app)

@@ -152,3 +152,14 @@ public class BarberEquipmentViewModel
     public string BarberName { get; set; } = string.Empty;
     public IReadOnlyList<EquipmentItem> Items { get; set; } = new List<EquipmentItem>();
 }
+
+public class BarberAccountViewModel
+{
+    public int BarberId { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string? Specialties { get; set; }
+    public string? PhotoUrl { get; set; }
+    public bool IsActive { get; set; }
+}

@@ -1,0 +1,272 @@
+@model BarberBook.Web.Models.Barber.BarberAppointmentItemViewModel
+@{
+    ViewData["Title"] = $"Appointment #{Model.ReferenceCode}";
+    var badgeClass = Model.Status switch
+    {
+        BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+        BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+        BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+        BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+        BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-rose-100 text-rose-800 border-rose-300",
+        _ => "bg-slate-100 text-slate-700"
+    };
+}
+
+<div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Breadcrumb & Back Navigation -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+            <a href="/barber/appointments" class="hover:text-amber-800 font-bold transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                <span>Back to Appointments</span>
+            </a>
+            <span>/</span>
+            <span class="font-mono font-semibold text-slate-800">@Model.ReferenceCode</span>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border @badgeClass capitalize shadow-xs">
+            @Model.StatusString
+        </span>
+    </div>
+
+    <!-- Main Card Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>APPOINTMENT DOSSIER</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Booking #@Model.ReferenceCode</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                Scheduled for <strong class="text-slate-800">@Model.ScheduledDateFormatted</strong> at <strong class="text-amber-800">@Model.ScheduledTime12h</strong> (Asia/Manila).
+            </p>
+        </div>
+
+        <!-- Action Buttons according to §9 matrix -->
+        <div class="flex flex-wrap items-center gap-2.5">
+            @if (Model.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
+            {
+                <form method="post" action="/barber/appointments/@Model.Id/status" class="inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="to" value="confirmed" />
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                        <span>Confirm Booking</span>
+                    </button>
+                </form>
+
+                <button type="button" onclick="openActionModal('rejected')" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <span>Reject</span>
+                </button>
+
+                <button type="button" onclick="openActionModal('cancelled')" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                    Cancel
+                </button>
+            }
+            else if (Model.Status == BarberBook.Data.Enums.AppointmentStatus.Confirmed)
+            {
+                <form method="post" action="/barber/appointments/@Model.Id/status" class="inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="to" value="completed" />
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Complete Service</span>
+                    </button>
+                </form>
+
+                <button type="button" onclick="openActionModal('cancelled')" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                    Cancel
+                </button>
+            }
+            else
+            {
+                <span class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-500 text-xs font-semibold border border-slate-200 italic">
+                    Terminal State &mdash; No Further Transitions Permitted
+                </span>
+            }
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Customer Details -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-4">
+            <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                <span class="p-2 rounded-xl bg-slate-100 text-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                </span>
+                <div>
+                    <h2 class="text-base font-serif font-bold text-slate-900">Client Information</h2>
+                    <p class="text-[11px] text-slate-500">Contact details and booking notes</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Full Name</span>
+                    <span class="font-bold text-slate-900 text-sm">@Model.CustomerName</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Phone Number</span>
+                    <span class="font-semibold text-slate-800">@Model.CustomerPhone</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Email Address</span>
+                    <span class="font-semibold text-slate-800">@Model.CustomerEmail</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Client Notes</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 text-slate-800 italic mt-1">
+                            "@Model.Notes"
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-slate-400 italic">No special instructions provided.</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Service & Settlement Details -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-4">
+            <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                <span class="p-2 rounded-xl bg-amber-50 text-amber-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 7.756a4.5 4.5 0 100 8.488M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </span>
+                <div>
+                    <h2 class="text-base font-serif font-bold text-slate-900">Service & Settlement</h2>
+                    <p class="text-[11px] text-slate-500">Pricing and scheduled timeframe</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Service Requested</span>
+                    <span class="font-bold text-slate-900 text-sm">@Model.ServiceName</span>
+                </div>
+                <div class="flex justify-between items-baseline pt-1">
+                    <div>
+                        <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Service Price (Locked Snapshot)</span>
+                        <span class="text-2xl font-serif font-black text-amber-700">@Model.FormattedPrice</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 italic">Settled in-shop (LM-1)</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Appointment Timeslot</span>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 font-mono font-bold text-xs">
+                            @Model.ScheduledTime12h
+                        </span>
+                        <span class="text-slate-600 font-medium">@Model.ScheduledDateFormatted</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status History Audit Timeline -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+                <h2 class="text-lg font-serif font-bold text-slate-900">Status History & Audit Trail</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Immutable record of every lifecycle event and actor note (BR-03, AF-6)</p>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                @Model.StatusHistories.Count entries
+            </span>
+        </div>
+
+        @if (!Model.StatusHistories.Any())
+        {
+            <p class="text-xs text-slate-400 italic py-4">No audit logs recorded for this appointment.</p>
+        }
+        else
+        {
+            <div class="space-y-3 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-slate-200">
+                @foreach (var history in Model.StatusHistories)
+                {
+                    <div class="relative flex items-start gap-3 pl-8">
+                        <div class="absolute left-2 top-1.5 w-3 h-3 rounded-full bg-amber-500 border-2 border-white ring-1 ring-amber-400"></div>
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 w-full text-xs space-y-1">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="font-bold text-slate-900 flex items-center gap-2">
+                                    <span class="capitalize text-slate-500">@history.FromStatus</span>
+                                    <span>&rarr;</span>
+                                    <span class="capitalize text-amber-800 font-black">@history.ToStatus</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
+                                        @history.ChangedByRole
+                                    </span>
+                                </div>
+                                <span class="text-[11px] text-slate-400">@history.TimestampFormatted</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(history.Note))
+                            {
+                                <p class="text-slate-600 italic text-[11px] mt-1 bg-white p-2 rounded-lg border border-slate-200">
+                                    "@history.Note"
+                                </p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal for Reason / Note (Reject / Cancel) -->
+<div id="actionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+        <h3 id="modalTitle" class="text-xl font-serif font-bold text-slate-900">Update Status</h3>
+        <p id="modalDescription" class="text-xs text-slate-600 mt-1">Please provide an optional reason or note for this status change.</p>
+
+        <form id="actionForm" method="post" action="/barber/appointments/@Model.Id/status" class="mt-4 space-y-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="modalTargetStatus" name="to" value="" />
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reason / Note</label>
+                <textarea name="note" rows="3" placeholder="e.g. Client requested cancellation or scheduling conflict..."
+                          class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeActionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Dismiss
+                </button>
+                <button type="submit" id="modalSubmitBtn" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Confirm Transition
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openActionModal(targetStatus) {
+        document.getElementById('modalTargetStatus').value = targetStatus;
+        const title = targetStatus === 'rejected' ? 'Reject Appointment' : 'Cancel Appointment';
+        const desc = targetStatus === 'rejected'
+            ? 'State why this appointment cannot be accepted (e.g. fully booked, barber off-duty).'
+            : 'Provide an operational reason for cancelling this booking.';
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalDescription').innerText = desc;
+
+        const btn = document.getElementById('modalSubmitBtn');
+        if (targetStatus === 'rejected') {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm';
+            btn.innerText = 'Reject Appointment';
+        } else {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 transition shadow-sm';
+            btn.innerText = 'Cancel Appointment';
+        }
+
+        document.getElementById('actionModal').classList.remove('hidden');
+    }
+
+    function closeActionModal() {
+        document.getElementById('actionModal').classList.add('hidden');
+    }
+</script>

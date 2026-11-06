@@ -1,0 +1,94 @@
+@model BarberBook.Web.Models.Barber.BarberAccountViewModel
+@{
+    ViewData["Title"] = "Barber Account Settings";
+}
+
+<div class="space-y-8 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>SECURITY & PROFILE</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Barber Account</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                Manage your profile credentials and security credentials (BF-1, P03).
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold @(Model.IsActive ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-red-100 text-red-800 border border-red-300")">
+                @(Model.IsActive ? "Active Craftsman" : "Inactive Account")
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Profile Summary Card -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 text-amber-400 font-serif font-black text-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-md">
+                    @Model.DisplayName[0]
+                </div>
+                <div>
+                    <h2 class="text-xl font-serif font-bold text-slate-900">@Model.DisplayName</h2>
+                    <p class="text-xs text-amber-700 font-semibold">@(Model.Specialties ?? "Master Barber Craftsman")</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Email Address</span>
+                    <span class="font-bold text-slate-900 text-sm">@Model.Email</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Contact Phone</span>
+                    <span class="font-semibold text-slate-800 text-sm">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not set" : Model.PhoneNumber)</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Shop Policy</span>
+                    <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">
+                        Barber accounts are provisioned and managed centrally by shop administrators. To update your name, photo, or contact phone, please contact the shop administrator.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Card (P03 endpoint /Account/ChangePassword) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-xl font-serif font-bold text-slate-900">Change Password</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Update your password to keep your barber account secure.</p>
+            </div>
+
+            <form method="post" action="/Account/ChangePassword" class="space-y-4">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Current Password</label>
+                    <input type="password" name="CurrentPassword" required
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Password</label>
+                    <input type="password" name="NewPassword" required minlength="8"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">Minimum 8 characters with letters, numbers, and symbols.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Confirm New Password</label>
+                    <input type="password" name="ConfirmPassword" required minlength="8"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
