@@ -338,7 +338,7 @@ Tests: admin-only access; deactivation blocks login and booking; search and pagi
 ```
 
 **Done when**
-- [ ] Admin can find a customer, edit their information, deactivate them and see their appointment history.
+- [x] Admin can find a customer, edit their information, deactivate them and see their appointment history.
 
 ---
 
