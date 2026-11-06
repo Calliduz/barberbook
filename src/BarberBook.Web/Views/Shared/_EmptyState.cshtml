@@ -1,0 +1,23 @@
+@* Accessible Empty State Component (P18, EO-4) *@
+@model (string Title, string Description, string? ActionText, string? ActionUrl)
+
+<div class="p-8 sm:p-12 text-center bg-white rounded-3xl border border-slate-200/80 shadow-xs max-w-lg mx-auto">
+    <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 mb-4">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+        </svg>
+    </div>
+    <h3 class="text-base font-serif font-bold text-slate-900 tracking-tight">@Model.Title</h3>
+    <p class="mt-1 text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
+        @Model.Description
+    </p>
+    @if (!string.IsNullOrEmpty(Model.ActionText) && !string.IsNullOrEmpty(Model.ActionUrl))
+    {
+        <div class="mt-5">
+            <a href="@Model.ActionUrl" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                @Model.ActionText
+            </a>
+        </div>
+    }
+</div>
+

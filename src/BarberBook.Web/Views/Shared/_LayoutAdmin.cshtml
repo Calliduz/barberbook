@@ -12,29 +12,7 @@
 
     <!-- Tailwind CSS (Offline-ready with local bundle) -->
     <script src="~/lib/tailwindcss.js" asp-append-version="true"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fbf7ee',
-                            100: '#f5edd6',
-                            500: '#b4832c',
-                            600: '#9b6c20',
-                            700: '#7a5119',
-                            800: '#5c3d14',
-                            900: '#3c270d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <partial name="_TailwindConfig" />
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -212,6 +190,10 @@
             <p>&copy; @DateTime.UtcNow.Year BarberBook Management System — SBIT-3D Group 4</p>
         </div>
     </footer>
+
+    <!-- Shared Accessible Toast & Confirm Modal Components -->
+    <partial name="_Toast" />
+    <partial name="_ConfirmDialog" />
 
     <script>
         function toggleMobileMenu() {

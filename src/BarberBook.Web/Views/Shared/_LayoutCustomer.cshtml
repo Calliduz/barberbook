@@ -12,40 +12,7 @@
 
     <!-- Tailwind CSS (Offline-ready with local bundle) -->
     <script src="~/lib/tailwindcss.js" asp-append-version="true"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fbf7ee',
-                            100: '#f5edd6',
-                            200: '#eddcb2',
-                            300: '#e1c587',
-                            400: '#d4a359',
-                            500: '#b4832c',
-                            600: '#9b6c20',
-                            700: '#7a5119',
-                            800: '#5c3d14',
-                            900: '#3c270d'
-                        },
-                        barber: {
-                            red: '#D62828',
-                            blue: '#1D3557',
-                            cream: '#FBF7EE',
-                            leather: '#0F172A',
-                            charcoal: '#1E293B',
-                            gold: '#B4832C'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <partial name="_TailwindConfig" />
     
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -59,13 +26,13 @@
             <div class="flex items-center justify-between h-18 py-3">
                 <div class="flex items-center space-x-8">
                     <!-- Brand with Spinning Barber Pole Icon -->
-                    <a href="/" class="flex items-center space-x-3 group">
-                        <div class="barber-pole-icon shadow-lg group-hover:scale-105 transition-transform"></div>
+                    <a href="/" class="flex items-center space-x-2 sm:space-x-3 group shrink-0">
+                        <div class="barber-pole-icon shadow-lg group-hover:scale-105 transition-transform shrink-0"></div>
                         <div class="flex flex-col">
-                            <span class="text-2xl font-serif font-black tracking-tight text-brand-400 group-hover:text-brand-300 transition-colors">
+                            <span class="text-xl sm:text-2xl font-serif font-black tracking-tight text-brand-400 group-hover:text-brand-300 transition-colors">
                                 Barber<span class="text-white font-sans font-extrabold">Book</span>
                             </span>
-                            <span class="text-[9px] uppercase tracking-widest text-brand-400/80 font-bold -mt-1">Classic Craft &bull; Manila</span>
+                            <span class="hidden sm:inline text-[9px] uppercase tracking-widest text-brand-400/80 font-bold -mt-1">Classic Craft &bull; Manila</span>
                         </div>
                     </a>
 
@@ -123,11 +90,11 @@
                     <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Shop Hours</h4>
                     <p class="text-xs text-slate-400">Monday &ndash; Saturday</p>
                     <p class="text-xs font-semibold text-brand-300">9:00 AM &ndash; 6:00 PM</p>
-                    <p class="text-xs text-slate-500 mt-1">Closed on Sundays & Special Holidays</p>
+                    <p class="text-xs text-slate-300 mt-1">Closed on Sundays & Special Holidays</p>
                 </div>
                 <div>
                     <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Quick Navigation</h4>
-                    <ul class="space-y-1.5 text-xs text-slate-400">
+                    <ul class="space-y-1.5 text-xs text-slate-300">
                         <li><a href="/services" class="hover:text-brand-300 transition">Services Menu</a></li>
                         <li><a href="/barbers" class="hover:text-brand-300 transition">Master Barbers</a></li>
                         <li><a href="/book" class="hover:text-brand-300 transition">Book Appointment</a></li>
@@ -135,17 +102,21 @@
                 </div>
                 <div>
                     <h4 class="text-xs uppercase tracking-wider font-bold text-slate-200 mb-3">Shop Policy</h4>
-                    <p class="text-xs text-slate-400 leading-relaxed">
+                    <p class="text-xs text-slate-300 leading-relaxed">
                         In-shop settlement upon service completion. All appointments scheduled in Asia/Manila standard time.
                     </p>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-300">
                 <p>&copy; @DateTime.UtcNow.Year BarberBook Management System &bull; SBIT-3D Group 4</p>
-                <p class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-500">Shop Zone: Asia/Manila (UTC+8)</p>
+                <p class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-300">Shop Zone: Asia/Manila (UTC+8)</p>
             </div>
         </div>
     </footer>
+
+    <!-- Shared Accessible Toast & Confirm Modal Components -->
+    <partial name="_Toast" />
+    <partial name="_ConfirmDialog" />
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

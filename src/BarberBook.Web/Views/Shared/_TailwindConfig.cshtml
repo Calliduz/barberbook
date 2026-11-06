@@ -1,0 +1,58 @@
+@* BarberBook Shared Design Tokens & Tailwind Configuration (P18, EO-4) *@
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                    serif: ['"Playfair Display"', 'Georgia', 'Cambria', 'serif'],
+                    mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+                },
+                colors: {
+                    brand: {
+                        50: '#fbf7ee',
+                        100: '#f5edd6',
+                        200: '#eddcb2',
+                        300: '#e1c587',
+                        400: '#d4a359',
+                        500: '#b4832c',
+                        600: '#9b6c20',
+                        700: '#7a5119',
+                        800: '#5c3d14',
+                        900: '#3c270d'
+                    },
+                    barber: {
+                        cream: '#FBF7EE',
+                        leather: '#0F172A',
+                        charcoal: '#1E293B',
+                        charcoalDark: '#141C2A',
+                        gold: '#B4832C',
+                        goldLight: '#D4A359',
+                        red: '#D62828',
+                        navy: '#1D3557',
+                        borderSoft: '#E2E8F0',
+                        borderDark: '#334155'
+                    },
+                    status: {
+                        pending: '#D97706',      /* amber-600 for accessible 4.5:1 text contrast */
+                        pendingBg: '#FEF3C7',    /* amber-100 */
+                        confirmed: '#1D4ED8',    /* blue-700 */
+                        confirmedBg: '#DBEAFE',  /* blue-100 */
+                        completed: '#047857',    /* emerald-700 */
+                        completedBg: '#D1FAE5',  /* emerald-100 */
+                        cancelled: '#475569',    /* slate-600 */
+                        cancelledBg: '#F1F5F9',  /* slate-100 */
+                        rejected: '#B91C1C',     /* rose-700 */
+                        rejectedBg: '#FFE4E6'    /* rose-100 */
+                    }
+                },
+                boxShadow: {
+                    'vintage': '0 4px 20px -2px rgba(180, 131, 44, 0.12), 0 2px 6px -1px rgba(15, 23, 42, 0.08)',
+                    'vintage-lg': '0 10px 25px -3px rgba(180, 131, 44, 0.18), 0 4px 10px -2px rgba(15, 23, 42, 0.12)',
+                    'dark-card': '0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.3)'
+                }
+            }
+        }
+    };
+</script>
+

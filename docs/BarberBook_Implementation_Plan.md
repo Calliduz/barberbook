@@ -529,7 +529,7 @@ Run an automated accessibility check (axe through Playwright) on the main pages,
 ```
 
 **Done when**
-- [ ] The booking flow works at 375 px without horizontal scroll and the axe check is clean on the main pages.
+- [x] The booking flow works at 375 px without horizontal scroll and the axe check is clean on the main pages.
 
 ---
 

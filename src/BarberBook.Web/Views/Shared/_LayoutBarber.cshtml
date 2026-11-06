@@ -12,40 +12,7 @@
 
     <!-- Tailwind CSS (Offline-ready with local bundle) -->
     <script src="~/lib/tailwindcss.js" asp-append-version="true"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fbf7ee',
-                            100: '#f5edd6',
-                            200: '#eddcb2',
-                            300: '#e1c587',
-                            400: '#d4a359',
-                            500: '#b4832c',
-                            600: '#9b6c20',
-                            700: '#7a5119',
-                            800: '#5c3d14',
-                            900: '#3c270d'
-                        },
-                        barber: {
-                            red: '#D62828',
-                            blue: '#1D3557',
-                            cream: '#FBF7EE',
-                            leather: '#0F172A',
-                            charcoal: '#1E293B',
-                            gold: '#B4832C'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <partial name="_TailwindConfig" />
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -177,6 +144,10 @@
             </div>
         </div>
     </footer>
+
+    <!-- Shared Accessible Toast & Confirm Modal Components -->
+    <partial name="_Toast" />
+    <partial name="_ConfirmDialog" />
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

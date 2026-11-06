@@ -24,3 +24,4 @@ public interface IPurchaseSaleService
     Task<List<ProductSalesSummaryItemDto>> GetProductSalesSummaryAsync(
         LocalDate? startDate = null, LocalDate? endDate = null, CancellationToken ct = default);
 }
+

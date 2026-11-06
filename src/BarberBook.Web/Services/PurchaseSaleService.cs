@@ -480,3 +480,4 @@ public class PurchaseSaleService : IPurchaseSaleService
         return fallback;
     }
 }
+

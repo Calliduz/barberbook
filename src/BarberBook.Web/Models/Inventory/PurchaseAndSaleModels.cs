@@ -257,3 +257,4 @@ public class ProductSalesSummaryItemDto
     public decimal TotalRevenue { get; set; }
     public string FormattedTotalRevenue { get; set; } = "₱0.00";
 }
+

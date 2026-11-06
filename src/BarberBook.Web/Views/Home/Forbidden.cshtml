@@ -2,20 +2,30 @@
     ViewData["Title"] = "Forbidden";
 }
 
-<div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
-    <div class="inline-flex items-center justify-center p-3 bg-red-100 rounded-full mb-4">
-        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+<div class="max-w-md mx-auto my-12 bg-white/95 rounded-3xl shadow-xl border border-slate-200/90 p-8 sm:p-10 text-center space-y-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 mx-auto">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
     </div>
-    <h1 class="text-2xl font-bold text-slate-900">403 — Forbidden</h1>
-    <p class="mt-2 text-slate-600">
-        You do not have permission to access this page or portal.
-    </p>
-    <div class="mt-6">
-        <a href="/" class="inline-flex items-center px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+
+    <div>
+        <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
+            <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+            <span>403 FORBIDDEN</span>
+        </div>
+        <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Access Prohibited</h1>
+        <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+            You do not have permission to access this administrative resource or data.
+        </p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <a href="/" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
             Back to Home
+        </a>
+        <a href="/login" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            Sign In with Another Account
         </a>
     </div>
 </div>
-
