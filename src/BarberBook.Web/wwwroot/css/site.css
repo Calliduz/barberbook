@@ -29,7 +29,7 @@ body {
         background-position: 0 0;
     }
     100% {
-        background-position: 0 96px;
+        background-position: 0 56.57px;
     }
 }
 
@@ -38,7 +38,7 @@ body {
         background-position: 0 0;
     }
     100% {
-        background-position: 68px 0;
+        background-position: -68px 0;
     }
 }
 
@@ -182,10 +182,8 @@ textarea:focus-visible {
     outline-offset: 2px !important;
 }
 
-/* Reduced Motion Preference (WCAG 2.3.3) */
+/* Reduced Motion Preference (WCAG 2.3.3) - Disables intrusive pulses while preserving signature branding */
 @media (prefers-reduced-motion: reduce) {
-    .barber-pole-icon,
-    .barber-pole-divider,
     .animate-spin,
     .animate-pulse {
         animation: none !important;
