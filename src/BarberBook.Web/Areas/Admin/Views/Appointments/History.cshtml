@@ -22,16 +22,28 @@
 
     <!-- Filters Bar -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 text-sm">
             <!-- Search -->
             <div class="lg:col-span-2">
                 <label for="historySearch" class="block text-xs font-semibold text-slate-600 mb-1">Search</label>
                 <div class="relative">
                     <input type="text" id="historySearch" placeholder="Reference code, customer, phone..." onkeydown="if(event.key==='Enter') applyFilters()" class="w-full rounded-lg border-slate-300 pl-9 pr-3 py-1.5 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
-                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                 </div>
+            </div>
+
+            <!-- Branch Filter -->
+            <div>
+                <label for="historyBranch" class="block text-xs font-semibold text-slate-600 mb-1">Branch</label>
+                <select id="historyBranch" onchange="applyFilters()" class="w-full rounded-lg border-slate-300 py-1.5 px-3 text-sm focus:border-brand-500 focus:ring-brand-500">
+                    <option value="">All Branches</option>
+                    @foreach (var br in Model.Branches)
+                    {
+                        <option value="@br.Id">@br.Name</option>
+                    }
+                </select>
             </div>
 
             <!-- Status Filter -->
@@ -107,9 +119,10 @@
         </div>
     </div>
 
-    <!-- History Table -->
+    <!-- History Table & Mobile Cards -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- Desktop Table View -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold">
                     <tr>
@@ -132,6 +145,14 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Stacked Card View -->
+        <div id="historyCardList" class="sm:hidden divide-y divide-slate-100">
+            <div class="p-8 text-center text-slate-500">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-300 border-t-brand-600"></div>
+                <p class="mt-2 text-xs">Loading records...</p>
+            </div>
         </div>
 
         <!-- Pagination -->
@@ -187,6 +208,7 @@
 
     function resetFilters() {
         document.getElementById('historySearch').value = '';
+        if (document.getElementById('historyBranch')) document.getElementById('historyBranch').value = '';
         document.getElementById('historyStatus').value = '';
         document.getElementById('historyBarber').value = '';
         document.getElementById('historyService').value = '';
@@ -200,12 +222,21 @@
 
     async function loadHistory() {
         const tbody = document.getElementById('historyTableBody');
+        const cardList = document.getElementById('historyCardList');
         tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-slate-500">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-300 border-t-brand-600"></div>
             <p class="mt-2 text-sm">Loading appointment history...</p>
         </td></tr>`;
+        if (cardList) {
+            cardList.innerHTML = `<div class="p-8 text-center text-slate-500">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-300 border-t-brand-600"></div>
+                <p class="mt-2 text-xs">Loading records...</p>
+            </div>`;
+        }
 
         const search = document.getElementById('historySearch').value.trim();
+        const branchSelect = document.getElementById('historyBranch');
+        const branchId = branchSelect ? branchSelect.value : '';
         const status = document.getElementById('historyStatus').value;
         const barberId = document.getElementById('historyBarber').value;
         const serviceId = document.getElementById('historyService').value;
@@ -216,6 +247,7 @@
 
         let url = `/api/admin/appointments?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (branchId) url += `&branchId=${branchId}`;
         if (status) url += `&status=${encodeURIComponent(status)}`;
         if (barberId) url += `&barberId=${barberId}`;
         if (serviceId) url += `&serviceId=${serviceId}`;
@@ -230,16 +262,24 @@
             renderTable(cachedRecords, data.totalCount);
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-rose-600 font-medium">${err.message}</td></tr>`;
+            if (cardList) cardList.innerHTML = `<div class="p-6 text-center text-rose-600 text-xs font-medium">${err.message}</div>`;
         }
     }
 
     function renderTable(items, totalCount) {
         const tbody = document.getElementById('historyTableBody');
+        const cardList = document.getElementById('historyCardList');
         if (!items || items.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-slate-500">
                 <p class="text-base font-semibold text-slate-700">No appointments found</p>
                 <p class="text-xs text-slate-400 mt-1">Try broadening your search or date criteria.</p>
             </td></tr>`;
+            if (cardList) {
+                cardList.innerHTML = `<div class="p-8 text-center text-slate-500">
+                    <p class="text-base font-semibold text-slate-700">No appointments found</p>
+                    <p class="text-xs text-slate-400 mt-1">Try broadening your search or date criteria.</p>
+                </div>`;
+            }
             document.getElementById('paginationInfo').innerText = 'Showing 0 records';
             document.getElementById('prevPageBtn').disabled = true;
             document.getElementById('nextPageBtn').disabled = true;
@@ -247,10 +287,14 @@
         }
 
         let html = '';
+        let cardHtml = '';
         items.forEach(app => {
             const badge = getStatusBadgeHtml(app.status, app.statusDisplay);
             html += `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="openDrawer(${app.id})">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-brand-700">${app.referenceCode}</td>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-brand-700">
+                    <div>${app.referenceCode}</div>
+                    ${app.branchName ? `<div class="text-[10px] text-slate-400 font-sans font-normal">${escapeHtml(app.branchName)}</div>` : ''}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <div class="font-medium text-slate-900">${escapeHtml(app.customerName)}</div>
                     <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
@@ -273,8 +317,47 @@
                     </button>
                 </td>
             </tr>`;
+
+            cardHtml += `
+            <div class="p-4 space-y-3 hover:bg-slate-50/60 transition cursor-pointer" onclick="openDrawer(${app.id})">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="font-mono text-xs font-bold text-brand-700">${app.referenceCode}</span>
+                            ${app.branchName ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">${escapeHtml(app.branchName)}</span>` : ''}
+                        </div>
+                        <div class="font-bold text-slate-900 text-sm mt-0.5">${escapeHtml(app.customerName)}</div>
+                        <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
+                    </div>
+                    <div class="shrink-0">
+                        ${badge}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/60">
+                    <div>
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Barber & Service</span>
+                        <span class="font-semibold text-slate-800">${escapeHtml(app.barberName)}</span>
+                        <span class="block text-[11px] text-slate-500">${escapeHtml(app.serviceName)} (${app.durationMinutes}m)</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Schedule</span>
+                        <span class="font-semibold text-slate-900">${app.formattedDate}</span>
+                        <span class="block text-[11px] text-slate-500 font-mono">${app.formattedTime}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-sm font-bold text-slate-900">${app.formattedPrice}</span>
+                    <button type="button" onclick="event.stopPropagation(); openDrawer(${app.id})" class="inline-flex items-center text-xs font-bold text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition">
+                        <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Timeline &rarr;
+                    </button>
+                </div>
+            </div>`;
         });
         tbody.innerHTML = html;
+        if (cardList) cardList.innerHTML = cardHtml;
 
         // Pagination
         const startItem = (currentPage - 1) * pageSize + 1;
@@ -353,6 +436,14 @@
                     <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Assigned Barber</span>
                     <div class="font-medium text-slate-900">${escapeHtml(app.barberName)}</div>
                 </div>
+
+                ${app.branchName ? `<div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Branch Station</span>
+                    <div class="font-medium text-slate-900 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        <span>${escapeHtml(app.branchName)}</span>
+                    </div>
+                </div>` : ''}
 
                 <div>
                     <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Scheduled Time</span>

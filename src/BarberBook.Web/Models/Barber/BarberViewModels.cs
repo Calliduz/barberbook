@@ -82,6 +82,9 @@ public class BarberAppointmentItemViewModel
     public AppointmentStatus Status { get; set; }
     public string StatusString => Status.ToString().ToLowerInvariant();
     public string? Notes { get; set; }
+    public string? BranchName { get; set; }
+    public string? BranchAddress { get; set; }
+    public string? BranchPhone { get; set; }
     public List<BarberStatusHistoryItemViewModel> StatusHistories { get; set; } = new();
 }
 

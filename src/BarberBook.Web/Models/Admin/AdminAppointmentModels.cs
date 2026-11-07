@@ -17,6 +17,7 @@ public class AdminAppointmentListQuery
     public int? BarberId { get; set; }
     public int? CustomerId { get; set; }
     public int? ServiceId { get; set; }
+    public int? BranchId { get; set; }
     public string? Search { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
@@ -34,6 +35,8 @@ public class AdminAppointmentItemDto
     public string CustomerPhone { get; set; } = string.Empty;
     public int BarberId { get; set; }
     public string BarberName { get; set; } = string.Empty;
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
     public int ServiceId { get; set; }
     public string ServiceName { get; set; } = string.Empty;
     public decimal Price { get; set; }
@@ -65,6 +68,7 @@ public class AdminAppointmentsViewModel
 {
     public List<PublicServiceDto> Services { get; set; } = new();
     public List<PublicBarberDto> Barbers { get; set; } = new();
+    public List<AdminBranchItemDto> Branches { get; set; } = new();
     public string TodayDateString { get; set; } = string.Empty;
     public string InitialView { get; set; } = "list"; // list, day, week
     public string? InitialStatus { get; set; }

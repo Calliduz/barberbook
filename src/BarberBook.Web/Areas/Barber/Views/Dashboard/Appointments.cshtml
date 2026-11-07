@@ -77,7 +77,8 @@
         }
         else
         {
-            <div class="overflow-x-auto">
+            <!-- Desktop Table View (hidden on mobile) -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
                         <tr>
@@ -104,7 +105,13 @@
 
                             <tr class="hover:bg-slate-50/70 transition">
                                 <td class="py-4 px-6">
-                                    <a href="/barber/appointments/@app.Id" class="font-mono font-bold text-amber-800 hover:text-amber-900 hover:underline text-xs">@app.ReferenceCode</a>
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="/barber/appointments/@app.Id" class="font-mono font-bold text-amber-800 hover:text-amber-900 hover:underline text-xs">@app.ReferenceCode</a>
+                                        @if (!string.IsNullOrWhiteSpace(app.BranchName))
+                                        {
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">@app.BranchName</span>
+                                        }
+                                    </div>
                                     <div class="font-bold text-slate-900 mt-0.5">@app.ScheduledDateFormatted</div>
                                     <div class="text-[11px] text-slate-500">@app.ScheduledTime12h</div>
                                 </td>
@@ -184,6 +191,122 @@
                         }
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Stacked Card View (hidden on desktop) -->
+            <div class="md:hidden divide-y divide-slate-100">
+                @foreach (var app in Model.Appointments)
+                {
+                    var badgeClass = app.Status switch
+                    {
+                        BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+                        BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+                        BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+                        BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+                        BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
+                        _ => "bg-slate-100 text-slate-700"
+                    };
+
+                    <div class="p-5 space-y-3.5 hover:bg-slate-50/50 transition">
+                        <!-- Card Header: Ref code & Status Badge -->
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <a href="/barber/appointments/@app.Id" class="font-mono font-bold text-amber-800 hover:text-amber-900 text-xs hover:underline">
+                                        @app.ReferenceCode
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(app.BranchName))
+                                    {
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                            @app.BranchName
+                                        </span>
+                                    }
+                                </div>
+                                <div class="font-bold text-slate-900 text-sm mt-0.5">@app.ScheduledDateFormatted</div>
+                                <div class="text-xs font-medium text-slate-500">@app.ScheduledTime12h</div>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border @badgeClass capitalize">
+                                    @app.StatusString
+                                </span>
+                                <button type="button" onclick="openHistoryModal(@app.Id)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition" title="View Audit Timeline">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Client & Service Details -->
+                        <div class="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 space-y-2 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Client:</span>
+                                <div class="text-right">
+                                    <span class="font-bold text-slate-900">@app.CustomerName</span>
+                                    @if (!string.IsNullOrWhiteSpace(app.CustomerPhone) && app.CustomerPhone != "No phone provided")
+                                    {
+                                        <a href="tel:@app.CustomerPhone" class="block text-[11px] text-amber-700 hover:underline font-mono">@app.CustomerPhone</a>
+                                    }
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-slate-200/60 pt-2">
+                                <span class="text-slate-500 font-semibold">Service:</span>
+                                <div class="text-right">
+                                    <span class="font-bold text-slate-800">@app.ServiceName</span>
+                                    <span class="font-bold text-amber-800 block">@app.FormattedPrice</span>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(app.Notes))
+                            {
+                                <div class="border-t border-slate-200/60 pt-2 text-[11px] text-slate-600 italic">
+                                    Note: "@app.Notes"
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-1">
+                            @if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
+                            {
+                                <div class="grid grid-cols-3 gap-2">
+                                    <form method="post" action="/barber/appointments/@app.Id/status" class="w-full">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="to" value="confirmed" />
+                                        <button type="submit" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-500 transition shadow-sm text-center">
+                                            Confirm
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'rejected')" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition text-center">
+                                        Reject
+                                    </button>
+                                    <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition text-center">
+                                        Cancel
+                                    </button>
+                                </div>
+                            }
+                            else if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Confirmed)
+                            {
+                                <div class="grid grid-cols-2 gap-2">
+                                    <form method="post" action="/barber/appointments/@app.Id/status" class="w-full">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="to" value="completed" />
+                                        <button type="submit" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-sm text-center">
+                                            Complete Service
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition text-center">
+                                        Cancel
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center justify-between text-xs text-slate-400 italic py-1">
+                                    <span>Terminal state &bull; Recorded in log</span>
+                                    <a href="/barber/appointments/@app.Id" class="text-amber-800 hover:underline font-semibold not-italic">View Details &rarr;</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>

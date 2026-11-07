@@ -52,6 +52,7 @@ public class DashboardController : Controller
         return await _dbContext.Barbers
             .Include(b => b.User)
             .Include(b => b.WorkingHours)
+            .Include(b => b.Branch)
             .FirstOrDefaultAsync(b => b.UserId == userId.Value);
     }
 
@@ -69,6 +70,8 @@ public class DashboardController : Controller
             .Include(a => a.Customer)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
+            .Include(a => a.Branch)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .Where(a => a.BarberId == barber.Id);
 
         var todayAppointments = await appointmentsQuery
@@ -210,6 +213,8 @@ public class DashboardController : Controller
             .Include(a => a.Customer)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
+            .Include(a => a.Branch)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .Where(a => a.BarberId == barber.Id)
             .AsQueryable();
 
@@ -284,6 +289,8 @@ public class DashboardController : Controller
             .Include(a => a.Customer)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
+            .Include(a => a.Branch)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (app == null || app.BarberId != barber.Id)
@@ -310,6 +317,8 @@ public class DashboardController : Controller
             .Include(a => a.Customer)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
+            .Include(a => a.Branch)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (app == null || app.BarberId != barber.Id)
@@ -747,6 +756,9 @@ public class DashboardController : Controller
             ScheduledTime12h = $"{startsAtManila.TimeOfDay.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)} – {endsAtManila.TimeOfDay.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)}",
             Status = app.Status,
             Notes = app.Notes,
+            BranchName = app.Branch?.Name ?? app.Barber?.Branch?.Name,
+            BranchAddress = app.Branch?.Address ?? app.Barber?.Branch?.Address,
+            BranchPhone = app.Branch?.PhoneNumber ?? app.Barber?.Branch?.PhoneNumber,
             StatusHistories = app.StatusHistories
                 .OrderBy(sh => sh.ChangedAt)
                 .Select(sh => new BarberStatusHistoryItemViewModel

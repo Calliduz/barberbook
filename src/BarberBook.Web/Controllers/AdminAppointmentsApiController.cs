@@ -40,8 +40,10 @@ public class AdminAppointmentsApiController : ControllerBase
         var dbQuery = _dbContext.Appointments
             .Include(a => a.Customer)
             .Include(a => a.Barber).ThenInclude(b => b.User)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
+            .Include(a => a.Branch)
             .AsQueryable();
 
         // 1. Date Range Filter
@@ -90,6 +92,12 @@ public class AdminAppointmentsApiController : ControllerBase
         if (query.ServiceId.HasValue && query.ServiceId.Value > 0)
         {
             dbQuery = dbQuery.Where(a => a.ServiceId == query.ServiceId.Value);
+        }
+
+        // 5b. Branch Filter
+        if (query.BranchId.HasValue && query.BranchId.Value > 0)
+        {
+            dbQuery = dbQuery.Where(a => a.BranchId == query.BranchId.Value || a.Barber.BranchId == query.BranchId.Value);
         }
 
         // 6. Text Search (Reference Code or Customer Name/Email/Phone)
@@ -152,6 +160,8 @@ public class AdminAppointmentsApiController : ControllerBase
                 CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
                 BarberId = app.BarberId,
                 BarberName = app.Barber.DisplayName,
+                BranchId = app.BranchId ?? app.Barber.BranchId,
+                BranchName = app.Branch?.Name ?? app.Barber?.Branch?.Name,
                 ServiceId = app.ServiceId,
                 ServiceName = app.ServiceName,
                 Price = app.Price,

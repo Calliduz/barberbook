@@ -61,6 +61,19 @@ public class AppointmentsController : Controller
             })
             .ToListAsync(cancellationToken);
 
+        var branches = await _dbContext.Branches
+            .Where(br => br.IsActive)
+            .OrderBy(br => br.Name)
+            .Select(br => new AdminBranchItemDto
+            {
+                Id = br.Id,
+                Name = br.Name,
+                Address = br.Address,
+                PhoneNumber = br.PhoneNumber,
+                IsActive = br.IsActive
+            })
+            .ToListAsync(cancellationToken);
+
         var todayInManila = _clock.GetCurrentInstant().InZone(_zone).Date;
         var todayStr = todayInManila.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
@@ -68,6 +81,7 @@ public class AppointmentsController : Controller
         {
             Services = services,
             Barbers = barbers,
+            Branches = branches,
             TodayDateString = todayStr,
             InitialView = string.Equals(view, "day", StringComparison.OrdinalIgnoreCase) ? "day" :
                           string.Equals(view, "week", StringComparison.OrdinalIgnoreCase) ? "week" : "list",
@@ -109,10 +123,24 @@ public class AppointmentsController : Controller
         var todayInManila = _clock.GetCurrentInstant().InZone(_zone).Date;
         var todayStr = todayInManila.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
+        var branches = await _dbContext.Branches
+            .Where(br => br.IsActive)
+            .OrderBy(br => br.Name)
+            .Select(br => new AdminBranchItemDto
+            {
+                Id = br.Id,
+                Name = br.Name,
+                Address = br.Address,
+                PhoneNumber = br.PhoneNumber,
+                IsActive = br.IsActive
+            })
+            .ToListAsync(cancellationToken);
+
         var model = new AdminAppointmentsViewModel
         {
             Services = services,
             Barbers = barbers,
+            Branches = branches,
             TodayDateString = todayStr,
             InitialView = "list"
         };
