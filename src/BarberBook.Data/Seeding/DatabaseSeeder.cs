@@ -70,8 +70,21 @@ public static class DatabaseSeeder
         var branchesData = new[]
         {
             (Name: "Manila Main Branch", Address: "123 Escolta St., Binondo, Manila", Phone: "0917-111-2222"),
-            (Name: "Makati Poblacion Branch", Address: "456 General Luna St., Poblacion, Makati", Phone: "0917-333-4444")
+            (Name: "Makati Poblacion Branch", Address: "456 General Luna St., Poblacion, Makati", Phone: "0917-333-4444"),
+            (Name: "BGC High Street Branch", Address: "Unit 204, Bonifacio High Street, Taguig", Phone: "0917-555-6666"),
+            (Name: "QC Tomas Morato Branch", Address: "78 Tomas Morato Ave., Quezon City", Phone: "0917-777-8888"),
+            (Name: "Ortigas Center Branch", Address: "Emerald Ave. cor. Doña Julia Vargas, Pasig", Phone: "0917-999-0000")
         };
+
+        // Clean up any obsolete duplicate Alabang branches
+        var obsoleteBranches = await context.Branches
+            .Where(b => b.Name == "Alabang Town Center Branch" && !context.Appointments.Any(a => a.BranchId == b.Id) && !context.Barbers.Any(bar => bar.BranchId == b.Id))
+            .ToListAsync();
+        if (obsoleteBranches.Any())
+        {
+            context.Branches.RemoveRange(obsoleteBranches);
+            await context.SaveChangesAsync();
+        }
 
         var branchMap = new Dictionary<string, Branch>();
         foreach (var (bName, bAddress, bPhone) in branchesData)
@@ -95,12 +108,15 @@ public static class DatabaseSeeder
             branchMap[bName] = branch;
         }
 
-        // 3. Seed Barbers: Ramon, Dennis, Miguel
+        // 3. Seed Barbers
         var barberData = new[]
         {
             (Name: "Ramon", Email: "ramon@barberbook.local", Bio: "Master barber specializing in classic cuts and beard styling.", Specialties: "Classic Cuts, Beard Sculpting", Branch: "Manila Main Branch"),
             (Name: "Dennis", Email: "dennis@barberbook.local", Bio: "Precision stylist with 10+ years experience in modern fades.", Specialties: "Modern Fades, Shaves", Branch: "Manila Main Branch"),
-            (Name: "Miguel", Email: "miguel@barberbook.local", Bio: "Creative colorist and artistic stylist.", Specialties: "Hair Color, Texture Styling", Branch: "Makati Poblacion Branch")
+            (Name: "Miguel", Email: "miguel@barberbook.local", Bio: "Creative colorist and artistic stylist.", Specialties: "Hair Color, Texture Styling", Branch: "Makati Poblacion Branch"),
+            (Name: "Carlos", Email: "carlos@barberbook.local", Bio: "Master fade specialist and beard sculpting artist.", Specialties: "Taper Fades, Pompadours, Beard Grooming", Branch: "BGC High Street Branch"),
+            (Name: "Rafael", Email: "rafael@barberbook.local", Bio: "Traditional wet shave artisan and hot towel specialist.", Specialties: "Hot Towel Shave, Scissor Cuts", Branch: "QC Tomas Morato Branch"),
+            (Name: "Anton", Email: "anton@barberbook.local", Bio: "Executive stylist known for clean contours and pompadours.", Specialties: "Executive Cuts, Texture Styling", Branch: "Ortigas Center Branch")
         };
 
         var barberMap = new Dictionary<string, Barber>();

@@ -74,6 +74,18 @@ public class AppointmentsController : Controller
             })
             .ToListAsync(cancellationToken);
 
+        var products = await _dbContext.Products
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Name)
+            .Select(p => new AdminRetailProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.SellPrice,
+                FormattedPrice = FormattingHelpers.FormatPeso(p.SellPrice)
+            })
+            .ToListAsync(cancellationToken);
+
         var todayInManila = _clock.GetCurrentInstant().InZone(_zone).Date;
         var todayStr = todayInManila.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 
@@ -82,6 +94,7 @@ public class AppointmentsController : Controller
             Services = services,
             Barbers = barbers,
             Branches = branches,
+            Products = products,
             TodayDateString = todayStr,
             InitialView = string.Equals(view, "day", StringComparison.OrdinalIgnoreCase) ? "day" :
                           string.Equals(view, "week", StringComparison.OrdinalIgnoreCase) ? "week" : "list",

@@ -75,6 +75,7 @@ public class AvailabilityService : IAvailabilityService
             .Where(a => a.BarberId == barberId &&
                         a.Status != AppointmentStatus.Cancelled &&
                         a.Status != AppointmentStatus.Rejected &&
+                        a.Status != AppointmentStatus.NoShow &&
                         a.EndsAt > dayStartUtc &&
                         a.StartsAt < dayEndUtc)
             .ToListAsync(cancellationToken);
@@ -217,6 +218,7 @@ public class AvailabilityService : IAvailabilityService
             .AnyAsync(a => a.BarberId == barberId &&
                            a.Status != AppointmentStatus.Cancelled &&
                            a.Status != AppointmentStatus.Rejected &&
+                           a.Status != AppointmentStatus.NoShow &&
                            (!ignoreAppointmentId.HasValue || a.Id != ignoreAppointmentId.Value) &&
                            startsAt < a.EndsAt &&
                            endsAtUtc > a.StartsAt,

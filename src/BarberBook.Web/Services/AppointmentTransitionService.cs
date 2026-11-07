@@ -38,10 +38,11 @@ public class AppointmentTransitionService : IAppointmentTransitionService
 
         var fromStatus = appointment.Status;
 
-        // 1. Terminal status check (§9: completed, rejected, cancelled are terminal)
+        // 1. Terminal status check (§9: completed, rejected, cancelled, noshow are terminal)
         if (fromStatus == AppointmentStatus.Completed ||
             fromStatus == AppointmentStatus.Rejected ||
-            fromStatus == AppointmentStatus.Cancelled)
+            fromStatus == AppointmentStatus.Cancelled ||
+            fromStatus == AppointmentStatus.NoShow)
         {
             return AppointmentTransitionResult.InvalidTransition(
                 $"Cannot transition appointment from terminal status '{fromStatus.ToString().ToLowerInvariant()}'.");
@@ -64,7 +65,8 @@ public class AppointmentTransitionService : IAppointmentTransitionService
         {
             if (toStatus == AppointmentStatus.Completed ||
                 toStatus == AppointmentStatus.Cancelled ||
-                toStatus == AppointmentStatus.Pending) // Reschedule
+                toStatus == AppointmentStatus.Pending || // Reschedule
+                toStatus == AppointmentStatus.NoShow) // Client failed to arrive
             {
                 isValidTransitionStructure = true;
             }
@@ -81,12 +83,13 @@ public class AppointmentTransitionService : IAppointmentTransitionService
 
         if (string.Equals(actor.Role, "Admin", StringComparison.OrdinalIgnoreCase))
         {
-            // Admin can confirm, reject, complete, or cancel any appointment.
+            // Admin can confirm, reject, complete, cancel, or mark no-show any appointment.
             // Admin cannot reschedule a customer's appointment (customer-only).
             if (toStatus == AppointmentStatus.Confirmed ||
                 toStatus == AppointmentStatus.Rejected ||
                 toStatus == AppointmentStatus.Completed ||
-                toStatus == AppointmentStatus.Cancelled)
+                toStatus == AppointmentStatus.Cancelled ||
+                toStatus == AppointmentStatus.NoShow)
             {
                 isActorAuthorized = true;
             }
@@ -101,11 +104,12 @@ public class AppointmentTransitionService : IAppointmentTransitionService
                     "Barbers can only manage appointments assigned to them.");
             }
 
-            // Barber can confirm, reject, complete, or cancel own appointments.
+            // Barber can confirm, reject, complete, cancel, or mark no-show own appointments.
             if (toStatus == AppointmentStatus.Confirmed ||
                 toStatus == AppointmentStatus.Rejected ||
                 toStatus == AppointmentStatus.Completed ||
-                toStatus == AppointmentStatus.Cancelled)
+                toStatus == AppointmentStatus.Cancelled ||
+                toStatus == AppointmentStatus.NoShow)
             {
                 isActorAuthorized = true;
             }

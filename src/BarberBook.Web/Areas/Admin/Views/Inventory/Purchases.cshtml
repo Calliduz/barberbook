@@ -1,6 +1,6 @@
 @model BarberBook.Web.Models.Inventory.AdminPurchasesViewModel
 @{
-    ViewData["Title"] = "Buy & Restock Purchases (HW-2, AF-11)";
+    ViewData["Title"] = "Buy & Restock Purchases";
 }
 
 <div class="space-y-8">
@@ -9,7 +9,7 @@
         <div>
             <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>RESTOCKING & WHOLESALE PURCHASES · HW-2 / AF-11 / INV-03</span>
+                <span>RESTOCKING & WHOLESALE PURCHASES</span>
             </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Buy & Restock Inventory</h1>
             <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
@@ -199,7 +199,7 @@
 <div id="purchaseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
         <h3 class="text-xl font-serif font-bold text-slate-900">Record Wholesale Purchase (Buy)</h3>
-        <p class="text-xs text-slate-600 mt-1">Restock retail inventory and update cost prices (HW-2, AF-11).</p>
+        <p class="text-xs text-slate-600 mt-1">Restock retail inventory and update cost prices.</p>
 
         <form id="purchaseForm" onsubmit="submitPurchase(event)" class="mt-5 space-y-4">
             @Html.AntiForgeryToken()

@@ -1,6 +1,6 @@
 @model BarberBook.Web.Models.Inventory.AdminProductSalesViewModel
 @{
-    ViewData["Title"] = "Sell Products & Counter Sales (HW-2, AF-12, SC-11)";
+    ViewData["Title"] = "Sell Products & Counter Sales";
 }
 
 <div class="space-y-8">
@@ -9,7 +9,7 @@
         <div>
             <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>PRODUCT SALES & COUNTER CHECKOUT · HW-2 / AF-12 / SC-11 / INV-04 / INV-06</span>
+                <span>PRODUCT SALES & COUNTER CHECKOUT</span>
             </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Sell Products & Counter Sales</h1>
             <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
@@ -64,7 +64,7 @@
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-3xl font-serif font-black text-amber-700">@Model.FormattedTotalSalesAmount</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Separately audited from appointment service sales (INV-06)</p>
+            <p class="mt-1 text-xs text-slate-500">Retail sales revenue tracked alongside service revenue</p>
         </div>
 
         <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
@@ -73,7 +73,7 @@
                 <span class="text-3xl font-serif font-black text-slate-900">@Model.Sales.Count</span>
                 <span class="text-xs text-slate-500 font-medium">transactions</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">In-shop counter settlements (LM-1, LM-2)</p>
+            <p class="mt-1 text-xs text-slate-500">In-shop counter settlements</p>
         </div>
 
         <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
@@ -249,7 +249,7 @@
 <div id="saleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
         <h3 class="text-xl font-serif font-bold text-slate-900">Record Counter Product Sale</h3>
-        <p class="text-xs text-slate-600 mt-1">Dispense retail products at the counter and deduct live inventory stock (HW-2, AF-12).</p>
+        <p class="text-xs text-slate-600 mt-1">Dispense retail products at the counter and deduct live inventory stock.</p>
 
         <form id="saleForm" onsubmit="submitSale(event)" class="mt-5 space-y-4">
             @Html.AntiForgeryToken()

@@ -107,7 +107,7 @@ public class AdminCustomerInformationTests : IClassFixture<WebApplicationFactory
         var html = await htmlResp.Content.ReadAsStringAsync();
         html.Should().Contain("Juan Dela Cruz");
         html.Should().Contain("Client Appointment History");
-        html.Should().Contain("Transactions (RP-3)");
+        html.Should().Contain("Transactions");
     }
 
     [Fact]

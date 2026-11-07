@@ -10,7 +10,7 @@
         <div>
             <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>SHOP ASSETS & INVENTORY · HW-1 / AF-9 / AF-10 / INV-03 / INV-05</span>
+                <span>SHOP ASSETS & INVENTORY</span>
             </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Shop Inventory & Equipment</h1>
             <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
@@ -98,7 +98,7 @@
                 <span class="text-3xl font-serif font-black @(Model.LowStockCount > 0 ? "text-rose-600" : "text-slate-900")">@Model.LowStockCount</span>
                 <span class="text-xs font-medium @(Model.LowStockCount > 0 ? "text-rose-600" : "text-slate-500")">at or below reorder level</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Requires restocking purchase (INV-05)</p>
+            <p class="mt-1 text-xs text-slate-500">Requires restocking purchase</p>
         </div>
 
         <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
@@ -107,7 +107,7 @@
                 <span class="text-3xl font-serif font-black text-slate-900">@Model.TotalEquipment</span>
                 <span class="text-xs text-slate-500 font-medium">registered assets</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Clippers, shears, trimmers and furniture (HW-1)</p>
+            <p class="mt-1 text-xs text-slate-500">Clippers, shears, trimmers and workstations</p>
         </div>
     </div>
 
@@ -266,10 +266,10 @@
                         All Assets Directory
                     </span>
                     <a href="/admin/equipment/per-barber" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                        Equipment per Barber (HW-1)
+                        Equipment per Barber
                     </a>
                     <a href="/admin/equipment/quality" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                        Quality Monitoring (HW-3)
+                        Quality Monitoring
                     </a>
                 </div>
                 <div>
@@ -574,7 +574,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL: ADJUST STOCK (INV-03, INV-04)       -->
+<!-- MODAL: ADJUST STOCK                        -->
 <!-- ========================================== -->
 <div id="adjustStockModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
@@ -800,7 +800,7 @@
             <button onclick="closeModal('retireEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
         </div>
         <p class="text-xs text-slate-600 mb-3">
-            Are you sure you want to retire <span id="retireEqTitle" class="font-bold text-slate-900"></span>? Retired equipment remains in historical logs (BR-13).
+            Are you sure you want to retire <span id="retireEqTitle" class="font-bold text-slate-900"></span>? Retired equipment remains safely archived in historical logs.
         </p>
         <form id="retireEquipmentForm" method="post" action="" class="space-y-4">
             @Html.AntiForgeryToken()
@@ -817,7 +817,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL: ASSIGN EQUIPMENT (HW-1, AF-9)       -->
+<!-- MODAL: ASSIGN EQUIPMENT                    -->
 <!-- ========================================== -->
 <div id="assignEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
@@ -840,7 +840,7 @@
                         <option value="@b.Id">@b.DisplayName (@b.ActiveToolCount active tools)</option>
                     }
                 </select>
-                <p class="text-[10px] text-slate-400 mt-1">If already assigned, the previous assignment will be closed automatically (INV-01).</p>
+                <p class="text-[10px] text-slate-400 mt-1">If already assigned, the previous assignment will be archived automatically.</p>
             </div>
 
             <div>
@@ -857,7 +857,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL: ADMIN INSPECT (HW-3, AF-13)         -->
+<!-- MODAL: ADMIN INSPECT                       -->
 <!-- ========================================== -->
 <div id="adminInspectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
@@ -1069,7 +1069,7 @@
         projectedEl.innerText = projected + ' ' + currentUnitValue;
 
         if (projected < 0) {
-            errorEl.innerText = 'Adjustment would result in negative stock (' + projected + '). Stock cannot go below zero (INV-03).';
+            errorEl.innerText = 'Adjustment would result in negative stock (' + projected + '). Stock cannot go below zero.';
             errorEl.classList.remove('hidden');
             submitBtn.disabled = true;
         } else {

@@ -41,7 +41,7 @@
             </p>
         </div>
 
-        <!-- Action Buttons according to §9 matrix -->
+        <!-- Action Buttons -->
         <div class="flex flex-wrap items-center gap-2.5">
             @if (Model.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
             {
@@ -196,7 +196,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
                 <h2 class="text-lg font-serif font-bold text-slate-900">Status History & Audit Trail</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Immutable record of every lifecycle event and actor note (BR-03, AF-6)</p>
+                <p class="text-xs text-slate-500 mt-0.5">Complete record of every lifecycle event and staff note</p>
             </div>
             <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
                 @Model.StatusHistories.Count entries

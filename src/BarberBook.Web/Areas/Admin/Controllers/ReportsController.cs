@@ -127,6 +127,58 @@ public class ReportsController : Controller
         return View(model);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/reports/export")]
+    public async Task<IActionResult> Export(
+        [FromQuery] string tab = "daily",
+        [FromQuery] string? date = null,
+        [FromQuery] int? year = null,
+        [FromQuery] int? month = null,
+        [FromQuery] int? barberId = null,
+        [FromQuery] int? customerId = null)
+    {
+        var localNow = _clock.GetCurrentInstant().InZone(_zone).Date;
+        var sb = new System.Text.StringBuilder();
+
+        if (tab == "monthly")
+        {
+            int selectedYear = year ?? localNow.Year;
+            int selectedMonth = month ?? localNow.Month;
+            var monthly = await _reportingService.GetMonthlySalesAsync(selectedYear, selectedMonth);
+
+            sb.AppendLine("Date,CompletedCount,ServiceSales,ProductSales,GrandTotal");
+            foreach (var item in monthly.DailyTotals)
+            {
+                sb.AppendLine($"\"{item.DateFormatted}\",{item.CompletedCount},{item.ServiceSales:F2},{item.ProductSales:F2},{item.GrandTotal:F2}");
+            }
+            sb.AppendLine($"\"TOTAL\",{monthly.CompletedCount},{monthly.TotalSales:F2},{monthly.ProductSales:F2},{monthly.GrandTotal:F2}");
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", $"monthly-sales-{selectedYear}-{selectedMonth:D2}.csv");
+        }
+        else
+        {
+            LocalDate selectedDate = localNow;
+            if (!string.IsNullOrEmpty(date) && LocalDatePattern.Iso.Parse(date).TryGetValue(localNow, out var parsedDate))
+            {
+                selectedDate = parsedDate;
+            }
+
+            var daily = await _reportingService.GetDailySalesAsync(selectedDate);
+            sb.AppendLine("No,Time,Customer,Barber,Service,Amount");
+            foreach (var item in daily.Items)
+            {
+                sb.AppendLine($"{item.No},\"{item.Time}\",\"{item.Customer.Replace("\"", "\"\"")}\",\"{item.Barber.Replace("\"", "\"\"")}\",\"{item.Service.Replace("\"", "\"\"")}\",{item.Amount:F2}");
+            }
+            sb.AppendLine($",,,,\"Service Total\",{daily.TotalSales:F2}");
+            sb.AppendLine($",,,,\"Product Total\",{daily.ProductSales.Total:F2}");
+            sb.AppendLine($",,,,\"Grand Total\",{daily.GrandTotal:F2}");
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", $"daily-sales-{selectedDate:yyyy-MM-dd}.csv");
+        }
+    }
+
     #region REST API Endpoints
 
     /// <summary>

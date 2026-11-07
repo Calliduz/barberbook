@@ -9,11 +9,11 @@
         <div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>EQUIPMENT MONITORING (BF-6, HW-1, HW-3)</span>
+                <span>EQUIPMENT MONITORING</span>
             </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">My Assigned Equipment</h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Barber: <span class="font-bold text-slate-800">@Model.BarberName</span> &bull; Monitor your workstation clippers, shears, and chairs and record inspections (HW-3).
+                Barber: <span class="font-bold text-slate-800">@Model.BarberName</span> &bull; Monitor your workstation clippers, shears, and chairs and record inspections.
             </p>
         </div>
 
@@ -92,7 +92,7 @@
 <div id="inspectionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
         <h3 id="inspectModalTitle" class="text-xl font-serif font-bold text-slate-900">Equipment Inspection</h3>
-        <p id="inspectModalSubtitle" class="text-xs text-slate-600 mt-1">Record a condition audit on this tool (HW-3).</p>
+        <p id="inspectModalSubtitle" class="text-xs text-slate-600 mt-1">Record a condition audit on this tool.</p>
 
         <form id="inspectionForm" method="post" action="" class="mt-5 space-y-4">
             @Html.AntiForgeryToken()

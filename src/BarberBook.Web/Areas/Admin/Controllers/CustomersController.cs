@@ -98,6 +98,7 @@ public class CustomersController : Controller
         {
             var userAppts = appts.Where(a => a.CustomerId == u.Id).ToList();
             var completed = userAppts.Where(a => a.Status == AppointmentStatus.Completed).ToList();
+            var noShows = userAppts.Where(a => a.Status == AppointmentStatus.NoShow).ToList();
             var totalSpent = completed.Sum(a => a.Price);
             var memberSinceLocal = u.CreatedAt.InZone(_zone);
 
@@ -116,6 +117,7 @@ public class CustomersController : Controller
                 MemberSince = memberSinceLocal.ToString("MMM d, yyyy", null),
                 TotalAppointments = userAppts.Count,
                 CompletedVisits = completed.Count,
+                NoShowCount = noShows.Count,
                 TotalSpent = totalSpent,
                 FormattedTotalSpent = FormattingHelpers.FormatPeso(totalSpent),
                 LastVisit = lastVisitStr
@@ -189,6 +191,7 @@ public class CustomersController : Controller
 
         var completed = appointments.Where(a => a.Status == AppointmentStatus.Completed).ToList();
         var cancelled = appointments.Where(a => a.Status == AppointmentStatus.Cancelled).ToList();
+        var noShows = appointments.Where(a => a.Status == AppointmentStatus.NoShow).ToList();
         var totalSpent = completed.Sum(a => a.Price);
 
         var lastVisitApp = completed.OrderByDescending(a => a.StartsAt).FirstOrDefault();
@@ -242,6 +245,7 @@ public class CustomersController : Controller
                 totalAppointments = appointments.Count,
                 completedVisits = completed.Count,
                 cancelledVisits = cancelled.Count,
+                noShowVisits = noShows.Count,
                 totalSpent,
                 formattedTotalSpent = FormattingHelpers.FormatPeso(totalSpent),
                 lastVisit = lastVisitStr,
@@ -260,6 +264,7 @@ public class CustomersController : Controller
             TotalAppointments = appointments.Count,
             CompletedVisits = completed.Count,
             CancelledVisits = cancelled.Count,
+            NoShowVisits = noShows.Count,
             TotalSpent = totalSpent,
             FormattedTotalSpent = FormattingHelpers.FormatPeso(totalSpent),
             LastVisit = lastVisitStr,

@@ -27,6 +27,7 @@ public class AdminCustomerItemViewModel
     public string MemberSince { get; set; } = string.Empty;
     public int TotalAppointments { get; set; }
     public int CompletedVisits { get; set; }
+    public int NoShowCount { get; set; }
     public decimal TotalSpent { get; set; }
     public string FormattedTotalSpent { get; set; } = string.Empty;
     public string LastVisit { get; set; } = string.Empty;
@@ -45,6 +46,7 @@ public class AdminCustomerDetailViewModel
     public int TotalAppointments { get; set; }
     public int CompletedVisits { get; set; }
     public int CancelledVisits { get; set; }
+    public int NoShowVisits { get; set; }
     public decimal TotalSpent { get; set; }
     public string FormattedTotalSpent { get; set; } = "₱0.00";
     public string LastVisit { get; set; } = "No visits yet";

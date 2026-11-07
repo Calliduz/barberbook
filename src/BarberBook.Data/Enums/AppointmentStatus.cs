@@ -6,6 +6,7 @@ public enum AppointmentStatus
     Confirmed = 2,
     Rejected = 3,
     Completed = 4,
-    Cancelled = 5
+    Cancelled = 5,
+    NoShow = 6
 }
 

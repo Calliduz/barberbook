@@ -77,7 +77,7 @@ public class AppointmentsApiController : ControllerBase
         {
             // History includes all terminal states (completed, cancelled, rejected) or past appointments, newest first
             query = query
-                .Where(a => a.EndsAt <= now || a.Status == AppointmentStatus.Completed || a.Status == AppointmentStatus.Cancelled || a.Status == AppointmentStatus.Rejected)
+                .Where(a => a.EndsAt <= now || a.Status == AppointmentStatus.Completed || a.Status == AppointmentStatus.Cancelled || a.Status == AppointmentStatus.Rejected || a.Status == AppointmentStatus.NoShow)
                 .OrderByDescending(a => a.StartsAt);
         }
         else
@@ -781,6 +781,7 @@ public class AppointmentsApiController : ControllerBase
         AppointmentStatus.Completed => "Completed",
         AppointmentStatus.Cancelled => "Cancelled",
         AppointmentStatus.Rejected => "Rejected",
+        AppointmentStatus.NoShow => "No-Show",
         _ => status.ToString()
     };
 }

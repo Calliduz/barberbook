@@ -405,7 +405,7 @@
                 </svg>
             </button>
         </div>
-        <p class="text-sm text-slate-600 mb-4">Set a new password for <span id="resetBarberName" class="font-semibold text-slate-900"></span>. (No email reset is supported, AS-21).</p>
+        <p class="text-sm text-slate-600 mb-4">Set a new password for <span id="resetBarberName" class="font-semibold text-slate-900"></span>. Direct password override managed by shop administrator.</p>
         <form id="resetPasswordForm" method="post" action="" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-slate-700">New Password *</label>
@@ -490,7 +490,7 @@
         document.getElementById('toggleStatusForm').action = '/admin/barbers/' + id + '/toggle-status';
         const title = isActive ? 'Deactivate Barber Account' : 'Activate Barber Account';
         const msg = isActive
-            ? 'Are you sure you want to deactivate ' + displayName + '? The barber will not be able to log in and will be hidden from customer bookings. Existing historical appointments remain intact (BR-13).'
+            ? 'Are you sure you want to deactivate ' + displayName + '? The barber will not be able to log in and will be hidden from customer bookings. Existing historical appointments remain safely preserved.'
             : 'Are you sure you want to activate ' + displayName + '? The barber will be visible for customer bookings and able to log in.';
         const btnClass = isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500';
         const btnText = isActive ? 'Deactivate' : 'Activate';

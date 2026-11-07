@@ -153,6 +153,17 @@ public class AppointmentTransitionTests : IClassFixture<WebApplicationFactory<Pr
         // Confirmed -> Rejected (Invalid: rejection only applies to pending)
         yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.Rejected, "Admin", true, 409 };
         yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.Rejected, "Barber", true, 409 };
+
+        // Confirmed -> NoShow (Admin and assigned Barber can mark No-Show)
+        yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.NoShow, "Admin", true, 200 };
+        yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.NoShow, "Barber", true, 200 };
+        yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.NoShow, "Barber", false, 403 };
+        yield return new object[] { AppointmentStatus.Confirmed, AppointmentStatus.NoShow, "Customer", true, 403 };
+
+        // Pending -> NoShow (Invalid: only confirmed appointments can be no-show)
+        yield return new object[] { AppointmentStatus.Pending, AppointmentStatus.NoShow, "Admin", true, 409 };
+        yield return new object[] { AppointmentStatus.Pending, AppointmentStatus.NoShow, "Barber", true, 409 };
+        yield return new object[] { AppointmentStatus.Pending, AppointmentStatus.NoShow, "Customer", true, 409 };
     }
 
     [Theory]
@@ -237,9 +248,10 @@ public class AppointmentTransitionTests : IClassFixture<WebApplicationFactory<Pr
     [InlineData(AppointmentStatus.Completed)]
     [InlineData(AppointmentStatus.Rejected)]
     [InlineData(AppointmentStatus.Cancelled)]
+    [InlineData(AppointmentStatus.NoShow)]
     public async Task Section9_TerminalStatusImmutability_CannotTransitionFromTerminalStatuses(AppointmentStatus terminalStatus)
     {
-        // §9: completed, rejected, cancelled are terminal statuses. No role can move them.
+        // Terminal statuses: completed, rejected, cancelled, noshow. No role can move them.
         await EnsureSeededAsync();
 
         using var scope = _factory.Services.CreateScope();
@@ -255,7 +267,8 @@ public class AppointmentTransitionTests : IClassFixture<WebApplicationFactory<Pr
             AppointmentStatus.Confirmed,
             AppointmentStatus.Completed,
             AppointmentStatus.Cancelled,
-            AppointmentStatus.Rejected
+            AppointmentStatus.Rejected,
+            AppointmentStatus.NoShow
         };
 
         var actor = new TransitionActor(admin.Id, "Admin");

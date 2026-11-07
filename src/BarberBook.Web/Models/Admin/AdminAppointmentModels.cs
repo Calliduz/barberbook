@@ -7,6 +7,32 @@ public class UpdateAppointmentStatusRequest
 {
     public string To { get; set; } = string.Empty;
     public string? Note { get; set; }
+    public string? PaymentMethod { get; set; } // Cash, GCash, Maya, Card
+    public List<AddOnProductItemDto>? AddOns { get; set; }
+}
+
+public class AddOnProductItemDto
+{
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class CreateWalkInAppointmentRequest
+{
+    public int BarberId { get; set; }
+    public int ServiceId { get; set; }
+    public int? BranchId { get; set; }
+    public string? ClientName { get; set; }
+    public string? ClientPhone { get; set; }
+    public string? StartsAt { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class BulkUpdateStatusRequest
+{
+    public List<int> AppointmentIds { get; set; } = new();
+    public string To { get; set; } = string.Empty;
+    public string? Note { get; set; }
 }
 
 public class AdminAppointmentListQuery
@@ -64,11 +90,20 @@ public class AdminAppointmentPagedResultDto
     public int TotalPages => PageSize > 0 ? (int)Math.Ceiling((double)TotalCount / PageSize) : 0;
 }
 
+public class AdminRetailProductDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public string FormattedPrice { get; set; } = string.Empty;
+}
+
 public class AdminAppointmentsViewModel
 {
     public List<PublicServiceDto> Services { get; set; } = new();
     public List<PublicBarberDto> Barbers { get; set; } = new();
     public List<AdminBranchItemDto> Branches { get; set; } = new();
+    public List<AdminRetailProductDto> Products { get; set; } = new();
     public string TodayDateString { get; set; } = string.Empty;
     public string InitialView { get; set; } = "list"; // list, day, week
     public string? InitialStatus { get; set; }

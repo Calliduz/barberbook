@@ -1,9 +1,12 @@
+using System.Globalization;
 using System.Security.Claims;
 using BarberBook.Data;
+using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Appointment;
+using BarberBook.Web.Models.Inventory;
 using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +23,21 @@ public class AdminAppointmentsApiController : ControllerBase
 {
     private readonly BarberBookDbContext _dbContext;
     private readonly IAppointmentTransitionService _transitionService;
+    private readonly IClock _clock;
+    private readonly IPurchaseSaleService _purchaseSaleService;
     private readonly DateTimeZone _zone;
 
     public AdminAppointmentsApiController(
         BarberBookDbContext dbContext,
         IAppointmentTransitionService transitionService,
+        IClock clock,
+        IPurchaseSaleService purchaseSaleService,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
         _transitionService = transitionService;
+        _clock = clock;
+        _purchaseSaleService = purchaseSaleService;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
 
@@ -203,10 +212,11 @@ public class AdminAppointmentsApiController : ControllerBase
             return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "The 'to' target status is required."));
         }
 
-        if (!Enum.TryParse<AppointmentStatus>(request.To, true, out var targetStatus))
+        var normalizedTo = request.To.Replace("-", "").Replace("_", "").Trim();
+        if (!Enum.TryParse<AppointmentStatus>(normalizedTo, true, out var targetStatus))
         {
             return BadRequest(new ApiErrorResponse("VALIDATION_ERROR",
-                $"Invalid status '{request.To}'. Allowed values: confirmed, rejected, completed, cancelled."));
+                $"Invalid status '{request.To}'. Allowed values: confirmed, rejected, completed, cancelled, noshow."));
         }
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -217,11 +227,20 @@ public class AdminAppointmentsApiController : ControllerBase
 
         var actor = new TransitionActor(adminUserId, "Admin");
 
+        var transitionNote = request.Note;
+        if (!string.IsNullOrWhiteSpace(request.PaymentMethod))
+        {
+            var pMethod = request.PaymentMethod.Trim();
+            transitionNote = string.IsNullOrWhiteSpace(transitionNote)
+                ? $"Settled via {pMethod}"
+                : $"[Payment: {pMethod}] {transitionNote.Trim()}";
+        }
+
         var result = await _transitionService.TransitionAsync(
             id,
             targetStatus,
             actor,
-            request.Note,
+            transitionNote,
             cancellationToken: cancellationToken);
 
         if (!result.Success)
@@ -230,6 +249,31 @@ public class AdminAppointmentsApiController : ControllerBase
         }
 
         var app = result.Appointment!;
+
+        // If completed and retail add-ons are specified, record counter product sale attached to this appointment
+        if (targetStatus == AppointmentStatus.Completed && request.AddOns != null && request.AddOns.Any())
+        {
+            try
+            {
+                var saleRequest = new CreateProductSaleRequest
+                {
+                    AppointmentId = app.Id,
+                    CustomerId = app.CustomerId,
+                    Notes = $"Add-on retail purchase at checkout (Appt #{app.ReferenceCode}, Settlement: {request.PaymentMethod ?? "Cash"})",
+                    Items = request.AddOns.Select(a => new CreateProductSaleItemRequest
+                    {
+                        ProductId = a.ProductId,
+                        Quantity = a.Quantity
+                    }).ToList()
+                };
+                await _purchaseSaleService.CreateProductSaleAsync(saleRequest, adminUserId, cancellationToken);
+            }
+            catch
+            {
+                // Non-blocking for status transition
+            }
+        }
+
         var startsAtManila = app.StartsAt.InZone(_zone);
         var endsAtManila = app.EndsAt.InZone(_zone);
 
@@ -261,13 +305,189 @@ public class AdminAppointmentsApiController : ControllerBase
         return Ok(dto);
     }
 
+    [HttpPost("bulk-status")]
+    public async Task<IActionResult> BulkUpdateStatus(
+        [FromBody] BulkUpdateStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.AppointmentIds == null || !request.AppointmentIds.Any())
+        {
+            return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "At least one appointment ID is required."));
+        }
+
+        var normalizedTo = request.To.Replace("-", "").Replace("_", "").Trim();
+        if (!Enum.TryParse<AppointmentStatus>(normalizedTo, true, out var targetStatus))
+        {
+            return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", $"Invalid status '{request.To}'. Allowed values: confirmed, rejected, completed, cancelled, noshow."));
+        }
+
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(userIdClaim, out var adminUserId);
+        var actor = new TransitionActor(adminUserId, "Admin");
+
+        int successCount = 0;
+        var errors = new List<string>();
+
+        foreach (var id in request.AppointmentIds)
+        {
+            var result = await _transitionService.TransitionAsync(
+                id,
+                targetStatus,
+                actor,
+                request.Note ?? $"Bulk updated to {targetStatus}",
+                cancellationToken: cancellationToken);
+
+            if (result.Success) successCount++;
+            else errors.Add($"ID {id}: {result.ErrorMessage}");
+        }
+
+        return Ok(new
+        {
+            successCount,
+            failedCount = request.AppointmentIds.Count - successCount,
+            errors
+        });
+    }
+
+    [HttpPost("walk-in")]
+    public async Task<IActionResult> CreateWalkIn(
+        [FromBody] CreateWalkInAppointmentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(userIdClaim, out var adminUserId);
+
+        var service = await _dbContext.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId, cancellationToken);
+        if (service == null || !service.IsActive)
+        {
+            return BadRequest(new ApiErrorResponse("INVALID_SERVICE", "Selected service is invalid or inactive."));
+        }
+
+        var barber = await _dbContext.Barbers
+            .Include(b => b.User)
+            .FirstOrDefaultAsync(b => b.Id == request.BarberId, cancellationToken);
+        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        {
+            return BadRequest(new ApiErrorResponse("INVALID_BARBER", "Selected barber is invalid or inactive."));
+        }
+
+        var now = _clock.GetCurrentInstant();
+        Instant startsAtInstant;
+        if (!string.IsNullOrWhiteSpace(request.StartsAt))
+        {
+            var parseResult = InstantPattern.ExtendedIso.Parse(request.StartsAt);
+            if (parseResult.Success)
+            {
+                startsAtInstant = parseResult.Value;
+            }
+            else if (DateTimeOffset.TryParse(request.StartsAt, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
+            {
+                startsAtInstant = Instant.FromDateTimeOffset(dto);
+            }
+            else
+            {
+                var nowManila = now.InZone(_zone);
+                int minute = (nowManila.Minute / 30) * 30;
+                var alignedLocal = new LocalDateTime(nowManila.Year, nowManila.Month, nowManila.Day, nowManila.Hour, minute, 0);
+                startsAtInstant = alignedLocal.InZoneLeniently(_zone).ToInstant();
+            }
+        }
+        else
+        {
+            var nowManila = now.InZone(_zone);
+            int minute = (nowManila.Minute / 30) * 30;
+            var alignedLocal = new LocalDateTime(nowManila.Year, nowManila.Month, nowManila.Day, nowManila.Hour, minute, 0);
+            startsAtInstant = alignedLocal.InZoneLeniently(_zone).ToInstant();
+        }
+
+        var endsAtInstant = startsAtInstant.Plus(Duration.FromMinutes(service.DurationMinutes));
+
+        var clientName = string.IsNullOrWhiteSpace(request.ClientName) ? "Walk-In Customer" : request.ClientName.Trim();
+        var clientPhone = string.IsNullOrWhiteSpace(request.ClientPhone) ? "09000000000" : request.ClientPhone.Trim();
+
+        var customer = await _dbContext.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Customer && u.PhoneNumber == clientPhone, cancellationToken);
+        if (customer == null)
+        {
+            var randSuffix = Guid.NewGuid().ToString("N")[..6];
+            customer = new ApplicationUser
+            {
+                UserName = $"walkin_{randSuffix}@barberbook.local",
+                Email = $"walkin_{randSuffix}@barberbook.local",
+                FullName = clientName,
+                PhoneNumber = clientPhone,
+                Role = UserRole.Customer,
+                IsActive = true,
+                CreatedAt = now
+            };
+            _dbContext.Users.Add(customer);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        var datePrefix = startsAtInstant.InZone(_zone).ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        var prefix = $"BB-{datePrefix}-";
+        var countToday = await _dbContext.Appointments.CountAsync(a => a.ReferenceCode.StartsWith(prefix), cancellationToken);
+        int seq = countToday + 1;
+        string refCode;
+        do
+        {
+            refCode = $"{prefix}{seq:D4}";
+            seq++;
+        } while (await _dbContext.Appointments.AnyAsync(a => a.ReferenceCode == refCode, cancellationToken));
+
+        var appointment = new Appointment
+        {
+            ReferenceCode = refCode,
+            CustomerId = customer.Id,
+            BarberId = barber.Id,
+            BranchId = request.BranchId ?? barber.BranchId,
+            ServiceId = service.Id,
+            StartsAt = startsAtInstant,
+            EndsAt = endsAtInstant,
+            Status = AppointmentStatus.Confirmed,
+            Price = service.Price,
+            ServiceName = service.Name,
+            Notes = string.IsNullOrWhiteSpace(request.Notes) ? "Express Walk-In Booking" : request.Notes.Trim(),
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        _dbContext.Appointments.Add(appointment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _dbContext.StatusHistories.Add(new StatusHistory
+        {
+            AppointmentId = appointment.Id,
+            FromStatus = null,
+            ToStatus = AppointmentStatus.Confirmed,
+            ChangedById = adminUserId,
+            ChangedByRole = "Admin",
+            Note = "Express walk-in booking created and confirmed by front desk staff",
+            ChangedAt = now
+        });
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(new
+        {
+            id = appointment.Id,
+            referenceCode = appointment.ReferenceCode,
+            customerName = customer.FullName,
+            barberName = barber.DisplayName,
+            serviceName = service.Name,
+            price = appointment.Price,
+            formattedPrice = FormattingHelpers.FormatPeso(appointment.Price),
+            status = "confirmed",
+            startsAt = appointment.StartsAt.ToString()
+        });
+    }
+
     private static string GetStatusDisplay(AppointmentStatus status) => status switch
     {
-        AppointmentStatus.Pending => "Pending — awaiting confirmation by the shop",
+        AppointmentStatus.Pending => "Pending",
         AppointmentStatus.Confirmed => "Confirmed",
         AppointmentStatus.Completed => "Completed",
         AppointmentStatus.Cancelled => "Cancelled",
         AppointmentStatus.Rejected => "Rejected",
+        AppointmentStatus.NoShow => "No-Show",
         _ => status.ToString()
     };
 }

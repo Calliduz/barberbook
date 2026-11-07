@@ -10,7 +10,14 @@
             <h1 class="text-2xl font-bold tracking-tight text-slate-900">Bookings Management</h1>
             <p class="mt-1 text-sm text-slate-500">Review, confirm, reject, complete, or cancel shop appointments across all barbers.</p>
         </div>
-        <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+        <div class="mt-4 sm:mt-0 flex items-center space-x-2.5">
+            <button type="button" onclick="openWalkInModal()" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm transition">
+                <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                + Quick Walk-In
+            </button>
+
             <!-- View Switcher -->
             <div class="inline-flex rounded-lg border border-slate-300 bg-white p-1 shadow-sm">
                 <button type="button" id="viewBtnList" onclick="switchView('list')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition text-slate-700 hover:text-slate-900">
@@ -51,6 +58,9 @@
                 <button type="button" onclick="setQuickStatus('completed')" id="statusPillCompleted" class="status-pill px-3 py-1.5 rounded-full text-xs font-semibold border transition bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100">
                     Completed
                 </button>
+                <button type="button" onclick="setQuickStatus('noshow')" id="statusPillNoShow" class="status-pill px-3 py-1.5 rounded-full text-xs font-semibold border transition bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100">
+                    No-Show
+                </button>
                 <button type="button" onclick="setQuickStatus('cancelled')" id="statusPillCancelled" class="status-pill px-3 py-1.5 rounded-full text-xs font-semibold border transition bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100">
                     Cancelled
                 </button>
@@ -67,6 +77,7 @@
                     <option value="pending">Pending (Needs Action)</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="completed">Completed</option>
+                    <option value="noshow">No-Show</option>
                     <option value="cancelled">Cancelled</option>
                     <option value="rejected">Rejected</option>
                 </select>
@@ -128,6 +139,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- 1-Click Date Presets -->
+        <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100 flex-wrap text-xs">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Date Presets:</span>
+            <button type="button" onclick="setDatePreset('today')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
+            <button type="button" onclick="setDatePreset('tomorrow')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Tomorrow</button>
+            <button type="button" onclick="setDatePreset('this_week')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">This Week</button>
+            <button type="button" onclick="setDatePreset('this_month')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">This Month</button>
+            <button type="button" onclick="setDatePreset('clear')" class="px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-slate-600 transition">Clear Dates</button>
+        </div>
+    </div>
     </div>
 
     <!-- 1. LIST VIEW CONTAINER -->
@@ -137,14 +159,14 @@
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold">
                     <tr>
-                        <th scope="col" class="px-6 py-3.5 text-left">Reference</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Customer</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Barber</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Service</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Date & Time</th>
-                        <th scope="col" class="px-6 py-3.5 text-right">Price</th>
-                        <th scope="col" class="px-6 py-3.5 text-center">Status</th>
-                        <th scope="col" class="px-6 py-3.5 text-right">Actions</th>
+                        <th scope="col" class="px-4 py-3.5 text-left">Reference</th>
+                        <th scope="col" class="px-4 py-3.5 text-left">Customer</th>
+                        <th scope="col" class="px-4 py-3.5 text-left">Barber</th>
+                        <th scope="col" class="px-4 py-3.5 text-left">Service</th>
+                        <th scope="col" class="px-4 py-3.5 text-left">Date & Time</th>
+                        <th scope="col" class="px-4 py-3.5 text-right">Price</th>
+                        <th scope="col" class="px-4 py-3.5 text-center">Status</th>
+                        <th scope="col" class="px-4 py-3.5 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="appointmentTableBody" class="divide-y divide-slate-200 bg-white">
@@ -242,7 +264,7 @@
     </div>
 </div>
 
-<!-- STATUS ACTION MODAL (Confirm / Reject / Complete / Cancel) -->
+<!-- STATUS ACTION MODAL (Confirm / Reject / Complete / Cancel / NoShow) -->
 <div id="statusActionModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -274,10 +296,179 @@
     </div>
 </div>
 
+<!-- EXPRESS WALK-IN BOOKING MODAL -->
+<div id="walkInModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+            <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <h3 class="font-bold text-base">Express Walk-In Booking</h3>
+            </div>
+            <button type="button" onclick="closeWalkInModal()" class="text-slate-400 hover:text-white">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <form id="walkInForm" onsubmit="submitWalkIn(event)" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="walkInBranch" class="block text-xs font-semibold text-slate-700 mb-1">Branch Station <span class="text-rose-500">*</span></label>
+                    <select id="walkInBranch" required class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500">
+                        @foreach (var br in Model.Branches)
+                        {
+                            <option value="@br.Id">@br.Name</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="walkInBarber" class="block text-xs font-semibold text-slate-700 mb-1">Assigned Barber <span class="text-rose-500">*</span></label>
+                    <select id="walkInBarber" required class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500">
+                        @foreach (var b in Model.Barbers)
+                        {
+                            <option value="@b.Id">@b.DisplayName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="walkInService" class="block text-xs font-semibold text-slate-700 mb-1">Service <span class="text-rose-500">*</span></label>
+                <select id="walkInService" required class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500">
+                    @foreach (var s in Model.Services)
+                    {
+                        <option value="@s.Id">@s.Name (@s.FormattedPrice - @s.DurationMinutes mins)</option>
+                    }
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="walkInCustomerName" class="block text-xs font-semibold text-slate-700 mb-1">Client Name <span class="text-rose-500">*</span></label>
+                    <input type="text" id="walkInCustomerName" required placeholder="e.g. John Doe / Walk-in Guest" value="Walk-in Guest" class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label for="walkInCustomerPhone" class="block text-xs font-semibold text-slate-700 mb-1">Phone Number (Optional)</label>
+                    <input type="text" id="walkInCustomerPhone" placeholder="0917XXXXXXX" class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="walkInDate" class="block text-xs font-semibold text-slate-700 mb-1">Date <span class="text-rose-500">*</span></label>
+                    <input type="date" id="walkInDate" required class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                </div>
+                <div>
+                    <label for="walkInTime" class="block text-xs font-semibold text-slate-700 mb-1">Start Time <span class="text-rose-500">*</span></label>
+                    <input type="time" id="walkInTime" required class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                </div>
+            </div>
+
+            <div>
+                <label for="walkInNotes" class="block text-xs font-semibold text-slate-700 mb-1">Notes / Requests</label>
+                <input type="text" id="walkInNotes" placeholder="e.g. Quick fade, beard trim" class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+            </div>
+
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>Express walk-ins are immediately saved and confirmed without requiring a pre-registered account.</span>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+                <button type="button" onclick="closeWalkInModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="submit" id="walkInSubmitBtn" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 shadow-sm transition">Create & Lock Slot</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- CHECKOUT & SETTLEMENT MODAL -->
+<div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+            <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <h3 class="font-bold text-base">Complete Appointment & Checkout</h3>
+            </div>
+            <button type="button" onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <form id="checkoutForm" onsubmit="submitCheckout(event)" class="p-6 space-y-4">
+            <input type="hidden" id="checkoutAppId" />
+
+            <!-- Summary Card -->
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]" id="checkoutRefCode">REF</span>
+                    <span class="font-bold text-slate-900 text-sm" id="checkoutServicePrice">₱0.00</span>
+                </div>
+                <div class="font-bold text-slate-900 text-sm" id="checkoutCustomerAndService">Customer & Service</div>
+                <div class="text-slate-500" id="checkoutBarberAndSchedule">Barber & Schedule</div>
+            </div>
+
+            <!-- Payment Method -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-2">Counter Payment Method <span class="text-rose-500">*</span></label>
+                <div class="grid grid-cols-4 gap-2">
+                    <label class="cursor-pointer border rounded-xl p-2.5 text-center flex flex-col items-center justify-center space-y-1 transition border-amber-500 bg-amber-50 text-slate-900 payment-method-opt" data-method="Cash">
+                        <input type="radio" name="checkoutPaymentMethod" value="Cash" checked class="sr-only" onchange="selectPaymentMethod('Cash')" />
+                        <span class="text-xs font-bold">💵 Cash</span>
+                    </label>
+                    <label class="cursor-pointer border rounded-xl p-2.5 text-center flex flex-col items-center justify-center space-y-1 transition border-slate-200 bg-white text-slate-700 hover:bg-slate-50 payment-method-opt" data-method="GCash">
+                        <input type="radio" name="checkoutPaymentMethod" value="GCash" class="sr-only" onchange="selectPaymentMethod('GCash')" />
+                        <span class="text-xs font-bold text-blue-600">📱 GCash</span>
+                    </label>
+                    <label class="cursor-pointer border rounded-xl p-2.5 text-center flex flex-col items-center justify-center space-y-1 transition border-slate-200 bg-white text-slate-700 hover:bg-slate-50 payment-method-opt" data-method="Maya">
+                        <input type="radio" name="checkoutPaymentMethod" value="Maya" class="sr-only" onchange="selectPaymentMethod('Maya')" />
+                        <span class="text-xs font-bold text-emerald-600">💳 Maya</span>
+                    </label>
+                    <label class="cursor-pointer border rounded-xl p-2.5 text-center flex flex-col items-center justify-center space-y-1 transition border-slate-200 bg-white text-slate-700 hover:bg-slate-50 payment-method-opt" data-method="Card">
+                        <input type="radio" name="checkoutPaymentMethod" value="Card" class="sr-only" onchange="selectPaymentMethod('Card')" />
+                        <span class="text-xs font-bold text-indigo-600">💳 Card</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Retail Add-Ons -->
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-700">Retail Add-Ons (Optional)</label>
+                    <button type="button" onclick="addCheckoutProductRow()" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition">+ Add Product</button>
+                </div>
+                <div id="checkoutAddOnsList" class="space-y-2 max-h-36 overflow-y-auto">
+                    <!-- Dynamic Product Add-On Rows -->
+                </div>
+            </div>
+
+            <!-- Settlement Grand Total -->
+            <div class="p-3 rounded-xl bg-slate-900 text-white flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Total Amount Settled</span>
+                    <span class="text-xs text-slate-300" id="checkoutBreakdownText">Service only</span>
+                </div>
+                <div class="text-xl font-mono font-bold text-amber-400" id="checkoutGrandTotal">₱0.00</div>
+            </div>
+
+            <div>
+                <label for="checkoutNote" class="block text-xs font-semibold text-slate-700 mb-1">Settlement Note (Optional)</label>
+                <input type="text" id="checkoutNote" placeholder="e.g. Paid exact amount / Bought pomade" class="w-full rounded-lg border-slate-300 py-1.5 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+                <button type="button" onclick="closeCheckoutModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="submit" id="checkoutSubmitBtn" class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-sm transition">Settle & Mark Completed</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     const INITIAL_VIEW = '@Model.InitialView';
     const INITIAL_STATUS = '@Model.InitialStatus';
     const TODAY_DATE = '@Model.TodayDateString';
+    const RETAIL_PRODUCTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products));
+    const ALL_BARBERS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Barbers));
 
     let currentView = INITIAL_VIEW || 'list';
     let currentStatus = INITIAL_STATUS || '';
@@ -285,6 +476,7 @@
     let pageSize = 15;
     let cachedAppointments = [];
     let currentSelectedApp = null;
+    let currentCheckoutProductRows = [];
 
     let selectedDay = TODAY_DATE;
     let selectedWeekStart = getMonday(new Date(TODAY_DATE));
@@ -328,22 +520,25 @@
 
         if (!status) {
             let el = document.getElementById('statusPillAll');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         } else if (status === 'pending') {
             let el = document.getElementById('statusPillPending');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         } else if (status === 'confirmed') {
             let el = document.getElementById('statusPillConfirmed');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         } else if (status === 'completed') {
             let el = document.getElementById('statusPillCompleted');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+        } else if (status === 'noshow' || status === 'no_show') {
+            let el = document.getElementById('statusPillNoShow');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         } else if (status === 'cancelled') {
             let el = document.getElementById('statusPillCancelled');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         } else if (status === 'rejected') {
             let el = document.getElementById('statusPillRejected');
-            el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            if (el) el.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
         }
 
         currentPage = 1;
@@ -393,6 +588,38 @@
         } else if (currentView === 'week') {
             renderWeekView();
         }
+    }
+
+    function setDatePreset(preset) {
+        const today = new Date(TODAY_DATE + 'T00:00:00');
+        let start = '';
+        let end = '';
+        if (preset === 'today') {
+            start = TODAY_DATE;
+            end = TODAY_DATE;
+        } else if (preset === 'tomorrow') {
+            const tom = new Date(today);
+            tom.setDate(tom.getDate() + 1);
+            start = formatDateYMD(tom);
+            end = formatDateYMD(tom);
+        } else if (preset === 'this_week') {
+            const mon = getMonday(today);
+            const sun = new Date(mon);
+            sun.setDate(sun.getDate() + 6);
+            start = formatDateYMD(mon);
+            end = formatDateYMD(sun);
+        } else if (preset === 'this_month') {
+            const first = new Date(today.getFullYear(), today.getMonth(), 1);
+            const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            start = formatDateYMD(first);
+            end = formatDateYMD(last);
+        } else if (preset === 'clear') {
+            start = '';
+            end = '';
+        }
+        document.getElementById('filterStartDate').value = start;
+        document.getElementById('filterEndDate').value = end;
+        applyFilters();
     }
 
     async function loadAppointments() {
@@ -460,30 +687,30 @@
         let cardHtml = '';
         items.forEach(app => {
             const badge = getStatusBadgeHtml(app.status, app.statusDisplay);
-            html += `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="openDrawer(${app.id})">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-brand-700">
+            html += `<tr class="hover:bg-slate-50/80 transition cursor-pointer" onclick="openDrawer(${app.id})">
+                <td class="px-4 py-3 whitespace-nowrap font-mono text-xs font-bold text-amber-700">
                     <div>${app.referenceCode}</div>
-                    ${app.branchName ? `<div class="text-[10px] text-slate-400 font-sans font-normal">${escapeHtml(app.branchName)}</div>` : ''}
+                    ${app.branchName ? `<div class="text-[10px] text-slate-400 font-sans font-normal truncate max-w-[130px]">${escapeHtml(app.branchName)}</div>` : ''}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-slate-900">${escapeHtml(app.customerName)}</div>
-                    <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="font-medium text-slate-900 text-sm">${escapeHtml(app.customerName)}</div>
+                    <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail || '—')}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700 font-medium">${escapeHtml(app.barberName)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700">
-                    <div>${escapeHtml(app.serviceName)}</div>
-                    <div class="text-xs text-slate-400">${app.durationMinutes} mins</div>
+                <td class="px-4 py-3 whitespace-nowrap text-slate-700 font-medium text-xs sm:text-sm">${escapeHtml(app.barberName)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-slate-700 text-xs sm:text-sm">
+                    <div class="font-medium">${escapeHtml(app.serviceName)}</div>
+                    <div class="text-[11px] text-slate-400">${app.durationMinutes} mins</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-4 py-3 whitespace-nowrap text-xs sm:text-sm">
                     <div class="font-medium text-slate-900">${app.formattedDate}</div>
-                    <div class="text-xs text-slate-500">${app.formattedTime}</div>
+                    <div class="text-[11px] text-slate-500 font-mono">${app.formattedTime}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-slate-900">${app.formattedPrice}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">${badge}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-xs" onclick="event.stopPropagation()">
-                    <button type="button" onclick="openDrawer(${app.id})" class="text-brand-600 hover:text-brand-800 font-semibold px-2 py-1 rounded bg-brand-50 hover:bg-brand-100">
-                        View
-                    </button>
+                <td class="px-4 py-3 whitespace-nowrap text-right font-semibold text-slate-900 text-xs sm:text-sm">${app.formattedPrice}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">${badge}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-xs" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-end gap-1">
+                        ${renderInlineRowActions(app)}
+                    </div>
                 </td>
             </tr>`;
 
@@ -492,11 +719,11 @@
                 <div class="flex items-start justify-between gap-2">
                     <div>
                         <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="font-mono text-xs font-bold text-brand-700">${app.referenceCode}</span>
+                            <span class="font-mono text-xs font-bold text-amber-700">${app.referenceCode}</span>
                             ${app.branchName ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">${escapeHtml(app.branchName)}</span>` : ''}
                         </div>
                         <div class="font-bold text-slate-900 text-sm mt-0.5">${escapeHtml(app.customerName)}</div>
-                        <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
+                        <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail || '—')}</div>
                     </div>
                     <div class="shrink-0">
                         ${badge}
@@ -518,9 +745,9 @@
 
                 <div class="flex items-center justify-between pt-1">
                     <span class="text-sm font-bold text-slate-900">${app.formattedPrice}</span>
-                    <button type="button" onclick="event.stopPropagation(); openDrawer(${app.id})" class="text-brand-600 hover:text-brand-800 font-bold text-xs px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 transition">
-                        View Dossier &rarr;
-                    </button>
+                    <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                        ${renderInlineRowActions(app)}
+                    </div>
                 </div>
             </div>`;
         });
@@ -536,6 +763,37 @@
         document.getElementById('nextPageBtn').disabled = endItem >= totalCount;
     }
 
+    function renderInlineRowActions(app) {
+        const status = (app.status || '').toLowerCase();
+        let html = '';
+        if (status === 'pending') {
+            html += `
+                <button type="button" onclick="openActionModal(${app.id}, 'confirmed')" title="Confirm Booking" class="p-1.5 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </button>
+                <button type="button" onclick="openActionModal(${app.id}, 'rejected')" title="Reject Booking" class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            `;
+        } else if (status === 'confirmed') {
+            html += `
+                <button type="button" onclick="openCheckoutModal(${app.id})" title="Settle & Complete Checkout" class="px-2 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Checkout
+                </button>
+                <button type="button" onclick="openActionModal(${app.id}, 'noshow')" title="Mark as No-Show" class="p-1.5 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </button>
+            `;
+        }
+        html += `
+            <button type="button" onclick="openDrawer(${app.id})" title="View Details" class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+        `;
+        return html;
+    }
+
     function changePage(delta) {
         currentPage += delta;
         loadAppointments();
@@ -543,17 +801,23 @@
 
     function getStatusBadgeHtml(status, label) {
         status = (status || '').toLowerCase();
-        let bg = 'bg-slate-100 text-slate-800 border-slate-300';
-        if (status === 'pending') bg = 'bg-amber-100 text-amber-800 border-amber-300';
-        else if (status === 'confirmed') bg = 'bg-sky-100 text-sky-800 border-sky-300';
-        else if (status === 'completed') bg = 'bg-emerald-100 text-emerald-800 border-emerald-300';
-        else if (status === 'cancelled') bg = 'bg-slate-100 text-slate-800 border-slate-300';
-        else if (status === 'rejected') bg = 'bg-rose-100 text-rose-800 border-rose-300';
-
-        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${bg}">${label || status}</span>`;
+        if (status === 'pending') {
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-50 text-amber-800 border-amber-300"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>Pending</span>`;
+        } else if (status === 'confirmed') {
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-sky-50 text-sky-800 border-sky-300"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Confirmed</span>`;
+        } else if (status === 'completed') {
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-emerald-50 text-emerald-800 border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Completed</span>`;
+        } else if (status === 'noshow' || status === 'no_show') {
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-purple-50 text-purple-800 border-purple-300">No-Show</span>`;
+        } else if (status === 'cancelled') {
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-slate-100 text-slate-700 border-slate-300">Cancelled</span>`;
+        } else if (status === 'rejected') {
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-rose-50 text-rose-800 border-rose-300">Rejected</span>`;
+        }
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-slate-100 text-slate-800 border-slate-300">${label || status}</span>`;
     }
 
-    // DAY CALENDAR VIEW
+    // DAY CALENDAR VIEW (Interactive Visual Time-Slot Grid)
     async function renderDayView() {
         selectedDay = document.getElementById('selectedCalendarDay').value || TODAY_DATE;
         const dateObj = new Date(selectedDay + 'T00:00:00');
@@ -561,9 +825,9 @@
         document.getElementById('dayViewTitle').innerText = dateObj.toLocaleDateString('en-US', options);
 
         const container = document.getElementById('dayGridContent');
-        container.innerHTML = `<div class="py-12 text-center text-slate-500"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-300 border-t-brand-600"></div><p class="mt-2 text-sm">Loading day schedule...</p></div>`;
+        container.innerHTML = `<div class="py-12 text-center text-slate-500"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-300 border-t-brand-600"></div><p class="mt-2 text-sm">Loading day schedule grid...</p></div>`;
 
-        let url = `/api/admin/appointments?startDate=${selectedDay}&endDate=${selectedDay}&pageSize=100`;
+        let url = `/api/admin/appointments?startDate=${selectedDay}&endDate=${selectedDay}&pageSize=200`;
         const barberId = document.getElementById('filterBarber').value;
         if (barberId) url += `&barberId=${barberId}`;
         const serviceId = document.getElementById('filterService').value;
@@ -577,49 +841,84 @@
             const items = data.items || [];
             cachedAppointments = items;
 
-            if (items.length === 0) {
-                container.innerHTML = `<div class="py-12 text-center text-slate-500">
-                    <p class="text-base font-semibold text-slate-700">No appointments scheduled for this day</p>
-                    <p class="text-xs text-slate-400 mt-1">Select another day or adjust your filters.</p>
-                </div>`;
+            // Determine active barbers list
+            let barbersToShow = ALL_BARBERS;
+            if (barberId) {
+                barbersToShow = ALL_BARBERS.filter(b => b.Id == barberId);
+            }
+            if (!barbersToShow || barbersToShow.length === 0) {
+                const uniqueBarberNames = [...new Set(items.map(a => a.barberName))];
+                barbersToShow = uniqueBarberNames.map((name, idx) => ({ Id: idx + 1, DisplayName: name }));
+            }
+
+            if (barbersToShow.length === 0) {
+                container.innerHTML = `<div class="py-12 text-center text-slate-500"><p class="text-base font-semibold text-slate-700">No active barbers configured</p></div>`;
                 return;
             }
 
-            // Group by Barber
-            const barbersMap = {};
-            items.forEach(a => {
-                if (!barbersMap[a.barberName]) barbersMap[a.barberName] = [];
-                barbersMap[a.barberName].push(a);
+            // 30-minute time intervals from 09:00 to 19:00
+            const TIME_SLOTS = [
+                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+                '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+                '18:00', '18:30', '19:00'
+            ];
+
+            let html = `<div class="overflow-x-auto"><table class="w-full border-collapse border border-slate-200 min-w-[700px]">`;
+            
+            // Header Row (Barbers)
+            html += `<thead class="bg-slate-50 sticky top-0 z-10"><tr>
+                <th class="w-20 p-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center border-b border-r border-slate-200">Time</th>`;
+            barbersToShow.forEach(b => {
+                html += `<th class="p-3 text-xs font-bold text-slate-800 text-left border-b border-r border-slate-200">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold">${b.DisplayName.charAt(0)}</div>
+                        <span>${escapeHtml(b.DisplayName)}</span>
+                    </div>
+                </th>`;
+            });
+            html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
+
+            // Time Slot Rows
+            TIME_SLOTS.forEach(slot => {
+                html += `<tr><td class="p-2 text-center font-mono text-xs text-slate-500 font-semibold bg-slate-50/60 border-r border-slate-200 whitespace-nowrap">${slot}</td>`;
+                
+                barbersToShow.forEach(barber => {
+                    // Match appointments for this barber and time slot
+                    const app = items.find(a => 
+                        (a.barberName === barber.DisplayName || a.barberId === barber.Id) &&
+                        (a.scheduledTimeString.startsWith(slot) || a.scheduledTimeString === slot)
+                    );
+
+                    html += `<td class="p-1.5 border-r border-slate-200 align-top min-w-[170px] max-w-[240px]">`;
+                    if (app) {
+                        const status = (app.status || '').toLowerCase();
+                        let borderClass = 'border-amber-300 bg-amber-50/70 hover:bg-amber-100/60';
+                        if (status === 'confirmed') borderClass = 'border-sky-300 bg-sky-50/70 hover:bg-sky-100/60';
+                        else if (status === 'completed') borderClass = 'border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100/60';
+                        else if (status === 'noshow') borderClass = 'border-purple-300 bg-purple-50/70 hover:bg-purple-100/60';
+                        else if (status === 'cancelled' || status === 'rejected') borderClass = 'border-slate-200 bg-slate-100/80 opacity-60';
+
+                        html += `<div onclick="openDrawer(${app.id})" class="p-2 rounded-lg border ${borderClass} transition cursor-pointer shadow-xs text-xs space-y-1">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="font-mono text-[10px] font-bold text-slate-700">${app.referenceCode}</span>
+                                ${getStatusBadgeHtml(app.status, app.status.substring(0,4).toUpperCase())}
+                            </div>
+                            <div class="font-bold text-slate-900 truncate">${escapeHtml(app.customerName)}</div>
+                            <div class="text-[11px] text-slate-600 truncate">${escapeHtml(app.serviceName)} (${app.durationMinutes}m)</div>
+                            <div class="text-[11px] font-semibold text-slate-900">${app.formattedPrice}</div>
+                        </div>`;
+                    } else {
+                        html += `<div onclick="openWalkInModal(${barber.Id}, '${slot}')" class="h-12 rounded-lg border border-dashed border-transparent hover:border-amber-300 hover:bg-amber-50/40 flex items-center justify-center text-slate-300 hover:text-amber-700 transition cursor-pointer group">
+                            <span class="text-[11px] font-semibold opacity-0 group-hover:opacity-100">+ Walk-in</span>
+                        </div>`;
+                    }
+                    html += `</td>`;
+                });
+                html += `</tr>`;
             });
 
-            let html = `<div class="grid grid-cols-1 md:grid-cols-${Math.min(Object.keys(barbersMap).length, 3)} gap-6">`;
-            for (const [barber, appList] of Object.entries(barbersMap)) {
-                html += `<div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex flex-col">
-                    <div class="font-bold text-slate-900 border-b border-slate-200 pb-2 mb-3 flex items-center justify-between">
-                        <span>${escapeHtml(barber)}</span>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">${appList.length}</span>
-                    </div>
-                    <div class="space-y-3 flex-1 overflow-y-auto max-h-[500px]">`;
-                
-                appList.sort((x, y) => x.scheduledTimeString.localeCompare(y.scheduledTimeString)).forEach(app => {
-                    const badge = getStatusBadgeHtml(app.status, app.status.toUpperCase());
-                    html += `<div onclick="openDrawer(${app.id})" class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm hover:border-brand-500 transition cursor-pointer">
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-mono font-bold text-brand-700">${app.referenceCode}</span>
-                            <span>${badge}</span>
-                        </div>
-                        <div class="font-semibold text-sm text-slate-800">${escapeHtml(app.customerName)}</div>
-                        <div class="text-xs text-slate-500">${escapeHtml(app.serviceName)} (${app.formattedPrice})</div>
-                        <div class="mt-2 text-xs font-medium text-slate-600 flex items-center">
-                            <svg class="h-3.5 w-3.5 mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            ${app.formattedTime}
-                        </div>
-                    </div>`;
-                });
-
-                html += `</div></div>`;
-            }
-            html += `</div>`;
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         } catch (err) {
             container.innerHTML = `<div class="py-8 text-center text-rose-600 font-medium">${err.message}</div>`;
@@ -684,8 +983,8 @@
                 const dayApps = items.filter(a => a.scheduledDateString === day.dateStr);
                 const isToday = day.dateStr === TODAY_DATE;
 
-                html += `<div class="border rounded-xl p-3 flex flex-col ${isToday ? 'border-brand-500 bg-brand-50/20' : 'border-slate-200 bg-slate-50'}">
-                    <div class="border-b pb-2 mb-2 text-center ${isToday ? 'border-brand-300 font-bold text-brand-900' : 'border-slate-200 font-semibold text-slate-800'}">
+                html += `<div class="border rounded-xl p-3 flex flex-col ${isToday ? 'border-amber-500 bg-amber-50/20' : 'border-slate-200 bg-slate-50'}">
+                    <div class="border-b pb-2 mb-2 text-center ${isToday ? 'border-amber-300 font-bold text-amber-900' : 'border-slate-200 font-semibold text-slate-800'}">
                         <div class="text-xs uppercase">${day.dayName}</div>
                         <div class="text-sm">${day.displayDate}</div>
                         <div class="text-[10px] text-slate-500 mt-0.5">${dayApps.length} bookings</div>
@@ -697,9 +996,9 @@
                 } else {
                     dayApps.sort((a,b) => a.scheduledTimeString.localeCompare(b.scheduledTimeString)).forEach(app => {
                         const badge = getStatusBadgeHtml(app.status, app.status.substring(0,4).toUpperCase());
-                        html += `<div onclick="openDrawer(${app.id})" class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm hover:border-brand-500 cursor-pointer text-xs">
+                        html += `<div onclick="openDrawer(${app.id})" class="p-2 bg-white rounded-lg border border-slate-200 shadow-sm hover:border-amber-500 cursor-pointer text-xs">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="font-mono text-[10px] font-bold text-brand-700">${app.referenceCode}</span>
+                                <span class="font-mono text-[10px] font-bold text-amber-700">${app.referenceCode}</span>
                                 <span>${badge}</span>
                             </div>
                             <div class="font-bold text-slate-900 truncate">${escapeHtml(app.customerName)}</div>
@@ -748,7 +1047,7 @@
         if (app.timeline && app.timeline.length > 0) {
             app.timeline.forEach(t => {
                 timelineHtml += `<div class="relative pl-6 pb-2 border-l-2 border-slate-200 last:border-transparent">
-                    <span class="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-brand-500 ring-4 ring-white"></span>
+                    <span class="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-amber-500 ring-4 ring-white"></span>
                     <div class="text-xs font-semibold text-slate-800 flex items-center justify-between">
                         <span>${t.toStatus ? t.toStatus.toUpperCase() : 'EVENT'} <span class="text-slate-400 font-normal">by ${escapeHtml(t.changedByRole)}</span></span>
                         <span class="text-[10px] text-slate-500">${t.formattedChangedAt || ''}</span>
@@ -764,7 +1063,7 @@
         content.innerHTML = `
             <div class="border-b border-slate-200 pb-4">
                 <div class="flex items-center justify-between">
-                    <span class="font-mono text-sm font-bold text-brand-700">${app.referenceCode}</span>
+                    <span class="font-mono text-sm font-bold text-amber-700">${app.referenceCode}</span>
                     <span>${badge}</span>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 mt-1">${escapeHtml(app.serviceName)}</h3>
@@ -834,8 +1133,12 @@
             `;
         } else if (status === 'confirmed') {
             buttons = `
-                <button type="button" onclick="openActionModal(${app.id}, 'completed')" class="px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-sm">
-                    Mark as Completed
+                <button type="button" onclick="openCheckoutModal(${app.id})" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Settle & Checkout
+                </button>
+                <button type="button" onclick="openActionModal(${app.id}, 'noshow')" class="px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-sm">
+                    Mark as No-Show
                 </button>
                 <button type="button" onclick="openActionModal(${app.id}, 'cancelled')" class="px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-rose-700 font-semibold text-xs shadow-sm">
                     Cancel Booking
@@ -887,8 +1190,13 @@
         } else if (targetStatus === 'completed') {
             title.innerText = 'Complete Appointment';
             desc.innerText = 'Confirm that the service has been rendered in the shop. This will be recorded into transaction reports.';
-            btn.classList.add('bg-brand-600', 'hover:bg-brand-500');
+            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
             btn.innerText = 'Complete Appointment';
+        } else if (targetStatus === 'noshow' || targetStatus === 'no_show') {
+            title.innerText = 'Mark Appointment as No-Show';
+            desc.innerText = 'Are you sure you want to mark this client as a No-Show? The time slot will be released and their profile will record this incident.';
+            btn.classList.add('bg-purple-600', 'hover:bg-purple-500');
+            btn.innerText = 'Mark as No-Show';
         } else if (targetStatus === 'cancelled') {
             title.innerText = 'Cancel Appointment';
             desc.innerText = 'Please state the reason for cancellation. The slot will be released for other bookings.';
@@ -909,7 +1217,6 @@
         const targetStatus = document.getElementById('modalTargetStatus').value;
         const note = document.getElementById('modalNote').value.trim();
 
-        // Check if note is required for reject / cancel
         if ((targetStatus === 'rejected' || targetStatus === 'cancelled') && !note) {
             document.getElementById('modalNoteError').classList.remove('hidden');
             return;
@@ -931,12 +1238,238 @@
             closeActionModal();
             closeDrawer();
 
-            // Refresh current view
             if (currentView === 'list') loadAppointments();
             else if (currentView === 'day') renderDayView();
             else if (currentView === 'week') renderWeekView();
         } catch (err) {
             alert('Request failed: ' + err.message);
+        }
+    }
+
+    // EXPRESS WALK-IN MODAL HANDLERS
+    function openWalkInModal(prefillBarberId, prefillTime) {
+        const now = new Date();
+        const ymd = formatDateYMD(now);
+        document.getElementById('walkInDate').value = selectedDay || ymd;
+        
+        if (prefillTime) {
+            document.getElementById('walkInTime').value = prefillTime;
+        } else {
+            let hours = now.getHours().toString().padStart(2, '0');
+            let mins = now.getMinutes() < 30 ? '00' : '30';
+            document.getElementById('walkInTime').value = `${hours}:${mins}`;
+        }
+
+        if (prefillBarberId) {
+            document.getElementById('walkInBarber').value = prefillBarberId;
+        }
+
+        document.getElementById('walkInModal').classList.remove('hidden');
+    }
+
+    function closeWalkInModal() {
+        document.getElementById('walkInModal').classList.add('hidden');
+    }
+
+    async function submitWalkIn(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('walkInSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Creating...';
+
+        const payload = {
+            branchId: parseInt(document.getElementById('walkInBranch').value, 10),
+            barberId: parseInt(document.getElementById('walkInBarber').value, 10),
+            serviceId: parseInt(document.getElementById('walkInService').value, 10),
+            customerName: document.getElementById('walkInCustomerName').value.trim(),
+            customerPhone: document.getElementById('walkInCustomerPhone').value.trim() || null,
+            date: document.getElementById('walkInDate').value,
+            time: document.getElementById('walkInTime').value,
+            notes: document.getElementById('walkInNotes').value.trim() || null
+        };
+
+        try {
+            const res = await fetch('/api/admin/appointments/walk-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                alert(err.error ? err.error.message : 'Error creating walk-in booking');
+                return;
+            }
+
+            closeWalkInModal();
+            if (currentView === 'list') loadAppointments();
+            else if (currentView === 'day') renderDayView();
+            else if (currentView === 'week') renderWeekView();
+        } catch (err) {
+            alert('Request failed: ' + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Create & Lock Slot';
+        }
+    }
+
+    // CHECKOUT MODAL HANDLERS
+    let checkoutBasePrice = 0;
+    let selectedPaymentMethod = 'Cash';
+
+    async function openCheckoutModal(appointmentId) {
+        let app = cachedAppointments.find(a => a.id === appointmentId);
+        if (!app) {
+            try {
+                const res = await fetch(`/api/appointments/${appointmentId}`);
+                if (res.ok) app = await res.json();
+            } catch {}
+        }
+        if (!app) return;
+
+        document.getElementById('checkoutAppId').value = app.id;
+        document.getElementById('checkoutRefCode').innerText = app.referenceCode;
+        document.getElementById('checkoutServicePrice').innerText = app.formattedPrice;
+        document.getElementById('checkoutCustomerAndService').innerText = `${app.customerName} — ${app.serviceName}`;
+        document.getElementById('checkoutBarberAndSchedule').innerText = `${app.barberName} · ${app.formattedDate} at ${app.formattedTime}`;
+        document.getElementById('checkoutNote').value = '';
+
+        checkoutBasePrice = app.price || 0;
+        currentCheckoutProductRows = [];
+        renderCheckoutProductRows();
+        selectPaymentMethod('Cash');
+
+        document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        document.querySelectorAll('.payment-method-opt').forEach(el => {
+            if (el.dataset.method === method) {
+                el.classList.remove('border-slate-200', 'bg-white', 'text-slate-700');
+                el.classList.add('border-amber-500', 'bg-amber-50', 'text-slate-900');
+            } else {
+                el.classList.add('border-slate-200', 'bg-white', 'text-slate-700');
+                el.classList.remove('border-amber-500', 'bg-amber-50', 'text-slate-900');
+            }
+        });
+    }
+
+    function addCheckoutProductRow() {
+        if (!RETAIL_PRODUCTS || RETAIL_PRODUCTS.length === 0) {
+            alert('No active retail products available in inventory.');
+            return;
+        }
+        currentCheckoutProductRows.push({
+            productId: RETAIL_PRODUCTS[0].Id,
+            quantity: 1
+        });
+        renderCheckoutProductRows();
+    }
+
+    function removeCheckoutProductRow(index) {
+        currentCheckoutProductRows.splice(index, 1);
+        renderCheckoutProductRows();
+    }
+
+    function updateCheckoutProduct(index, productId) {
+        currentCheckoutProductRows[index].productId = parseInt(productId, 10);
+        renderCheckoutProductRows();
+    }
+
+    function updateCheckoutQuantity(index, qty) {
+        const q = parseInt(qty, 10);
+        currentCheckoutProductRows[index].quantity = isNaN(q) || q < 1 ? 1 : q;
+        renderCheckoutProductRows();
+    }
+
+    function renderCheckoutProductRows() {
+        const container = document.getElementById('checkoutAddOnsList');
+        if (currentCheckoutProductRows.length === 0) {
+            container.innerHTML = `<p class="text-xs text-slate-400 italic">No retail add-ons attached.</p>`;
+            calculateCheckoutGrandTotal(0);
+            return;
+        }
+
+        let html = '';
+        let addOnsTotal = 0;
+
+        currentCheckoutProductRows.forEach((row, idx) => {
+            const prod = RETAIL_PRODUCTS.find(p => p.Id === row.productId) || RETAIL_PRODUCTS[0];
+            const rowTotal = (prod ? prod.SellingPrice : 0) * row.quantity;
+            addOnsTotal += rowTotal;
+
+            html += `<div class="flex items-center gap-2 text-xs bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <select onchange="updateCheckoutProduct(${idx}, this.value)" class="flex-1 rounded-md border-slate-300 py-1 text-xs">
+                    ${RETAIL_PRODUCTS.map(p => `<option value="${p.Id}" ${p.Id === row.productId ? 'selected' : ''}>${escapeHtml(p.Name)} (₱${p.SellingPrice.toFixed(2)})</option>`).join('')}
+                </select>
+                <input type="number" min="1" max="50" value="${row.quantity}" onchange="updateCheckoutQuantity(${idx}, this.value)" class="w-16 rounded-md border-slate-300 py-1 text-xs text-center" />
+                <span class="font-bold text-slate-800 w-20 text-right">₱${rowTotal.toFixed(2)}</span>
+                <button type="button" onclick="removeCheckoutProductRow(${idx})" class="p-1 text-rose-500 hover:text-rose-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+        calculateCheckoutGrandTotal(addOnsTotal);
+    }
+
+    function calculateCheckoutGrandTotal(addOnsTotal) {
+        const grandTotal = checkoutBasePrice + addOnsTotal;
+        document.getElementById('checkoutGrandTotal').innerText = `₱${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('checkoutBreakdownText').innerText = addOnsTotal > 0 
+            ? `Service (₱${checkoutBasePrice.toFixed(2)}) + Add-ons (₱${addOnsTotal.toFixed(2)})`
+            : `Service only`;
+    }
+
+    async function submitCheckout(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('checkoutSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Processing...';
+
+        const appId = document.getElementById('checkoutAppId').value;
+        const note = document.getElementById('checkoutNote').value.trim();
+
+        const addOns = currentCheckoutProductRows.map(r => ({
+            productId: r.productId,
+            quantity: r.quantity
+        }));
+
+        try {
+            const res = await fetch(`/api/admin/appointments/${appId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: 'completed',
+                    paymentMethod: selectedPaymentMethod,
+                    addOns: addOns.length > 0 ? addOns : null,
+                    note: note || null
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                alert(err.error ? err.error.message : 'Error settling checkout');
+                return;
+            }
+
+            closeCheckoutModal();
+            closeDrawer();
+
+            if (currentView === 'list') loadAppointments();
+            else if (currentView === 'day') renderDayView();
+            else if (currentView === 'week') renderWeekView();
+        } catch (err) {
+            alert('Request failed: ' + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Settle & Mark Completed';
         }
     }
 

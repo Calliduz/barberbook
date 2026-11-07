@@ -8,7 +8,7 @@
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900">Services & Prices</h1>
-            <p class="mt-1 text-sm text-slate-500">Configure barber services, fixed pricing in Philippine Pesos (₱), and durations in 30-minute intervals (BR-05).</p>
+            <p class="mt-1 text-sm text-slate-500">Configure barber services, fixed pricing in Philippine Pesos (₱), and durations in 30-minute intervals.</p>
         </div>
         <div class="mt-4 sm:mt-0">
             <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 text-sm font-bold shadow-sm transition active:scale-[0.98]">
@@ -272,7 +272,7 @@
                     </select>
                 </div>
             </div>
-            <p class="text-xs text-slate-400">Durations must be in multiples of 30 minutes to match the shop scheduling grid (BR-05).</p>
+            <p class="text-xs text-slate-400">Durations must be in multiples of 30 minutes to match the shop scheduling grid.</p>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
                 <button type="button" onclick="closeModal('createModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
                 <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Create Service</button>
@@ -317,7 +317,7 @@
                 </div>
             </div>
             <p class="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
-                <strong>Note:</strong> Price updates only affect future bookings. Historical completed appointments retain their price snapshot (BR-08, BR-14).
+                <strong>Note:</strong> Price updates only affect future bookings. Historical completed appointments retain their price snapshot.
             </p>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
                 <button type="button" onclick="closeModal('editModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
@@ -357,7 +357,7 @@
         document.getElementById('toggleStatusForm').action = '/admin/services/' + id + '/toggle-status';
         const title = isActive ? 'Deactivate Service' : 'Activate Service';
         const msg = isActive
-            ? 'Are you sure you want to deactivate "' + name + '"? It will be removed from customer booking and service lists, but will remain visible in past appointment histories and sales reports (BR-13).'
+            ? 'Are you sure you want to deactivate "' + name + '"? It will be removed from customer booking and service lists, but will remain visible in past appointment histories and sales reports.'
             : 'Are you sure you want to activate "' + name + '"? It will immediately become available for customer bookings.';
         const btnClass = isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500';
         const btnText = isActive ? 'Deactivate' : 'Activate';
