@@ -183,10 +183,49 @@
                                         @app.StatusString
                                     </span>
                                 </td>
-                                <td class="py-4 px-6 text-right">
-                                    <a href="/barber/appointments/@app.Id" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-700 hover:text-amber-900 hover:bg-amber-50 border border-amber-200 transition">
-                                        Manage
-                                    </a>
+                                <td class="py-4 px-6 text-right whitespace-nowrap">
+                                    @if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
+                                    {
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <form method="post" action="/barber/appointments/@app.Id/status" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="to" value="confirmed" />
+                                                <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs">
+                                                    Confirm
+                                                </button>
+                                            </form>
+                                            <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'rejected')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition">
+                                                Reject
+                                            </button>
+                                            <a href="/barber/appointments/@app.Id" class="p-1.5 text-slate-400 hover:text-slate-800 transition" title="View Details">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                                            </a>
+                                        </div>
+                                    }
+                                    else if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Confirmed)
+                                    {
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <form method="post" action="/barber/appointments/@app.Id/status" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="to" value="completed" />
+                                                <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-xs">
+                                                    Complete
+                                                </button>
+                                            </form>
+                                            <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 border border-slate-200 transition">
+                                                Cancel
+                                            </button>
+                                            <a href="/barber/appointments/@app.Id" class="p-1.5 text-slate-400 hover:text-slate-800 transition" title="View Details">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <a href="/barber/appointments/@app.Id" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition">
+                                            Details &rarr;
+                                        </a>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -228,11 +267,47 @@
                             <div class="font-bold text-amber-800">@app.FormattedPrice</div>
                         </div>
 
-                        <div class="flex items-center justify-between text-xs pt-1">
-                            <span class="text-slate-600 font-medium">@app.ServiceName</span>
-                            <a href="/barber/appointments/@app.Id" class="px-3 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition">
-                                Manage &rarr;
-                            </a>
+                        <div class="pt-2 border-t border-slate-100">
+                            @if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Pending)
+                            {
+                                <div class="grid grid-cols-3 gap-2">
+                                    <form method="post" action="/barber/appointments/@app.Id/status" class="w-full">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="to" value="confirmed" />
+                                        <button type="submit" class="w-full py-2 px-2 rounded-lg text-xs font-bold bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs text-center">
+                                            Confirm
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'rejected')" class="w-full py-2 px-2 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition text-center">
+                                        Reject
+                                    </button>
+                                    <a href="/barber/appointments/@app.Id" class="w-full py-2 px-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition text-center">
+                                        Details
+                                    </a>
+                                </div>
+                            }
+                            else if (app.Status == BarberBook.Data.Enums.AppointmentStatus.Confirmed)
+                            {
+                                <div class="grid grid-cols-3 gap-2">
+                                    <form method="post" action="/barber/appointments/@app.Id/status" class="w-full col-span-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="to" value="completed" />
+                                        <button type="submit" class="w-full py-2 px-3 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-xs text-center">
+                                            Complete Cut
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="openActionModal(@app.Id, '@app.ReferenceCode', 'cancelled')" class="w-full py-2 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition text-center">
+                                        Cancel
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center justify-between text-xs text-slate-400 italic">
+                                    <span>Finished record</span>
+                                    <a href="/barber/appointments/@app.Id" class="text-amber-800 hover:underline font-semibold not-italic">View Details &rarr;</a>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
@@ -267,3 +342,61 @@
         </a>
     </div>
 </div>
+
+<!-- Modal for Reason / Note (Reject / Cancel) -->
+<div id="actionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+        <h3 id="modalTitle" class="text-xl font-serif font-bold text-slate-900">Update Status</h3>
+        <p id="modalDescription" class="text-xs text-slate-600 mt-1">Please provide an optional reason or note for this status change.</p>
+
+        <form id="actionForm" method="post" action="" class="mt-4 space-y-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="modalTargetStatus" name="to" value="" />
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reason / Note (optional)</label>
+                <textarea name="note" rows="3" placeholder="e.g. Scheduling conflict or client request..."
+                          class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeActionModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Dismiss
+                </button>
+                <button type="submit" id="modalSubmitBtn" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Confirm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openActionModal(id, refCode, targetStatus) {
+        const form = document.getElementById('actionForm');
+        form.action = '/barber/appointments/' + id + '/status';
+        document.getElementById('modalTargetStatus').value = targetStatus;
+
+        const title = targetStatus === 'rejected' ? 'Reject Appointment #' + refCode : 'Cancel Appointment #' + refCode;
+        const desc = targetStatus === 'rejected'
+            ? 'State why this appointment cannot be accepted (e.g. station maintenance, off-duty).'
+            : 'Provide an operational reason for cancelling this booking.';
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalDescription').innerText = desc;
+
+        const btn = document.getElementById('modalSubmitBtn');
+        if (targetStatus === 'rejected') {
+            btn.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm';
+            btn.innerText = 'Reject Booking';
+        } else {
+            btn.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 transition shadow-sm';
+            btn.innerText = 'Cancel Booking';
+        }
+
+        document.getElementById('actionModal').classList.remove('hidden');
+    }
+
+    function closeActionModal() {
+        document.getElementById('actionModal').classList.add('hidden');
+    }
+</script>

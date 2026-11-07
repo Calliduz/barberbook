@@ -98,7 +98,7 @@
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Journal &mdash; @Model.DailyReport.DateFormatted</h2>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Journal · @Model.DailyReport.DateFormatted</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Line-item journal including completed cuts and retail product sales</p>
                     </div>
                     <span class="text-xs text-slate-500 font-medium">@Model.DailyReport.CombinedJournal.Count entries logged</span>
@@ -273,7 +273,7 @@
             }
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Income at a Glance &mdash; @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Income at a Glance · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
                     <span class="text-xs text-slate-500 font-medium">Daily Revenue Distribution (Services + Products)</span>
                 </div>
                 <div class="flex items-end gap-1 sm:gap-2 h-36 pt-6 border-b border-slate-200 overflow-x-auto pb-2">
@@ -471,7 +471,7 @@
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record &mdash; @Model.CustomerReport.CustomerName</h2>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record · @Model.CustomerReport.CustomerName</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Completed appointments (newest first)</p>
                     </div>
                     @if (Model.SelectedCustomerId > 0)
@@ -589,7 +589,7 @@
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record &mdash; Master Barber @Model.BarberReport.BarberName</h2>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record · Master Barber @Model.BarberReport.BarberName</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Completed services (newest first) with 50% commission split</p>
                     </div>
                 </div>

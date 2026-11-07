@@ -100,7 +100,7 @@
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h2 class="text-lg font-serif font-bold text-slate-900">Completed Service Records</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Historical ledger of all services performed and settled in-shop (LM-1, LM-2).</p>
+                <p class="text-xs text-slate-500 mt-0.5">Historical ledger of all services performed and settled at the counter.</p>
             </div>
         </div>
 
@@ -241,7 +241,7 @@
             <div class="grid grid-cols-2 gap-4 text-xs">
                 <div class="space-y-1">
                     <p><span class="font-bold uppercase text-slate-500">Barber Name:</span> <span class="font-bold text-slate-900 text-sm">@Model.BarberName</span></p>
-                    <p><span class="font-bold uppercase text-slate-500">Pay Period:</span> <span>@(string.IsNullOrEmpty(Model.StartDate) ? "Beginning" : Model.StartDate) &mdash; @(string.IsNullOrEmpty(Model.EndDate) ? "Current" : Model.EndDate)</span></p>
+                    <p><span class="font-bold uppercase text-slate-500">Pay Period:</span> <span>@(string.IsNullOrEmpty(Model.StartDate) ? "Beginning" : Model.StartDate) - @(string.IsNullOrEmpty(Model.EndDate) ? "Current" : Model.EndDate)</span></p>
                 </div>
                 <div class="space-y-1 text-right">
                     <p><span class="font-bold uppercase text-slate-500">Completed Cuts:</span> <span class="font-bold font-mono">@Model.TotalCompletedCount</span></p>
@@ -266,12 +266,12 @@
                     </tr>
                     <tr>
                         <td class="p-2 border border-slate-300 font-semibold text-slate-600">Shop Operating Overhead &amp; Facilities Share (50%)</td>
-                        <td class="p-2 border border-slate-300 text-right font-mono">&mdash;</td>
+                        <td class="p-2 border border-slate-300 text-right font-mono">-</td>
                         <td class="p-2 border border-slate-300 text-right text-slate-600">@Model.FormattedShopShare</td>
                     </tr>
                     <tr class="bg-slate-50 font-black">
                         <td class="p-2 border border-slate-300 uppercase">Net Barber Take-Home Commission (50%)</td>
-                        <td class="p-2 border border-slate-300 text-right font-mono">&mdash;</td>
+                        <td class="p-2 border border-slate-300 text-right font-mono">-</td>
                         <td class="p-2 border border-slate-300 text-right text-base text-slate-900">@Model.FormattedTotalCommission</td>
                     </tr>
                 </tbody>
