@@ -15,8 +15,8 @@
             <p class="mt-1 text-sm text-slate-500">Manage physical barbershop locations, operational schedules, assigned barbers, and branch-level booking visibility.</p>
         </div>
         <div class="mt-4 sm:mt-0">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 transition">
-                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center h-[38px] rounded-xl bg-amber-500 px-4 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 transition whitespace-nowrap">
+                <svg class="-ml-1 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 Add New Branch
@@ -57,23 +57,29 @@
     }
 
     <!-- Search & Filters -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4">
-        <form method="get" action="/admin/branches" class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3.5">
+        <form method="get" action="/admin/branches" class="flex flex-col sm:flex-row gap-3 justify-between items-center">
             <div class="w-full sm:w-80 relative">
-                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search branch name, address, phone..." onkeydown="if(event.key==='Enter') this.form.submit()" class="w-full rounded-xl border-slate-300 pl-10 pr-4 py-2 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search branch name, address, phone..." onkeydown="if(event.key==='Enter') this.form.submit()" class="filter-control w-full pl-9 pr-4 text-xs" />
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <label for="statusFilter" class="text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status:</label>
-                <select id="statusFilter" name="status" onchange="this.form.submit()" class="rounded-xl border-slate-300 py-1.5 pl-3 pr-8 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label for="statusFilter" class="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status:</label>
+                <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs">
                     <option value="all" selected="@(Model.StatusFilter == "all")">All Statuses</option>
                     <option value="active" selected="@(Model.StatusFilter == "active")">Active Only</option>
                     <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive Only</option>
                 </select>
+                @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.StatusFilter != "all")
+                {
+                    <a href="/admin/branches" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition flex items-center whitespace-nowrap">
+                        Reset
+                    </a>
+                }
             </div>
         </form>
     </div>
@@ -218,31 +224,32 @@
         <!-- Pagination -->
         @if (Model.TotalPages > 1)
         {
-            <div class="flex items-center justify-between border-t border-slate-100 bg-white px-4 py-3 sm:px-6">
-                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs text-slate-500">
-                            Showing <span class="font-bold text-slate-900">@((Model.Page - 1) * Model.PageSize + 1)</span> to
-                            <span class="font-bold text-slate-900">@Math.Min(Model.Page * Model.PageSize, Model.TotalCount)</span> of
-                            <span class="font-bold text-slate-900">@Model.TotalCount</span> branches
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="isolate inline-flex -space-x-px rounded-xl shadow-sm" aria-label="Pagination">
-                            @if (Model.Page > 1)
-                            {
-                                <a href="?page=@(Model.Page - 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center rounded-l-xl px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">Previous</a>
-                            }
-                            @for (var p = 1; p <= Model.TotalPages; p++)
-                            {
-                                <a href="?page=@p&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center px-4 py-2 text-xs font-semibold @(p == Model.Page ? "z-10 bg-amber-500 text-slate-950 font-bold" : "text-slate-900 ring-1 ring-inset ring-slate-200 hover:bg-slate-50")">@p</a>
-                            }
-                            @if (Model.Page < Model.TotalPages)
-                            {
-                                <a href="?page=@(Model.Page + 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center rounded-r-xl px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">Next</a>
-                            }
-                        </nav>
-                    </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 bg-slate-50/80 px-4 py-3 sm:px-6 gap-3">
+                <div class="text-xs text-slate-500">
+                    Showing <span class="font-bold text-slate-800">@((Model.Page - 1) * Model.PageSize + 1)</span> to
+                    <span class="font-bold text-slate-800">@Math.Min(Model.Page * Model.PageSize, Model.TotalCount)</span> of
+                    <span class="font-bold text-slate-800">@Model.TotalCount</span> branches
+                </div>
+                <div class="inline-flex items-center rounded-xl bg-white border border-slate-200 p-1 shadow-2xs space-x-1 text-xs">
+                    @if (Model.Page > 1)
+                    {
+                        <a href="?page=@(Model.Page - 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="px-3 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold transition">&larr; Prev</a>
+                    }
+                    else
+                    {
+                        <span class="px-3 py-1 text-slate-300 font-semibold cursor-not-allowed opacity-50">&larr; Prev</span>
+                    }
+
+                    <span class="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold shadow-xs">@Model.Page</span>
+
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a href="?page=@(Model.Page + 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="px-3 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold transition">Next &rarr;</a>
+                    }
+                    else
+                    {
+                        <span class="px-3 py-1 text-slate-300 font-semibold cursor-not-allowed opacity-50">Next &rarr;</span>
+                    }
                 </div>
             </div>
         }

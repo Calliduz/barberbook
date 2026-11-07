@@ -592,3 +592,151 @@ html.dark .bg-slate-100 {
     background-color: #1e293b;
 }
 
+/* 7. STANDARDIZED SAAS DESIGN SYSTEM UTILITIES */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-control {
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 36px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    color: #0f172a;
+    transition: all 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+
+.filter-control:focus {
+    outline: none;
+    border-color: #b4832c;
+    box-shadow: 0 0 0 2px rgba(180, 131, 44, 0.2);
+    background-color: #ffffff;
+}
+
+.filter-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.page-header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@@media (min-width: 640px) {
+    .page-header-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+}
+
+.header-overline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #b4832c;
+    margin-bottom: 4px;
+}
+
+.page-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    max-width: 65ch;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.cell-truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cell-truncate-lg {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+.table-header-cell {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.table-body-cell {
+    padding: 12px 16px;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+/* Dark mode overrides for standardized utilities */
+html.dark .filter-control {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+html.dark .filter-control:focus {
+    background-color: #0b1120;
+    border-color: #f59e0b;
+}
+
+html.dark .filter-label {
+    color: #94a3b8;
+}
+
+html.dark .page-title {
+    color: #f8fafc;
+}
+
+html.dark .page-subtitle {
+    color: #94a3b8;
+}
+
+html.dark .table-header-cell {
+    color: #94a3b8;
+}
+
+

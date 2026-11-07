@@ -55,26 +55,26 @@
                     @{
                         var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? "";
                     }
-                    <nav class="hidden xl:flex space-x-1 items-center">
-                        <a href="/barber" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath == "/barber" ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                    <nav class="hidden xl:flex space-x-1 items-center whitespace-nowrap">
+                        <a href="/barber" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath == "/barber" ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             Dashboard
                         </a>
-                        <a href="/barber/schedule" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/schedule") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/schedule" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/schedule") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             My Schedule
                         </a>
-                        <a href="/barber/appointments" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/appointments") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/appointments" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/appointments") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             Appointments
                         </a>
-                        <a href="/barber/availability" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/availability") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/availability" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/availability") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             Availability & Days Off
                         </a>
-                        <a href="/barber/transactions" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/transactions" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             My Transactions
                         </a>
-                        <a href="/barber/account" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/account") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/account" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/account") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             Account
                         </a>
-                        <a href="/barber/equipment" class="px-3 py-2 rounded-xl text-xs font-semibold transition @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
+                        <a href="/barber/equipment" class="px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">
                             My Equipment
                         </a>
                     </nav>
@@ -106,10 +106,6 @@
                         </svg>
                     </button>
 
-                    <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition">
-                        <span>Shop Front</span>
-                        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-                    </a>
                     <partial name="_LoginPartial" />
                 </div>
             </div>

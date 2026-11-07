@@ -118,16 +118,16 @@
         <!-- ========================================== -->
         <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden space-y-4 p-5">
             <!-- Search & Actions Bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-3 flex-1">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-2.5 flex-1">
                     <input type="hidden" name="tab" value="products" />
                     <div class="relative flex-1 min-w-[200px]">
                         <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="Search product name, SKU, category..."
-                               class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                               class="filter-control w-full pl-9 pr-3 text-xs" />
+                        <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                     </div>
 
-                    <select name="category" onchange="this.form.submit()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                    <select name="category" onchange="this.form.submit()" class="filter-control text-xs">
                         <option value="">All Categories</option>
                         @foreach (var cat in Model.ProductCategories)
                         {
@@ -135,20 +135,16 @@
                         }
                     </select>
 
-                    <button type="submit" class="py-2 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-sm">
-                        Filter
-                    </button>
-
                     @if (!string.IsNullOrEmpty(Context.Request.Query["search"]) || !string.IsNullOrEmpty(Context.Request.Query["category"]))
                     {
-                        <a href="/admin/inventory?tab=products" class="py-2 px-3 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition">
+                        <a href="/admin/inventory?tab=products" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition flex items-center whitespace-nowrap">
                             Reset
                         </a>
                     }
                 </form>
 
                 <div>
-                    <button onclick="openModal('addProductModal')" class="py-2 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
+                    <button onclick="openModal('addProductModal')" class="h-[38px] px-4 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                         <span>Add Product</span>
                     </button>
@@ -273,7 +269,7 @@
                     </a>
                 </div>
                 <div>
-                    <button onclick="openModal('addEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
+                    <button onclick="openModal('addEquipmentModal')" class="h-[38px] px-4 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                         <span>Add Equipment</span>
                     </button>
@@ -281,16 +277,16 @@
             </div>
 
             <!-- Search & Actions Bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-3 flex-1">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-2.5 flex-1">
                     <input type="hidden" name="tab" value="equipment" />
                     <div class="relative flex-1 min-w-[180px]">
                         <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="Search tag, name, model, serial..."
-                               class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                               class="filter-control w-full pl-9 pr-3 text-xs" />
+                        <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                     </div>
 
-                    <select name="category" onchange="this.form.submit()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white">
+                    <select name="category" onchange="this.form.submit()" class="filter-control text-xs">
                         <option value="">All Categories</option>
                         @foreach (var cat in Model.EquipmentCategories)
                         {
@@ -298,7 +294,7 @@
                         }
                     </select>
 
-                    <select name="status" onchange="this.form.submit()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white">
+                    <select name="status" onchange="this.form.submit()" class="filter-control text-xs">
                         <option value="">All Statuses</option>
                         <option value="InService" selected="@(Context.Request.Query["status"] == "InService")">In Service</option>
                         <option value="UnderMaintenance" selected="@(Context.Request.Query["status"] == "UnderMaintenance")">Under Maintenance</option>
@@ -306,7 +302,7 @@
                         <option value="Retired" selected="@(Context.Request.Query["status"] == "Retired")">Retired</option>
                     </select>
 
-                    <select name="condition" onchange="this.form.submit()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white">
+                    <select name="condition" onchange="this.form.submit()" class="filter-control text-xs">
                         <option value="">All Conditions</option>
                         <option value="Excellent" selected="@(Context.Request.Query["condition"] == "Excellent")">Excellent</option>
                         <option value="Good" selected="@(Context.Request.Query["condition"] == "Good")">Good</option>
@@ -314,13 +310,9 @@
                         <option value="Poor" selected="@(Context.Request.Query["condition"] == "Poor")">Poor</option>
                     </select>
 
-                    <button type="submit" class="py-2 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-sm">
-                        Filter
-                    </button>
-
                     @if (!string.IsNullOrEmpty(Context.Request.Query["search"]) || !string.IsNullOrEmpty(Context.Request.Query["category"]) || !string.IsNullOrEmpty(Context.Request.Query["status"]) || !string.IsNullOrEmpty(Context.Request.Query["condition"]))
                     {
-                        <a href="/admin/inventory?tab=equipment" class="py-2 px-3 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition">
+                        <a href="/admin/inventory?tab=equipment" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition flex items-center whitespace-nowrap">
                             Reset
                         </a>
                     }

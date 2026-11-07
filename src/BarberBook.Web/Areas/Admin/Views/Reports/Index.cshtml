@@ -17,11 +17,11 @@
         </div>
         <div class="mt-4 sm:mt-0 flex flex-wrap gap-2">
             <a href="/admin/reports/export?tab=@Model.ActiveTab&date=@Model.SelectedDateString&year=@Model.SelectedYear&month=@Model.SelectedMonth" 
-               class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1.5 transition">
+               class="h-[38px] px-4 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1.5 transition whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                 <span>Export to CSV / Excel</span>
             </a>
-            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm flex items-center gap-1.5 transition">
+            <button type="button" onclick="window.print()" class="h-[38px] px-4 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm flex items-center gap-1.5 transition whitespace-nowrap">
                 <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24-1.076-.673-2.684-.673-4.008 0-3.26 2.37-5.821 5.953-5.821 3.582 0 5.953 2.561 5.953 5.821 0 1.324-.433 2.932-.673 4.008m-10.56 0h11.12m-11.12 0A2.25 2.25 0 004.5 16.079v3.171A2.25 2.25 0 006.75 21.5h10.5a2.25 2.25 0 002.25-2.25v-3.171a2.25 2.25 0 00-1.68-2.25" /></svg>
                 <span>Print Report</span>
             </button>
@@ -56,20 +56,20 @@
     {
         <!-- DAILY SALES VIEW -->
         <div class="space-y-6">
-            <!-- Filter & Preset Bar (Redundancy Removed: duplicate totals replaced with quick presets) -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <form id="dailyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <!-- Filter & Preset Bar -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-3.5 sm:p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <form id="dailyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <input type="hidden" name="tab" value="daily" />
                     <label for="date" class="text-xs font-bold uppercase tracking-wider text-slate-600">Select Date:</label>
                     <input type="date" id="date" name="date" value="@Model.SelectedDateString" onchange="this.form.submit()"
-                           class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+                           class="filter-control h-[38px] text-xs font-bold text-slate-900" />
                 </form>
 
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Quick Presets:</span>
-                    <button type="button" onclick="setDailyDate(getTodayStr())" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
-                    <button type="button" onclick="setDailyDate(getYesterdayStr())" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Yesterday</button>
-                    <button type="button" onclick="setDailyDate('2026-09-14')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Sep 14, 2026</button>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Presets:</span>
+                    <button type="button" onclick="setDailyDate(getTodayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
+                    <button type="button" onclick="setDailyDate(getYesterdayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Yesterday</button>
+                    <button type="button" onclick="setDailyDate('2026-09-14')" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Sep 14, 2026</button>
                 </div>
             </div>
 
