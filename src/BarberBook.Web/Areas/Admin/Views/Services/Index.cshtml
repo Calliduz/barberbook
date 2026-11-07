@@ -11,7 +11,7 @@
             <p class="mt-1 text-sm text-slate-500">Configure barber services, fixed pricing in Philippine Pesos (₱), and durations in 30-minute intervals (BR-05).</p>
         </div>
         <div class="mt-4 sm:mt-0">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 transition">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 text-sm font-bold shadow-sm transition active:scale-[0.98]">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
@@ -77,7 +77,8 @@
 
     <!-- Services Table -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- Desktop Table View -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead class="bg-slate-50 text-slate-600 font-semibold">
                     <tr>
@@ -146,6 +147,72 @@
                     }
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Stacked Card View -->
+        <div class="sm:hidden divide-y divide-slate-100">
+            @if (!Model.Items.Any())
+            {
+                <div class="py-12 text-center text-slate-400 text-xs">
+                    No services found matching the criteria.
+                </div>
+            }
+            @foreach (var service in Model.Items)
+            {
+                <div class="p-4 space-y-3 hover:bg-amber-50/20 transition">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-slate-900 text-base">@service.Name</h3>
+                                @if (service.IsActive)
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">
+                                        Inactive
+                                    </span>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <p class="text-xs text-slate-500 mt-1 line-clamp-2">@service.Description</p>
+                            }
+                        </div>
+                        <div class="text-right">
+                            <span class="font-serif font-black text-lg text-slate-900">
+                                @FormattingHelpers.FormatPeso(service.Price)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            @service.DurationMinutes mins
+                        </span>
+                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                            @service.CompletedBookingsCount bookings completed
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1 border-t border-slate-100">
+                        <button type="button"
+                                onclick="openEditModal(@service.Id, '@Html.Raw(Html.Encode(service.Name))', '@Html.Raw(Html.Encode(service.Description ?? ""))', @service.Price, @service.DurationMinutes)"
+                                class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 shadow-2xs transition text-center">
+                            Edit Service
+                        </button>
+                        <button type="button"
+                                onclick="confirmToggleStatus(@service.Id, '@Html.Raw(Html.Encode(service.Name))', @(service.IsActive ? "true" : "false"))"
+                                class="flex-1 py-2 px-3 rounded-xl text-xs font-bold @(service.IsActive ? "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" : "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100") transition text-center">
+                            @(service.IsActive ? "Deactivate" : "Activate")
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
 
         <!-- Pagination -->

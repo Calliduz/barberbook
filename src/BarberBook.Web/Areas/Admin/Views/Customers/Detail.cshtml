@@ -179,7 +179,8 @@
             }
             else
             {
-                <div class="overflow-x-auto">
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
                             <tr>
@@ -242,6 +243,67 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mobile Stacked Card View -->
+                <div class="md:hidden divide-y divide-slate-100">
+                    @foreach (var app in Model.Appointments)
+                    {
+                        var badgeClass = app.Status switch
+                        {
+                            BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+                            BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
+                            _ => "bg-slate-100 text-slate-700"
+                        };
+
+                        <div class="p-4 space-y-3 hover:bg-amber-50/20 transition">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                        #@app.ReferenceCode
+                                    </span>
+                                    <h3 class="font-bold text-slate-900 text-sm mt-1">@app.ServiceName</h3>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-serif font-black text-base text-slate-900">@app.FormattedPrice</span>
+                                    <div class="mt-0.5">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border @badgeClass capitalize">
+                                            @app.StatusString
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <div>
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Scheduled For</span>
+                                    <span class="font-semibold text-slate-900">@app.ScheduledDateFormatted</span>
+                                    <span class="block text-amber-800 font-bold">@app.ScheduledTime12h</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Barber</span>
+                                    <span class="font-semibold text-slate-800">@app.BarberName</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(app.Notes))
+                            {
+                                <p class="text-xs text-slate-500 italic bg-amber-50/40 p-2 rounded-lg border border-amber-900/5">
+                                    "@app.Notes"
+                                </p>
+                            }
+
+                            <div class="pt-1">
+                                <button type="button" onclick="openTimelineModal(@app.Id)"
+                                        class="w-full py-2 px-3 rounded-xl text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition text-center shadow-2xs">
+                                    View Audit Timeline &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -273,7 +335,8 @@
             }
             else
             {
-                <div class="overflow-x-auto">
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
                             <tr>
@@ -314,6 +377,34 @@
                             </tr>
                         </tfoot>
                     </table>
+                </div>
+
+                <!-- Mobile Stacked Card View -->
+                <div class="md:hidden divide-y divide-slate-100">
+                    @foreach (var tr in completedApps)
+                    {
+                        <div class="p-4 space-y-2 hover:bg-amber-50/20 transition">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="font-mono text-xs font-bold text-amber-800">#@tr.ReferenceCode</span>
+                                    <h3 class="font-bold text-slate-900 text-sm mt-0.5">@tr.ServiceName</h3>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-serif font-black text-base text-slate-900">@tr.FormattedPrice</span>
+                                    <span class="block text-[10px] font-bold text-emerald-700">Completed</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+                                <span>@tr.ScheduledDateFormatted &bull; @tr.ScheduledTime12h</span>
+                                <span class="font-medium text-slate-700">Barber: @tr.BarberName</span>
+                            </div>
+                        </div>
+                    }
+                    <div class="p-4 bg-slate-50 flex items-center justify-between text-xs font-bold rounded-b-2xl">
+                        <span class="uppercase tracking-wider text-slate-500">Total Settled</span>
+                        <span class="text-base text-amber-800 font-serif font-black">@Model.FormattedTotalSpent</span>
+                    </div>
                 </div>
             }
         </div>
