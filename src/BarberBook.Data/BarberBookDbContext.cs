@@ -23,6 +23,7 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<PurchaseItem> PurchaseItems => Set<PurchaseItem>();
     public DbSet<ProductSale> ProductSales => Set<ProductSale>();
     public DbSet<ProductSaleItem> ProductSaleItems => Set<ProductSaleItem>();
+    public DbSet<Branch> Branches => Set<Branch>();
 
     public BarberBookDbContext(DbContextOptions<BarberBookDbContext> options)
         : base(options)
@@ -74,6 +75,12 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.PhotoUrl).HasColumnName("photo_url").HasMaxLength(500);
             entity.Property(e => e.Specialties).HasColumnName("specialties").HasMaxLength(255);
             entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            entity.Property(e => e.BranchId).HasColumnName("branch_id");
+
+            entity.HasOne(e => e.Branch)
+                .WithMany(b => b.Barbers)
+                .HasForeignKey(e => e.BranchId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.UserId).IsUnique();
         });
@@ -142,6 +149,7 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired();
             entity.Property(e => e.BarberId).HasColumnName("barber_id").IsRequired();
             entity.Property(e => e.ServiceId).HasColumnName("service_id").IsRequired();
+            entity.Property(e => e.BranchId).HasColumnName("branch_id");
             entity.Property(e => e.StartsAt).HasColumnName("starts_at").IsRequired();
             entity.Property(e => e.EndsAt).HasColumnName("ends_at").IsRequired();
             entity.Property(e => e.Status)
@@ -171,6 +179,11 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
                 .WithMany(s => s.Appointments)
                 .HasForeignKey(e => e.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Branch)
+                .WithMany(b => b.Appointments)
+                .HasForeignKey(e => e.BranchId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.ReferenceCode).IsUnique();
             entity.HasIndex(e => new { e.BarberId, e.StartsAt });
@@ -475,6 +488,23 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
 
             entity.HasIndex(e => e.ProductSaleId);
             entity.HasIndex(e => e.ProductId);
+        });
+
+        // 17. Branches (Multi-Branch Management)
+        builder.Entity<Branch>(entity =>
+        {
+            entity.ToTable("branches");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Address).HasColumnName("address").HasMaxLength(300).IsRequired();
+            entity.Property(e => e.PhoneNumber).HasColumnName("phone_number").HasMaxLength(30);
+            entity.Property(e => e.OpeningTime).HasColumnName("opening_time").IsRequired();
+            entity.Property(e => e.ClosingTime).HasColumnName("closing_time").IsRequired();
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
+
+            entity.HasIndex(e => e.Name);
         });
     }
 }

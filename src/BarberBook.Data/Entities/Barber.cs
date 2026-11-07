@@ -12,6 +12,9 @@ public class Barber
     public string? Specialties { get; set; }
     public bool IsActive { get; set; } = true;
 
+    public int? BranchId { get; set; }
+    public Branch? Branch { get; set; }
+
     // Navigation properties
     public ICollection<WorkingHours> WorkingHours { get; set; } = new List<WorkingHours>();
     public ICollection<DayOff> DaysOff { get; set; } = new List<DayOff>();

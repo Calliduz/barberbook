@@ -241,7 +241,7 @@
                             ${statusBadgeHtml}
                         </div>
                         <h3 class="text-lg font-bold text-neutral-100">${app.serviceName}</h3>
-                        <p class="text-xs text-neutral-400 mt-0.5">Barber: <strong class="text-neutral-200">${app.barberName}</strong> · ${app.durationMinutes} mins</p>
+                        <p class="text-xs text-neutral-400 mt-0.5">Barber: <strong class="text-neutral-200">${app.barberName}</strong>${app.branchName ? ` · <span class="text-amber-300 font-medium">${app.branchName}</span>` : ''} · ${app.durationMinutes} mins</p>
                     </div>
                     <div class="text-left sm:text-right">
                         <span class="text-lg font-extrabold text-amber-400">${app.formattedPrice}</span>

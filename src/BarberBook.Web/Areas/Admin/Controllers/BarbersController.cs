@@ -82,6 +82,12 @@ public class BarbersController : Controller
 
         var totalCount = await query.CountAsync();
 
+        var branches = await _dbContext.Branches
+            .Where(br => br.IsActive)
+            .OrderBy(br => br.Name)
+            .Select(br => new BranchOptionDto { Id = br.Id, Name = br.Name })
+            .ToListAsync();
+
         var barbers = await query
             .OrderBy(b => b.DisplayName)
             .Skip((page - 1) * pageSize)
@@ -96,6 +102,8 @@ public class BarbersController : Controller
                 Bio = b.Bio,
                 PhotoUrl = b.PhotoUrl,
                 Specialties = b.Specialties,
+                BranchId = b.BranchId,
+                BranchName = b.Branch != null ? b.Branch.Name : null,
                 IsActive = b.IsActive && b.User.IsActive,
                 CompletedAppointmentsCount = b.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
             })
@@ -104,6 +112,7 @@ public class BarbersController : Controller
         var viewModel = new BarberListViewModel
         {
             Items = barbers,
+            Branches = branches,
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize,
@@ -269,6 +278,7 @@ public class BarbersController : Controller
             Bio = string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio.Trim(),
             PhotoUrl = string.IsNullOrWhiteSpace(request.PhotoUrl) ? null : request.PhotoUrl.Trim(),
             Specialties = string.IsNullOrWhiteSpace(request.Specialties) ? null : request.Specialties.Trim(),
+            BranchId = request.BranchId,
             IsActive = true
         };
 
@@ -285,6 +295,7 @@ public class BarbersController : Controller
             Bio = barber.Bio,
             PhotoUrl = barber.PhotoUrl,
             Specialties = barber.Specialties,
+            BranchId = barber.BranchId,
             IsActive = true,
             CompletedAppointmentsCount = 0
         };
@@ -350,6 +361,7 @@ public class BarbersController : Controller
             barber.PhotoUrl = request.PhotoUrl.Trim();
         }
         barber.Specialties = string.IsNullOrWhiteSpace(request.Specialties) ? null : request.Specialties.Trim();
+        barber.BranchId = request.BranchId;
 
         barber.User.FullName = request.ResolvedFullName;
 
@@ -365,6 +377,7 @@ public class BarbersController : Controller
             Bio = barber.Bio,
             PhotoUrl = barber.PhotoUrl,
             Specialties = barber.Specialties,
+            BranchId = barber.BranchId,
             IsActive = barber.IsActive && barber.User.IsActive
         };
 

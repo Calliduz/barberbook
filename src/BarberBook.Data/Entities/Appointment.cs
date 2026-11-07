@@ -14,6 +14,9 @@ public class Appointment
     public int BarberId { get; set; }
     public Barber Barber { get; set; } = null!;
 
+    public int? BranchId { get; set; }
+    public Branch? Branch { get; set; }
+
     public int ServiceId { get; set; }
     public Service Service { get; set; } = null!;
 

@@ -126,6 +126,10 @@ namespace BarberBook.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("barber_id");
 
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("integer")
+                        .HasColumnName("branch_id");
+
                     b.Property<Instant>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -179,6 +183,8 @@ namespace BarberBook.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BranchId");
+
                     b.HasIndex("ReferenceCode")
                         .IsUnique();
 
@@ -212,6 +218,10 @@ namespace BarberBook.Data.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("bio");
 
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("integer")
+                        .HasColumnName("branch_id");
+
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -240,10 +250,63 @@ namespace BarberBook.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BranchId");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("barbers", (string)null);
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("address");
+
+                    b.Property<LocalTime>("ClosingTime")
+                        .HasColumnType("time")
+                        .HasColumnName("closing_time");
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<LocalTime>("OpeningTime")
+                        .HasColumnType("time")
+                        .HasColumnName("opening_time");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("phone_number");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("branches", (string)null);
                 });
 
             modelBuilder.Entity("BarberBook.Data.Entities.DayOff", b =>
@@ -1008,6 +1071,11 @@ namespace BarberBook.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BarberBook.Data.Entities.Branch", "Branch")
+                        .WithMany("Appointments")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("BarberBook.Data.Entities.ApplicationUser", "Customer")
                         .WithMany("CustomerAppointments")
                         .HasForeignKey("CustomerId")
@@ -1022,6 +1090,8 @@ namespace BarberBook.Data.Migrations
 
                     b.Navigation("Barber");
 
+                    b.Navigation("Branch");
+
                     b.Navigation("Customer");
 
                     b.Navigation("Service");
@@ -1029,11 +1099,18 @@ namespace BarberBook.Data.Migrations
 
             modelBuilder.Entity("BarberBook.Data.Entities.Barber", b =>
                 {
+                    b.HasOne("BarberBook.Data.Entities.Branch", "Branch")
+                        .WithMany("Barbers")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("BarberBook.Data.Entities.ApplicationUser", "User")
                         .WithOne("BarberProfile")
                         .HasForeignKey("BarberBook.Data.Entities.Barber", "UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Branch");
 
                     b.Navigation("User");
                 });
@@ -1277,6 +1354,13 @@ namespace BarberBook.Data.Migrations
                     b.Navigation("EquipmentAssignments");
 
                     b.Navigation("WorkingHours");
+                });
+
+            modelBuilder.Entity("BarberBook.Data.Entities.Branch", b =>
+                {
+                    b.Navigation("Appointments");
+
+                    b.Navigation("Barbers");
                 });
 
             modelBuilder.Entity("BarberBook.Data.Entities.Equipment", b =>

@@ -1,3 +1,4 @@
+using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Customer;
 
 namespace BarberBook.Web.Models.Appointment;
@@ -39,6 +40,9 @@ public class AppointmentDetailDto
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerPhone { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
+    public string? BranchAddress { get; set; }
     public int BarberId { get; set; }
     public string BarberName { get; set; } = string.Empty;
     public int ServiceId { get; set; }
@@ -61,6 +65,8 @@ public class AppointmentSummaryDto
 {
     public int Id { get; set; }
     public string ReferenceCode { get; set; } = string.Empty;
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
     public int BarberId { get; set; }
     public string BarberName { get; set; } = string.Empty;
     public string? BarberPhotoUrl { get; set; }
@@ -83,8 +89,10 @@ public class AppointmentSummaryDto
 
 public class BookingWizardViewModel
 {
+    public List<BranchOptionDto> Branches { get; set; } = new();
     public List<PublicServiceDto> Services { get; set; } = new();
     public List<PublicBarberDto> Barbers { get; set; } = new();
+    public int? PreSelectedBranchId { get; set; }
     public int? PreSelectedServiceId { get; set; }
     public int? PreSelectedBarberId { get; set; }
     public string TodayDateString { get; set; } = string.Empty;

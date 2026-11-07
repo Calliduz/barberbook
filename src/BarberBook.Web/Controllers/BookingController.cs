@@ -33,11 +33,24 @@ public class BookingController : Controller
     public async Task<IActionResult> Index(
         [FromQuery] int? serviceId,
         [FromQuery] int? barberId,
+        [FromQuery] int? branchId,
         [FromQuery] int? service,
-        [FromQuery] int? barber)
+        [FromQuery] int? barber,
+        [FromQuery] int? branch)
     {
         var effServiceId = serviceId ?? service;
         var effBarberId = barberId ?? barber;
+        var effBranchId = branchId ?? branch;
+
+        var branches = await _dbContext.Branches
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.Name)
+            .Select(b => new BarberBook.Web.Models.Admin.BranchOptionDto
+            {
+                Id = b.Id,
+                Name = b.Name
+            })
+            .ToListAsync();
 
         var services = await _dbContext.Services
             .Where(s => s.IsActive)
@@ -55,6 +68,7 @@ public class BookingController : Controller
 
         var barbers = await _dbContext.Barbers
             .Include(b => b.User)
+            .Include(b => b.Branch)
             .Include(b => b.WorkingHours)
             .Where(b => b.IsActive && b.User.IsActive)
             .OrderBy(b => b.DisplayName)
@@ -67,6 +81,8 @@ public class BookingController : Controller
             Bio = b.Bio,
             PhotoUrl = b.PhotoUrl,
             Specialties = b.Specialties,
+            BranchId = b.BranchId,
+            BranchName = b.Branch != null ? b.Branch.Name : null,
             WeeklyScheduleText = FormattingHelpers.FormatWeeklySchedule(b.WorkingHours)
         }).ToList();
 
@@ -90,8 +106,10 @@ public class BookingController : Controller
 
         var model = new BookingWizardViewModel
         {
+            Branches = branches,
             Services = services,
             Barbers = barberDtos,
+            PreSelectedBranchId = effBranchId,
             PreSelectedServiceId = effServiceId,
             PreSelectedBarberId = effBarberId,
             TodayDateString = today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
@@ -110,6 +128,8 @@ public class BookingController : Controller
         var appointment = await _dbContext.Appointments
             .Include(a => a.Customer)
             .Include(a => a.Barber).ThenInclude(b => b.User)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
+            .Include(a => a.Branch)
             .Include(a => a.Service)
             .FirstOrDefaultAsync(a => a.ReferenceCode == referenceCode);
 
@@ -144,8 +164,11 @@ public class BookingController : Controller
             CustomerName = appointment.Customer.FullName,
             CustomerPhone = appointment.Customer.PhoneNumber ?? string.Empty,
             CustomerEmail = appointment.Customer.Email ?? string.Empty,
+            BranchId = appointment.BranchId ?? appointment.Barber?.BranchId,
+            BranchName = appointment.Branch?.Name ?? appointment.Barber?.Branch?.Name,
+            BranchAddress = appointment.Branch?.Address ?? appointment.Barber?.Branch?.Address,
             BarberId = appointment.BarberId,
-            BarberName = appointment.Barber.DisplayName,
+            BarberName = appointment.Barber?.DisplayName ?? string.Empty,
             ServiceId = appointment.ServiceId,
             ServiceName = appointment.ServiceName,
             Price = appointment.Price,

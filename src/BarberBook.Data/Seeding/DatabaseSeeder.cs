@@ -66,17 +66,46 @@ public static class DatabaseSeeder
             await userManager.AddToRoleAsync(adminUser, "Admin");
         }
 
+        // 2.5 Seed Branches (Multi-Branch Support)
+        var branchesData = new[]
+        {
+            (Name: "Manila Main Branch", Address: "123 Escolta St., Binondo, Manila", Phone: "0917-111-2222"),
+            (Name: "Makati Poblacion Branch", Address: "456 General Luna St., Poblacion, Makati", Phone: "0917-333-4444")
+        };
+
+        var branchMap = new Dictionary<string, Branch>();
+        foreach (var (bName, bAddress, bPhone) in branchesData)
+        {
+            var branch = await context.Branches.FirstOrDefaultAsync(b => b.Name == bName);
+            if (branch == null)
+            {
+                branch = new Branch
+                {
+                    Name = bName,
+                    Address = bAddress,
+                    PhoneNumber = bPhone,
+                    OpeningTime = new LocalTime(9, 0),
+                    ClosingTime = new LocalTime(18, 0),
+                    IsActive = true,
+                    CreatedAt = now
+                };
+                context.Branches.Add(branch);
+                await context.SaveChangesAsync();
+            }
+            branchMap[bName] = branch;
+        }
+
         // 3. Seed Barbers: Ramon, Dennis, Miguel
         var barberData = new[]
         {
-            (Name: "Ramon", Email: "ramon@barberbook.local", Bio: "Master barber specializing in classic cuts and beard styling.", Specialties: "Classic Cuts, Beard Sculpting"),
-            (Name: "Dennis", Email: "dennis@barberbook.local", Bio: "Precision stylist with 10+ years experience in modern fades.", Specialties: "Modern Fades, Shaves"),
-            (Name: "Miguel", Email: "miguel@barberbook.local", Bio: "Creative colorist and artistic stylist.", Specialties: "Hair Color, Texture Styling")
+            (Name: "Ramon", Email: "ramon@barberbook.local", Bio: "Master barber specializing in classic cuts and beard styling.", Specialties: "Classic Cuts, Beard Sculpting", Branch: "Manila Main Branch"),
+            (Name: "Dennis", Email: "dennis@barberbook.local", Bio: "Precision stylist with 10+ years experience in modern fades.", Specialties: "Modern Fades, Shaves", Branch: "Manila Main Branch"),
+            (Name: "Miguel", Email: "miguel@barberbook.local", Bio: "Creative colorist and artistic stylist.", Specialties: "Hair Color, Texture Styling", Branch: "Makati Poblacion Branch")
         };
 
         var barberMap = new Dictionary<string, Barber>();
 
-        foreach (var (name, email, bio, specialties) in barberData)
+        foreach (var (name, email, bio, specialties, branchName) in barberData)
         {
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
@@ -99,6 +128,7 @@ public static class DatabaseSeeder
                 await userManager.AddToRoleAsync(user, "Barber");
             }
 
+            var branchId = branchMap[branchName].Id;
             var barber = await context.Barbers.Include(b => b.WorkingHours).FirstOrDefaultAsync(b => b.UserId == user.Id);
             if (barber == null)
             {
@@ -108,9 +138,15 @@ public static class DatabaseSeeder
                     DisplayName = name,
                     Bio = bio,
                     Specialties = specialties,
+                    BranchId = branchId,
                     IsActive = true
                 };
                 context.Barbers.Add(barber);
+                await context.SaveChangesAsync();
+            }
+            else if (barber.BranchId != branchId)
+            {
+                barber.BranchId = branchId;
                 await context.SaveChangesAsync();
             }
 
@@ -272,6 +308,7 @@ public static class DatabaseSeeder
                 ReferenceCode = item.Ref,
                 CustomerId = customer.Id,
                 BarberId = barber.Id,
+                BranchId = barber.BranchId,
                 ServiceId = service.Id,
                 StartsAt = startsAt,
                 EndsAt = endsAt,

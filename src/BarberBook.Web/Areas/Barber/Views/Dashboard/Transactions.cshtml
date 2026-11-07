@@ -17,28 +17,35 @@
             </p>
         </div>
 
-        <!-- Filter Form -->
-        <form method="get" action="/barber/transactions" class="flex flex-wrap items-center gap-2">
-            <div class="flex items-center gap-1.5 text-xs text-slate-600">
-                <span>From</span>
-                <input type="date" name="startDate" value="@Model.StartDate"
-                       class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
-            </div>
-            <div class="flex items-center gap-1.5 text-xs text-slate-600">
-                <span>To</span>
-                <input type="date" name="endDate" value="@Model.EndDate"
-                       class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
-            </div>
-            <button type="submit" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
-                Filter
+        <!-- Actions & Filter Form -->
+        <div class="flex flex-wrap items-center gap-2">
+            <form method="get" action="/barber/transactions" class="flex flex-wrap items-center gap-2 print:hidden">
+                <div class="flex items-center gap-1.5 text-xs text-slate-600">
+                    <span>From</span>
+                    <input type="date" name="startDate" value="@Model.StartDate"
+                           class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
+                </div>
+                <div class="flex items-center gap-1.5 text-xs text-slate-600">
+                    <span>To</span>
+                    <input type="date" name="endDate" value="@Model.EndDate"
+                           class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
+                </div>
+                <button type="submit" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                    Filter
+                </button>
+                @if (!string.IsNullOrEmpty(Model.StartDate) || !string.IsNullOrEmpty(Model.EndDate))
+                {
+                    <a href="/barber/transactions" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition">
+                        Reset
+                    </a>
+                }
+            </form>
+
+            <button type="button" onclick="window.print()" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5 print:hidden">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span>Print Cutoff Slip</span>
             </button>
-            @if (!string.IsNullOrEmpty(Model.StartDate) || !string.IsNullOrEmpty(Model.EndDate))
-            {
-                <a href="/barber/transactions" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition">
-                    Reset
-                </a>
-            }
-        </form>
+        </div>
     </div>
 
     <!-- Metrics Cards -->
@@ -107,7 +114,8 @@
         }
         else
         {
-            <div class="overflow-x-auto">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
                         <tr>
@@ -168,7 +176,142 @@
                     </tfoot>
                 </table>
             </div>
+
+            <!-- Mobile Stacked Card View -->
+            <div class="md:hidden divide-y divide-slate-100">
+                @foreach (var tr in Model.Transactions)
+                {
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-mono font-bold text-xs text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                @tr.ReferenceCode
+                            </span>
+                            <span class="text-[11px] text-slate-400 font-medium">
+                                @tr.DateFormatted &bull; @tr.TimeFormatted
+                            </span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-900 text-sm">@tr.CustomerName</div>
+                            <div class="text-xs text-slate-600 font-medium mt-0.5">@tr.ServiceName</div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Settled Price</span>
+                                <span class="font-bold text-slate-900">@tr.FormattedPrice</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-emerald-700 block text-[10px] uppercase font-bold">Barber Share (50%)</span>
+                                <span class="font-bold text-emerald-700 text-sm">@tr.FormattedCommissionAmount</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Mobile Summary Footer -->
+                <div class="p-4 bg-slate-50 space-y-2 border-t border-slate-200">
+                    <div class="flex justify-between text-xs text-slate-600">
+                        <span>Total Service Sales:</span>
+                        <span class="font-bold text-slate-900">@Model.FormattedTotalRevenue</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-black text-emerald-700 pt-1 border-t border-slate-200">
+                        <span>My Commission (50%):</span>
+                        <span>@Model.FormattedTotalCommission</span>
+                    </div>
+                </div>
+            </div>
         }
     </div>
+
+    <!-- PRINT-ONLY OFFICIAL PAYOUT & COMMISSION VOUCHER -->
+    <div class="hidden print:block font-sans text-slate-900 pt-6">
+        <div class="border-2 border-slate-900 p-8 rounded-2xl space-y-6">
+            <!-- Header -->
+            <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-serif font-black tracking-tight uppercase">BarberBook Master Grooming</h2>
+                    <p class="text-xs text-slate-600 uppercase tracking-widest mt-0.5">Official Barber Payout &amp; Commission Cutoff Slip (RP-4, BR-07)</p>
+                </div>
+                <div class="text-right text-xs">
+                    <p class="font-mono font-bold">PAYOUT VOUCHER</p>
+                    <p class="text-slate-500">Date Printed: @DateTime.UtcNow.ToString("MMM dd, yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Metadata Box -->
+            <div class="grid grid-cols-2 gap-4 text-xs">
+                <div class="space-y-1">
+                    <p><span class="font-bold uppercase text-slate-500">Barber Name:</span> <span class="font-bold text-slate-900 text-sm">@Model.BarberName</span></p>
+                    <p><span class="font-bold uppercase text-slate-500">Pay Period:</span> <span>@(string.IsNullOrEmpty(Model.StartDate) ? "Beginning" : Model.StartDate) &mdash; @(string.IsNullOrEmpty(Model.EndDate) ? "Current" : Model.EndDate)</span></p>
+                </div>
+                <div class="space-y-1 text-right">
+                    <p><span class="font-bold uppercase text-slate-500">Completed Cuts:</span> <span class="font-bold font-mono">@Model.TotalCompletedCount</span></p>
+                    <p><span class="font-bold uppercase text-slate-500">Commission Rate:</span> <span class="font-bold">50% Gross Share</span></p>
+                </div>
+            </div>
+
+            <!-- Financial Summary Table -->
+            <table class="w-full text-xs text-left border-collapse border border-slate-300">
+                <thead class="bg-slate-100 font-bold uppercase tracking-wider text-slate-700">
+                    <tr>
+                        <th class="p-2 border border-slate-300">Description</th>
+                        <th class="p-2 border border-slate-300 text-right">Completed Count</th>
+                        <th class="p-2 border border-slate-300 text-right">Total Amount (PHP)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2 border border-slate-300 font-semibold">Total Gross Client Service Revenue (Cash Settled In-Shop)</td>
+                        <td class="p-2 border border-slate-300 text-right font-mono">@Model.TotalCompletedCount</td>
+                        <td class="p-2 border border-slate-300 text-right font-bold">@Model.FormattedTotalRevenue</td>
+                    </tr>
+                    <tr>
+                        <td class="p-2 border border-slate-300 font-semibold text-slate-600">Shop Operating Overhead &amp; Facilities Share (50%)</td>
+                        <td class="p-2 border border-slate-300 text-right font-mono">&mdash;</td>
+                        <td class="p-2 border border-slate-300 text-right text-slate-600">@Model.FormattedShopShare</td>
+                    </tr>
+                    <tr class="bg-slate-50 font-black">
+                        <td class="p-2 border border-slate-300 uppercase">Net Barber Take-Home Commission (50%)</td>
+                        <td class="p-2 border border-slate-300 text-right font-mono">&mdash;</td>
+                        <td class="p-2 border border-slate-300 text-right text-base text-slate-900">@Model.FormattedTotalCommission</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Signatures -->
+            <div class="pt-8 grid grid-cols-2 gap-12 text-xs">
+                <div class="border-t border-slate-800 pt-2 text-center">
+                    <p class="font-bold">@Model.BarberName</p>
+                    <p class="text-slate-500 text-[10px] uppercase tracking-wider">Barber Signature &amp; Date Received</p>
+                </div>
+                <div class="border-t border-slate-800 pt-2 text-center">
+                    <p class="font-bold">BarberBook Shop Manager</p>
+                    <p class="text-slate-500 text-[10px] uppercase tracking-wider">Authorized Management Signature</p>
+                </div>
+            </div>
+
+            <!-- Legal and Audit Notice -->
+            <div class="pt-2 text-[9px] text-slate-400 text-center uppercase tracking-wider">
+                Audited &amp; Reconciled via BarberBook Enterprise Core &bull; SBIT-3D Group 4
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    @@media print {
+        body {
+            background-color: white !important;
+            color: black !important;
+        }
+        nav, header, footer, .sidebar, button, form {
+            display: none !important;
+        }
+        .print\:hidden {
+            display: none !important;
+        }
+        .print\:block {
+            display: block !important;
+        }
+    }
+</style>
 

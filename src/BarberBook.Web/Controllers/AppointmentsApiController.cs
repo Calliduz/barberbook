@@ -51,7 +51,8 @@ public class AppointmentsApiController : ControllerBase
 
         var now = _clock.GetCurrentInstant();
         var query = _dbContext.Appointments
-            .Include(a => a.Barber)
+            .Include(a => a.Barber).ThenInclude(b => b.Branch)
+            .Include(a => a.Branch)
             .Include(a => a.Service)
             .Include(a => a.StatusHistories)
             .Where(a => a.CustomerId == customerId);
@@ -110,9 +111,11 @@ public class AppointmentsApiController : ControllerBase
             {
                 Id = app.Id,
                 ReferenceCode = app.ReferenceCode,
+                BranchId = app.BranchId ?? app.Barber?.BranchId,
+                BranchName = app.Branch?.Name ?? app.Barber?.Branch?.Name,
                 BarberId = app.BarberId,
-                BarberName = app.Barber.DisplayName,
-                BarberPhotoUrl = app.Barber.PhotoUrl,
+                BarberName = app.Barber?.DisplayName ?? string.Empty,
+                BarberPhotoUrl = app.Barber?.PhotoUrl,
                 ServiceId = app.ServiceId,
                 ServiceName = app.ServiceName,
                 Price = app.Price,
@@ -286,6 +289,7 @@ public class AppointmentsApiController : ControllerBase
                 ReferenceCode = refCode,
                 CustomerId = customerId,
                 BarberId = request.BarberId,
+                BranchId = barber.BranchId,
                 ServiceId = request.ServiceId,
                 StartsAt = startsAtInstant,
                 EndsAt = endsAt,

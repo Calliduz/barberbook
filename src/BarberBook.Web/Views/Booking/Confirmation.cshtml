@@ -52,6 +52,19 @@
                 <span class="text-neutral-400">Barber</span>
                 <span class="font-bold text-neutral-100">@Model.BarberName</span>
             </div>
+            @if (!string.IsNullOrEmpty(Model.BranchName))
+            {
+                <div class="py-3 flex justify-between items-center">
+                    <span class="text-neutral-400">Branch Location</span>
+                    <div class="text-right">
+                        <span class="font-bold text-neutral-100 block">@Model.BranchName</span>
+                        @if (!string.IsNullOrEmpty(Model.BranchAddress))
+                        {
+                            <span class="text-[11px] text-neutral-400 block">@Model.BranchAddress</span>
+                        }
+                    </div>
+                </div>
+            }
             <div class="py-3 flex justify-between items-center">
                 <span class="text-neutral-400">Date</span>
                 <span class="font-bold text-neutral-100">@Model.FormattedDate</span>
@@ -74,8 +87,25 @@
         </div>
 
         <p class="text-xs text-neutral-400 mt-4">
-            Payment will be settled in cash at the barber shop upon service completion.
+            Payment will be settled in cash at the barber shop upon service completion (LM-1).
         </p>
+
+        <!-- Calendar Sync & Print Slip (Enterprise Booking Feature) -->
+        <div class="mt-6 p-4 rounded-2xl bg-neutral-950/80 border border-neutral-800 flex flex-wrap items-center justify-center gap-3">
+            <span class="text-xs text-neutral-400 font-semibold w-full sm:w-auto">Keep your schedule handy:</span>
+            <button type="button" onclick="addToGoogleCalendar()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 text-xs font-semibold border border-amber-500/20 transition">
+                <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                <span>Google Calendar</span>
+            </button>
+            <button type="button" onclick="downloadIcsFile()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold border border-neutral-700 transition">
+                <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>iCal / Apple (.ics)</span>
+            </button>
+            <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold border border-neutral-700 transition">
+                <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span>Print Voucher</span>
+            </button>
+        </div>
 
         <!-- CTA Action Buttons -->
         <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -91,4 +121,59 @@
     </div>
 </div>
 </div>
+
+<script>
+    const appData = {
+        title: "BarberBook: @Model.ServiceName with @Model.BarberName",
+        details: "Appointment @Model.ReferenceCode for @Model.ServiceName at BarberBook. Status: @Model.StatusDisplay. Settled in-shop.",
+        location: "@(Model.BranchName ?? "BarberBook Heritage Barbershop")@(string.IsNullOrEmpty(Model.BranchAddress) ? "" : ", " + Model.BranchAddress)",
+        startsAtUtc: "@Model.StartsAt",
+        endsAtUtc: "@Model.EndsAt",
+        refCode: "@Model.ReferenceCode"
+    };
+
+    function parseToCalString(isoStr) {
+        if (!isoStr) return "";
+        const d = new Date(isoStr);
+        return d.toISOString().replace(/-|:|\.\d+/g, "");
+    }
+
+    function addToGoogleCalendar() {
+        const startStr = parseToCalString(appData.startsAtUtc);
+        const endStr = parseToCalString(appData.endsAtUtc);
+        const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(appData.title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(appData.details)}&location=${encodeURIComponent(appData.location)}`;
+        window.open(gUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function downloadIcsFile() {
+        const startStr = parseToCalString(appData.startsAtUtc);
+        const endStr = parseToCalString(appData.endsAtUtc);
+        const icsContent = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//BarberBook//Appointment System//EN",
+            "CALSCALE:GREGORIAN",
+            "METHOD:PUBLISH",
+            "BEGIN:VEVENT",
+            `UID:barberbook-${appData.refCode}@@barberbook.local`,
+            `DTSTAMP:${startStr}`,
+            `DTSTART:${startStr}`,
+            `DTEND:${endStr}`,
+            `SUMMARY:${appData.title}`,
+            `DESCRIPTION:${appData.details}`,
+            `LOCATION:${appData.location}`,
+            "STATUS:CONFIRMED",
+            "END:VEVENT",
+            "END:VCALENDAR"
+        ].join("\r\n");
+
+        const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute("download", `BarberBook-${appData.refCode}.ics`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
 

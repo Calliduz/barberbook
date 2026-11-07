@@ -30,6 +30,7 @@ public class CreateBarberRequest
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
+    public int? BranchId { get; set; }
 }
 
 public class UpdateBarberRequest
@@ -58,11 +59,18 @@ public class UpdateBarberRequest
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
+    public int? BranchId { get; set; }
 }
 
 public class ResetBarberPasswordRequest
 {
     public string NewPassword { get; set; } = string.Empty;
+}
+
+public class BranchOptionDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 }
 
 public class AdminBarberItemDto
@@ -75,6 +83,8 @@ public class AdminBarberItemDto
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
     public bool IsActive { get; set; }
     public int CompletedAppointmentsCount { get; set; }
 }
@@ -82,6 +92,7 @@ public class AdminBarberItemDto
 public class BarberListViewModel
 {
     public List<AdminBarberItemDto> Items { get; set; } = new();
+    public List<BranchOptionDto> Branches { get; set; } = new();
     public int TotalCount { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;

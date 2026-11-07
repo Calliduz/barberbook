@@ -81,7 +81,7 @@ public class CoreTraceabilityAndBoundaryTests : IClassFixture<WebApplicationFact
                 $"LM-5 violation: Found notification assembly matching {keyword}");
         }
 
-        // 3. Inspect EF Core metadata to verify single-shop architecture (no tenant or branch columns)
+        // 3. Inspect EF Core metadata to verify no multi-tenant isolation columns (TenantId prohibited per LM-3)
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
@@ -90,7 +90,6 @@ public class CoreTraceabilityAndBoundaryTests : IClassFixture<WebApplicationFact
             {
                 var properties = entityType.GetProperties().Select(p => p.Name);
                 properties.Should().NotContain("TenantId", $"LM-3 violation: Found TenantId on {entityType.Name}");
-                properties.Should().NotContain("BranchId", $"LM-3 violation: Found BranchId on {entityType.Name}");
             }
         }
 

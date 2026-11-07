@@ -1,0 +1,387 @@
+@model BarberBook.Web.Models.Admin.BranchListViewModel
+@{
+    ViewData["Title"] = "Branches";
+}
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>MULTI-BRANCH OPERATIONS</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Branches Management</h1>
+            <p class="mt-1 text-sm text-slate-500">Manage physical barbershop locations, operational schedules, assigned barbers, and branch-level booking visibility.</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 transition">
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Add New Branch
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="rounded-xl bg-emerald-50 p-4 border border-emerald-200">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-emerald-800">@TempData["SuccessMessage"]</p>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="rounded-xl bg-rose-50 p-4 border border-rose-200">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-rose-800">@TempData["ErrorMessage"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Search & Filters -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4">
+        <form method="get" action="/admin/branches" class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="w-full sm:w-80 relative">
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search branch name, address, phone..." class="w-full rounded-xl border-slate-300 pl-10 pr-4 py-2 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <label for="statusFilter" class="text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status:</label>
+                <select id="statusFilter" name="status" onchange="this.form.submit()" class="rounded-xl border-slate-300 py-1.5 pl-3 pr-8 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                    <option value="all" selected="@(Model.StatusFilter == "all")">All Branches</option>
+                    <option value="active" selected="@(Model.StatusFilter == "active")">Active Only</option>
+                    <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive Only</option>
+                </select>
+                <button type="submit" class="rounded-xl bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Branches Table & Mobile Cards -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/90 overflow-hidden">
+        <!-- Desktop Table View -->
+        <div class="hidden sm:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100 text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3.5 pl-6 pr-3">Branch Location</th>
+                        <th class="px-3 py-3.5">Address</th>
+                        <th class="px-3 py-3.5">Contact Phone</th>
+                        <th class="px-3 py-3.5">Hours</th>
+                        <th class="px-3 py-3.5 text-center">Active Barbers</th>
+                        <th class="px-3 py-3.5 text-center">Completed Cuts</th>
+                        <th class="px-3 py-3.5">Status</th>
+                        <th class="py-3.5 pl-3 pr-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700">
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="py-12 text-center text-slate-400">
+                                No branches found matching the criteria.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var branch in Model.Items)
+                    {
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-4 pl-6 pr-3">
+                                <div class="font-bold text-slate-900 text-sm">@branch.Name</div>
+                                <div class="text-[11px] text-slate-400">Branch ID: #@branch.Id</div>
+                            </td>
+                            <td class="px-3 py-4 text-slate-600">@branch.Address</td>
+                            <td class="px-3 py-4 text-slate-600">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "—" : branch.PhoneNumber)</td>
+                            <td class="px-3 py-4 text-slate-600 font-mono text-[11px]">@branch.OpeningTime - @branch.ClosingTime</td>
+                            <td class="px-3 py-4 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                    @branch.BarbersCount Barbers
+                                </span>
+                            </td>
+                            <td class="px-3 py-4 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    @branch.CompletedAppointmentsCount Done
+                                </span>
+                            </td>
+                            <td class="px-3 py-4">
+                                @if (branch.IsActive)
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200">
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap space-x-2">
+                                <button type="button" onclick="openEditModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', '@Html.Raw(Html.Encode(branch.Address))', '@Html.Raw(Html.Encode(branch.PhoneNumber ?? ""))', '@branch.OpeningTime', '@branch.ClosingTime')" class="text-amber-600 hover:text-amber-800 font-bold text-xs">Edit</button>
+                                <span class="text-slate-300">|</span>
+                                <button type="button" onclick="confirmToggleStatus(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', @(branch.IsActive ? "true" : "false"))" class="@(branch.IsActive ? "text-rose-600 hover:text-rose-800" : "text-emerald-600 hover:text-emerald-800") font-bold text-xs">
+                                    @(branch.IsActive ? "Deactivate" : "Activate")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Stacked Card View -->
+        <div class="sm:hidden divide-y divide-slate-100">
+            @if (!Model.Items.Any())
+            {
+                <div class="py-12 text-center text-slate-400 text-xs">
+                    No branches found matching the criteria.
+                </div>
+            }
+            @foreach (var branch in Model.Items)
+            {
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">@branch.Name</h3>
+                            <p class="text-[11px] text-slate-400">Branch ID: #@branch.Id</p>
+                        </div>
+                        @if (branch.IsActive)
+                        {
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                                Active
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">
+                                Inactive
+                            </span>
+                        }
+                    </div>
+
+                    <p class="text-xs text-slate-600">@branch.Address</p>
+
+                    <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                        <div>
+                            <span class="block text-slate-400 uppercase text-[9px] font-bold">Hours</span>
+                            <span class="font-mono text-slate-800">@branch.OpeningTime - @branch.ClosingTime</span>
+                        </div>
+                        <div>
+                            <span class="block text-slate-400 uppercase text-[9px] font-bold">Phone</span>
+                            <span class="text-slate-800">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "—" : branch.PhoneNumber)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                            @branch.BarbersCount Barbers
+                        </span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            @branch.CompletedAppointmentsCount Done
+                        </span>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-3 text-xs">
+                        <button type="button" onclick="openEditModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', '@Html.Raw(Html.Encode(branch.Address))', '@Html.Raw(Html.Encode(branch.PhoneNumber ?? ""))', '@branch.OpeningTime', '@branch.ClosingTime')" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-bold hover:bg-amber-100 transition">
+                            Edit
+                        </button>
+                        <button type="button" onclick="confirmToggleStatus(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', @(branch.IsActive ? "true" : "false"))" class="px-3 py-1.5 rounded-lg @(branch.IsActive ? "bg-rose-50 text-rose-700 border border-rose-200" : "bg-emerald-50 text-emerald-700 border border-emerald-200") font-bold transition">
+                            @(branch.IsActive ? "Deactivate" : "Activate")
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="flex items-center justify-between border-t border-slate-100 bg-white px-4 py-3 sm:px-6">
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500">
+                            Showing <span class="font-bold text-slate-900">@((Model.Page - 1) * Model.PageSize + 1)</span> to
+                            <span class="font-bold text-slate-900">@Math.Min(Model.Page * Model.PageSize, Model.TotalCount)</span> of
+                            <span class="font-bold text-slate-900">@Model.TotalCount</span> branches
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="isolate inline-flex -space-x-px rounded-xl shadow-sm" aria-label="Pagination">
+                            @if (Model.Page > 1)
+                            {
+                                <a href="?page=@(Model.Page - 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center rounded-l-xl px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">Previous</a>
+                            }
+                            @for (var p = 1; p <= Model.TotalPages; p++)
+                            {
+                                <a href="?page=@p&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center px-4 py-2 text-xs font-semibold @(p == Model.Page ? "z-10 bg-amber-500 text-slate-950 font-bold" : "text-slate-900 ring-1 ring-inset ring-slate-200 hover:bg-slate-50")">@p</a>
+                            }
+                            @if (Model.Page < Model.TotalPages)
+                            {
+                                <a href="?page=@(Model.Page + 1)&q=@Model.SearchQuery&status=@Model.StatusFilter" class="relative inline-flex items-center rounded-r-xl px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">Next</a>
+                            }
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Create Branch Modal -->
+<div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-serif font-bold text-slate-900">Add New Branch Location</h3>
+            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form method="post" action="/admin/branches" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Branch Name *</label>
+                <input type="text" name="Name" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. Quezon City Fairview Branch" />
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Street Address *</label>
+                <input type="text" name="Address" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. Unit 4, Regalado Highway, Fairview, QC" />
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
+                <input type="text" name="PhoneNumber" class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. 0917-555-1234" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Opening Time *</label>
+                    <input type="time" name="OpeningTime" value="09:00" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Closing Time *</label>
+                    <input type="time" name="ClosingTime" value="18:00" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('createModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Branch</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Branch Modal -->
+<div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-serif font-bold text-slate-900">Edit Branch Details</h3>
+            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="editBranchForm" method="post" action="" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Branch Name *</label>
+                <input type="text" id="editName" name="Name" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Street Address *</label>
+                <input type="text" id="editAddress" name="Address" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
+                <input type="text" id="editPhoneNumber" name="PhoneNumber" class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Opening Time *</label>
+                    <input type="time" id="editOpeningTime" name="OpeningTime" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Closing Time *</label>
+                    <input type="time" id="editClosingTime" name="ClosingTime" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('editModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toggle Status Modal -->
+<div id="confirmStatusModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+        <h3 id="confirmStatusTitle" class="text-lg font-serif font-bold text-slate-900">Deactivate Branch</h3>
+        <p id="confirmStatusMessage" class="text-xs text-slate-500 mt-2">
+            Are you sure you want to deactivate this branch? Barbers and existing appointments will remain preserved, but new bookings at this location will be paused.
+        </p>
+        <form id="toggleStatusForm" method="post" action="" class="mt-5 flex justify-end space-x-3">
+            <button type="button" onclick="closeModal('confirmStatusModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+            <button type="submit" id="confirmStatusBtn" class="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 transition shadow-sm">Deactivate</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+    }
+
+    function openEditModal(id, name, address, phone, openTime, closeTime) {
+        document.getElementById('editBranchForm').action = '/admin/branches/' + id + '/edit';
+        document.getElementById('editName').value = name;
+        document.getElementById('editAddress').value = address;
+        document.getElementById('editPhoneNumber').value = phone;
+        document.getElementById('editOpeningTime').value = openTime;
+        document.getElementById('editClosingTime').value = closeTime;
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function confirmToggleStatus(id, name, isActive) {
+        document.getElementById('toggleStatusForm').action = '/admin/branches/' + id + '/toggle-status';
+        const title = isActive ? 'Deactivate Branch' : 'Activate Branch';
+        const msg = isActive
+            ? 'Are you sure you want to deactivate ' + name + '? New customer bookings will be paused for this branch, but all historical appointments and barber associations remain intact.'
+            : 'Are you sure you want to activate ' + name + '? The branch will be visible for customer bookings.';
+        const btnClass = isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500';
+        const btnText = isActive ? 'Deactivate' : 'Activate';
+
+        document.getElementById('confirmStatusTitle').innerText = title;
+        document.getElementById('confirmStatusMessage').innerText = msg;
+        const confirmBtn = document.getElementById('confirmStatusBtn');
+        confirmBtn.className = 'rounded-xl px-4 py-2 text-xs font-bold text-white transition ' + btnClass;
+        confirmBtn.innerText = btnText;
+
+        document.getElementById('confirmStatusModal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+</script>

@@ -95,7 +95,25 @@
             <h2 class="text-xl font-serif font-black text-slate-900 tracking-tight">Choose a Barber</h2>
             <button type="button" onclick="goToStep(1)" class="text-xs text-amber-700 hover:text-amber-800 font-bold px-2 py-1 rounded-lg hover:bg-amber-100/60 transition focus:outline-none focus:ring-2 focus:ring-amber-500">← Change Service</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        @if (Model.Branches.Any())
+        {
+            <!-- Branch Filter Chips -->
+            <div class="mb-4 flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Branch:</span>
+                <button type="button" onclick="filterBarbersByBranch(null)" id="branch-chip-all" class="branch-chip px-3 py-1 rounded-full text-xs font-bold transition bg-amber-500 text-slate-950">
+                    All Locations
+                </button>
+                @foreach (var br in Model.Branches)
+                {
+                    <button type="button" onclick="filterBarbersByBranch(@br.Id)" id="branch-chip-@br.Id" class="branch-chip px-3 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition">
+                        @br.Name
+                    </button>
+                }
+            </div>
+        }
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="barbers-list-container">
             @foreach (var barber in Model.Barbers)
             {
                 <div class="barber-card cursor-pointer p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-amber-500/60 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
@@ -105,6 +123,7 @@
                      aria-label="Select master barber @barber.DisplayName"
                      data-id="@barber.Id"
                      data-name="@barber.DisplayName"
+                     data-branch-id="@(barber.BranchId?.ToString() ?? "0")"
                      onclick="selectBarber(@barber.Id, '@barber.DisplayName')"
                      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectBarber(@barber.Id, '@barber.DisplayName');}">
                     <div class="flex items-center gap-4">
@@ -118,8 +137,17 @@
                                 @(string.IsNullOrEmpty(barber.DisplayName) ? "B" : barber.DisplayName[..1].ToUpperInvariant())
                             </div>
                         }
-                        <div>
-                            <h3 class="text-lg font-bold text-neutral-100">@barber.DisplayName</h3>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-neutral-100">@barber.DisplayName</h3>
+                                @if (!string.IsNullOrEmpty(barber.BranchName))
+                                {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                        @barber.BranchName
+                                    </span>
+                                }
+                            </div>
                             <p class="text-xs text-amber-400 font-medium mt-0.5">@barber.Specialties</p>
                         </div>
                     </div>
@@ -275,6 +303,13 @@
             }
         }
 
+        // Check for branch filter from URL query param
+        const urlParams = new URLSearchParams(window.location.search);
+        const branchParam = urlParams.get('branchId');
+        if (branchParam) {
+            filterBarbersByBranch(parseInt(branchParam, 10));
+        }
+
         // Determine initial step based on pre-selections
         if (state.serviceId && state.barberId) {
             goToStep(3);
@@ -373,6 +408,25 @@
         if (chosen) highlightCard(chosen, 'barber');
 
         goToStep(3);
+    }
+
+    function filterBarbersByBranch(branchId) {
+        document.querySelectorAll('.branch-chip').forEach(btn => {
+            btn.className = 'branch-chip px-3 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition';
+        });
+        const activeChip = branchId ? document.getElementById(`branch-chip-${branchId}`) : document.getElementById('branch-chip-all');
+        if (activeChip) {
+            activeChip.className = 'branch-chip px-3 py-1 rounded-full text-xs font-bold transition bg-amber-500 text-slate-950';
+        }
+
+        document.querySelectorAll('.barber-card').forEach(card => {
+            const bBranchId = card.getAttribute('data-branch-id');
+            if (!branchId || bBranchId === branchId.toString()) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 
     function highlightCard(card, type) {

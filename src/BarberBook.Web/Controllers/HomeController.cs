@@ -43,11 +43,18 @@ public class HomeController : Controller
 
         var barbers = await _dbContext.Barbers
             .Include(b => b.User)
+            .Include(b => b.Branch)
             .Where(b => b.IsActive && b.User.IsActive)
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
 
+        var branches = await _dbContext.Branches
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.Name)
+            .ToListAsync();
+
         ViewBag.Barbers = barbers;
+        ViewBag.Branches = branches;
         return View(highlights);
     }
 
@@ -83,6 +90,7 @@ public class HomeController : Controller
     {
         var barbers = await _dbContext.Barbers
             .Include(b => b.User)
+            .Include(b => b.Branch)
             .Include(b => b.WorkingHours)
             .Where(b => b.IsActive && b.User.IsActive)
             .OrderBy(b => b.DisplayName)
@@ -96,6 +104,7 @@ public class HomeController : Controller
     {
         var barber = await _dbContext.Barbers
             .Include(b => b.User)
+            .Include(b => b.Branch)
             .Include(b => b.WorkingHours)
             .FirstOrDefaultAsync(b => b.Id == id && b.IsActive && b.User.IsActive);
 

@@ -33,6 +33,8 @@ public class PublicBarberDto
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
     public string WeeklyScheduleText { get; set; } = string.Empty;
 }
 
@@ -43,6 +45,8 @@ public class BarberDetailDto
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
+    public int? BranchId { get; set; }
+    public string? BranchName { get; set; }
     public string WeeklyScheduleText { get; set; } = string.Empty;
     public List<PublicWorkingHoursDto> WeeklyHours { get; set; } = new();
     public List<PublicDayOffDto> UpcomingDaysOff { get; set; } = new();
