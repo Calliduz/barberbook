@@ -517,10 +517,14 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
 
-        // Clean up test barbers (Id > 3)
+        // Clean up transient test barbers created during tests
         var testBarbers = await db.Barbers
             .Include(b => b.User)
-            .Where(b => b.Id > 3)
+            .Where(b => b.User != null && (
+                b.User.Email!.Contains("barber_antonio_") ||
+                b.User.Email.Contains("deactivate_test_") ||
+                b.User.Email.Contains("pwd_reset_") ||
+                b.User.Email.Contains("barber_separate_names_")))
             .ToListAsync();
 
         if (testBarbers.Count > 0)

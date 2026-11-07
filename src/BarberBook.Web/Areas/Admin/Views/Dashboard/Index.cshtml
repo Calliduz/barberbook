@@ -67,14 +67,14 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-emerald-700">@Model.FormattedTodayCompletedSales</span>
+                <span class="text-3xl font-serif font-black text-emerald-700">@Model.FormattedTodayGrandTotal</span>
             </div>
             <div class="mt-2 text-xs text-slate-500 space-y-0.5">
-                <p>@Model.TodayCounts.Completed completed visits settled</p>
+                <p class="font-medium text-slate-700">@Model.FormattedTodayCompletedSales Services &bull; @Model.TodayCounts.Completed cuts</p>
                 @if (Model.TodayProductSales > 0)
                 {
                     <p class="text-[11px] font-semibold text-amber-700">
-                        + @Model.FormattedTodayProductSales products &bull; Grand: @Model.FormattedTodayGrandTotal
+                        + @Model.FormattedTodayProductSales retail counter sales
                     </p>
                 }
             </div>
@@ -89,14 +89,14 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.FormattedMonthToDateCompletedSales</span>
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.FormattedMonthToDateGrandTotal</span>
             </div>
             <div class="mt-2 text-xs text-slate-500 space-y-0.5">
-                <p>Active month services journal</p>
+                <p class="font-medium text-slate-700">@Model.FormattedMonthToDateCompletedSales Services</p>
                 @if (Model.MonthToDateProductSales > 0)
                 {
                     <p class="text-[11px] font-semibold text-amber-700">
-                        + @Model.FormattedMonthToDateProductSales products &bull; Grand: @Model.FormattedMonthToDateGrandTotal
+                        + @Model.FormattedMonthToDateProductSales retail products
                     </p>
                 }
             </div>
@@ -199,12 +199,10 @@
                             <th class="py-3 px-4 w-10 text-center">
                                 <input type="checkbox" id="selectAllPending" onchange="toggleSelectAllPending(this)" class="w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500 cursor-pointer" />
                             </th>
-                            <th class="py-3 px-4">Reference</th>
                             <th class="py-3 px-4">Customer</th>
                             <th class="py-3 px-4">Scheduled For</th>
                             <th class="py-3 px-4">Barber</th>
                             <th class="py-3 px-4">Service</th>
-                            <th class="py-3 px-4">Price</th>
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -215,16 +213,18 @@
                                 <td class="py-3.5 px-4 text-center">
                                     <input type="checkbox" value="@pending.Id" onchange="updateBulkBar()" class="pending-bulk-chk w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500 cursor-pointer" />
                                 </td>
-                                <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-800 whitespace-nowrap">
-                                    @pending.ReferenceCode
-                                    <span class="block text-[10px] font-sans text-slate-400 font-normal">Booked: @pending.CreatedAtFormatted</span>
-                                </td>
                                 <td class="py-3.5 px-4">
                                     <div class="font-bold text-slate-900 text-xs">@pending.CustomerName</div>
                                     @if (!string.IsNullOrWhiteSpace(pending.CustomerPhone))
                                     {
-                                        <div class="text-[11px] text-slate-500">@pending.CustomerPhone</div>
+                                        <div class="text-[11px] text-slate-500 flex items-center gap-1">
+                                            <span>@pending.CustomerPhone</span>
+                                            <button type="button" class="copy-btn text-slate-400 hover:text-amber-700" onclick="copyToClipboard('@pending.CustomerPhone', this)" title="Copy phone number" aria-label="Copy phone number">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                                            </button>
+                                        </div>
                                     }
+                                    <span class="text-[10px] font-mono text-amber-800">#@pending.ReferenceCode</span>
                                 </td>
                                 <td class="py-3.5 px-4 whitespace-nowrap">
                                     <div class="font-bold text-slate-900 text-xs">@pending.ScheduledDateFormatted</div>
@@ -235,13 +235,7 @@
                                 </td>
                                 <td class="py-3.5 px-4 text-slate-600 text-xs">
                                     <div class="font-medium text-slate-800">@pending.ServiceName</div>
-                                    @if (!string.IsNullOrWhiteSpace(pending.Notes))
-                                    {
-                                        <div class="text-[10px] text-slate-400 italic">"@pending.Notes"</div>
-                                    }
-                                </td>
-                                <td class="py-3.5 px-4 font-serif font-bold text-slate-900 whitespace-nowrap text-xs">
-                                    @pending.FormattedPrice
+                                    <div class="text-[11px] text-slate-500 font-mono">@pending.FormattedPrice</div>
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                     <div class="inline-flex items-center gap-1.5">

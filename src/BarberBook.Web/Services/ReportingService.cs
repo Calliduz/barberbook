@@ -109,6 +109,36 @@ public class ReportingService : IReportingService
 
         var grandTotal = totalSales + productSalesTotal;
 
+        // Unified sales journal containing both completed services and settled retail counter sales
+        var combinedJournal = new List<DailySalesLineItemDto>(items);
+        foreach (var sale in daySales)
+        {
+            var saleTime = sale.SoldAt.InZone(_zone).ToString("h:mm tt", CultureInfo.InvariantCulture);
+            var customerName = sale.Customer?.FullName ?? (string.IsNullOrWhiteSpace(sale.Notes) ? "Counter Client" : sale.Notes);
+            foreach (var item in sale.Items)
+            {
+                combinedJournal.Add(new DailySalesLineItemDto
+                {
+                    No = 0, // reindexed below
+                    AppointmentId = 0,
+                    ReferenceCode = $"SALE-#{sale.Id:D4}",
+                    Time = saleTime,
+                    Customer = customerName,
+                    Barber = "Shop Counter",
+                    Service = item.ProductName + (item.Quantity > 1 ? $" (x{item.Quantity})" : ""),
+                    Amount = item.LineTotal,
+                    FormattedAmount = FormattingHelpers.FormatPeso(item.LineTotal),
+                    ItemType = "Retail Product"
+                });
+            }
+        }
+
+        // Re-index line item numbering
+        for (int i = 0; i < combinedJournal.Count; i++)
+        {
+            combinedJournal[i].No = i + 1;
+        }
+
         return new DailySalesReportDto
         {
             Date = date,
@@ -119,6 +149,7 @@ public class ReportingService : IReportingService
             ByService = byService,
             ByBarber = byBarber,
             Items = items,
+            CombinedJournal = combinedJournal,
             ProductSales = new ProductSalesSummaryDto
             {
                 Total = productSalesTotal,

@@ -27,6 +27,107 @@ public static class DatabaseSeeder
         // Ensure database and extensions
         await context.Database.MigrateAsync();
 
+        // 0. Clean up transient automated test artifacts from development database
+        var testUsers = await context.Users
+            .Where(u => u.Email != null && (
+                u.Email.Contains("test.local") ||
+                u.Email.StartsWith("fakebarber_") ||
+                u.Email.StartsWith("deact_cust_") ||
+                u.Email.StartsWith("updated_") ||
+                u.Email.StartsWith("pwd_cust_") ||
+                u.Email.StartsWith("cust_17") ||
+                u.FullName.Contains("Attempted Self Barber") ||
+                u.FullName.Contains("Inactive Test User") ||
+                u.FullName.Contains("Malicious Admin Wannabe") ||
+                u.FullName.Contains("Password Reset Client") ||
+                u.FullName.Contains("Updated Brand New Name") ||
+                u.FullName.Contains("Deactivation Subject") ||
+                u.FullName.Contains("Cross Role Customer") ||
+                u.FullName.StartsWith("Juan Customer 17")))
+            .ToListAsync();
+
+        if (testUsers.Any())
+        {
+            var testUserIds = testUsers.Select(u => u.Id).ToList();
+
+            var testAppts = await context.Appointments.Where(a => testUserIds.Contains(a.CustomerId)).ToListAsync();
+            var testApptIds = testAppts.Select(a => a.Id).ToList();
+            var testHistories = await context.StatusHistories.Where(h => testApptIds.Contains(h.AppointmentId)).ToListAsync();
+            context.StatusHistories.RemoveRange(testHistories);
+            context.Appointments.RemoveRange(testAppts);
+
+            var userRoles = await context.UserRoles.Where(ur => testUserIds.Contains(ur.UserId)).ToListAsync();
+            context.UserRoles.RemoveRange(userRoles);
+            var userLogins = await context.UserLogins.Where(ul => testUserIds.Contains(ul.UserId)).ToListAsync();
+            context.UserLogins.RemoveRange(userLogins);
+            var userClaims = await context.UserClaims.Where(uc => testUserIds.Contains(uc.UserId)).ToListAsync();
+            context.UserClaims.RemoveRange(userClaims);
+            var userTokens = await context.UserTokens.Where(ut => testUserIds.Contains(ut.UserId)).ToListAsync();
+            context.UserTokens.RemoveRange(userTokens);
+
+            context.Users.RemoveRange(testUsers);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Purged {Count} automated test user records.", testUsers.Count);
+        }
+
+        // Clean up transient test equipment artifacts
+        var testEquipment = await context.Equipment
+            .Where(e => e.Name.Contains("Damaged Blade Clipper") ||
+                        e.Name.Contains("Overdue Inspection Dryer") ||
+                        e.Name.Contains("Dennis Dedicated Shears") ||
+                        e.Name.Contains("Reassignment Test Clipper") ||
+                        e.Name.Contains("Shop Shared Clipper") ||
+                        e.Name.Contains("Hydraulic Maintenance Chair") ||
+                        e.Name.Contains("Returnable Trimmer") ||
+                        e.Name.Contains("Ramon Private Trimmer") ||
+                        e.Name.Contains("Alpha Clipper Station") ||
+                        e.Name.Contains("Retirable Trimmer") ||
+                        e.AssetTag.StartsWith("EQ-TEST") ||
+                        e.AssetTag.StartsWith("TEST-"))
+            .ToListAsync();
+
+        if (testEquipment.Any())
+        {
+            var eqIds = testEquipment.Select(e => e.Id).ToList();
+            var checks = await context.EquipmentChecks.Where(c => eqIds.Contains(c.EquipmentId)).ToListAsync();
+            var assigns = await context.EquipmentAssignments.Where(a => eqIds.Contains(a.EquipmentId)).ToListAsync();
+            context.EquipmentChecks.RemoveRange(checks);
+            context.EquipmentAssignments.RemoveRange(assigns);
+            context.Equipment.RemoveRange(testEquipment);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Purged {Count} test equipment records.", testEquipment.Count);
+        }
+
+        // Clean up transient test products
+        var testProducts = await context.Products
+            .Where(p => p.Name.Contains("Low Stock Detection Spray") ||
+                        p.Name.Contains("Original SKU Product") ||
+                        p.Name.Contains("Deactivatable Pomade") ||
+                        p.Name.Contains("Negative Stock Protection Balm") ||
+                        p.Name.Contains("Precision Derivation Gel") ||
+                        p.Name.Contains("History Audit Pomade") ||
+                        p.Name.Contains("Reason Test Wax") ||
+                        p.Name.Contains("Limited Beard Balm") ||
+                        p.Name.Contains("Matte Clay Styling Wax") ||
+                        p.Name.Contains("Precision Shave Gel") ||
+                        p.Sku.StartsWith("SKU-") ||
+                        p.Sku.StartsWith("TEST-"))
+            .ToListAsync();
+
+        if (testProducts.Any())
+        {
+            var pIds = testProducts.Select(p => p.Id).ToList();
+            var purchaseItems = await context.PurchaseItems.Where(pi => pIds.Contains(pi.ProductId)).ToListAsync();
+            var movements = await context.StockMovements.Where(m => pIds.Contains(m.ProductId)).ToListAsync();
+            var saleItems = await context.ProductSaleItems.Where(i => pIds.Contains(i.ProductId)).ToListAsync();
+            context.PurchaseItems.RemoveRange(purchaseItems);
+            context.StockMovements.RemoveRange(movements);
+            context.ProductSaleItems.RemoveRange(saleItems);
+            context.Products.RemoveRange(testProducts);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Purged {Count} test product records.", testProducts.Count);
+        }
+
         // 1. Seed Roles
         string[] roleNames = ["Customer", "Barber", "Admin"];
         foreach (var roleName in roleNames)
@@ -223,7 +324,13 @@ public static class DatabaseSeeder
             (Name: "Paolo Reyes", Email: "paolo@barberbook.local", Phone: "09173456789"),
             (Name: "Carlo Mendoza", Email: "carlo@barberbook.local", Phone: "09174567890"),
             (Name: "Adrian Cruz", Email: "adrian@barberbook.local", Phone: "09175678901"),
-            (Name: "Leo Garcia", Email: "leo@barberbook.local", Phone: "09176789012")
+            (Name: "Leo Garcia", Email: "leo@barberbook.local", Phone: "09176789012"),
+            (Name: "Marco Gonzales", Email: "marco@barberbook.local", Phone: "09177890123"),
+            (Name: "Rafael Santos", Email: "rafael.santos@barberbook.local", Phone: "09178901234"),
+            (Name: "Dominic Reyes", Email: "dominic@barberbook.local", Phone: "09179012345"),
+            (Name: "Joshua Tan", Email: "joshua@barberbook.local", Phone: "09170123456"),
+            (Name: "Christian Bautista", Email: "christian@barberbook.local", Phone: "09171237890"),
+            (Name: "Gabriel Ramos", Email: "gabriel@barberbook.local", Phone: "09172348901")
         };
 
         var customerMap = new Dictionary<string, ApplicationUser>();
@@ -353,6 +460,113 @@ public static class DatabaseSeeder
 
             context.StatusHistories.Add(history);
             await context.SaveChangesAsync();
+        }
+
+        // 6.5 Dynamic Active Appointments for Today and Yesterday (Non-interfering with Sep 14 test specs)
+        var todayManila = now.InZone(ManilaZone).Date;
+        var todayYear = todayManila.Year;
+        var todayMonth = todayManila.Month;
+        var todayDay = todayManila.Day;
+
+        if (!(todayYear == 2026 && todayMonth == 9 && todayDay == 14))
+        {
+            var dynamicSeed = new[]
+            {
+                new { Ref = "BB-TODAY-0001", Customer = "Mark Santos", Barber = "Ramon", Service = "Haircut", Hour = 9, Minute = 30, Status = AppointmentStatus.Completed },
+                new { Ref = "BB-TODAY-0002", Customer = "Paolo Reyes", Barber = "Dennis", Service = "Haircut + Shave", Hour = 11, Minute = 0, Status = AppointmentStatus.Completed },
+                new { Ref = "BB-TODAY-0003", Customer = "Carlo Mendoza", Barber = "Ramon", Service = "Haircut", Hour = 13, Minute = 30, Status = AppointmentStatus.Completed },
+                new { Ref = "BB-TODAY-0004", Customer = "Marco Gonzales", Barber = "Dennis", Service = "Beard Trim", Hour = 15, Minute = 30, Status = AppointmentStatus.Confirmed },
+                new { Ref = "BB-TODAY-0005", Customer = "Adrian Cruz", Barber = "Miguel", Service = "Haircut + Shave", Hour = 16, Minute = 30, Status = AppointmentStatus.Pending },
+                new { Ref = "BB-TODAY-0006", Customer = "Leo Garcia", Barber = "Dennis", Service = "Haircut", Hour = 17, Minute = 0, Status = AppointmentStatus.Pending }
+            };
+
+            foreach (var d in dynamicSeed)
+            {
+                if (!await context.Appointments.AnyAsync(a => a.ReferenceCode == d.Ref))
+                {
+                    var service = serviceMap[d.Service];
+                    var barber = barberMap[d.Barber];
+                    var customer = customerMap[d.Customer];
+                    var startsAt = ManilaToUtc(todayYear, todayMonth, todayDay, d.Hour, d.Minute);
+                    var endsAt = startsAt.Plus(Duration.FromMinutes(service.DurationMinutes));
+
+                    var appt = new Appointment
+                    {
+                        ReferenceCode = d.Ref,
+                        CustomerId = customer.Id,
+                        BarberId = barber.Id,
+                        BranchId = barber.BranchId,
+                        ServiceId = service.Id,
+                        StartsAt = startsAt,
+                        EndsAt = endsAt,
+                        Status = d.Status,
+                        Price = service.Price,
+                        ServiceName = service.Name,
+                        Notes = d.Status == AppointmentStatus.Pending ? "Client requested afternoon slot" : "Standard booking",
+                        CreatedAt = startsAt.Minus(Duration.FromHours(4)),
+                        UpdatedAt = startsAt
+                    };
+                    context.Appointments.Add(appt);
+                    await context.SaveChangesAsync();
+
+                    context.StatusHistories.Add(new StatusHistory
+                    {
+                        AppointmentId = appt.Id,
+                        FromStatus = d.Status == AppointmentStatus.Pending ? null : AppointmentStatus.Pending,
+                        ToStatus = d.Status,
+                        ChangedById = adminUser.Id,
+                        ChangedByRole = "Admin",
+                        Note = "Seeded live schedule appointment",
+                        ChangedAt = appt.UpdatedAt
+                    });
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            // Dynamic product retail sale for Today
+            var todayNotes = "Counter walk-in retail purchase";
+            var dayStartUtc = ManilaToUtc(todayYear, todayMonth, todayDay, 0, 0);
+            var existingSale = await context.ProductSales.FirstOrDefaultAsync(s => s.Notes == todayNotes && s.SoldAt >= dayStartUtc);
+            if (existingSale == null)
+            {
+                var pomade = await context.Products.FirstOrDefaultAsync(p => p.Sku == "PRD-POM-01");
+                var beardOil = await context.Products.FirstOrDefaultAsync(p => p.Sku == "PRD-BOIL-02");
+
+                if (pomade != null && beardOil != null)
+                {
+                    var soldTime = ManilaToUtc(todayYear, todayMonth, todayDay, 10, 15);
+                    var sale = new ProductSale
+                    {
+                        SoldAt = soldTime,
+                        CreatedAt = soldTime,
+                        TotalAmount = pomade.SellPrice + beardOil.SellPrice,
+                        Notes = todayNotes,
+                        RecordedById = adminUser.Id
+                    };
+                    context.ProductSales.Add(sale);
+                    await context.SaveChangesAsync();
+
+                    context.ProductSaleItems.Add(new ProductSaleItem
+                    {
+                        ProductSaleId = sale.Id,
+                        ProductId = pomade.Id,
+                        ProductName = pomade.Name,
+                        Quantity = 1,
+                        UnitPrice = pomade.SellPrice,
+                        LineTotal = pomade.SellPrice
+                    });
+                    context.ProductSaleItems.Add(new ProductSaleItem
+                    {
+                        ProductSaleId = sale.Id,
+                        ProductId = beardOil.Id,
+                        ProductName = beardOil.Name,
+                        Quantity = 1,
+                        UnitPrice = beardOil.SellPrice,
+                        LineTotal = beardOil.SellPrice
+                    });
+                    await context.SaveChangesAsync();
+                }
+            }
         }
 
         // 7. Seed Products and Initial Stock Movements (HW-1, AF-10, INV-03, INV-05)

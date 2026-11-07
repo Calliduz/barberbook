@@ -381,7 +381,7 @@ public class CustomersController : Controller
 
         var msg = customer.IsActive
             ? $"Customer '{customer.FullName}' account has been reactivated."
-            : $"Customer '{customer.FullName}' account has been deactivated (BR-13).";
+            : $"Customer '{customer.FullName}' account has been deactivated.";
 
         if (IsJsonRequest())
         {

@@ -69,7 +69,7 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Quick Presets:</span>
                     <button type="button" onclick="setDailyDate(getTodayStr())" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
                     <button type="button" onclick="setDailyDate(getYesterdayStr())" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Yesterday</button>
-                    <button type="button" onclick="setDailyDate('2026-09-14')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 transition">Demo Data (Sep 14)</button>
+                    <button type="button" onclick="setDailyDate('2026-09-14')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Sep 14, 2026</button>
                 </div>
             </div>
 
@@ -98,20 +98,20 @@
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Report &mdash; @Model.DailyReport.DateFormatted</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Line-item sales journal</p>
+                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Journal &mdash; @Model.DailyReport.DateFormatted</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Line-item journal including completed cuts and retail product sales</p>
                     </div>
-                    <span class="text-xs text-slate-500 font-medium">@Model.DailyReport.Items.Count entries logged</span>
+                    <span class="text-xs text-slate-500 font-medium">@Model.DailyReport.CombinedJournal.Count entries logged</span>
                 </div>
 
-                @if (!Model.DailyReport.Items.Any())
+                @if (!Model.DailyReport.CombinedJournal.Any())
                 {
                     <div class="p-12 text-center text-slate-400 text-sm">
                         <div class="inline-flex p-3 rounded-full bg-slate-100 mb-2">
                             <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <p class="font-semibold text-slate-600">No completed sales recorded for @Model.DailyReport.DateFormatted.</p>
-                        <p class="text-xs text-slate-400 mt-1">Only completed appointments generate financial records.</p>
+                        <p class="text-xs text-slate-400 mt-1">Only completed appointments and settled retail counter sales generate financial records.</p>
                     </div>
                 }
                 else
@@ -123,13 +123,14 @@
                                     <th class="py-3 px-6 w-12 text-center">No.</th>
                                     <th class="py-3 px-6">Time</th>
                                     <th class="py-3 px-6">Customer</th>
-                                    <th class="py-3 px-6">Barber</th>
-                                    <th class="py-3 px-6">Service</th>
+                                    <th class="py-3 px-6">Barber / Counter</th>
+                                    <th class="py-3 px-6">Service / Item</th>
+                                    <th class="py-3 px-6 text-center">Type</th>
                                     <th class="py-3 px-6 text-right">Amount (₱)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach (var row in Model.DailyReport.Items)
+                                @foreach (var row in Model.DailyReport.CombinedJournal)
                                 {
                                     <tr class="hover:bg-slate-50/80 transition">
                                         <td class="py-3.5 px-6 text-center font-bold text-slate-400">
@@ -145,8 +146,18 @@
                                         <td class="py-3.5 px-6 font-medium text-slate-700">
                                             @row.Barber
                                         </td>
-                                        <td class="py-3.5 px-6 text-slate-600">
+                                        <td class="py-3.5 px-6 text-slate-800 font-medium">
                                             @row.Service
+                                        </td>
+                                        <td class="py-3.5 px-6 text-center whitespace-nowrap">
+                                            @if (row.ItemType == "Retail Product")
+                                            {
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Retail Product</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">Service</span>
+                                            }
                                         </td>
                                         <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 whitespace-nowrap">
                                             @row.FormattedAmount
@@ -156,8 +167,8 @@
                             </tbody>
                             <tfoot class="bg-slate-50/90 font-bold border-t-2 border-slate-200 text-slate-900">
                                 <tr>
-                                    <td colspan="5" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Sales</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.DailyReport.FormattedTotalSales</td>
+                                    <td colspan="6" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Grand Total Revenue</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-700">@Model.DailyReport.FormattedGrandTotal</td>
                                 </tr>
                             </tfoot>
                         </table>

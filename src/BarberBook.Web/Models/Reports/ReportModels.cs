@@ -14,6 +14,7 @@ public class DailySalesReportDto
     public List<GroupSalesBreakdownDto> ByService { get; set; } = new();
     public List<GroupSalesBreakdownDto> ByBarber { get; set; } = new();
     public List<DailySalesLineItemDto> Items { get; set; } = new();
+    public List<DailySalesLineItemDto> CombinedJournal { get; set; } = new();
 
     // HW-2, INV-06: Product sales reported separately beside service sales; Grand total = both
     public ProductSalesSummaryDto ProductSales { get; set; } = new();
@@ -40,6 +41,7 @@ public class DailySalesLineItemDto
     public string Service { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public string FormattedAmount { get; set; } = string.Empty;
+    public string ItemType { get; set; } = "Service";
 }
 
 public class GroupSalesBreakdownDto
@@ -115,6 +117,7 @@ public class CustomerTransactionItemDto
     public string Status { get; set; } = "Completed";
     public decimal Amount { get; set; }
     public string FormattedAmount { get; set; } = string.Empty;
+    public string ItemType { get; set; } = "Service";
 }
 
 public class BarberTransactionsReportDto
@@ -146,6 +149,7 @@ public class BarberTransactionItemDto
     public string Service { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public string FormattedAmount { get; set; } = string.Empty;
+    public string ItemType { get; set; } = "Service";
 
     // Commission per transaction
     public decimal CommissionRate { get; set; } = 0.50m;

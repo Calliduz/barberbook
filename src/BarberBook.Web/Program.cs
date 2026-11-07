@@ -129,6 +129,13 @@ if (args.Contains("--seed"))
     return;
 }
 
+// Development automatic schema migration & seed hygiene
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    await BarberBook.Data.Seeding.DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+}
+
 // Security Headers & Centralized Error Handler Middleware
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ApiExceptionMiddleware>();

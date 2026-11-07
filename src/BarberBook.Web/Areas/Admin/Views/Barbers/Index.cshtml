@@ -66,11 +66,10 @@
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <label for="statusFilter" class="text-sm font-medium text-slate-600 whitespace-nowrap">Status:</label>
                 <select id="statusFilter" name="status" onchange="this.form.submit()" class="rounded-lg border-slate-300 py-2 pl-3 pr-8 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm">
-                    <option value="all" selected="@(Model.StatusFilter == "all")">All Barbers</option>
-                    <option value="active" selected="@(Model.StatusFilter == "active")">Active Only</option>
-                    <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive Only</option>
+                    <option value="all" selected="@(Model.StatusFilter == "all")">All Statuses</option>
+                    <option value="active" selected="@(Model.StatusFilter == "active")">Active</option>
+                    <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive</option>
                 </select>
-                <button type="submit" class="rounded-lg bg-slate-100 hover:bg-slate-200 px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition">Filter</button>
             </div>
         </form>
     </div>
@@ -116,10 +115,10 @@
                                     }
                                     <div>
                                         <div class="font-semibold text-slate-900">@barber.DisplayName</div>
-                                        <div class="text-xs text-slate-500">@barber.FullName</div>
+                                        <div class="text-xs text-slate-500">@(string.IsNullOrWhiteSpace(barber.Specialties) ? "Master Barber" : barber.Specialties)</div>
                                         @if (!string.IsNullOrWhiteSpace(barber.BranchName))
                                         {
-                                            <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                            <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
                                                 <svg class="w-2.5 h-2.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                                                 @barber.BranchName
                                             </span>
