@@ -112,7 +112,7 @@ public class CustomersController : Controller
                 Id = u.Id,
                 FullName = u.FullName,
                 Email = u.Email ?? "",
-                Phone = u.PhoneNumber ?? "—",
+                Phone = u.PhoneNumber ?? "-",
                 IsActive = u.IsActive,
                 MemberSince = memberSinceLocal.ToString("MMM d, yyyy", null),
                 TotalAppointments = userAppts.Count,

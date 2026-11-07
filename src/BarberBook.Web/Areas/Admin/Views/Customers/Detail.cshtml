@@ -1,6 +1,6 @@
 @model BarberBook.Web.Models.Admin.AdminCustomerDetailViewModel
 @{
-    ViewData["Title"] = $"Customer — {Model.FullName}";
+    ViewData["Title"] = $"Customer · {Model.FullName}";
 }
 
 <div class="space-y-6">
@@ -12,17 +12,17 @@
         </a>
 
         <div class="flex items-center gap-2">
-            <form method="post" action="/admin/customers/@Model.Id/toggle-status" class="inline">
+            <form method="post" action="/admin/customers/@Model.Id/toggle-status" class="inline" id="customerStatusForm">
                 @Html.AntiForgeryToken()
                 @if (Model.IsActive)
                 {
-                    <button type="submit" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition">
+                    <button type="button" onclick="confirmCustomerDeactivate()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition">
                         Deactivate Account
                     </button>
                 }
                 else
                 {
-                    <button type="submit" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
+                    <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
                         Reactivate Account
                     </button>
                 }
@@ -60,9 +60,22 @@
                     }
                 </div>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2">
-                    <span>Email: <strong class="text-slate-800">@Model.Email</strong></span>
+                    <span class="inline-flex items-center gap-1">
+                        <span>Email: <strong class="text-slate-800">@Model.Email</strong></span>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard('@Model.Email', this)" title="Copy email address" aria-label="Copy email address">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                        </button>
+                    </span>
                     <span class="text-slate-400">&bull;</span>
-                    <span>Phone: <strong class="text-slate-800">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</strong></span>
+                    <span class="inline-flex items-center gap-1">
+                        <span>Phone: <strong class="text-slate-800">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</strong></span>
+                        @if (!string.IsNullOrWhiteSpace(Model.Phone))
+                        {
+                            <button type="button" class="copy-btn" onclick="copyToClipboard('@Model.Phone', this)" title="Copy phone number" aria-label="Copy phone number">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                            </button>
+                        }
+                    </span>
                     <span class="text-slate-400">&bull;</span>
                     <span>Member since @Model.MemberSince</span>
                 </p>
@@ -575,6 +588,19 @@
 
     function closeTimelineModal() {
         document.getElementById('timelineModal').classList.add('hidden');
+    }
+
+    async function confirmCustomerDeactivate() {
+        const confirmed = await window.showConfirmDialog({
+            title: 'Deactivate Customer Account',
+            message: 'Are you sure you want to deactivate @Model.FullName\'s account? They will be unable to log in or book new appointments until reactivated.',
+            confirmText: 'Deactivate Account',
+            cancelText: 'Keep Active',
+            isDestructive: true
+        });
+        if (confirmed) {
+            document.getElementById('customerStatusForm').submit();
+        }
     }
 </script>
 

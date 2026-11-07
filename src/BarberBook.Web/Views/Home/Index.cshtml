@@ -1,6 +1,6 @@
 @model List<BarberBook.Data.Entities.Service>
 @{
-    ViewData["Title"] = "BarberBook — Classic Cuts & Master Grooming";
+    ViewData["Title"] = "BarberBook · Classic Cuts & Master Grooming";
     var barbers = ViewBag.Barbers as List<BarberBook.Data.Entities.Barber> ?? new List<BarberBook.Data.Entities.Barber>();
     var branches = ViewBag.Branches as List<BarberBook.Data.Entities.Branch> ?? new List<BarberBook.Data.Entities.Branch>();
 
@@ -294,43 +294,105 @@
         </div>
     }
 
-    <!-- THE BARBERBOOK STANDARD (Features / Perks) -->
-    <div class="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden shadow-2xl">
+    <!-- THE BARBERBOOK STANDARD (Asymmetric Bento Grid with UI Previews) -->
+    <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-800 relative overflow-hidden shadow-2xl">
         <div class="relative z-10 max-w-2xl mb-8">
             <span class="text-xs uppercase tracking-widest text-brand-400 font-bold block mb-2">The BarberBook Standard</span>
-            <h3 class="text-2xl sm:text-3xl font-serif font-bold text-white">Why Our Customers Return</h3>
-            <p class="text-sm text-slate-300 mt-2">Built specifically for punctuality, craftsmanship, and transparent service.</p>
+            <h3 class="text-2xl sm:text-3xl font-serif font-bold text-white">Engineered for Precision &amp; Convenience</h3>
+            <p class="text-sm text-slate-300 mt-2">Built specifically for punctuality, master craftsmanship, and transparent service.</p>
         </div>
 
         <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
-                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
-                    I
+            <!-- Bento 1: Large Card (2 columns) with Interactive Time Slot Matrix Preview -->
+            <div class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Live Engine Lock
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400">Strict Slot Reservation</span>
+                    </div>
+                    <h4 class="text-lg sm:text-xl font-bold text-white font-serif">Mathematical Slot Availability</h4>
+                    <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                        Our booking engine guarantees zero overlapping appointments. When you select an artisan and a time slot, it is locked exclusively for your grooming session.
+                    </p>
                 </div>
-                <h4 class="text-base font-bold text-white">Live Slot Availability</h4>
-                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
-                    Our database prevents overlapping appointments with mathematical certainty. When you book a slot, it is exclusively reserved for you.
-                </p>
+
+                <!-- Visual Slot Grid Preview -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2 font-mono">
+                        <span>Schedule Grid Preview</span>
+                        <span class="text-emerald-400">30-Min Intervals</span>
+                    </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 text-center text-xs font-semibold">
+                        <span class="py-1.5 px-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">10:00 AM</span>
+                        <span class="py-1.5 px-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">10:30 AM</span>
+                        <span class="py-1.5 px-2 rounded-lg bg-slate-800/60 text-slate-500 border border-slate-700/50 line-through">11:00 AM</span>
+                        <span class="py-1.5 px-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">11:30 AM</span>
+                        <span class="py-1.5 px-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">01:00 PM</span>
+                        <span class="py-1.5 px-2 rounded-lg bg-slate-800/60 text-slate-500 border border-slate-700/50 line-through">01:30 PM</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
-                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
-                    II
+            <!-- Bento 2: Tall Vertical Accent Card (1 column) -->
+            <div class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-800/90 to-slate-900 border border-slate-700/80 flex flex-col justify-between interactive-card">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold mb-4">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white font-serif">In-Shop Counter Settlement</h4>
+                    <p class="mt-2 text-xs text-slate-300 leading-relaxed">
+                        No online payment gateway fees or convenience surcharges. Pay the exact service price upon completion via Cash, QR, or Card.
+                    </p>
                 </div>
-                <h4 class="text-base font-bold text-white">Direct In-Shop Settlement</h4>
-                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
-                    No online payment gateways, convenience fees, or transaction surcharges. Simply pay the exact snapshotted service price in shop.
-                </p>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-amber-400 font-semibold">
+                    <span>Zero Surcharges</span>
+                    <span>100% Transparent</span>
+                </div>
             </div>
 
-            <div class="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80">
-                <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center justify-center font-serif font-bold text-lg mb-4">
-                    III
+            <!-- Bento 3: Equipment & Quality Hygiene Card (1 column) -->
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center font-bold mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white font-serif">Artisan Tool Care</h4>
+                    <p class="mt-2 text-xs text-slate-300 leading-relaxed">
+                        Every clipper, shear, and razor undergoes strict routine sanitation and maintenance logs before and after each client cut.
+                    </p>
                 </div>
-                <h4 class="text-base font-bold text-white">Reschedule Flexibility</h4>
-                <p class="mt-2 text-xs text-slate-400 leading-relaxed">
-                    Plans changed? Reschedule your booking into any upcoming open slot or cancel directly from your customer portal with instant confirmation.
-                </p>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-blue-300 font-semibold">
+                    <span>Oiled &amp; Zero-Gapped</span>
+                    <span>Hospital Grade</span>
+                </div>
+            </div>
+
+            <!-- Bento 4: Reschedule Flexibility & Customer Portal Card (2 columns) -->
+            <div class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            Instant Self-Service
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400">Zero-Friction Rebooking</span>
+                    </div>
+                    <h4 class="text-lg sm:text-xl font-bold text-white font-serif">1-Click Rescheduling &amp; Cancellations</h4>
+                    <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                        Plans changed? Move your appointment to any open slot or cancel directly from your customer portal. Released slots instantly return to live inventory for other clients.
+                    </p>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-3 items-center">
+                    <a href="/book" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs shadow-md hover:bg-amber-400 transition">
+                        <span>Book Your Preferred Slot</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                    </a>
+                    <a href="/services" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-700/80 text-white font-semibold text-xs hover:bg-slate-700 transition">
+                        View Service Menu
+                    </a>
+                </div>
             </div>
         </div>
     </div>

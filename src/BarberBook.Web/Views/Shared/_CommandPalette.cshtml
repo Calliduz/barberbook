@@ -1,0 +1,180 @@
+@* BarberBook Global Command Palette (Ctrl+K or /) *@
+<div id="global-command-palette" 
+     class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6 md:p-20 flex justify-center items-start overflow-y-auto"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Global Search and Quick Navigation">
+    
+    <div class="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all transform mt-8 sm:mt-12">
+        <!-- Search Input Header -->
+        <div class="relative border-b border-slate-200 dark:border-slate-800 px-4 py-3.5 flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            <input type="text" 
+                   id="command-palette-input" 
+                   placeholder="Type a page name, section, or booking reference (BK-...)" 
+                   class="w-full bg-transparent text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
+                   autocomplete="off" />
+            <kbd class="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">ESC</kbd>
+        </div>
+
+        <!-- Quick Links / Results List -->
+        <div class="max-h-96 overflow-y-auto p-2 divide-y divide-slate-100 dark:divide-slate-800/60" id="command-items-container">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="py-1">
+                    <span class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">Executive Admin</span>
+                    <a href="/admin" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="dashboard analytics overview kpi stats">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span>Executive Dashboard</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin</span>
+                    </a>
+                    <a href="/admin/appointments" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="appointments bookings approvals calendar schedule walkin walk-in">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            <span>Bookings & Approvals Queue</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/appointments</span>
+                    </a>
+                    <a href="/admin/history" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="history audit past completed cancelled terminal logs">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span>Completed History & Audit</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/history</span>
+                    </a>
+                    <a href="/admin/reports" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="reports sales revenue finance daily monthly csv export">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Sales & Financial Reports</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/reports</span>
+                    </a>
+                    <a href="/admin/customers" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="customers clients profiles phone directory noshow">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span>Customer Directory & Profiles</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/customers</span>
+                    </a>
+                    <a href="/admin/barbers" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="barbers staff team artisans roster create barber">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                            <span>Master Barbers Roster</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/barbers</span>
+                    </a>
+                    <a href="/admin/services" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="services menu haircuts grooming beard pricing duration">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                            <span>Services Menu & Pricing</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/services</span>
+                    </a>
+                    <a href="/admin/branches" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="branches locations shops manila makati bgc">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                            <span>Shop Branches & Stations</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/branches</span>
+                    </a>
+                    <a href="/admin/inventory" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="inventory stock products pomade tools equipment">
+                        <span class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Inventory & Retail Stock</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono">/admin/inventory</span>
+                    </a>
+                </div>
+            }
+            else if (User.IsInRole("Barber"))
+            {
+                <div class="py-1">
+                    <span class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">Barber Portal</span>
+                    <a href="/barber" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="workstation today dashboard schedule chair">
+                        <span>Workstation Dashboard</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber</span>
+                    </a>
+                    <a href="/barber/appointments" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="appointments bookings queue clients cuts">
+                        <span>My Client Appointments</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber/appointments</span>
+                    </a>
+                    <a href="/barber/availability" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="availability hours day off vacation working schedule">
+                        <span>Availability & Days Off</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber/availability</span>
+                    </a>
+                    <a href="/barber/equipment" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="equipment clippers shears tools condition inspection">
+                        <span>My Assigned Tools & Inspection</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber/equipment</span>
+                    </a>
+                    <a href="/barber/transactions" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="transactions history completed earnings cuts tips">
+                        <span>My Completed Cuts Log</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber/transactions</span>
+                    </a>
+                    <a href="/barber/account" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="account profile password bio settings">
+                        <span>Barber Profile & Password</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/barber/account</span>
+                    </a>
+                </div>
+            }
+
+            <!-- Common Navigation for All Roles / Guests -->
+            <div class="py-1">
+                <span class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">General Navigation</span>
+                <a href="/book" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="book appointment haircut reservation slot schedule">
+                    <span class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span class="font-bold text-amber-600 dark:text-amber-400">Book an Appointment</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-mono">/book</span>
+                </a>
+                <a href="/services" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="services menu haircuts beard trim grooming prices">
+                    <span>Grooming Services Menu</span>
+                    <span class="text-[10px] text-slate-400 font-mono">/services</span>
+                </a>
+                <a href="/barbers" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="barbers artisans master team ramon dennis">
+                    <span>Master Barbers Roster</span>
+                    <span class="text-[10px] text-slate-400 font-mono">/barbers</span>
+                </a>
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
+                {
+                    <a href="/my-appointments" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="my appointments bookings history cancel reschedule">
+                        <span>My Customer Appointments</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/my-appointments</span>
+                    </a>
+                    <a href="/profile" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="profile settings phone password email">
+                        <span>My Profile Settings</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/profile</span>
+                    </a>
+                }
+                else if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a href="/login" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="login signin sign in auth">
+                        <span>Client Login</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/login</span>
+                    </a>
+                    <a href="/register" class="command-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400 transition" data-keywords="register signup sign up new account">
+                        <span>Create Client Account</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/register</span>
+                    </a>
+                }
+            </div>
+
+            <div id="command-no-results" class="hidden py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                No matching pages or actions found. Try searching for "Book", "Appointments", "Services", or a reference code.
+            </div>
+        </div>
+
+        <!-- Footer Shortcuts -->
+        <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span><kbd class="font-mono font-semibold bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300">Enter</kbd> to navigate</span>
+                <span><kbd class="font-mono font-semibold bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300">Esc</kbd> to dismiss</span>
+            </div>
+            <button type="button" onclick="closeCommandPalette()" class="hover:text-slate-600 dark:hover:text-slate-300 transition">Close</button>
+        </div>
+    </div>
+</div>

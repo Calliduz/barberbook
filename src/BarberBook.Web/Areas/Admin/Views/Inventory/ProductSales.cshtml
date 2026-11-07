@@ -168,7 +168,7 @@
                                     @(s.RecordedByName ?? "Administrator")
                                 </td>
                                 <td class="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
-                                    @(s.Notes ?? "—")
+                                    @(s.Notes ?? "-")
                                 </td>
                                 <td class="py-3 px-4 text-right">
                                     <button type="button" onclick="showSaleItems(@s.Id)"
@@ -397,7 +397,7 @@
 
             let optionsHtml = '';
             activeProducts.forEach(p => {
-                optionsHtml += `<option value="${p.id}" ${p.id === line.productId ? 'selected' : ''}>${p.name} (${p.sku}) — Stock: ${p.stock}</option>`;
+                optionsHtml += `<option value="${p.id}" ${p.id === line.productId ? 'selected' : ''}>${p.name} (${p.sku}) · Stock: ${p.stock}</option>`;
             });
 
             const lineTotal = (line.quantity || 0) * (line.unitPrice || 0);

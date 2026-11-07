@@ -113,7 +113,7 @@
                                 <div class="text-[11px] text-slate-400">Branch ID: #@branch.Id</div>
                             </td>
                             <td class="px-3 py-4 text-slate-600">@branch.Address</td>
-                            <td class="px-3 py-4 text-slate-600">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "—" : branch.PhoneNumber)</td>
+                            <td class="px-3 py-4 text-slate-600">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "-" : branch.PhoneNumber)</td>
                             <td class="px-3 py-4 text-slate-600 font-mono text-[11px]">@branch.OpeningTime - @branch.ClosingTime</td>
                             <td class="px-3 py-4 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
@@ -191,7 +191,7 @@
                         </div>
                         <div>
                             <span class="block text-slate-400 uppercase text-[9px] font-bold">Phone</span>
-                            <span class="text-slate-800">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "—" : branch.PhoneNumber)</span>
+                            <span class="text-slate-800">@(string.IsNullOrWhiteSpace(branch.PhoneNumber) ? "-" : branch.PhoneNumber)</span>
                         </div>
                     </div>
 

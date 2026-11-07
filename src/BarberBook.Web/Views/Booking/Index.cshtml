@@ -101,12 +101,12 @@
             <!-- Branch Filter Chips -->
             <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Branch:</span>
-                <button type="button" onclick="filterBarbersByBranch(null)" id="branch-chip-all" class="branch-chip px-3 py-1 rounded-full text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs">
+                <button type="button" onclick="filterBarbersByBranch(null)" id="branch-chip-all" class="branch-chip px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs">
                     All Locations
                 </button>
                 @foreach (var br in Model.Branches)
                 {
-                    <button type="button" onclick="filterBarbersByBranch(@br.Id)" id="branch-chip-@br.Id" class="branch-chip px-3 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition">
+                    <button type="button" onclick="filterBarbersByBranch(@br.Id)" id="branch-chip-@br.Id" class="branch-chip px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition">
                         @br.Name
                     </button>
                 }
@@ -412,11 +412,11 @@
 
     function filterBarbersByBranch(branchId) {
         document.querySelectorAll('.branch-chip').forEach(btn => {
-            btn.className = 'branch-chip px-3 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition';
+            btn.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition';
         });
         const activeChip = branchId ? document.getElementById(`branch-chip-${branchId}`) : document.getElementById('branch-chip-all');
         if (activeChip) {
-            activeChip.className = 'branch-chip px-3 py-1 rounded-full text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs';
+            activeChip.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs';
         }
 
         document.querySelectorAll('.barber-card').forEach(card => {

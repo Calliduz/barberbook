@@ -27,43 +27,59 @@
         @Html.AntiForgeryToken()
 
         <div>
-            <label asp-for="FullName" class="block text-xs uppercase tracking-wider text-slate-600 font-bold mb-1">Full Name</label>
+            <label asp-for="FullName" class="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold mb-1">Full Name</label>
             <input asp-for="FullName" type="text" required autocomplete="name" placeholder="e.g. Juan dela Cruz"
-                   class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm" />
+                   class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-slate-900 dark:text-slate-100 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm transition" />
             <span asp-validation-for="FullName" class="text-xs text-red-600 mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Email" class="block text-xs uppercase tracking-wider text-slate-600 font-bold mb-1">Email Address</label>
+            <label asp-for="Email" class="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold mb-1">Email Address</label>
             <input asp-for="Email" type="email" required autocomplete="email" placeholder="juan@example.com"
-                   class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm" />
+                   class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-slate-900 dark:text-slate-100 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm transition" />
             <span asp-validation-for="Email" class="text-xs text-red-600 mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Phone" class="block text-xs uppercase tracking-wider text-slate-600 font-bold mb-1">Phone Number <span class="text-slate-400 font-normal lowercase">(optional)</span></label>
+            <label asp-for="Phone" class="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold mb-1">Phone Number <span class="text-slate-400 font-normal lowercase">(optional)</span></label>
             <input asp-for="Phone" type="tel" autocomplete="tel" placeholder="0917xxxxxxx"
-                   class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm" />
+                   class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-slate-900 dark:text-slate-100 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm transition" />
             <span asp-validation-for="Phone" class="text-xs text-red-600 mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Password" class="block text-xs uppercase tracking-wider text-slate-600 font-bold mb-1">Password</label>
-            <input asp-for="Password" type="password" required autocomplete="new-password" placeholder="At least 6 characters"
-                   class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm" />
+            <label asp-for="Password" class="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold mb-1">Password</label>
+            <div class="relative">
+                <input asp-for="Password" id="register-password" type="password" required autocomplete="new-password" placeholder="At least 6 characters"
+                       class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 pr-10 text-slate-900 dark:text-slate-100 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm transition" />
+                <button type="button" onclick="togglePasswordVisibility('register-password', this)"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition focus:outline-none"
+                        aria-label="Show password">
+                    <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                    <svg class="icon-eye-slash w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+                </button>
+            </div>
             <span asp-validation-for="Password" class="text-xs text-red-600 mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="ConfirmPassword" class="block text-xs uppercase tracking-wider text-slate-600 font-bold mb-1">Confirm Password</label>
-            <input asp-for="ConfirmPassword" type="password" required autocomplete="new-password" placeholder="Repeat your password"
-                   class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm" />
+            <label asp-for="ConfirmPassword" class="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold mb-1">Confirm Password</label>
+            <div class="relative">
+                <input asp-for="ConfirmPassword" id="register-confirm-password" type="password" required autocomplete="new-password" placeholder="Repeat your password"
+                       class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 pr-10 text-slate-900 dark:text-slate-100 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm transition" />
+                <button type="button" onclick="togglePasswordVisibility('register-confirm-password', this)"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition focus:outline-none"
+                        aria-label="Show password">
+                    <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                    <svg class="icon-eye-slash w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+                </button>
+            </div>
             <span asp-validation-for="ConfirmPassword" class="text-xs text-red-600 mt-1 block"></span>
         </div>
 
         <div class="pt-3">
             <button type="submit"
-                    class="w-full py-3 px-4 rounded-xl text-neutral-950 font-bold text-sm bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition shadow-md shadow-amber-500/20">
+                    class="w-full py-2.5 px-4 rounded-lg text-neutral-950 font-bold text-sm bg-amber-500 hover:bg-amber-400 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition shadow-md shadow-amber-500/20">
                 Create Account
             </button>
         </div>

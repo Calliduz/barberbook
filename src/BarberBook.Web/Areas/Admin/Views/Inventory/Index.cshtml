@@ -414,7 +414,7 @@
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
                                     <div class="font-mono text-xs @(eq.IsOverdue ? "text-rose-600 font-bold" : "text-slate-600")">
-                                        @(eq.NextInspectionDue ?? "—")
+                                        @(eq.NextInspectionDue ?? "-")
                                     </div>
                                     @if (eq.IsOverdue)
                                     {
@@ -422,7 +422,7 @@
                                     }
                                 </td>
                                 <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-700">
-                                    @(eq.FormattedPurchaseCost ?? "—")
+                                    @(eq.FormattedPurchaseCost ?? "-")
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
                                     @if (!isRetired)

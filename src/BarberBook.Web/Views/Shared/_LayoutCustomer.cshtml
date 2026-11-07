@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BarberBook Master Grooming</title>
     
+    <!-- Dark Mode Init to prevent FOUC -->
+    <script>
+        if (localStorage.getItem('barberbook_theme') === 'dark' || (!localStorage.getItem('barberbook_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +26,13 @@
     <!-- Custom BarberBook Styles & Rotating Barber Pole Animations -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="flex flex-col min-h-full text-slate-800 antialiased font-sans selection:bg-brand-500 selection:text-white bg-[#FBF7EE]">
-    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 border-b border-slate-800">
+<body class="flex flex-col min-h-full text-slate-800 antialiased font-sans selection:bg-brand-500 selection:text-white bg-[#FBF7EE] dark:bg-[#090e17] dark:text-slate-100">
+    <!-- Accessible Skip to Main Content Link -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[9999] px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-lg shadow-xl ring-2 ring-slate-900 focus:outline-none transition">
+        Skip to main content
+    </a>
+
+    <header class="bg-slate-900/95 backdrop-blur-md text-white shadow-xl sticky top-0 z-50 border-b border-slate-800">
         <!-- Animated Barber Pole Ribbon Divider (Top of Nav Bar) -->
         <div class="barber-pole-divider"></div>
         @{
@@ -61,6 +75,31 @@
                 </div>
 
                 <div class="flex items-center space-x-2">
+                    <!-- Global Command Palette Search Button -->
+                    <button type="button" onclick="openCommandPalette()"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 transition"
+                            title="Search pages and bookings (Ctrl+K or /)"
+                            aria-label="Search pages and bookings">
+                        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                        <span class="hidden sm:inline">Search</span>
+                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">Ctrl K</kbd>
+                    </button>
+
+                    <!-- Dark Mode Toggle Button -->
+                    <button type="button" onclick="toggleDarkMode()"
+                            class="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 transition"
+                            title="Toggle Light / Dark Mode"
+                            aria-label="Toggle Light or Dark Mode">
+                        <!-- Sun Icon (shown in dark mode) -->
+                        <svg class="theme-toggle-sun w-4 h-4 text-amber-400 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                        </svg>
+                        <!-- Moon Icon (shown in light mode) -->
+                        <svg class="theme-toggle-moon w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                        </svg>
+                    </button>
+
                     <partial name="_LoginPartial" />
 
                     <!-- Mobile Menu Hamburger Button -->
@@ -126,7 +165,7 @@
         </div>
     }
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="main-content" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @RenderBody()
     </main>
 
@@ -173,7 +212,9 @@
     <!-- Shared Accessible Toast & Confirm Modal Components -->
     <partial name="_Toast" />
     <partial name="_ConfirmDialog" />
+    <partial name="_CommandPalette" />
 
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
