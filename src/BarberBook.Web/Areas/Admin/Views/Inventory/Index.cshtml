@@ -465,54 +465,54 @@
 <!-- ========================================== -->
 <!-- MODAL: ADD PRODUCT                        -->
 <!-- ========================================== -->
-<div id="addProductModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 class="text-lg font-serif font-black text-slate-900">Add Retail Product</h3>
-            <button onclick="closeModal('addProductModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+<div id="addProductModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-serif font-black text-slate-900">Add Retail Product</h3>
+            <button onclick="closeModal('addProductModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
-        <form method="post" action="/admin/inventory/products/create" class="space-y-4">
+        <form method="post" action="/admin/inventory/products/create" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">SKU *</label>
-                    <input type="text" name="sku" required placeholder="e.g. PRD-POM-06" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 uppercase font-mono" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">SKU *</label>
+                    <input type="text" name="sku" required placeholder="e.g. PRD-POM-06" class="modal-input font-mono uppercase" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Unit *</label>
-                    <input type="text" name="unit" required value="pcs" placeholder="pcs, btl, tub" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unit *</label>
+                    <input type="text" name="unit" required value="pcs" placeholder="pcs, btl, tub" class="modal-input" />
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Product Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Matte Texture Styling Paste (100ml)" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Product Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Matte Texture Styling Paste (100ml)" class="modal-input" />
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                <input type="text" name="category" required placeholder="Styling, Beard Care, Shaving, Aftercare" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Category *</label>
+                <input type="text" name="category" required placeholder="Styling, Beard Care, Shaving, Aftercare" class="modal-input" />
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cost Price (₱) *</label>
-                    <input type="number" step="0.01" name="costPrice" required placeholder="200.00" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cost Price (₱) *</label>
+                    <input type="number" step="0.01" name="costPrice" required placeholder="200.00" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sell Price (₱) *</label>
-                    <input type="number" step="0.01" name="sellPrice" required placeholder="380.00" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sell Price (₱) *</label>
+                    <input type="number" step="0.01" name="sellPrice" required placeholder="380.00" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Reorder Level *</label>
-                    <input type="number" name="reorderLevel" value="5" min="0" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reorder Level *</label>
+                    <input type="number" name="reorderLevel" value="5" min="0" required class="modal-input" />
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Initial Stock Count</label>
-                <input type="number" name="initialStock" value="0" min="0" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Initial Stock Count</label>
+                <input type="number" name="initialStock" value="0" min="0" class="modal-input" />
                 <p class="text-[10px] text-slate-400 mt-1">Creates an initial adjustment movement if greater than zero.</p>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addProductModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Save Product</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('addProductModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Product</button>
             </div>
         </form>
     </div>
@@ -521,45 +521,45 @@
 <!-- ========================================== -->
 <!-- MODAL: EDIT PRODUCT                         -->
 <!-- ========================================== -->
-<div id="editProductModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 class="text-lg font-serif font-black text-slate-900">Edit Product</h3>
-            <button onclick="closeModal('editProductModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+<div id="editProductModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-serif font-black text-slate-900">Edit Product</h3>
+            <button onclick="closeModal('editProductModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
-        <form id="editProductForm" method="post" action="" class="space-y-4">
+        <form id="editProductForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Product Name *</label>
-                <input type="text" id="editProductName" name="name" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Product Name *</label>
+                <input type="text" id="editProductName" name="name" required class="modal-input" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                    <input type="text" id="editProductCategory" name="category" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Category *</label>
+                    <input type="text" id="editProductCategory" name="category" required class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Unit *</label>
-                    <input type="text" id="editProductUnit" name="unit" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unit *</label>
+                    <input type="text" id="editProductUnit" name="unit" required class="modal-input" />
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cost Price (₱) *</label>
-                    <input type="number" step="0.01" id="editProductCostPrice" name="costPrice" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cost Price (₱) *</label>
+                    <input type="number" step="0.01" id="editProductCostPrice" name="costPrice" required class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sell Price (₱) *</label>
-                    <input type="number" step="0.01" id="editProductSellPrice" name="sellPrice" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sell Price (₱) *</label>
+                    <input type="number" step="0.01" id="editProductSellPrice" name="sellPrice" required class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Reorder Level *</label>
-                    <input type="number" id="editProductReorderLevel" name="reorderLevel" min="0" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reorder Level *</label>
+                    <input type="number" id="editProductReorderLevel" name="reorderLevel" min="0" required class="modal-input" />
                 </div>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editProductModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Update Product</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('editProductModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Update Product</button>
             </div>
         </form>
     </div>
@@ -568,27 +568,27 @@
 <!-- ========================================== -->
 <!-- MODAL: ADJUST STOCK                        -->
 <!-- ========================================== -->
-<div id="adjustStockModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+<div id="adjustStockModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
             <div>
-                <h3 class="text-lg font-serif font-black text-slate-900">Adjust Product Stock</h3>
+                <h3 class="text-xl font-serif font-black text-slate-900">Adjust Product Stock</h3>
                 <p id="adjustProductTitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
-            <button onclick="closeModal('adjustStockModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+            <button onclick="closeModal('adjustStockModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
 
-        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200/60 text-xs text-amber-900 mb-4 flex items-center justify-between">
+        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200/60 text-xs text-amber-900 my-2 flex items-center justify-between shrink-0">
             <span class="font-medium">Current Stock Level:</span>
             <span id="adjustCurrentStock" class="font-bold text-sm"></span>
         </div>
 
-        <form id="adjustStockForm" method="post" action="" class="space-y-4">
+        <form id="adjustStockForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Adjustment Quantity (±) *</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Adjustment Quantity (±) *</label>
                 <input type="number" id="adjustQuantityInput" name="quantity" required placeholder="e.g. +5 or -3"
-                       class="w-full text-sm font-bold p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20" />
+                       class="modal-input font-bold" />
                 <p class="text-[10px] text-slate-400 mt-1">Positive number adds stock; negative number deducts stock.</p>
             </div>
 
@@ -598,16 +598,16 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Mandatory Reason *</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Mandatory Reason *</label>
                 <textarea id="adjustReasonInput" name="reason" rows="2" required placeholder="Reason for inventory correction or shrinkage..."
-                          class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20"></textarea>
+                          class="modal-input"></textarea>
             </div>
 
             <div id="adjustErrorNotice" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold"></div>
 
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('adjustStockModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" id="adjustSubmitButton" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Confirm Adjustment</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('adjustStockModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" id="adjustSubmitButton" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Confirm Adjustment</button>
             </div>
         </form>
     </div>
@@ -634,65 +634,65 @@
 <!-- ========================================== -->
 <!-- MODAL: ADD EQUIPMENT                       -->
 <!-- ========================================== -->
-<div id="addEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 class="text-lg font-serif font-black text-slate-900">Register Equipment Asset</h3>
-            <button onclick="closeModal('addEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+<div id="addEquipmentModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-serif font-black text-slate-900">Register Equipment Asset</h3>
+            <button onclick="closeModal('addEquipmentModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
-        <form method="post" action="/admin/inventory/equipment/create" class="space-y-4">
+        <form method="post" action="/admin/inventory/equipment/create" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Asset Tag *</label>
-                    <input type="text" name="assetTag" required placeholder="e.g. EQ-006" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 uppercase font-mono" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Asset Tag *</label>
+                    <input type="text" name="assetTag" required placeholder="e.g. EQ-006" class="modal-input font-mono uppercase" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                    <input type="text" name="category" required placeholder="Clippers, Trimmers, Shears" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Category *</label>
+                    <input type="text" name="category" required placeholder="Clippers, Trimmers, Shears" class="modal-input" />
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Equipment Name *</label>
-                <input type="text" name="name" required placeholder="e.g. Master Cordless Clipper" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Equipment Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Master Cordless Clipper" class="modal-input" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Brand / Model</label>
-                    <input type="text" name="brandModel" placeholder="e.g. Andis Master" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Brand / Model</label>
+                    <input type="text" name="brandModel" placeholder="e.g. Andis Master" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Serial Number</label>
-                    <input type="text" name="serialNo" placeholder="e.g. SN-99824" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-mono" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Serial Number</label>
+                    <input type="text" name="serialNo" placeholder="e.g. SN-99824" class="modal-input font-mono" />
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Purchase Date</label>
-                    <input type="date" name="purchaseDate" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Purchase Date</label>
+                    <input type="date" name="purchaseDate" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cost (₱)</label>
-                    <input type="number" step="0.01" name="purchaseCost" placeholder="6500.00" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cost (₱)</label>
+                    <input type="number" step="0.01" name="purchaseCost" placeholder="6500.00" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Inspection Days</label>
-                    <input type="number" name="inspectionIntervalDays" value="30" min="1" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Inspection Days</label>
+                    <input type="number" name="inspectionIntervalDays" value="30" min="1" required class="modal-input" />
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Condition</label>
-                    <select name="condition" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Condition</label>
+                    <select name="condition" class="modal-input">
                         <option value="Good">Good</option>
                         <option value="Excellent">Excellent</option>
                         <option value="Fair">Fair</option>
                         <option value="Poor">Poor</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
-                    <select name="status" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Status</label>
+                    <select name="status" class="modal-input">
                         <option value="InService">In Service</option>
                         <option value="UnderMaintenance">Under Maintenance</option>
                         <option value="OutOfService">Out of Service</option>
@@ -700,12 +700,12 @@
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Notes</label>
-                <textarea name="notes" rows="2" placeholder="Optional asset notes..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Notes</label>
+                <textarea name="notes" rows="2" placeholder="Optional asset notes..." class="modal-input"></textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Save Asset</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('addEquipmentModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Asset</button>
             </div>
         </form>
     </div>
@@ -714,55 +714,55 @@
 <!-- ========================================== -->
 <!-- MODAL: EDIT EQUIPMENT                      -->
 <!-- ========================================== -->
-<div id="editEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 class="text-lg font-serif font-black text-slate-900">Edit Equipment Asset</h3>
-            <button onclick="closeModal('editEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+<div id="editEquipmentModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-serif font-black text-slate-900">Edit Equipment Asset</h3>
+            <button onclick="closeModal('editEquipmentModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
-        <form id="editEquipmentForm" method="post" action="" class="space-y-4">
+        <form id="editEquipmentForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Equipment Name *</label>
-                <input type="text" id="editEqName" name="name" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Equipment Name *</label>
+                <input type="text" id="editEqName" name="name" required class="modal-input" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                    <input type="text" id="editEqCategory" name="category" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Category *</label>
+                    <input type="text" id="editEqCategory" name="category" required class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Brand / Model</label>
-                    <input type="text" id="editEqBrandModel" name="brandModel" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Brand / Model</label>
+                    <input type="text" id="editEqBrandModel" name="brandModel" class="modal-input" />
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Serial Number</label>
-                    <input type="text" id="editEqSerialNo" name="serialNo" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-mono" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Serial Number</label>
+                    <input type="text" id="editEqSerialNo" name="serialNo" class="modal-input font-mono" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cost (₱)</label>
-                    <input type="number" step="0.01" id="editEqCost" name="purchaseCost" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cost (₱)</label>
+                    <input type="number" step="0.01" id="editEqCost" name="purchaseCost" class="modal-input" />
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Inspection Days</label>
-                    <input type="number" id="editEqInterval" name="inspectionIntervalDays" min="1" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Inspection Days</label>
+                    <input type="number" id="editEqInterval" name="inspectionIntervalDays" min="1" required class="modal-input" />
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Condition</label>
-                    <select id="editEqCondition" name="condition" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Condition</label>
+                    <select id="editEqCondition" name="condition" class="modal-input">
                         <option value="Good">Good</option>
                         <option value="Excellent">Excellent</option>
                         <option value="Fair">Fair</option>
                         <option value="Poor">Poor</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
-                    <select id="editEqStatus" name="status" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Status</label>
+                    <select id="editEqStatus" name="status" class="modal-input">
                         <option value="InService">In Service</option>
                         <option value="UnderMaintenance">Under Maintenance</option>
                         <option value="OutOfService">Out of Service</option>
@@ -771,12 +771,12 @@
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Notes</label>
-                <textarea id="editEqNotes" name="notes" rows="2" class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Notes</label>
+                <textarea id="editEqNotes" name="notes" rows="2" class="modal-input"></textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Update Asset</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('editEquipmentModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Update Asset</button>
             </div>
         </form>
     </div>
@@ -785,24 +785,24 @@
 <!-- ========================================== -->
 <!-- MODAL: RETIRE EQUIPMENT                    -->
 <!-- ========================================== -->
-<div id="retireEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-            <h3 class="text-lg font-serif font-black text-rose-700">Retire Equipment Asset</h3>
-            <button onclick="closeModal('retireEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+<div id="retireEquipmentModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <h3 class="text-xl font-serif font-black text-rose-700">Retire Equipment Asset</h3>
+            <button onclick="closeModal('retireEquipmentModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
-        <p class="text-xs text-slate-600 mb-3">
+        <p class="text-xs text-slate-600 my-2 shrink-0">
             Are you sure you want to retire <span id="retireEqTitle" class="font-bold text-slate-900"></span>? Retired equipment remains safely archived in historical logs.
         </p>
-        <form id="retireEquipmentForm" method="post" action="" class="space-y-4">
+        <form id="retireEquipmentForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Retirement Reason / Note</label>
-                <textarea name="reason" rows="2" placeholder="e.g. End of operational lifecycle; replaced." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Retirement Reason / Note</label>
+                <textarea name="reason" rows="2" placeholder="e.g. End of operational lifecycle; replaced." class="modal-input"></textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('retireEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500">Confirm Retire</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('retireEquipmentModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm">Confirm Retire</button>
             </div>
         </form>
     </div>
@@ -811,21 +811,21 @@
 <!-- ========================================== -->
 <!-- MODAL: ASSIGN EQUIPMENT                    -->
 <!-- ========================================== -->
-<div id="assignEquipmentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+<div id="assignEquipmentModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
             <div>
-                <h3 class="text-lg font-serif font-black text-slate-900">Assign Equipment</h3>
+                <h3 class="text-xl font-serif font-black text-slate-900">Assign Equipment</h3>
                 <p id="assignModalSubtitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
-            <button onclick="closeModal('assignEquipmentModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+            <button onclick="closeModal('assignEquipmentModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
 
-        <form id="assignEquipmentForm" method="post" action="" class="space-y-4">
+        <form id="assignEquipmentForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Select Barber Station *</label>
-                <select id="assignBarberSelect" name="barberId" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Barber Station *</label>
+                <select id="assignBarberSelect" name="barberId" required class="modal-input">
                     <option value="">-- Choose Barber --</option>
                     @foreach (var b in Model.Barbers)
                     {
@@ -836,13 +836,13 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Assignment Notes / Workstation</label>
-                <textarea name="notes" rows="2" placeholder="e.g. Primary station clipper kit..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Assignment Notes / Workstation</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Primary station clipper kit..." class="modal-input"></textarea>
             </div>
 
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('assignEquipmentModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Confirm Assignment</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('assignEquipmentModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Confirm Assignment</button>
             </div>
         </form>
     </div>
@@ -851,21 +851,21 @@
 <!-- ========================================== -->
 <!-- MODAL: ADMIN INSPECT                       -->
 <!-- ========================================== -->
-<div id="adminInspectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+<div id="adminInspectModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
             <div>
-                <h3 class="text-lg font-serif font-black text-slate-900">Record Inspection Audit</h3>
+                <h3 class="text-xl font-serif font-black text-slate-900">Record Inspection Audit</h3>
                 <p id="adminInspectSubtitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
-            <button onclick="closeModal('adminInspectModal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+            <button onclick="closeModal('adminInspectModal')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
         </div>
 
-        <form id="adminInspectForm" method="post" action="" class="space-y-4">
+        <form id="adminInspectForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Equipment Condition *</label>
-                <select name="condition" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-white">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Equipment Condition *</label>
+                <select name="condition" required class="modal-input">
                     <option value="Good">Good - Fully operational and sanitized</option>
                     <option value="Excellent">Excellent - Mint condition</option>
                     <option value="Fair">Fair - Minor wear, acceptable for service</option>
@@ -874,18 +874,18 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Custom Next Check Due Date (optional)</label>
-                <input type="date" name="nextCheckDue" class="w-full text-xs p-2.5 rounded-xl border border-slate-200" />
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Custom Next Check Due Date (optional)</label>
+                <input type="date" name="nextCheckDue" class="modal-input" />
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Audit Notes / Sanitization Log</label>
-                <textarea name="notes" rows="2" placeholder="e.g. Motor tested, oiled, tension adjusted..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200"></textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Audit Notes / Sanitization Log</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Motor tested, oiled, tension adjusted..." class="modal-input"></textarea>
             </div>
 
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('adminInspectModal')" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button type="submit" class="py-2 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400">Save Inspection</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeModal('adminInspectModal')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Inspection</button>
             </div>
         </form>
     </div>

@@ -135,7 +135,7 @@ public class BranchesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -177,7 +177,7 @@ public class BranchesController : Controller
             return Created($"/api/admin/branches/{branch.Id}", resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Branch '{branch.Name}' created successfully.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' created successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -204,7 +204,7 @@ public class BranchesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -246,7 +246,7 @@ public class BranchesController : Controller
             return Ok(resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Branch '{branch.Name}' updated successfully.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -272,7 +272,7 @@ public class BranchesController : Controller
             return Ok(new { branchId = branch.Id, isActive = branch.IsActive, message = $"Branch '{branch.Name}' has been {statusText}." });
         }
 
-        TempData["SuccessMessage"] = $"Branch '{branch.Name}' has been {statusText}.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' has been {statusText}.";
         return RedirectToAction(nameof(Index));
     }
 

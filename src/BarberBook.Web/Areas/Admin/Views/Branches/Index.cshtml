@@ -257,41 +257,44 @@
 </div>
 
 <!-- Create Branch Modal -->
-<div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-serif font-bold text-slate-900">Add New Branch Location</h3>
-            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-500">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-lg font-serif font-bold text-slate-900">Add New Branch Location</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Register a physical barbershop workstation location</p>
+            </div>
+            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <form method="post" action="/admin/branches" class="space-y-4">
+        <form method="post" action="/admin/branches" class="modal-body space-y-4">
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Branch Name *</label>
-                <input type="text" name="Name" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. Quezon City Fairview Branch" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Branch Name *</label>
+                <input type="text" name="Name" required class="modal-input mt-1" placeholder="e.g. Quezon City Fairview Branch" />
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Street Address *</label>
-                <input type="text" name="Address" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. Unit 4, Regalado Highway, Fairview, QC" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Street Address *</label>
+                <input type="text" name="Address" required class="modal-input mt-1" placeholder="e.g. Unit 4, Regalado Highway, Fairview, QC" />
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
-                <input type="text" name="PhoneNumber" class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="e.g. 0917-555-1234" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
+                <input type="text" name="PhoneNumber" class="modal-input mt-1" placeholder="e.g. 0917-555-1234" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Opening Time *</label>
-                    <input type="time" name="OpeningTime" value="09:00" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Opening Time *</label>
+                    <input type="time" name="OpeningTime" value="09:00" required class="modal-input mt-1" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Closing Time *</label>
-                    <input type="time" name="ClosingTime" value="18:00" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Closing Time *</label>
+                    <input type="time" name="ClosingTime" value="18:00" required class="modal-input mt-1" />
                 </div>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('createModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="button" onclick="closeModal('createModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
                 <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Branch</button>
             </div>
         </form>
@@ -299,41 +302,44 @@
 </div>
 
 <!-- Edit Branch Modal -->
-<div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-serif font-bold text-slate-900">Edit Branch Details</h3>
-            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-500">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-lg font-serif font-bold text-slate-900">Edit Branch Details</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Update operational parameters and contact information</p>
+            </div>
+            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <form id="editBranchForm" method="post" action="" class="space-y-4">
+        <form id="editBranchForm" method="post" action="" class="modal-body space-y-4">
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Branch Name *</label>
-                <input type="text" id="editName" name="Name" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Branch Name *</label>
+                <input type="text" id="editName" name="Name" required class="modal-input mt-1" />
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Street Address *</label>
-                <input type="text" id="editAddress" name="Address" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Street Address *</label>
+                <input type="text" id="editAddress" name="Address" required class="modal-input mt-1" />
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
-                <input type="text" id="editPhoneNumber" name="PhoneNumber" class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Contact Phone Number</label>
+                <input type="text" id="editPhoneNumber" name="PhoneNumber" class="modal-input mt-1" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Opening Time *</label>
-                    <input type="time" id="editOpeningTime" name="OpeningTime" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Opening Time *</label>
+                    <input type="time" id="editOpeningTime" name="OpeningTime" required class="modal-input mt-1" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Closing Time *</label>
-                    <input type="time" id="editClosingTime" name="ClosingTime" required class="mt-1 block w-full rounded-xl border-slate-300 py-2 px-3 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Closing Time *</label>
+                    <input type="time" id="editClosingTime" name="ClosingTime" required class="modal-input mt-1" />
                 </div>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="button" onclick="closeModal('editModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
                 <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Changes</button>
             </div>
         </form>

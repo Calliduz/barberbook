@@ -188,7 +188,7 @@ public class InventoryController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Please fill in all required fields accurately.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Please fill in all required fields accurately.";
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
@@ -196,11 +196,11 @@ public class InventoryController : Controller
         {
             var userId = User.GetUserId();
             await _inventoryService.CreateProductAsync(request, userId);
-            TempData["SuccessMessage"] = $"Product '{request.Name}' ({request.Sku}) created successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Product '{request.Name}' ({request.Sku}) created successfully.";
         }
         catch (InvalidOperationException ex)
         {
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["Error"] = TempData["ErrorMessage"] = ex.Message;
         }
 
         return RedirectToAction(nameof(Index), new { tab = "products" });
@@ -212,18 +212,18 @@ public class InventoryController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Validation failed for product update.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Validation failed for product update.";
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
         var result = await _inventoryService.UpdateProductAsync(id, request);
         if (result == null)
         {
-            TempData["ErrorMessage"] = "Product not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Product not found.";
         }
         else
         {
-            TempData["SuccessMessage"] = $"Product '{result.Name}' updated successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Product '{result.Name}' updated successfully.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "products" });
@@ -235,7 +235,7 @@ public class InventoryController : Controller
     {
         if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.Reason))
         {
-            TempData["ErrorMessage"] = "A non-zero quantity and mandatory reason are required.";
+            TempData["Error"] = TempData["ErrorMessage"] = "A non-zero quantity and mandatory reason are required.";
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
@@ -243,11 +243,11 @@ public class InventoryController : Controller
         var (success, error, _) = await _inventoryService.AdjustStockAsync(id, request.Quantity, request.Reason, userId);
         if (!success)
         {
-            TempData["ErrorMessage"] = error ?? "Failed to adjust stock.";
+            TempData["Error"] = TempData["ErrorMessage"] = error ?? "Failed to adjust stock.";
         }
         else
         {
-            TempData["SuccessMessage"] = $"Stock adjusted successfully ({request.Quantity:+0;-0;0}).";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Stock adjusted successfully ({request.Quantity:+0;-0;0}).";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "products" });
@@ -260,11 +260,11 @@ public class InventoryController : Controller
         var success = await _inventoryService.SetProductActiveAsync(id, isActive);
         if (!success)
         {
-            TempData["ErrorMessage"] = "Product not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Product not found.";
         }
         else
         {
-            TempData["SuccessMessage"] = isActive ? "Product activated." : "Product deactivated.";
+            TempData["Success"] = TempData["SuccessMessage"] = isActive ? "Product activated." : "Product deactivated.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "products" });
@@ -276,18 +276,18 @@ public class InventoryController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Please fill in all required equipment fields.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Please fill in all required equipment fields.";
             return RedirectToAction(nameof(Index), new { tab = "equipment" });
         }
 
         try
         {
             var result = await _inventoryService.CreateEquipmentAsync(request);
-            TempData["SuccessMessage"] = $"Equipment '{result.Name}' ({result.AssetTag}) registered.";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Equipment '{result.Name}' ({result.AssetTag}) registered.";
         }
         catch (InvalidOperationException ex)
         {
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["Error"] = TempData["ErrorMessage"] = ex.Message;
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -299,18 +299,18 @@ public class InventoryController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Validation failed for equipment update.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Validation failed for equipment update.";
             return RedirectToAction(nameof(Index), new { tab = "equipment" });
         }
 
         var result = await _inventoryService.UpdateEquipmentAsync(id, request);
         if (result == null)
         {
-            TempData["ErrorMessage"] = "Equipment not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Equipment not found.";
         }
         else
         {
-            TempData["SuccessMessage"] = $"Equipment '{result.Name}' updated successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Equipment '{result.Name}' updated successfully.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -323,11 +323,11 @@ public class InventoryController : Controller
         var success = await _inventoryService.RetireEquipmentAsync(id, reason);
         if (!success)
         {
-            TempData["ErrorMessage"] = "Equipment not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Equipment not found.";
         }
         else
         {
-            TempData["SuccessMessage"] = "Equipment marked as retired.";
+            TempData["Success"] = TempData["SuccessMessage"] = "Equipment marked as retired.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -340,11 +340,11 @@ public class InventoryController : Controller
         var (success, error, _) = await _equipmentService.AssignEquipmentAsync(id, barberId, notes);
         if (!success)
         {
-            TempData["ErrorMessage"] = error ?? "Failed to assign equipment.";
+            TempData["Error"] = TempData["ErrorMessage"] = error ?? "Failed to assign equipment.";
         }
         else
         {
-            TempData["SuccessMessage"] = "Equipment assigned successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = "Equipment assigned successfully.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -357,11 +357,11 @@ public class InventoryController : Controller
         var (success, error) = await _equipmentService.ReturnEquipmentAsync(id, notes);
         if (!success)
         {
-            TempData["ErrorMessage"] = error ?? "Failed to return equipment.";
+            TempData["Error"] = TempData["ErrorMessage"] = error ?? "Failed to return equipment.";
         }
         else
         {
-            TempData["SuccessMessage"] = "Equipment returned to shop storage.";
+            TempData["Success"] = TempData["SuccessMessage"] = "Equipment returned to shop storage.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -385,11 +385,11 @@ public class InventoryController : Controller
         var (success, error, _) = await _equipmentService.LogInspectionAsync(id, condition, notes, nextDue, userId);
         if (!success)
         {
-            TempData["ErrorMessage"] = error ?? "Failed to record equipment inspection.";
+            TempData["Error"] = TempData["ErrorMessage"] = error ?? "Failed to record equipment inspection.";
         }
         else
         {
-            TempData["SuccessMessage"] = "Equipment inspection logged successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = "Equipment inspection logged successfully.";
         }
 
         return RedirectToAction(nameof(Index), new { tab = "equipment" });
@@ -730,7 +730,7 @@ public class InventoryController : Controller
             return BadRequest(new { error = error ?? "Failed to record purchase." });
         }
 
-        TempData["SuccessMessage"] = $"Purchase from {purchase?.SupplierName} recorded successfully. Inventory updated.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Purchase from {purchase?.SupplierName} recorded successfully. Inventory updated.";
         return Ok(new { success = true, purchaseId = purchase?.Id });
     }
 
@@ -797,7 +797,7 @@ public class InventoryController : Controller
             return BadRequest(new { error = error ?? "Failed to record product sale.", code = errorCode });
         }
 
-        TempData["SuccessMessage"] = $"Counter product sale recorded successfully ({FormattingHelpers.FormatPeso(sale?.TotalAmount ?? 0)}).";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Counter product sale recorded successfully ({FormattingHelpers.FormatPeso(sale?.TotalAmount ?? 0)}).";
         return Ok(new { success = true, saleId = sale?.Id });
     }
 

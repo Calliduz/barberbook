@@ -148,7 +148,7 @@ public class ServicesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -181,7 +181,7 @@ public class ServicesController : Controller
             return CreatedAtAction(nameof(Details), new { id = service.Id }, resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Service '{service.Name}' created successfully.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Service '{service.Name}' created successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -201,7 +201,7 @@ public class ServicesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -237,7 +237,7 @@ public class ServicesController : Controller
             return Ok(resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Service '{service.Name}' updated successfully.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Service '{service.Name}' updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -263,7 +263,7 @@ public class ServicesController : Controller
             return Ok(new { serviceId = service.Id, isActive = service.IsActive, message = $"Service '{service.Name}' has been {statusText}." });
         }
 
-        TempData["SuccessMessage"] = $"Service '{service.Name}' has been {statusText}.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Service '{service.Name}' has been {statusText}.";
         return RedirectToAction(nameof(Index));
     }
 

@@ -91,18 +91,18 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <form method="get" action="/admin/product-sales" class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">From:</label>
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">From:</label>
                     <input type="date" name="startDate" value="@Model.StartDate"
-                           class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                           class="filter-control font-medium" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">To:</label>
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">To:</label>
                     <input type="date" name="endDate" value="@Model.EndDate"
-                           class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                           class="filter-control font-medium" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Product:</label>
-                    <select name="productId" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Product:</label>
+                    <select name="productId" class="filter-control font-medium">
                         <option value="">All Products</option>
                         @foreach (var prod in Model.Products)
                         {
@@ -110,12 +110,12 @@
                         }
                     </select>
                 </div>
-                <button type="submit" class="py-1.5 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+                <button type="submit" class="py-2 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-xs">
                     Filter
                 </button>
                 @if (!string.IsNullOrEmpty(Model.StartDate) || !string.IsNullOrEmpty(Model.EndDate) || Model.FilterProductId.HasValue)
                 {
-                    <a href="/admin/product-sales" class="text-xs text-slate-400 hover:text-slate-600 underline">Clear</a>
+                    <a href="/admin/product-sales" class="text-xs font-bold text-amber-700 hover:text-amber-800 underline">Clear</a>
                 }
             </form>
         </div>
@@ -246,18 +246,23 @@
 <!-- ========================================== -->
 <!-- RECORD PRODUCT SALE MODAL                 -->
 <!-- ========================================== -->
-<div id="saleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
-        <h3 class="text-xl font-serif font-bold text-slate-900">Record Counter Product Sale</h3>
-        <p class="text-xs text-slate-600 mt-1">Dispense retail products at the counter and deduct live inventory stock.</p>
+<div id="saleModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+            <div>
+                <h3 class="text-xl font-serif font-black text-slate-900">Record Counter Product Sale</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Dispense retail products at the counter and deduct live inventory stock.</p>
+            </div>
+            <button onclick="closeSaleModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
+        </div>
 
-        <form id="saleForm" onsubmit="submitSale(event)" class="mt-5 space-y-4">
+        <form id="saleForm" onsubmit="submitSale(event)" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+                <div class="min-w-0">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Customer</label>
-                    <select id="sCustomerId" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+                    <select id="sCustomerId" class="modal-input font-medium">
                         <option value="">Walk-in Customer (No Account)</option>
                         @foreach (var c in Model.Customers)
                         {
@@ -265,10 +270,10 @@
                         }
                     </select>
                 </div>
-                <div>
+                <div class="min-w-0">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sale Date</label>
                     <input type="date" id="sSoldAt"
-                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500" />
+                           class="modal-input font-medium" />
                 </div>
             </div>
 
@@ -287,29 +292,29 @@
             </div>
 
             <!-- Running Total Display -->
-            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between">
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between shrink-0">
                 <div>
-                    <span class="text-xs text-slate-500">Settled in shop at counter</span>
+                    <span class="text-xs text-slate-500 font-medium">Settled in shop at counter</span>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Due</span>
-                    <span id="sTotalAmountDisplay" class="text-lg font-serif font-black text-amber-700">₱0.00</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Total Due</span>
+                    <span id="sTotalAmountDisplay" class="text-xl font-serif font-black text-amber-800">₱0.00</span>
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sale Notes (Optional)</label>
                 <textarea id="sNotes" rows="2" placeholder="e.g. Paid in cash, paired with pomade restock"
-                          class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
+                          class="modal-input font-medium"></textarea>
             </div>
 
-            <div id="saleError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold"></div>
+            <div id="saleError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold"></div>
 
-            <div class="flex items-center justify-end gap-2 pt-2">
-                <button type="button" onclick="closeSaleModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+            <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-100 shrink-0">
+                <button type="button" onclick="closeSaleModal()" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
                     Cancel
                 </button>
-                <button type="submit" id="sSubmitBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                <button type="submit" id="sSubmitBtn" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
                     Complete Counter Sale
                 </button>
             </div>
@@ -403,22 +408,22 @@
             const lineTotal = (line.quantity || 0) * (line.unitPrice || 0);
 
             row.innerHTML = `
-                <div class="flex-1">
-                    <select onchange="onProductSelected(${i}, this)" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white">
+                <div class="flex-1 min-w-0">
+                    <select onchange="onProductSelected(${i}, this)" class="modal-input font-medium text-xs py-1.5">
                         ${optionsHtml}
                     </select>
                 </div>
-                <div class="w-20">
+                <div class="w-20 shrink-0">
                     <input type="number" min="1" max="${line.stock}" value="${line.quantity}" oninput="onQtyChanged(${i}, this.value)"
-                           placeholder="Qty" class="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-300 text-center font-bold" />
+                           placeholder="Qty" class="modal-input font-bold text-xs py-1.5 text-center" />
                 </div>
-                <div class="w-28 text-right font-serif text-xs font-semibold text-slate-700">
+                <div class="w-28 text-right font-serif text-xs font-semibold text-slate-700 shrink-0">
                     ₱${line.unitPrice.toFixed(2)}
                 </div>
-                <div class="w-28 text-right font-serif font-bold text-amber-800 text-xs">
+                <div class="w-28 text-right font-serif font-bold text-amber-800 text-xs shrink-0">
                     ₱${lineTotal.toFixed(2)}
                 </div>
-                <div>
+                <div class="shrink-0">
                     <button type="button" onclick="removeSaleLine(${i})" class="text-rose-500 hover:text-rose-700 p-1 font-bold text-sm" title="Remove">&times;</button>
                 </div>
             `;

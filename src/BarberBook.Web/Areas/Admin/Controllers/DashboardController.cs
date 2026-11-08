@@ -420,7 +420,7 @@ public class DashboardController : Controller
     {
         if (!Enum.TryParse<AppointmentStatus>(to, true, out var targetStatus))
         {
-            TempData["ErrorMessage"] = $"Invalid status '{to}'.";
+            TempData["Error"] = TempData["ErrorMessage"] = $"Invalid status '{to}'.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -431,11 +431,11 @@ public class DashboardController : Controller
 
         if (!result.Success)
         {
-            TempData["ErrorMessage"] = result.ErrorMessage ?? "Status update failed.";
+            TempData["Error"] = TempData["ErrorMessage"] = result.ErrorMessage ?? "Status update failed.";
         }
         else
         {
-            TempData["SuccessMessage"] = $"Appointment #{id} marked as {targetStatus.ToString().ToLowerInvariant()} successfully.";
+            TempData["Success"] = TempData["SuccessMessage"] = $"Appointment #{id} marked as {targetStatus.ToString().ToLowerInvariant()} successfully.";
         }
 
         if (Request.Headers.Accept.ToString().Contains("application/json"))

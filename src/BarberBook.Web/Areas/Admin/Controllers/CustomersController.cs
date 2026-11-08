@@ -295,7 +295,7 @@ public class CustomersController : Controller
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Full name and email are required."));
             }
-            TempData["ErrorMessage"] = "Full name and email are required.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Full name and email are required.";
             return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
         }
 
@@ -308,7 +308,7 @@ public class CustomersController : Controller
             {
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
-            TempData["ErrorMessage"] = "Customer not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -325,7 +325,7 @@ public class CustomersController : Controller
                 {
                     return Conflict(new ApiErrorResponse("DUPLICATE_EMAIL", "Email address is already in use by another account."));
                 }
-                TempData["ErrorMessage"] = "Email address is already in use by another account.";
+                TempData["Error"] = TempData["ErrorMessage"] = "Email address is already in use by another account.";
                 return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
             }
 
@@ -356,7 +356,7 @@ public class CustomersController : Controller
             });
         }
 
-        TempData["SuccessMessage"] = $"Profile for '{customer.FullName}' updated successfully.";
+        TempData["Success"] = TempData["SuccessMessage"] = $"Profile for '{customer.FullName}' updated successfully.";
         return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
     }
 
@@ -371,7 +371,7 @@ public class CustomersController : Controller
             {
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
-            TempData["ErrorMessage"] = "Customer not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -388,7 +388,7 @@ public class CustomersController : Controller
             return Ok(new { success = true, isActive = customer.IsActive, message = msg });
         }
 
-        TempData["SuccessMessage"] = msg;
+        TempData["Success"] = TempData["SuccessMessage"] = msg;
         return RedirectToAction(nameof(Detail), new { id, tab = "security" });
     }
 
@@ -409,7 +409,7 @@ public class CustomersController : Controller
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", msg));
             }
-            TempData["ErrorMessage"] = msg;
+            TempData["Error"] = TempData["ErrorMessage"] = msg;
             return RedirectToAction(nameof(Detail), new { id, tab = "security" });
         }
 
@@ -422,7 +422,7 @@ public class CustomersController : Controller
             {
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
-            TempData["ErrorMessage"] = "Customer not found.";
+            TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -437,17 +437,17 @@ public class CustomersController : Controller
             {
                 return BadRequest(new ApiErrorResponse("PASSWORD_RESET_FAILED", errorMsg));
             }
-            TempData["ErrorMessage"] = errorMsg;
+            TempData["Error"] = TempData["ErrorMessage"] = errorMsg;
             return RedirectToAction(nameof(Detail), new { id, tab = "security" });
         }
 
-        var successMsg = $"Password for '{customer.FullName}' has been reset successfully (AS-21).";
+        var successMsg = $"Password for '{customer.FullName}' has been reset successfully.";
         if (IsJsonRequest())
         {
             return Ok(new { success = true, message = successMsg });
         }
 
-        TempData["SuccessMessage"] = successMsg;
+        TempData["Success"] = TempData["SuccessMessage"] = successMsg;
         return RedirectToAction(nameof(Detail), new { id, tab = "security" });
     }
 }
