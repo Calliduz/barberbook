@@ -80,9 +80,21 @@ public class ApiExceptionMiddleware
     {
         var path = context.Request.Path.Value ?? string.Empty;
         var accept = context.Request.Headers["Accept"].ToString();
-        return path.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("/health", StringComparison.OrdinalIgnoreCase) ||
-               accept.Contains("application/json");
+
+        // Endpoints explicitly namespaced for JSON APIs or health
+        if (path.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/health", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // Standard browser navigations prioritize HTML; never dump raw JSON to browser tabs
+        if (accept.Contains("text/html", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return accept.Contains("application/json", StringComparison.OrdinalIgnoreCase);
     }
 }
 

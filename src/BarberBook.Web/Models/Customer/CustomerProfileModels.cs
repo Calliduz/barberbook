@@ -4,6 +4,8 @@ namespace BarberBook.Web.Models.Customer;
 
 public class CustomerProfileDto
 {
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
@@ -11,9 +13,76 @@ public class CustomerProfileDto
 
 public class UpdateProfileRequest
 {
-    public string FullName { get; set; } = string.Empty;
+    private string _firstName = string.Empty;
+    private string _lastName = string.Empty;
+    private string _fullName = string.Empty;
+
+    public string FirstName
+    {
+        get => !string.IsNullOrWhiteSpace(_firstName) ? _firstName : GetFirstFromFullName(_fullName);
+        set
+        {
+            _firstName = value ?? string.Empty;
+            SyncFullName();
+        }
+    }
+
+    public string LastName
+    {
+        get => !string.IsNullOrWhiteSpace(_lastName) ? _lastName : GetLastFromFullName(_fullName);
+        set
+        {
+            _lastName = value ?? string.Empty;
+            SyncFullName();
+        }
+    }
+
+    public string FullName
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(_firstName) || !string.IsNullOrWhiteSpace(_lastName))
+            {
+                return $"{_firstName} {_lastName}".Trim();
+            }
+            return _fullName;
+        }
+        set
+        {
+            _fullName = value ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(_fullName) && string.IsNullOrWhiteSpace(_firstName) && string.IsNullOrWhiteSpace(_lastName))
+            {
+                var parts = _fullName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                _firstName = parts.Length > 0 ? parts[0] : string.Empty;
+                _lastName = parts.Length > 1 ? parts[1] : string.Empty;
+            }
+        }
+    }
+
     public string Email { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
+
+    private void SyncFullName()
+    {
+        if (!string.IsNullOrWhiteSpace(_firstName) || !string.IsNullOrWhiteSpace(_lastName))
+        {
+            _fullName = $"{_firstName} {_lastName}".Trim();
+        }
+    }
+
+    private static string GetFirstFromFullName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
+        var parts = fullName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 0 ? parts[0] : string.Empty;
+    }
+
+    private static string GetLastFromFullName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
+        var parts = fullName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 1 ? parts[1] : string.Empty;
+    }
 }
 
 public class PublicServiceDto

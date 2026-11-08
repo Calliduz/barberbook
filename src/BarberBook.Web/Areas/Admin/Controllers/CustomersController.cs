@@ -289,13 +289,18 @@ public class CustomersController : Controller
         [FromForm] AdminCustomerEditProfileModel? formModel)
     {
         var model = jsonModel ?? formModel;
-        if (model == null || string.IsNullOrWhiteSpace(model.FullName) || string.IsNullOrWhiteSpace(model.Email))
+        if (model == null || string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName) || string.IsNullOrWhiteSpace(model.Email))
         {
+            var msg = string.IsNullOrWhiteSpace(model?.FirstName)
+                ? "First name is required."
+                : string.IsNullOrWhiteSpace(model?.LastName)
+                    ? "Last name is required."
+                    : "Email is required.";
             if (IsJsonRequest())
             {
-                return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Full name and email are required."));
+                return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", msg));
             }
-            TempData["ErrorMessage"] = "Full name and email are required.";
+            TempData["ErrorMessage"] = msg;
             return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
         }
 

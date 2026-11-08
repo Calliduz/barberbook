@@ -200,15 +200,23 @@ public class AccountController : Controller
     {
         var model = inputModel ?? new RegisterModel();
 
-        if (string.IsNullOrWhiteSpace(model.FullName) ||
+        if (string.IsNullOrWhiteSpace(model.FirstName) ||
+            string.IsNullOrWhiteSpace(model.LastName) ||
             string.IsNullOrWhiteSpace(model.Email) ||
             string.IsNullOrWhiteSpace(model.Password))
         {
+            var msg = string.IsNullOrWhiteSpace(model.FirstName)
+                ? "First name is required."
+                : string.IsNullOrWhiteSpace(model.LastName)
+                    ? "Last name is required."
+                    : string.IsNullOrWhiteSpace(model.Email)
+                        ? "Email is required."
+                        : "Password is required.";
             if (isApi)
             {
-                return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Full name, email, and password are required."));
+                return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", msg));
             }
-            ModelState.AddModelError(string.Empty, "Full name, email, and password are required.");
+            ModelState.AddModelError(string.Empty, msg);
             return View("Register", model);
         }
 

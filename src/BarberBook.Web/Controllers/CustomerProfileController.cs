@@ -39,9 +39,12 @@ public class CustomerProfileController : ControllerBase
             return NotFound(new ApiErrorResponse("NOT_FOUND", "Customer user account not found or deactivated."));
         }
 
+        var parts = (user.FullName ?? string.Empty).Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         var dto = new CustomerProfileDto
         {
-            FullName = user.FullName,
+            FirstName = parts.Length > 0 ? parts[0] : string.Empty,
+            LastName = parts.Length > 1 ? parts[1] : string.Empty,
+            FullName = user.FullName ?? string.Empty,
             Email = user.Email ?? string.Empty,
             PhoneNumber = user.PhoneNumber
         };
@@ -97,9 +100,12 @@ public class CustomerProfileController : ControllerBase
             return BadRequest(new ApiErrorResponse("IDENTITY_ERROR", errors));
         }
 
+        var parts = (user.FullName ?? string.Empty).Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         var dto = new CustomerProfileDto
         {
-            FullName = user.FullName,
+            FirstName = parts.Length > 0 ? parts[0] : string.Empty,
+            LastName = parts.Length > 1 ? parts[1] : string.Empty,
+            FullName = user.FullName ?? string.Empty,
             Email = user.Email ?? string.Empty,
             PhoneNumber = user.PhoneNumber
         };

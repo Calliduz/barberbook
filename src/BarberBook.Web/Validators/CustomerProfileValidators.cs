@@ -7,9 +7,13 @@ public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequ
 {
     public UpdateProfileRequestValidator()
     {
-        RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Full name is required.")
-            .MaximumLength(150).WithMessage("Full name must not exceed 150 characters.");
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage("First name is required.")
+            .MaximumLength(75).WithMessage("First name must not exceed 75 characters.");
+
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage("Last name is required.")
+            .MaximumLength(75).WithMessage("Last name must not exceed 75 characters.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email address is required.")
