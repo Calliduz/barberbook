@@ -511,85 +511,274 @@ textarea:focus-visible {
     transform: scale(0.92);
 }
 
-/* 6. PERSISTENT DARK MODE STYLING */
-html.dark {
-    background-color: #090e17 !important;
-    color: #f1f5f9 !important;
+/* 6. COMPREHENSIVE DARK MODE SYSTEM TOKENS & INHERITANCE */
+:root {
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --input-bg: #ffffff;
+    --table-row-hover: #f1f5f9;
 }
 
-html.dark body {
-    background-color: #090e17 !important;
-    color: #f1f5f9 !important;
+html.dark,
+html[data-theme="dark"],
+body.dark-mode,
+[data-theme="dark"] {
+    --bg-main: #0b0f19;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --input-bg: #0f172a;
+    --table-row-hover: #273548;
 }
 
-html.dark .vintage-table-container {
-    background-color: #0f172a;
-    border-color: #1e293b;
+html.dark,
+html.dark body,
+body.dark-mode,
+[data-theme="dark"] {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
 }
 
-html.dark .vintage-table thead th {
-    background-color: #141c2e;
-    color: #94a3b8;
-    border-bottom-color: #1e293b;
+/* Unified Surface Cards, Panels & Containers */
+html.dark .card,
+html.dark .dashboard-card,
+html.dark .modal-content,
+html.dark .modal-dialog,
+html.dark .vintage-modal-card,
+html.dark .kpi-accent-card,
+html.dark .vintage-table-container,
+html.dark .bg-white,
+html.dark [class*="bg-white/"],
+html.dark div[class*="bg-white"],
+body.dark-mode .card,
+body.dark-mode .dashboard-card,
+body.dark-mode .modal-content,
+body.dark-mode .modal-dialog,
+body.dark-mode .vintage-modal-card,
+body.dark-mode .kpi-accent-card,
+body.dark-mode .vintage-table-container,
+body.dark-mode .bg-white,
+body.dark-mode [class*="bg-white/"],
+body.dark-mode div[class*="bg-white"],
+[data-theme="dark"] .card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-dialog,
+[data-theme="dark"] .vintage-modal-card,
+[data-theme="dark"] .kpi-accent-card,
+[data-theme="dark"] .vintage-table-container,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] [class*="bg-white/"],
+[data-theme="dark"] div[class*="bg-white"] {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
 }
 
-html.dark .vintage-table tbody td {
-    border-bottom-color: #1e293b;
-    color: #cbd5e1;
+/* Secondary & Muted Backgrounds */
+html.dark .bg-slate-50,
+html.dark div[class*="bg-slate-50"],
+body.dark-mode .bg-slate-50,
+body.dark-mode div[class*="bg-slate-50"],
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] div[class*="bg-slate-50"] {
+    background-color: var(--bg-main) !important;
+    border-color: var(--border-color) !important;
 }
 
-html.dark .vintage-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.035);
+html.dark .bg-slate-100,
+html.dark div[class*="bg-slate-100"],
+body.dark-mode .bg-slate-100,
+body.dark-mode div[class*="bg-slate-100"],
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] div[class*="bg-slate-100"] {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-color) !important;
 }
 
+/* Tables, Thead, Tbody, Rows & Cells */
+html.dark table,
+html.dark .table,
+html.dark .vintage-table,
+body.dark-mode table,
+body.dark-mode .table,
+body.dark-mode .vintage-table,
+[data-theme="dark"] table,
+[data-theme="dark"] .table,
+[data-theme="dark"] .vintage-table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+html.dark thead,
+html.dark thead th,
+html.dark th,
+html.dark .vintage-table thead th,
+html.dark .table-header-cell,
+body.dark-mode thead,
+body.dark-mode thead th,
+body.dark-mode th,
+body.dark-mode .vintage-table thead th,
+body.dark-mode .table-header-cell,
+[data-theme="dark"] thead,
+[data-theme="dark"] thead th,
+[data-theme="dark"] th,
+[data-theme="dark"] .vintage-table thead th,
+[data-theme="dark"] .table-header-cell {
+    background-color: #141c2e !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+html.dark tbody,
+html.dark tbody tr,
+html.dark tbody td,
+html.dark td,
+html.dark .vintage-table tbody td,
+body.dark-mode tbody,
+body.dark-mode tbody tr,
+body.dark-mode tbody td,
+body.dark-mode td,
+body.dark-mode .vintage-table tbody td,
+[data-theme="dark"] tbody,
+[data-theme="dark"] tbody tr,
+[data-theme="dark"] tbody td,
+[data-theme="dark"] td,
+[data-theme="dark"] .vintage-table tbody td {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+html.dark tbody tr:hover,
+html.dark .vintage-table tbody tr:hover,
+body.dark-mode tbody tr:hover,
+body.dark-mode .vintage-table tbody tr:hover,
+[data-theme="dark"] tbody tr:hover,
+[data-theme="dark"] .vintage-table tbody tr:hover {
+    background-color: var(--table-row-hover) !important;
+}
+
+/* Form Controls & Inputs */
+html.dark input,
+html.dark select,
+html.dark textarea,
 html.dark .form-input,
 html.dark .form-select,
-html.dark .form-textarea {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f8fafc;
+html.dark .form-textarea,
+html.dark .filter-control,
+html.dark .modal-input,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .form-textarea,
+body.dark-mode .filter-control,
+body.dark-mode .modal-input,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .filter-control,
+[data-theme="dark"] .modal-input {
+    background-color: var(--input-bg) !important;
+    border: 1.5px solid var(--border-color) !important;
+    color: var(--text-main) !important;
 }
 
-html.dark .vintage-modal-card {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f8fafc;
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus,
+html.dark .form-input:focus,
+html.dark .form-select:focus,
+html.dark .form-textarea:focus,
+html.dark .filter-control:focus,
+html.dark .modal-input:focus,
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus,
+body.dark-mode .form-input:focus,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-textarea:focus,
+body.dark-mode .filter-control:focus,
+body.dark-mode .modal-input:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] .form-textarea:focus,
+[data-theme="dark"] .filter-control:focus,
+[data-theme="dark"] .modal-input:focus {
+    background-color: #0b1120 !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
 }
 
-html.dark .bg-white {
-    background-color: #0f172a;
+/* Modals, Drawers & Dark Backdrops */
+.modal-backdrop,
+#walkInModal,
+#checkoutModal,
+#detailDrawerBackdrop,
+div[id$="Modal"][class*="fixed"],
+div[id$="DrawerBackdrop"] {
+    background-color: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
 }
 
-html.dark .text-slate-900 {
-    color: #f8fafc;
+html.dark #detailDrawer,
+body.dark-mode #detailDrawer,
+[data-theme="dark"] #detailDrawer {
+    background-color: var(--card-bg) !important;
+    border-left: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
 }
 
-html.dark .text-slate-800 {
-    color: #e2e8f0;
+/* Text Hierarchy */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark h1, html.dark h2, html.dark h3, html.dark h4,
+body.dark-mode .text-slate-900,
+body.dark-mode .text-slate-800,
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 {
+    color: var(--text-main) !important;
 }
 
-html.dark .text-slate-700 {
-    color: #cbd5e1;
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+body.dark-mode .text-slate-700,
+body.dark-mode .text-slate-600,
+body.dark-mode .text-slate-500,
+body.dark-mode .text-slate-400,
+[data-theme="dark"] .text-slate-700,
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-400 {
+    color: var(--text-muted) !important;
 }
 
-html.dark .text-slate-600 {
-    color: #94a3b8;
-}
-
-html.dark .border-slate-200 {
-    border-color: #1e293b;
-}
-
-html.dark .border-slate-100 {
-    border-color: #1e293b;
-}
-
-html.dark .bg-slate-50 {
-    background-color: #090e17;
-}
-
-html.dark .bg-slate-100 {
-    background-color: #1e293b;
+/* General Borders */
+html.dark [class*="border-slate-"],
+html.dark [class*="border-amber-900/10"],
+body.dark-mode [class*="border-slate-"],
+body.dark-mode [class*="border-amber-900/10"],
+[data-theme="dark"] [class*="border-slate-"],
+[data-theme="dark"] [class*="border-amber-900/10"] {
+    border-color: var(--border-color) !important;
 }
 
 /* 7. STANDARDIZED SAAS DESIGN SYSTEM UTILITIES */

@@ -11,22 +11,31 @@
     window.initTheme = function () {
         const storedTheme = localStorage.getItem('barberbook_theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = storedTheme === 'dark' || (!storedTheme && systemPrefersDark);
         
-        if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
+        if (isDark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (document.body) document.body.classList.add('dark-mode');
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (document.body) document.body.classList.remove('dark-mode');
         }
         updateThemeIcons();
     };
 
     window.toggleDarkMode = function () {
-        const isDark = document.documentElement.classList.contains('dark');
+        const isDark = document.documentElement.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
         if (isDark) {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (document.body) document.body.classList.remove('dark-mode');
             localStorage.setItem('barberbook_theme', 'light');
         } else {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (document.body) document.body.classList.add('dark-mode');
             localStorage.setItem('barberbook_theme', 'dark');
         }
         updateThemeIcons();

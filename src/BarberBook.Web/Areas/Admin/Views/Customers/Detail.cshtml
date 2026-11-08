@@ -84,7 +84,7 @@
 
         <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-right shrink-0">
             <span class="text-[11px] uppercase tracking-wider font-extrabold text-amber-800">LIFETIME SPENT</span>
-            <div class="text-2xl font-serif font-black text-amber-800 mt-0.5">@Model.FormattedTotalSpent</div>
+            <div class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-800 mt-0.5">@Model.FormattedTotalSpent</div>
             <div class="text-[11px] text-amber-800/80 mt-0.5">@Model.CompletedVisits completed cuts</div>
         </div>
     </div>
@@ -93,19 +93,19 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
             <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Total Bookings</p>
-            <p class="text-2xl font-serif font-black text-slate-900 mt-1">@Model.TotalAppointments</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 mt-1">@Model.TotalAppointments</p>
             <p class="text-[11px] text-slate-500 mt-0.5">All time requests</p>
         </div>
 
         <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
             <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Completed Visits</p>
-            <p class="text-2xl font-serif font-black text-emerald-600 mt-1">@Model.CompletedVisits</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-600 mt-1">@Model.CompletedVisits</p>
             <p class="text-[11px] text-slate-500 mt-0.5">Finished appointments</p>
         </div>
 
         <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
             <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Cancelled / Rejected</p>
-            <p class="text-2xl font-serif font-black text-slate-700 mt-1">@Model.CancelledVisits</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-700 mt-1">@Model.CancelledVisits</p>
             <p class="text-[11px] text-slate-500 mt-0.5">Unfulfilled bookings</p>
         </div>
 

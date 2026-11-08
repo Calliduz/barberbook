@@ -7,10 +7,6 @@
     <!-- Header -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
-                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>BOOKINGS & APPOINTMENT WORKSTATION</span>
-            </div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-serif">Bookings Management</h1>
             <p class="mt-1 text-sm text-slate-500">Review, confirm, reject, complete, or cancel shop appointments across all barbers.</p>
         </div>
@@ -971,7 +967,7 @@
                 });
             }
 
-            let html = `<div class="grid grid-cols-7 gap-3 min-w-[900px]">`;
+            let html = `<div class="gap-3 min-w-[1260px] pb-2" style="display: grid; grid-template-columns: repeat(7, minmax(180px, 1fr));">`;
             days.forEach(day => {
                 const dayApps = items.filter(a => a.scheduledDateString === day.dateStr);
                 const isToday = day.dateStr === TODAY_DATE;
