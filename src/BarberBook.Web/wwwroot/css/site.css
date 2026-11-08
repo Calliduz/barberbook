@@ -767,27 +767,74 @@ html.dark .view-btn-active {
     border-color: #d97706 !important;
 }
 
-/* Dropdown Hover Bridge: prevents menu dismissal when traversing margin gap */
-.group:hover > div[class*="absolute"],
-.dropdown-menu {
+/* Navigation Dropdown Containers */
+.nav-dropdown,
+.navbar-nav .dropdown {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
 }
 
-.group:hover > div[class*="absolute"]::before,
-.dropdown-menu::before {
+/* Nav Dropdown Menus: Positioned cleanly below the navbar, never overlapping */
+.nav-dropdown .dropdown-menu,
+.group > .dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    z-index: 1000 !important;
+}
+
+/* Dropdown Hover Bridge: prevents menu dismissal when traversing margin gap */
+.nav-dropdown .dropdown-menu::before,
+.group > .dropdown-menu::before {
     content: '';
     position: absolute;
-    top: -14px;
+    top: -10px;
     left: 0;
     right: 0;
-    height: 14px;
+    height: 10px;
     background: transparent;
     pointer-events: auto;
 }
 
 /* Click-to-Pin Dropdown State */
-.group.is-pinned > div[class*="absolute"] {
+.group.is-pinned > .dropdown-menu,
+.nav-dropdown.is-pinned > .dropdown-menu {
     display: block !important;
+}
+
+/* Top Nav Links & Dropdown Triggers */
+.nav-link,
+.nav-dropdown-trigger {
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link svg,
+.nav-dropdown-trigger svg {
+    color: #94a3b8;
+    stroke: currentColor;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover,
+.nav-dropdown:hover .nav-dropdown-trigger,
+.nav-dropdown.is-pinned .nav-dropdown-trigger,
+.nav-link.active,
+.nav-dropdown.active .nav-dropdown-trigger {
+    color: #ffffff !important;
+}
+
+.nav-link:hover svg,
+.nav-dropdown:hover .nav-dropdown-trigger svg,
+.nav-dropdown.is-pinned .nav-dropdown-trigger svg,
+.nav-link.active svg,
+.nav-dropdown.active .nav-dropdown-trigger svg {
+    color: #f59e0b !important;
 }
 
 /* Modal Dialog Layout & High-Contrast Input Discipline */
@@ -843,9 +890,27 @@ html.dark .modal-input:focus {
     animation: toastProgressBar 4000ms linear forwards;
 }
 
-/* KPI Card Accent Borders & 40x40 Square Icons */
+/* KPI Card Accent Borders */
 .kpi-accent-card {
+    border: 1px solid #e2e8f0 !important;
     border-top: 3px solid #d97706 !important;
+}
+
+html.dark .kpi-accent-card {
+    border: 1px solid #1e293b !important;
+    border-top: 3px solid #d97706 !important;
+}
+
+/* Force modern sans-serif tabular numbers on KPI metrics */
+.kpi-value,
+.stat-value,
+.kpi-accent-card .text-3xl,
+.kpi-accent-card .text-2xl,
+.kpi-accent-card h3 {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-variant-numeric: tabular-nums !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
 }
 
 .kpi-icon-box {

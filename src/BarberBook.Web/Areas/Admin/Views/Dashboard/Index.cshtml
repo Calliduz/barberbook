@@ -38,7 +38,7 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-emerald-700">@Model.FormattedTodayGrandTotal</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-emerald-700">@Model.FormattedTodayGrandTotal</span>
             </div>
             <div class="mt-2 text-xs text-slate-500 space-y-0.5">
                 <p class="font-medium text-slate-700">@Model.FormattedTodayCompletedSales Services &bull; @Model.TodayCounts.Completed cuts</p>
@@ -60,7 +60,7 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.FormattedMonthToDateGrandTotal</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900">@Model.FormattedMonthToDateGrandTotal</span>
             </div>
             <div class="mt-2 text-xs text-slate-500 space-y-0.5">
                 <p class="font-medium text-slate-700">@Model.FormattedMonthToDateCompletedSales Services</p>
@@ -82,7 +82,7 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-amber-600">@Model.PendingBookings.Count</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-amber-600">@Model.PendingBookings.Count</span>
                 <span class="text-xs text-slate-500 font-medium">needs action</span>
             </div>
             <p class="mt-2 text-xs text-slate-500">Requires inline confirm or reject</p>
@@ -97,7 +97,7 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.TodayCounts.Total</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900">@Model.TodayCounts.Total</span>
                 <span class="text-xs text-slate-500 font-medium">appointments</span>
             </div>
             <p class="mt-2 text-xs text-slate-500">@Model.TodayCounts.Confirmed confirmed &bull; @Model.TodayCounts.Pending pending</p>
@@ -626,6 +626,11 @@
 @section Scripts {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not loaded.');
+            return;
+        }
+
         // 1. 7-Day Revenue Trend Chart (Stacked Bar)
         const revCtx = document.getElementById('revenueTrendChart');
         if (revCtx) {

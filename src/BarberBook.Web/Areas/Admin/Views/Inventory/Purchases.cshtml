@@ -59,18 +59,18 @@
 
     <!-- Stat Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+        <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
             <span class="text-xs uppercase font-bold text-slate-500 block">Total Restocking Spend</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-amber-700">@Model.FormattedTotalPurchasedCost</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.FormattedTotalPurchasedCost</span>
             </div>
             <p class="mt-1 text-xs text-slate-500">Total cost outlay for purchased inventory stock</p>
         </div>
 
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+        <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
             <span class="text-xs uppercase font-bold text-slate-500 block">Purchase Batches</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.Purchases.Count</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900">@Model.Purchases.Count</span>
                 <span class="text-xs text-slate-500 font-medium">supplier orders</span>
             </div>
             <p class="mt-1 text-xs text-slate-500">Restock orders settled in-shop with suppliers</p>

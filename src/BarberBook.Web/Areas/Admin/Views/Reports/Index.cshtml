@@ -77,19 +77,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Service Sales (Completed)</span>
-                    <h3 class="text-2xl font-serif font-black text-slate-900 mt-1">@Model.DailyReport.FormattedTotalSales</h3>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 mt-1">@Model.DailyReport.FormattedTotalSales</h3>
                     <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.CompletedCount Completed Appointments</p>
                 </div>
 
                 <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Product Sales (Retail)</span>
-                    <h3 class="text-2xl font-serif font-black text-amber-700 mt-1">@Model.DailyReport.ProductSales.FormattedTotal</h3>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700 mt-1">@Model.DailyReport.ProductSales.FormattedTotal</h3>
                     <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.ProductSales.Count counter sale(s) recorded</p>
                 </div>
 
                 <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Grand Total Revenue</span>
-                    <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.DailyReport.FormattedGrandTotal</h3>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700 mt-1">@Model.DailyReport.FormattedGrandTotal</h3>
                     <p class="text-xs text-slate-500 mt-1">In-shop settlement (Service + Products)</p>
                 </div>
             </div>
@@ -297,15 +297,15 @@
                 <div class="flex items-center gap-4 sm:gap-6">
                     <div class="text-right">
                         <span class="text-[10px] uppercase font-bold text-slate-400 block">Service Sales</span>
-                        <span class="text-base font-serif font-bold text-slate-800">@Model.MonthlyReport.FormattedTotalSales</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-slate-800">@Model.MonthlyReport.FormattedTotalSales</span>
                     </div>
                     <div class="text-right">
                         <span class="text-[10px] uppercase font-bold text-slate-400 block">Product Sales</span>
-                        <span class="text-base font-serif font-bold text-amber-700">@Model.MonthlyReport.FormattedProductSales</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-amber-700">@Model.MonthlyReport.FormattedProductSales</span>
                     </div>
                     <div class="text-right border-l border-slate-200 pl-4">
                         <span class="text-xs uppercase font-bold text-slate-500 block">Grand Total</span>
-                        <span class="text-2xl font-serif font-black text-emerald-700">@Model.MonthlyReport.FormattedGrandTotal</span>
+                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700">@Model.MonthlyReport.FormattedGrandTotal</span>
                     </div>
                 </div>
             </div>
@@ -491,7 +491,7 @@
 
                 <div class="text-right">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Total Spent</span>
-                    <span class="text-2xl font-serif font-black text-amber-700">@Model.CustomerReport.FormattedTotalSpent</span>
+                    <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.CustomerReport.FormattedTotalSpent</span>
                     <span class="text-xs text-slate-500">@Model.CustomerReport.CompletedCount transactions</span>
                 </div>
             </div>
@@ -604,11 +604,11 @@
                     </div>
                     <div class="text-right border-l border-slate-200 pl-4">
                         <span class="text-[10px] uppercase font-bold text-emerald-600 block">Barber Commission (50%)</span>
-                        <span class="text-base font-serif font-bold text-emerald-700">@Model.BarberReport.FormattedTotalCommission</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-emerald-700">@Model.BarberReport.FormattedTotalCommission</span>
                     </div>
                     <div class="text-right border-l border-slate-200 pl-4">
                         <span class="text-xs uppercase font-bold text-slate-500 block">Shop Net Share</span>
-                        <span class="text-2xl font-serif font-black text-amber-700">@Model.BarberReport.FormattedShopNetShare</span>
+                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.BarberReport.FormattedShopNetShare</span>
                         <span class="text-[11px] text-slate-500 block">@Model.BarberReport.CompletedCount transactions</span>
                     </div>
                 </div>
@@ -696,6 +696,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not loaded.');
+            return;
+        }
+
         // 1. Daily Revenue Mix Doughnut
         const dailySplitCtx = document.getElementById('dailyRevenueSplitChart');
         if (dailySplitCtx) {
