@@ -1,0 +1,186 @@
+@model IReadOnlyList<BarberBook.Web.Models.Inventory.ProductDto>
+@{
+    ViewData["Title"] = "Grooming Apothecary & Products";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+    var selectedCat = ViewBag.SelectedCategory as string;
+    var searchTerm = ViewBag.SearchTerm as string;
+
+    string GetProductIcon(string category, string name)
+    {
+        var lower = (category + " " + name).ToLowerInvariant();
+        if (lower.Contains("oil") || lower.Contains("serum") || lower.Contains("tonic"))
+            return "bottle";
+        if (lower.Contains("shave") || lower.Contains("cream") || lower.Contains("soap"))
+            return "shave";
+        if (lower.Contains("clay") || lower.Contains("wax"))
+            return "clay";
+        return "pomade";
+    }
+}
+
+<div class="py-6 space-y-10">
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900 border border-brand-500/30 text-brand-300 text-xs font-semibold shadow-inner">
+            <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
+            <span>MASTER APOTHECARY &amp; RETAIL</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-serif font-black text-slate-900 tracking-tight">Artisan Grooming Products</h1>
+        <p class="text-base text-slate-600 font-light">
+            Take home the master-crafted pomades, nourishing beard oils, and soothing tonic formulas used daily at our styling chairs.
+        </p>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Category Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <a href="/products" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.IsNullOrEmpty(selectedCat) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 text-slate-600 hover:text-slate-900")">
+                All Products
+            </a>
+            @foreach (var cat in categories)
+            {
+                <a href="/products?category=@cat@(string.IsNullOrEmpty(searchTerm) ? "" : $"&search={searchTerm}")"
+                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.Equals(selectedCat, cat, StringComparison.OrdinalIgnoreCase) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 text-slate-600 hover:text-slate-900")">
+                    @cat
+                </a>
+            }
+        </div>
+
+        <!-- Search Bar -->
+        <form method="get" action="/products" class="w-full md:w-72 flex items-center gap-2">
+            @if (!string.IsNullOrEmpty(selectedCat))
+            {
+                <input type="hidden" name="category" value="@selectedCat" />
+            }
+            <div class="relative flex-1">
+                <input type="text" name="search" value="@searchTerm" placeholder="Search by name or SKU..."
+                       class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900" />
+                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-xs">
+                Search
+            </button>
+            @if (!string.IsNullOrEmpty(searchTerm) || !string.IsNullOrEmpty(selectedCat))
+            {
+                <a href="/products" class="p-2 text-slate-400 hover:text-slate-700 text-xs" title="Clear filters">&times;</a>
+            }
+        </form>
+    </div>
+
+    <!-- Product Grid -->
+    @if (!Model.Any())
+    {
+        <div class="text-center py-16 bg-white rounded-3xl border border-slate-200 text-slate-400">
+            <div class="inline-flex p-3 rounded-full bg-slate-100 mb-3">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+            </div>
+            <p class="text-base font-semibold text-slate-600">No retail products found matching your search.</p>
+            <p class="text-xs text-slate-400 mt-1">Try clearing your filters or check our service menu for in-shop styling.</p>
+            <a href="/products" class="inline-block mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
+                Reset Catalog
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach (var p in Model)
+            {
+                var iconType = GetProductIcon(p.Category, p.Name);
+                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-amber-500/50 transition duration-300 group">
+                    <!-- Product Header Box with Vintage Motif -->
+                    <div class="p-6 bg-slate-900 text-white relative overflow-hidden flex items-center justify-between">
+                        <div class="space-y-1 relative z-10">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                @p.Category
+                            </span>
+                            <div class="font-mono text-xs text-slate-400">@p.Sku</div>
+                        </div>
+
+                        <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                            @if (iconType == "bottle")
+                            {
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.75h4.5m-4.5 3h4.5M8.25 6.75h7.5a1.5 1.5 0 011.5 1.5v10.5a2.25 2.25 0 01-2.25 2.25H9A2.25 2.25 0 016.75 18.75V8.25a1.5 1.5 0 011.5-1.5z" /></svg>
+                            }
+                            else if (iconType == "shave")
+                            {
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                            }
+                            else
+                            {
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Product Body Content -->
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-baseline justify-between gap-2 mb-2">
+                                <h2 class="text-xl font-serif font-bold text-slate-900 group-hover:text-amber-800 transition">
+                                    @p.Name
+                                </h2>
+                                <span class="text-xl font-black text-slate-900 font-mono shrink-0">
+                                    @p.FormattedSellPrice
+                                </span>
+                            </div>
+
+                            <!-- Live Stock Status Pill -->
+                            <div class="flex items-center gap-2 mt-2">
+                                @if (p.CurrentStock > p.ReorderLevel)
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>In Stock (@p.CurrentStock @p.Unit)</span>
+                                    </span>
+                                }
+                                else if (p.CurrentStock > 0)
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        <span>Low Stock (Only @p.CurrentStock left)</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        <span>Out of Stock</span>
+                                    </span>
+                                }
+                                <span class="text-[11px] text-slate-500">Unit: @p.Unit</span>
+                            </div>
+
+                            <p class="mt-3 text-xs text-slate-600 leading-relaxed">
+                                Formulated specifically for professional barbershop application and home styling. Tested and approved by our resident artisans.
+                            </p>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-[11px] text-slate-500 italic">Available in-shop</span>
+                            <a href="/book" class="inline-flex items-center font-bold text-amber-700 hover:text-amber-900 group-hover:translate-x-0.5 transition-transform">
+                                Book &amp; Visit Shop &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Shop Notice Callout Banner -->
+    <div class="rounded-3xl bg-amber-50 border border-amber-200/80 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-1">
+            <h3 class="text-lg font-serif font-black text-amber-950">In-Shop Settlement &amp; Purchase Policy</h3>
+            <p class="text-xs text-amber-900/80 max-w-xl">
+                BarberBook maintains an authentic in-shop experience. All products are displayed, tested, and settled at our front reception desk during your visit (Cash or Direct shop settlement).
+            </p>
+        </div>
+        <a href="/book" class="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs sm:text-sm whitespace-nowrap shadow-md transition">
+            Book an Appointment Now
+        </a>
+    </div>
+</div>
+

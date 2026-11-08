@@ -151,8 +151,75 @@
                 </div>
             </div>
 
-            <!-- Products Table -->
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <!-- Mobile Responsive Product Cards (Visible on small screens) -->
+            <div class="block lg:hidden space-y-3">
+                @if (Model.Products.Count == 0)
+                {
+                    <div class="py-8 text-center text-slate-400 text-xs italic bg-white rounded-xl border border-slate-200">
+                        No products found matching the criteria.
+                    </div>
+                }
+                @foreach (var p in Model.Products)
+                {
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3 @(p.IsActive && p.IsLowStock ? "border-rose-300 bg-rose-50/20" : (!p.IsActive ? "opacity-60 bg-slate-50/50" : ""))">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <span class="font-mono text-[11px] font-bold text-slate-400">@p.Sku</span>
+                                <h4 class="font-bold text-slate-900 text-sm">@p.Name</h4>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700">@p.Category</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-serif font-black text-slate-900 text-sm">@p.FormattedSellPrice</span>
+                                <div class="text-[10px] text-slate-400">Cost: @p.FormattedCostPrice</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <div>
+                                <span class="text-slate-500">Current Stock:</span>
+                                <span class="font-bold @(p.IsLowStock ? "text-rose-600" : "text-slate-800")">@p.CurrentStock @p.Unit</span>
+                                @if (p.IsLowStock)
+                                {
+                                    <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800">Low</span>
+                                }
+                            </div>
+                            <div class="text-[11px] text-slate-500">
+                                Reorder at: @p.ReorderLevel @p.Unit
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold @(p.IsActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600")">
+                                @(p.IsActive ? "Active" : "Deactivated")
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button"
+                                        data-id="@p.Id" data-name="@p.Name" data-sku="@p.Sku" data-stock="@p.CurrentStock" data-unit="@p.Unit"
+                                        onclick="openAdjustModal(this)"
+                                        class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                    Adjust
+                                </button>
+                                <button type="button"
+                                        data-id="@p.Id" data-name="@p.Name" data-category="@p.Category" data-unit="@p.Unit" data-sell-price="@p.SellPrice" data-cost-price="@p.CostPrice" data-reorder-level="@p.ReorderLevel"
+                                        onclick="openEditProductModal(this)"
+                                        class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                    Edit
+                                </button>
+                                <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="isActive" value="@(p.IsActive ? "false" : "true")" />
+                                    <button type="submit" class="px-2 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700">
+                                        @(p.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Products Table (Hidden on small screens, visible on desktop) -->
+            <div class="hidden lg:block overflow-x-auto rounded-xl border border-slate-200">
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
                         <tr>
@@ -222,15 +289,21 @@
                                     }
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
-                                    <button onclick="openAdjustModal(@p.Id, '@p.Name', '@p.Sku', @p.CurrentStock, '@p.Unit')"
+                                    <button type="button"
+                                            data-id="@p.Id" data-name="@p.Name" data-sku="@p.Sku" data-stock="@p.CurrentStock" data-unit="@p.Unit"
+                                            onclick="openAdjustModal(this)"
                                             class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
                                         Adjust
                                     </button>
-                                    <button onclick="openHistoryDrawer(@p.Id, '@p.Name', '@p.Sku')"
+                                    <button type="button"
+                                            data-id="@p.Id" data-name="@p.Name" data-sku="@p.Sku"
+                                            onclick="openHistoryDrawer(this)"
                                             class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
                                         History
                                     </button>
-                                    <button onclick="openEditProductModal(@p.Id, '@p.Name', '@p.Category', '@p.Unit', @p.SellPrice, @p.CostPrice, @p.ReorderLevel)"
+                                    <button type="button"
+                                            data-id="@p.Id" data-name="@p.Name" data-category="@p.Category" data-unit="@p.Unit" data-sell-price="@p.SellPrice" data-cost-price="@p.CostPrice" data-reorder-level="@p.ReorderLevel"
+                                            onclick="openEditProductModal(this)"
                                             class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
                                         Edit
                                     </button>
@@ -1017,7 +1090,17 @@
         document.getElementById('eqTimelineDrawer').classList.add('hidden');
     }
 
-    function openEditProductModal(id, name, category, unit, sellPrice, costPrice, reorderLevel) {
+    function openEditProductModal(arg1, name, category, unit, sellPrice, costPrice, reorderLevel) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            category = arg1.getAttribute('data-category');
+            unit = arg1.getAttribute('data-unit');
+            sellPrice = arg1.getAttribute('data-sell-price');
+            costPrice = arg1.getAttribute('data-cost-price');
+            reorderLevel = arg1.getAttribute('data-reorder-level');
+        }
         document.getElementById('editProductForm').action = '/admin/inventory/products/' + id + '/edit';
         document.getElementById('editProductName').value = name;
         document.getElementById('editProductCategory').value = category;
@@ -1028,7 +1111,15 @@
         openModal('editProductModal');
     }
 
-    function openAdjustModal(id, name, sku, currentStock, unit) {
+    function openAdjustModal(arg1, name, sku, currentStock, unit) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            sku = arg1.getAttribute('data-sku');
+            currentStock = parseInt(arg1.getAttribute('data-stock'), 10) || 0;
+            unit = arg1.getAttribute('data-unit');
+        }
         currentStockValue = currentStock;
         currentUnitValue = unit;
 
@@ -1044,7 +1135,9 @@
         openModal('adjustStockModal');
     }
 
-    document.getElementById('adjustQuantityInput').addEventListener('input', function () {
+    const adjustQtyInput = document.getElementById('adjustQuantityInput');
+    if (adjustQtyInput) {
+        adjustQtyInput.addEventListener('input', function () {
         const val = parseInt(this.value, 10);
         const projectedEl = document.getElementById('adjustProjectedStock');
         const errorEl = document.getElementById('adjustErrorNotice');
@@ -1070,7 +1163,13 @@
         }
     });
 
-    async function openHistoryDrawer(id, name, sku) {
+    async function openHistoryDrawer(arg1, name, sku) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            sku = arg1.getAttribute('data-sku');
+        }
         document.getElementById('historyProductSubtitle').innerText = name + ' (' + sku + ')';
         document.getElementById('historyDrawerContent').innerHTML = '<div class="text-center py-10 text-xs text-slate-400">Loading audit log...</div>';
 

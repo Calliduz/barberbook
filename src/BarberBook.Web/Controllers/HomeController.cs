@@ -2,6 +2,7 @@ using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Customer;
+using BarberBook.Web.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,7 @@ public class HomeController : Controller
     private readonly BarberBookDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IValidator<UpdateProfileRequest> _profileValidator;
+    private readonly IInventoryService _inventoryService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
@@ -23,12 +25,14 @@ public class HomeController : Controller
         BarberBookDbContext dbContext,
         UserManager<ApplicationUser> userManager,
         IValidator<UpdateProfileRequest> profileValidator,
+        IInventoryService inventoryService,
         IClock clock,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _profileValidator = profileValidator;
+        _inventoryService = inventoryService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -53,8 +57,11 @@ public class HomeController : Controller
             .OrderBy(b => b.Name)
             .ToListAsync();
 
+        var products = await _inventoryService.GetProductsAsync(includeInactive: false);
+
         ViewBag.Barbers = barbers;
         ViewBag.Branches = branches;
+        ViewBag.Products = products;
         return View(highlights);
     }
 
@@ -122,6 +129,30 @@ public class HomeController : Controller
 
         ViewData["UpcomingDaysOff"] = upcomingDaysOff;
         return View(barber);
+    }
+
+    [HttpGet("products")]
+    [HttpGet("api/products")]
+    public async Task<IActionResult> Products([FromQuery] string? category = null, [FromQuery] string? search = null)
+    {
+        var products = await _inventoryService.GetProductsAsync(search: search, category: category, includeInactive: false);
+
+        if (IsJsonRequest())
+        {
+            return Ok(products);
+        }
+
+        var categories = await _dbContext.Products
+            .Where(p => p.IsActive)
+            .Select(p => p.Category)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToListAsync();
+
+        ViewBag.Categories = categories;
+        ViewBag.SelectedCategory = category;
+        ViewBag.SearchTerm = search;
+        return View(products);
     }
 
     [Authorize(Roles = "Customer")]

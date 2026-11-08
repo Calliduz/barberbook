@@ -3,6 +3,7 @@
     ViewData["Title"] = "BarberBook · Classic Cuts & Master Grooming";
     var barbers = ViewBag.Barbers as List<BarberBook.Data.Entities.Barber> ?? new List<BarberBook.Data.Entities.Barber>();
     var branches = ViewBag.Branches as List<BarberBook.Data.Entities.Branch> ?? new List<BarberBook.Data.Entities.Branch>();
+    var products = ViewBag.Products as IReadOnlyList<BarberBook.Web.Models.Inventory.ProductDto> ?? new List<BarberBook.Web.Models.Inventory.ProductDto>();
 
     // Local offline vectors and uploaded portraits mapped to service types
     string GetServiceImage(string name)
@@ -146,6 +147,93 @@
             }
         </div>
     </div>
+
+    <!-- ARTISAN GROOMING PRODUCTS & APOTHECARY SHOWCASE -->
+    @if (products.Any())
+    {
+        <div class="space-y-8 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                        <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                        <span>Apothecary &amp; Grooming Essentials</span>
+                    </div>
+                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Artisan Grooming Products</h2>
+                    <p class="mt-1 text-sm text-slate-600">Premium pomades, beard oils, and soothing tonics crafted for master styling and daily maintenance.</p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <a href="/products" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                        <span>View Complete Apothecary Catalog</span>
+                        <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var p in products.Take(6))
+                {
+                    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
+                        <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
+                            <div>
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    @p.Category
+                                </span>
+                                <div class="font-mono text-xs text-slate-400 mt-1">@p.Sku</div>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                            <div>
+                                <div class="flex items-baseline justify-between gap-2">
+                                    <h3 class="text-xl font-serif font-bold text-slate-900 group-hover:text-amber-800 transition">
+                                        @p.Name
+                                    </h3>
+                                    <span class="text-xl font-black text-slate-900 font-mono shrink-0">
+                                        @p.FormattedSellPrice
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-2 mt-2">
+                                    @if (p.CurrentStock > p.ReorderLevel)
+                                    {
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            <span>In Stock (@p.CurrentStock @p.Unit)</span>
+                                        </span>
+                                    }
+                                    else if (p.CurrentStock > 0)
+                                    {
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            <span>Low Stock (Only @p.CurrentStock left)</span>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                            <span>Out of Stock</span>
+                                        </span>
+                                    }
+                                    <span class="text-[11px] text-slate-500">Unit: @p.Unit</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-[11px] text-slate-500 italic">Available in-shop</span>
+                                <a href="/products" class="inline-flex items-center font-bold text-amber-700 hover:text-amber-900 group-hover:translate-x-0.5 transition-transform">
+                                    Explore Product Details &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 
     <!-- MASTER BARBERS SHOWCASE -->
     @if (barbers.Any())
