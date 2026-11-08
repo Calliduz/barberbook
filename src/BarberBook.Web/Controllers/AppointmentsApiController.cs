@@ -266,7 +266,21 @@ public class AppointmentsApiController : ControllerBase
             if (slotTaken)
             {
                 await tx.RollbackAsync(cancellationToken);
-                return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked. Please choose another time."));
+                return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked for this barber. Please choose another time."));
+            }
+
+            var customerBusy = await _dbContext.Appointments.AnyAsync(
+                a => a.CustomerId == customerId &&
+                     a.Status != AppointmentStatus.Cancelled &&
+                     a.Status != AppointmentStatus.Rejected &&
+                     startsAtInstant < a.EndsAt &&
+                     endsAt > a.StartsAt,
+                cancellationToken);
+
+            if (customerBusy)
+            {
+                await tx.RollbackAsync(cancellationToken);
+                return Conflict(new ApiErrorResponse("CUSTOMER_BUSY", "You already have an appointment scheduled during this time slot."));
             }
 
             // 9. Generate unique reference code: BB-YYYYMMDD-####

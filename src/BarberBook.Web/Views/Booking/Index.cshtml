@@ -480,13 +480,14 @@
             countBadge.classList.remove('hidden');
 
             slots.forEach(slot => {
+                const slotIso = slot.startsAtIso || (typeof slot.startsAtUtc === 'string' ? slot.startsAtUtc : null);
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'slot-btn py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-500 hover:bg-amber-50/50 text-slate-800 font-bold text-sm transition-all text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs';
                 btn.innerText = slot.formattedTime;
                 btn.setAttribute('aria-pressed', 'false');
                 btn.setAttribute('aria-label', `Select time slot ${slot.formattedTime}`);
-                btn.onclick = () => selectSlot(btn, slot.startsAtUtc, slot.formattedTime);
+                btn.onclick = () => selectSlot(btn, slotIso, slot.formattedTime);
                 grid.appendChild(btn);
             });
         } catch (e) {
@@ -547,7 +548,7 @@
 
             if (resp.status === 201) {
                 const data = await resp.json();
-                window.location.href = `/book/confirmation?referenceCode=${encodeURIComponent(data.referenceCode)}`;
+                window.location.href = `/book/confirmation/${encodeURIComponent(data.referenceCode)}`;
                 return;
             }
 
@@ -555,6 +556,7 @@
             if (err?.error?.code === 'SLOT_TAKEN') {
                 showError('That slot was just booked by another client. Please choose another available slot.');
                 goToStep(3);
+                loadAvailability();
             } else {
                 showError(err?.error?.message || 'Failed to complete booking. Please review your selections.');
             }

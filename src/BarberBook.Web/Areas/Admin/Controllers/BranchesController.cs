@@ -278,6 +278,103 @@ public class BranchesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet("admin/branches/{id:int}/barbers")]
+    [HttpGet("api/admin/branches/{id:int}/barbers")]
+    public async Task<IActionResult> GetBarbers(int id)
+    {
+        var branch = await _dbContext.Branches.FirstOrDefaultAsync(b => b.Id == id);
+        if (branch == null)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", $"Branch with ID {id} not found."));
+        }
+
+        var barbers = await _dbContext.Barbers
+            .Include(b => b.Branch)
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .Select(b => new BranchBarberItemDto
+            {
+                BarberId = b.Id,
+                DisplayName = b.DisplayName,
+                Specialties = b.Specialties,
+                IsAssignedToThisBranch = b.BranchId == id,
+                CurrentBranchName = b.Branch != null ? b.Branch.Name : "Unassigned"
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            branchId = branch.Id,
+            branchName = branch.Name,
+            barbers
+        });
+    }
+
+    [HttpPost("admin/branches/{id:int}/assign-barbers")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignBarbers(int id, [FromForm] AssignBranchBarbersRequest request)
+    {
+        return await ProcessAssignBarbersAsync(id, request, isApi: false);
+    }
+
+    [HttpPost("api/admin/branches/{id:int}/barbers")]
+    public async Task<IActionResult> AssignBarbersApi(int id, [FromBody] AssignBranchBarbersRequest request)
+    {
+        return await ProcessAssignBarbersAsync(id, request, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessAssignBarbersAsync(int id, AssignBranchBarbersRequest request, bool isApi)
+    {
+        var branch = await _dbContext.Branches.FirstOrDefaultAsync(b => b.Id == id);
+        if (branch == null)
+        {
+            return (isApi || IsJsonRequest())
+                ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Branch with ID {id} not found."))
+                : NotFound();
+        }
+
+        var selectedIds = request.BarberIds ?? new List<int>();
+
+        // Find all barbers currently assigned to this branch
+        var currentBranchBarbers = await _dbContext.Barbers
+            .Where(b => b.BranchId == id)
+            .ToListAsync();
+
+        // Any barber currently assigned here but not in selectedIds gets unassigned
+        foreach (var barber in currentBranchBarbers)
+        {
+            if (!selectedIds.Contains(barber.Id))
+            {
+                barber.BranchId = null;
+            }
+        }
+
+        // Any barber in selectedIds gets assigned to this branch
+        var newlyAssigned = await _dbContext.Barbers
+            .Where(b => selectedIds.Contains(b.Id))
+            .ToListAsync();
+
+        foreach (var barber in newlyAssigned)
+        {
+            barber.BranchId = id;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        if (isApi || IsJsonRequest())
+        {
+            return Ok(new
+            {
+                branchId = branch.Id,
+                assignedCount = selectedIds.Count,
+                message = $"Successfully updated barbers assigned to '{branch.Name}'."
+            });
+        }
+
+        TempData["SuccessMessage"] = $"Staff arrangement updated for '{branch.Name}' ({selectedIds.Count} barbers assigned).";
+        return RedirectToAction(nameof(Index));
+    }
+
     private bool IsJsonRequest()
     {
         return Request.Path.StartsWithSegments("/api") ||

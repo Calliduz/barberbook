@@ -76,6 +76,7 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.Specialties).HasColumnName("specialties").HasMaxLength(255);
             entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
             entity.Property(e => e.BranchId).HasColumnName("branch_id");
+            entity.Property(e => e.CommissionRate).HasColumnName("commission_rate").HasColumnType("numeric(5,2)").HasDefaultValue(0.50m);
 
             entity.HasOne(e => e.Branch)
                 .WithMany(b => b.Barbers)

@@ -31,6 +31,7 @@ public class CreateBarberRequest
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
     public int? BranchId { get; set; }
+    public decimal? CommissionRate { get; set; } = 0.50m;
 }
 
 public class UpdateBarberRequest
@@ -60,6 +61,7 @@ public class UpdateBarberRequest
     public string? PhotoUrl { get; set; }
     public string? Specialties { get; set; }
     public int? BranchId { get; set; }
+    public decimal? CommissionRate { get; set; } = 0.50m;
 }
 
 public class ResetBarberPasswordRequest
@@ -85,6 +87,8 @@ public class AdminBarberItemDto
     public string? Specialties { get; set; }
     public int? BranchId { get; set; }
     public string? BranchName { get; set; }
+    public decimal CommissionRate { get; set; } = 0.50m;
+    public string FormattedCommissionRate => $"{(int)(CommissionRate * 100)}% Barber / {(int)((1 - CommissionRate) * 100)}% Owner";
     public bool IsActive { get; set; }
     public int CompletedAppointmentsCount { get; set; }
 }

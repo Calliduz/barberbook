@@ -43,6 +43,11 @@ public class CreateBarberRequestValidator : AbstractValidator<CreateBarberReques
 
         RuleFor(x => x.Specialties)
             .MaximumLength(255).WithMessage("Specialties must not exceed 255 characters.");
+
+        RuleFor(x => x.CommissionRate)
+            .InclusiveBetween(0m, 100m)
+            .When(x => x.CommissionRate.HasValue)
+            .WithMessage("Commission rate must be between 0% and 100%.");
     }
 }
 
@@ -77,6 +82,11 @@ public class UpdateBarberRequestValidator : AbstractValidator<UpdateBarberReques
 
         RuleFor(x => x.Specialties)
             .MaximumLength(255).WithMessage("Specialties must not exceed 255 characters.");
+
+        RuleFor(x => x.CommissionRate)
+            .InclusiveBetween(0m, 100m)
+            .When(x => x.CommissionRate.HasValue)
+            .WithMessage("Commission rate must be between 0% and 100%.");
     }
 }
 

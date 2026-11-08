@@ -7,6 +7,7 @@ public class AvailableSlotDto
     public LocalTime Time { get; set; }
     public string FormattedTime { get; set; } = string.Empty;
     public Instant StartsAtUtc { get; set; }
+    public string StartsAtIso => StartsAtUtc.ToString();
 }
 
 public interface IAvailabilityService

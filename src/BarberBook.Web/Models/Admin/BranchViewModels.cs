@@ -43,3 +43,17 @@ public class BranchListViewModel
     public string? SearchQuery { get; set; }
     public string StatusFilter { get; set; } = "all";
 }
+
+public class BranchBarberItemDto
+{
+    public int BarberId { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+    public string? Specialties { get; set; }
+    public bool IsAssignedToThisBranch { get; set; }
+    public string? CurrentBranchName { get; set; }
+}
+
+public class AssignBranchBarbersRequest
+{
+    public List<int> BarberIds { get; set; } = new();
+}

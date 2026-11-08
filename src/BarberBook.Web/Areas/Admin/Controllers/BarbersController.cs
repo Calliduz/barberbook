@@ -104,6 +104,7 @@ public class BarbersController : Controller
                 Specialties = b.Specialties,
                 BranchId = b.BranchId,
                 BranchName = b.Branch != null ? b.Branch.Name : null,
+                CommissionRate = b.CommissionRate,
                 IsActive = b.IsActive && b.User.IsActive,
                 CompletedAppointmentsCount = b.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
             })
@@ -314,6 +315,12 @@ public class BarbersController : Controller
 
         await _userManager.AddToRoleAsync(user, "Barber");
 
+        decimal commRate = 0.50m;
+        if (request.CommissionRate.HasValue)
+        {
+            commRate = request.CommissionRate.Value > 1 ? request.CommissionRate.Value / 100m : request.CommissionRate.Value;
+        }
+
         // 4. Create Barber Profile
         var barber = new BarberEntity
         {
@@ -323,6 +330,7 @@ public class BarbersController : Controller
             PhotoUrl = string.IsNullOrWhiteSpace(request.PhotoUrl) ? null : request.PhotoUrl.Trim(),
             Specialties = string.IsNullOrWhiteSpace(request.Specialties) ? null : request.Specialties.Trim(),
             BranchId = request.BranchId,
+            CommissionRate = commRate,
             IsActive = true
         };
 
@@ -340,6 +348,7 @@ public class BarbersController : Controller
             PhotoUrl = barber.PhotoUrl,
             Specialties = barber.Specialties,
             BranchId = barber.BranchId,
+            CommissionRate = barber.CommissionRate,
             IsActive = true,
             CompletedAppointmentsCount = 0
         };
@@ -408,6 +417,11 @@ public class BarbersController : Controller
         barber.Specialties = string.IsNullOrWhiteSpace(request.Specialties) ? null : request.Specialties.Trim();
         barber.BranchId = request.BranchId;
 
+        if (request.CommissionRate.HasValue)
+        {
+            barber.CommissionRate = request.CommissionRate.Value > 1 ? request.CommissionRate.Value / 100m : request.CommissionRate.Value;
+        }
+
         barber.User.FullName = request.ResolvedFullName;
 
         await _dbContext.SaveChangesAsync();
@@ -423,6 +437,7 @@ public class BarbersController : Controller
             PhotoUrl = barber.PhotoUrl,
             Specialties = barber.Specialties,
             BranchId = barber.BranchId,
+            CommissionRate = barber.CommissionRate,
             IsActive = barber.IsActive && barber.User.IsActive
         };
 

@@ -122,16 +122,23 @@ public class BookingController : Controller
     }
 
     [Authorize(Roles = "Customer")]
-    [HttpGet("confirmation/{referenceCode}")]
-    public async Task<IActionResult> Confirmation(string referenceCode)
+    [HttpGet("confirmation/{referenceCode?}")]
+    [HttpGet("confirmation")]
+    public async Task<IActionResult> Confirmation([FromRoute] string? referenceCode = null, [FromQuery(Name = "referenceCode")] string? queryRefCode = null)
     {
+        var code = !string.IsNullOrWhiteSpace(referenceCode) ? referenceCode : queryRefCode;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return RedirectToAction("MyAppointments", "Home");
+        }
+
         var appointment = await _dbContext.Appointments
             .Include(a => a.Customer)
             .Include(a => a.Barber).ThenInclude(b => b.User)
             .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .Include(a => a.Branch)
             .Include(a => a.Service)
-            .FirstOrDefaultAsync(a => a.ReferenceCode == referenceCode);
+            .FirstOrDefaultAsync(a => a.ReferenceCode == code);
 
         if (appointment == null)
         {

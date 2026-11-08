@@ -145,6 +145,8 @@
                                 }
                             </td>
                             <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap space-x-2">
+                                <button type="button" onclick="openStaffModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))')" class="text-indigo-600 hover:text-indigo-900 font-bold text-xs">Arrange Barbers</button>
+                                <span class="text-slate-300">|</span>
                                 <button type="button" onclick="openEditModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', '@Html.Raw(Html.Encode(branch.Address))', '@Html.Raw(Html.Encode(branch.PhoneNumber ?? ""))', '@branch.OpeningTime', '@branch.ClosingTime')" class="text-amber-600 hover:text-amber-800 font-bold text-xs">Edit</button>
                                 <span class="text-slate-300">|</span>
                                 <button type="button" onclick="confirmToggleStatus(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', @(branch.IsActive ? "true" : "false"))" class="@(branch.IsActive ? "text-rose-600 hover:text-rose-800" : "text-emerald-600 hover:text-emerald-800") font-bold text-xs">
@@ -209,7 +211,10 @@
                         </span>
                     </div>
 
-                    <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-3 text-xs">
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2 text-xs flex-wrap">
+                        <button type="button" onclick="openStaffModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-900 border border-indigo-200 font-bold hover:bg-indigo-100 transition">
+                            Arrange Barbers
+                        </button>
                         <button type="button" onclick="openEditModal(@branch.Id, '@Html.Raw(Html.Encode(branch.Name))', '@Html.Raw(Html.Encode(branch.Address))', '@Html.Raw(Html.Encode(branch.PhoneNumber ?? ""))', '@branch.OpeningTime', '@branch.ClosingTime')" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-bold hover:bg-amber-100 transition">
                             Edit
                         </button>
@@ -354,7 +359,89 @@
     </div>
 </div>
 
+<!-- Arrange Branch Barbers Modal -->
+<div id="staffModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h3 id="staffModalTitle" class="text-lg font-serif font-bold text-slate-900">Arrange Shop Barbers</h3>
+                <p id="staffModalSubtitle" class="text-xs text-slate-500 mt-0.5">Select barbers assigned to work at this branch.</p>
+            </div>
+            <button type="button" onclick="closeModal('staffModal')" class="text-slate-400 hover:text-slate-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="staffModalForm" method="post" action="" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <div id="staffModalLoading" class="py-8 text-center text-slate-400 text-xs">
+                <div class="inline-block w-5 h-5 border-2 border-amber-500/40 border-t-amber-500 rounded-full animate-spin mb-2"></div>
+                <p>Loading shop staff...</p>
+            </div>
+
+            <div id="staffBarbersList" class="hidden space-y-2 max-h-72 overflow-y-auto pr-1">
+                <!-- Barbers dynamic list -->
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeModal('staffModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" id="staffSaveBtn" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Arrangement</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+    async function openStaffModal(id, branchName) {
+        document.getElementById('staffModalTitle').innerText = 'Arrange Barbers — ' + branchName;
+        document.getElementById('staffModalForm').action = '/admin/branches/' + id + '/assign-barbers';
+        const loading = document.getElementById('staffModalLoading');
+        const list = document.getElementById('staffBarbersList');
+        loading.classList.remove('hidden');
+        list.classList.add('hidden');
+        list.innerHTML = '';
+        document.getElementById('staffModal').classList.remove('hidden');
+
+        try {
+            const resp = await fetch('/admin/branches/' + id + '/barbers');
+            if (!resp.ok) {
+                loading.innerHTML = '<p class="text-rose-500 py-4">Failed to load barbers. Please try again.</p>';
+                return;
+            }
+            const data = await resp.json();
+            loading.classList.add('hidden');
+            list.classList.remove('hidden');
+
+            if (!data.barbers || data.barbers.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-400 py-4 text-center">No active barbers found in the system.</p>';
+                return;
+            }
+
+            data.barbers.forEach(b => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-500/60 hover:bg-amber-50/30 cursor-pointer transition';
+                label.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="BarberIds" value="${b.barberId}" ${b.isAssignedToThisBranch ? 'checked' : ''} class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 border-slate-300" />
+                        <div>
+                            <div class="text-xs font-bold text-slate-900">${b.displayName}</div>
+                            <div class="text-[11px] text-slate-500">${b.specialties || 'Master Barber'}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${b.isAssignedToThisBranch ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}">
+                            ${b.isAssignedToThisBranch ? 'This Branch' : (b.currentBranchName || 'Unassigned')}
+                        </span>
+                    </div>
+                `;
+                list.appendChild(label);
+            });
+        } catch (e) {
+            loading.innerHTML = '<p class="text-rose-500 py-4">Error loading barbers.</p>';
+        }
+    }
     function openCreateModal() {
         document.getElementById('createModal').classList.remove('hidden');
     }

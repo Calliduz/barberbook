@@ -402,6 +402,19 @@ public class AdminAppointmentsApiController : ControllerBase
 
         var endsAtInstant = startsAtInstant.Plus(Duration.FromMinutes(service.DurationMinutes));
 
+        var slotTaken = await _dbContext.Appointments.AnyAsync(
+            a => a.BarberId == request.BarberId &&
+                 a.Status != AppointmentStatus.Cancelled &&
+                 a.Status != AppointmentStatus.Rejected &&
+                 startsAtInstant < a.EndsAt &&
+                 endsAtInstant > a.StartsAt,
+            cancellationToken);
+
+        if (slotTaken)
+        {
+            return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected barber already has a booking during this time slot."));
+        }
+
         var clientName = string.IsNullOrWhiteSpace(request.ClientName) ? "Walk-In Customer" : request.ClientName.Trim();
         var clientPhone = string.IsNullOrWhiteSpace(request.ClientPhone) ? "09000000000" : request.ClientPhone.Trim();
 
