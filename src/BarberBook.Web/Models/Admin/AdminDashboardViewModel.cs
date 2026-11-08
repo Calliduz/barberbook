@@ -33,6 +33,16 @@ public class AdminDashboardViewModel
     // Needs action (pending bookings, oldest first, up to 10)
     public List<AdminDashboardPendingItemDto> PendingBookings { get; set; } = new();
 
+    // Chart.js Visual Analytics (7-day revenue trend + bookings breakdown)
+    public List<string> RevenueChartDates { get; set; } = new();
+    public List<decimal> RevenueChartServices { get; set; } = new();
+    public List<decimal> RevenueChartProducts { get; set; } = new();
+    public int ChartConfirmedCount { get; set; }
+    public int ChartCompletedCount { get; set; }
+    public int ChartPendingCount { get; set; }
+    public int ChartCancelledCount { get; set; }
+    public int ChartNoShowCount { get; set; }
+
     // Today's schedule grouped by barber
     public List<AdminDashboardBarberScheduleDto> TodayAppointmentsByBarber { get; set; } = new();
 

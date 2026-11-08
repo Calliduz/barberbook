@@ -70,7 +70,7 @@
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <label for="statusFilter" class="text-xs font-bold text-slate-600 whitespace-nowrap uppercase tracking-wider">Status:</label>
                 <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs">
-                    <option value="all" selected="@(Model.StatusFilter == "all")">All Services</option>
+                    <option value="all" selected="@(Model.StatusFilter == "all")">All Statuses</option>
                     <option value="active" selected="@(Model.StatusFilter == "active")">Active Only</option>
                     <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive Only</option>
                 </select>

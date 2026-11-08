@@ -27,6 +27,9 @@ public class CreateBarberRequestValidator : AbstractValidator<CreateBarberReques
             .EmailAddress().WithMessage("A valid email address is required.")
             .MaximumLength(256).WithMessage("Email must not exceed 256 characters.");
 
+        RuleFor(x => x.PhoneNumber)
+            .MaximumLength(20).WithMessage("Phone number must not exceed 20 characters.");
+
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Temporary password is required.")
             .MinimumLength(6).WithMessage("Temporary password must be at least 6 characters long.");
@@ -34,6 +37,9 @@ public class CreateBarberRequestValidator : AbstractValidator<CreateBarberReques
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage("Display name is required.")
             .MaximumLength(100).WithMessage("Display name must not exceed 100 characters.");
+
+        RuleFor(x => x.PhoneNumber)
+            .MaximumLength(20).WithMessage("Phone number must not exceed 20 characters.");
 
         RuleFor(x => x.Bio)
             .MaximumLength(1000).WithMessage("Bio must not exceed 1000 characters.");
@@ -68,6 +74,9 @@ public class UpdateBarberRequestValidator : AbstractValidator<UpdateBarberReques
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage("Display name is required.")
             .MaximumLength(100).WithMessage("Display name must not exceed 100 characters.");
+
+        RuleFor(x => x.PhoneNumber)
+            .MaximumLength(20).WithMessage("Phone number must not exceed 20 characters.");
 
         RuleFor(x => x.Bio)
             .MaximumLength(1000).WithMessage("Bio must not exceed 1000 characters.");

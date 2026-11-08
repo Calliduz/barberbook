@@ -25,6 +25,7 @@ public class CreateBarberRequest
     }
 
     public string Email { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public string Password { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public string? Bio { get; set; }
@@ -55,6 +56,7 @@ public class UpdateBarberRequest
         }
     }
 
+    public string? PhoneNumber { get; set; }
     public string DisplayName { get; set; } = string.Empty;
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }
@@ -79,6 +81,7 @@ public class AdminBarberItemDto
     public int UserId { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public string DisplayName { get; set; } = string.Empty;
     public string? Bio { get; set; }
     public string? PhotoUrl { get; set; }

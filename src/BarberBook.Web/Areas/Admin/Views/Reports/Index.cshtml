@@ -69,30 +69,74 @@
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Presets:</span>
                     <button type="button" onclick="setDailyDate(getTodayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
                     <button type="button" onclick="setDailyDate(getYesterdayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Yesterday</button>
-                    <button type="button" onclick="setDailyDate('2026-09-14')" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Sep 14, 2026</button>
+                    <a href="/admin/reports?tab=monthly" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition inline-flex items-center">This Month</a>
                 </div>
             </div>
 
             <!-- Daily Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Service Sales (Completed)</span>
                     <h3 class="text-2xl font-serif font-black text-slate-900 mt-1">@Model.DailyReport.FormattedTotalSales</h3>
                     <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.CompletedCount Completed Appointments</p>
                 </div>
 
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Product Sales (Retail)</span>
                     <h3 class="text-2xl font-serif font-black text-amber-700 mt-1">@Model.DailyReport.ProductSales.FormattedTotal</h3>
                     <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.ProductSales.Count counter sale(s) recorded</p>
                 </div>
 
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
                     <span class="text-xs uppercase font-bold text-slate-500 block">Grand Total Revenue</span>
                     <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.DailyReport.FormattedGrandTotal</h3>
                     <p class="text-xs text-slate-500 mt-1">In-shop settlement (Service + Products)</p>
                 </div>
             </div>
+
+            <!-- Daily Visual Analytics Row (Chart.js) -->
+            @if (Model.DailyReport.GrandTotal > 0)
+            {
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- Revenue Split: Services vs Retail (5 cols) -->
+                    <div class="md:col-span-5 bg-white/95 rounded-2xl border border-slate-200/90 shadow-sm p-6 flex flex-col justify-between">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="font-serif font-bold text-slate-900 text-sm">Revenue Mix</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Services vs. Retail Product Sales</p>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-700">@Model.DailyReport.FormattedGrandTotal</span>
+                        </div>
+                        <div class="mt-3 relative h-48 w-full flex items-center justify-center">
+                            <canvas id="dailyRevenueSplitChart"></canvas>
+                        </div>
+                        <div class="mt-3 grid grid-cols-2 gap-2 text-xs border-t border-slate-100 pt-3">
+                            <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Services</span>
+                                <span class="font-bold text-slate-900">@Model.DailyReport.FormattedTotalSales</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-amber-50 border border-amber-200">
+                                <span class="text-amber-700 block text-[10px] uppercase font-bold">Retail</span>
+                                <span class="font-bold text-amber-900">@Model.DailyReport.ProductSales.FormattedTotal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue by Barber Horizontal Bar (7 cols) -->
+                    <div class="md:col-span-7 bg-white/95 rounded-2xl border border-slate-200/90 shadow-sm p-6">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="font-serif font-bold text-slate-900 text-sm">Barber Revenue Distribution</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Sales contribution per master barber</p>
+                            </div>
+                            <span class="text-xs font-bold text-slate-400">@Model.DailyReport.ByBarber.Count active</span>
+                        </div>
+                        <div class="mt-4 relative h-56 w-full">
+                            <canvas id="dailyBarberBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            }
 
             <!-- Daily Journal Table matching paper sample: No., Time, Customer, Barber, Service, Amount -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
@@ -266,35 +310,20 @@
                 </div>
             </div>
 
-            <!-- Visual Bar Chart (Income at a glance) -->
-            @{
-                var maxDaySales = Model.MonthlyReport.DailyTotals.Any() ? Model.MonthlyReport.DailyTotals.Max(d => d.GrandTotal) : 0m;
-                if (maxDaySales == 0) maxDaySales = 1m; // Avoid division by zero
-            }
+            <!-- Monthly Visual Trend Chart (Chart.js Interactive) -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Income at a Glance · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
-                    <span class="text-xs text-slate-500 font-medium">Daily Revenue Distribution (Services + Products)</span>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-base font-serif font-bold text-slate-900">Income Distribution · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Daily breakdown of Service revenue and Retail product counter sales</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Full Month Trend
+                    </span>
                 </div>
-                <div class="flex items-end gap-1 sm:gap-2 h-36 pt-6 border-b border-slate-200 overflow-x-auto pb-2">
-                    @foreach (var d in Model.MonthlyReport.DailyTotals)
-                    {
-                        var heightPct = (int)Math.Round((d.GrandTotal / maxDaySales) * 100);
-                        var barColor = d.GrandTotal > 0 ? "bg-amber-500 hover:bg-amber-600" : "bg-slate-100";
-                        <div class="flex-1 min-w-[20px] flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@d.Date.ToString("yyyy-MM-dd", null)'">
-                            <div class="w-full @barColor rounded-t transition-all" style="height: @(Math.Max(heightPct, 4))%;"></div>
-                            <span class="text-[10px] text-slate-400 mt-1 font-semibold">@d.Day</span>
-                            <!-- Hover Tooltip -->
-                            <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-10 whitespace-nowrap">
-                                <div class="bg-slate-900 text-white text-[10px] rounded px-2 py-1 shadow-md">
-                                    <div class="font-bold">@d.DateFormatted</div>
-                                    <div>Services: @d.FormattedTotalSales</div>
-                                    <div>Products: @d.FormattedProductSales</div>
-                                    <div class="font-bold border-t border-slate-700 mt-0.5 pt-0.5">Grand: @d.FormattedGrandTotal</div>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                <div class="mt-4 relative h-64 sm:h-72 w-full">
+                    <canvas id="monthlySalesTrendChart"></canvas>
                 </div>
             </div>
 
@@ -646,6 +675,7 @@
     }
 </div>
 
+@section Scripts {
 <script>
     function getTodayStr() {
         return new Date().toISOString().split('T')[0];
@@ -664,4 +694,164 @@
             document.getElementById('dailyDateForm').submit();
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Daily Revenue Mix Doughnut
+        const dailySplitCtx = document.getElementById('dailyRevenueSplitChart');
+        if (dailySplitCtx) {
+            const serviceSales = @Model.DailyReport.TotalSales;
+            const productSales = @Model.DailyReport.ProductSales.Total;
+            new Chart(dailySplitCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Service Sales', 'Retail Products'],
+                    datasets: [{
+                        data: [serviceSales, productSales],
+                        backgroundColor: ['#1e293b', '#d97706'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    return ` ${ctx.label}: ₱${Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Daily Barber Revenue Horizontal Bar Chart
+        const dailyBarberCtx = document.getElementById('dailyBarberBarChart');
+        if (dailyBarberCtx) {
+            const barberLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyReport.ByBarber.Select(b => b.Name)));
+            const barberSales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyReport.ByBarber.Select(b => b.TotalSales)));
+
+            new Chart(dailyBarberCtx, {
+                type: 'bar',
+                data: {
+                    labels: barberLabels,
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: barberSales,
+                        backgroundColor: '#d97706',
+                        borderRadius: 6,
+                        maxBarThickness: 24
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                font: { family: 'Plus Jakarta Sans', size: 11 },
+                                color: '#64748b',
+                                callback: function (v) { return '₱' + Number(v).toLocaleString(); }
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' }, color: '#1e293b' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    return ` Revenue: ₱${Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Monthly Sales Trend Multi-Bar Chart
+        const monthlyTrendCtx = document.getElementById('monthlySalesTrendChart');
+        if (monthlyTrendCtx) {
+            const days = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyReport.DailyTotals.Select(d => d.Day.ToString())));
+            const services = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyReport.DailyTotals.Select(d => d.TotalSales)));
+            const products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyReport.DailyTotals.Select(d => d.ProductSales)));
+
+            new Chart(monthlyTrendCtx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [
+                        {
+                            label: 'Services',
+                            data: services,
+                            backgroundColor: '#1e293b',
+                            borderRadius: 4,
+                            maxBarThickness: 16
+                        },
+                        {
+                            label: 'Retail Products',
+                            data: products,
+                            backgroundColor: '#d97706',
+                            borderRadius: 4,
+                            maxBarThickness: 16
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#64748b' }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                font: { family: 'Plus Jakarta Sans', size: 11 },
+                                color: '#64748b',
+                                callback: function (v) { return '₱' + Number(v).toLocaleString(); }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                                color: '#475569'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    return ` ${ctx.dataset.label}: ₱${Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
 </script>
+}

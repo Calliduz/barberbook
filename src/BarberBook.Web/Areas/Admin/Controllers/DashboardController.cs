@@ -193,6 +193,32 @@ public class DashboardController : Controller
         var products = await _inventoryService.GetProductsAsync(includeInactive: false);
         var lowStock = products.Where(p => p.IsLowStock).ToList();
 
+        // 9. Chart.js Analytics: 7-day revenue trend & 30-day booking breakdown
+        var revDates = new List<string>();
+        var revServices = new List<decimal>();
+        var revProducts = new List<decimal>();
+        for (int i = 6; i >= 0; i--)
+        {
+            var day = today.PlusDays(-i);
+            revDates.Add(day.ToString("MMM d", CultureInfo.InvariantCulture));
+            var dayReport = await _reportingService.GetDailySalesAsync(day);
+            revServices.Add(dayReport.ServiceSales);
+            revProducts.Add(dayReport.ProductSales.Total);
+        }
+
+        var thirtyDaysAgoUtc = today.PlusDays(-30).AtStartOfDayInZone(_zone).ToInstant();
+        var recent30Appts = await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.StartsAt >= thirtyDaysAgoUtc)
+            .Select(a => a.Status)
+            .ToListAsync();
+
+        var chartConfirmed = recent30Appts.Count(s => s == AppointmentStatus.Confirmed);
+        var chartCompleted = recent30Appts.Count(s => s == AppointmentStatus.Completed);
+        var chartPending = recent30Appts.Count(s => s == AppointmentStatus.Pending);
+        var chartCancelled = recent30Appts.Count(s => s == AppointmentStatus.Cancelled);
+        var chartNoShow = recent30Appts.Count(s => s == AppointmentStatus.NoShow || s == AppointmentStatus.Rejected);
+
         var model = new AdminDashboardViewModel
         {
             TodayCounts = todayCounts,
@@ -216,7 +242,15 @@ public class DashboardController : Controller
             LowStockProducts = lowStock,
             PendingBookings = pendingBookings,
             TodayAppointmentsByBarber = todayByBarber,
-            RecentAppointments = recentAppts
+            RecentAppointments = recentAppts,
+            RevenueChartDates = revDates,
+            RevenueChartServices = revServices,
+            RevenueChartProducts = revProducts,
+            ChartConfirmedCount = chartConfirmed,
+            ChartCompletedCount = chartCompleted,
+            ChartPendingCount = chartPending,
+            ChartCancelledCount = chartCancelled,
+            ChartNoShowCount = chartNoShow
         };
 
         return View(model);

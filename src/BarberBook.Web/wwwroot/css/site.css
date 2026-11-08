@@ -739,4 +739,124 @@ html.dark .table-header-cell {
     color: #94a3b8;
 }
 
+/* ==========================================================================
+   EXECUTIVE DESIGN SYSTEM UNIFICATION TOKENS & CONTRAST FIXES
+   ========================================================================== */
+
+/* Strict Contrast for Dark Active Buttons & Tabs (Zero Dark-on-Dark Text) */
+.filter-btn-active,
+.tab-btn-active,
+button.bg-slate-900,
+.status-pill.bg-slate-900,
+.view-btn-active,
+[data-active="true"] {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-color: #0f172a !important;
+}
+
+html.dark .filter-btn-active,
+html.dark .tab-btn-active,
+html.dark button.bg-slate-900,
+html.dark .status-pill.bg-slate-900,
+html.dark .view-btn-active {
+    background-color: #d97706 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    border-color: #d97706 !important;
+}
+
+/* Dropdown Hover Bridge: prevents menu dismissal when traversing margin gap */
+.group:hover > div[class*="absolute"],
+.dropdown-menu {
+    position: relative;
+}
+
+.group:hover > div[class*="absolute"]::before,
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: transparent;
+    pointer-events: auto;
+}
+
+/* Click-to-Pin Dropdown State */
+.group.is-pinned > div[class*="absolute"] {
+    display: block !important;
+}
+
+/* Modal Dialog Layout & High-Contrast Input Discipline */
+.modal-dialog {
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.modal-body {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.modal-input {
+    border: 1.5px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    transition: all 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    outline: none !important;
+    background-color: #ffffff !important;
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+html.dark .modal-input {
+    border-color: #334155 !important;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+html.dark .modal-input:focus {
+    background-color: #0b1120 !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Toast Progress Bar Keyframe */
+@keyframes toastProgressBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.toast-progress {
+    height: 3px;
+    width: 100%;
+    animation: toastProgressBar 4000ms linear forwards;
+}
+
+/* KPI Card Accent Borders & 40x40 Square Icons */
+.kpi-accent-card {
+    border-top: 3px solid #d97706 !important;
+}
+
+.kpi-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
 

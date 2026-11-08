@@ -244,11 +244,49 @@
         }
     };
 
+    // 6. TOP NAVIGATION CLICK-TO-PIN DROPDOWNS & ESCAPE HANDLER
+    window.initNavDropdowns = function () {
+        document.querySelectorAll('header nav .group > button').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const group = btn.closest('.group');
+                if (!group) return;
+
+                const isAlreadyPinned = group.classList.contains('is-pinned');
+                // Close any other open dropdowns
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => {
+                    if (g !== group) g.classList.remove('is-pinned');
+                });
+
+                if (isAlreadyPinned) {
+                    group.classList.remove('is-pinned');
+                } else {
+                    group.classList.add('is-pinned');
+                }
+            });
+        });
+
+        // Close pinned dropdowns on outside click
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('header nav .group')) {
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => g.classList.remove('is-pinned'));
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => g.classList.remove('is-pinned'));
+            }
+        });
+    };
+
     // DOM Ready Initialization
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
         initDoubleSubmitPrevention();
         initBackToTop();
         initCommandPalette();
+        initNavDropdowns();
     });
 })();

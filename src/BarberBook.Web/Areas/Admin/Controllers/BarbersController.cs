@@ -98,6 +98,7 @@ public class BarbersController : Controller
                 UserId = b.UserId,
                 FullName = b.User.FullName,
                 Email = b.User.Email ?? string.Empty,
+                PhoneNumber = b.User.PhoneNumber,
                 DisplayName = b.DisplayName,
                 Bio = b.Bio,
                 PhotoUrl = b.PhotoUrl,
@@ -225,7 +226,9 @@ public class BarbersController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            var errMsg = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["Error"] = errMsg;
+            TempData["ErrorMessage"] = errMsg;
             return RedirectToAction(nameof(Index));
         }
 
@@ -239,7 +242,9 @@ public class BarbersController : Controller
                 return BadRequest(new ApiErrorResponse("DUPLICATE_EMAIL", $"An account with email '{cleanEmail}' already exists."));
             }
 
-            TempData["ErrorMessage"] = $"An account with email '{cleanEmail}' already exists.";
+            var errMsg = $"An account with email '{cleanEmail}' already exists.";
+            TempData["Error"] = errMsg;
+            TempData["ErrorMessage"] = errMsg;
             return RedirectToAction(nameof(Index));
         }
 
@@ -250,6 +255,7 @@ public class BarbersController : Controller
             UserName = cleanEmail,
             Email = cleanEmail,
             FullName = resolvedFullName,
+            PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
             Role = UserRole.Barber,
             IsActive = true,
             CreatedAt = _clock.GetCurrentInstant()
@@ -264,6 +270,7 @@ public class BarbersController : Controller
                 return BadRequest(new ApiErrorResponse("IDENTITY_ERROR", errorMsg));
             }
 
+            TempData["Error"] = errorMsg;
             TempData["ErrorMessage"] = errorMsg;
             return RedirectToAction(nameof(Index));
         }
@@ -291,6 +298,7 @@ public class BarbersController : Controller
             UserId = user.Id,
             FullName = user.FullName,
             Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
             DisplayName = barber.DisplayName,
             Bio = barber.Bio,
             PhotoUrl = barber.PhotoUrl,
@@ -305,7 +313,9 @@ public class BarbersController : Controller
             return CreatedAtAction(nameof(Details), new { id = barber.Id }, resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Barber account for {barber.DisplayName} created successfully.";
+        var successMsg = $"Barber account for '{barber.DisplayName}' created successfully.";
+        TempData["Success"] = successMsg;
+        TempData["SuccessMessage"] = successMsg;
         return RedirectToAction(nameof(Index));
     }
 
@@ -364,6 +374,10 @@ public class BarbersController : Controller
         barber.BranchId = request.BranchId;
 
         barber.User.FullName = request.ResolvedFullName;
+        if (request.PhoneNumber != null)
+        {
+            barber.User.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+        }
 
         await _dbContext.SaveChangesAsync();
 
@@ -373,6 +387,7 @@ public class BarbersController : Controller
             UserId = barber.UserId,
             FullName = barber.User.FullName,
             Email = barber.User.Email ?? string.Empty,
+            PhoneNumber = barber.User.PhoneNumber,
             DisplayName = barber.DisplayName,
             Bio = barber.Bio,
             PhotoUrl = barber.PhotoUrl,
@@ -386,7 +401,9 @@ public class BarbersController : Controller
             return Ok(resultDto);
         }
 
-        TempData["SuccessMessage"] = $"Barber profile for {barber.DisplayName} updated successfully.";
+        var updateMsg = $"Barber profile for '{barber.DisplayName}' updated successfully.";
+        TempData["Success"] = updateMsg;
+        TempData["SuccessMessage"] = updateMsg;
         return RedirectToAction(nameof(Index));
     }
 
@@ -431,6 +448,7 @@ public class BarbersController : Controller
                 return BadRequest(new ApiErrorResponse("PASSWORD_RESET_FAILED", errorMsg));
             }
 
+            TempData["Error"] = errorMsg;
             TempData["ErrorMessage"] = errorMsg;
             return RedirectToAction(nameof(Index));
         }
@@ -440,7 +458,9 @@ public class BarbersController : Controller
             return Ok(new { success = true, message = $"Password for {barber.DisplayName} reset successfully." });
         }
 
-        TempData["SuccessMessage"] = $"Password for {barber.DisplayName} reset successfully.";
+        var resetMsg = $"Password for {barber.DisplayName} reset successfully.";
+        TempData["Success"] = resetMsg;
+        TempData["SuccessMessage"] = resetMsg;
         return RedirectToAction(nameof(Index));
     }
 
@@ -473,7 +493,9 @@ public class BarbersController : Controller
             return Ok(new { barberId = barber.Id, isActive = barber.IsActive, message = $"Barber {barber.DisplayName} has been {statusText}." });
         }
 
-        TempData["SuccessMessage"] = $"Barber {barber.DisplayName} has been {statusText}.";
+        var toggleMsg = $"Barber {barber.DisplayName} has been {statusText}.";
+        TempData["Success"] = toggleMsg;
+        TempData["SuccessMessage"] = toggleMsg;
         return RedirectToAction(nameof(Index));
     }
 
