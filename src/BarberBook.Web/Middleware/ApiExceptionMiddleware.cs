@@ -54,19 +54,26 @@ public class ApiExceptionMiddleware
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        var code = "INTERNAL_SERVER_ERROR";
-        var message = "An unexpected error occurred.";
-
-        var response = new ApiErrorResponse(code, message);
-        var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
+        if (IsApiRequest(context))
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        await context.Response.WriteAsync(json);
+            var code = "INTERNAL_SERVER_ERROR";
+            var message = "An unexpected error occurred.";
+
+            var response = new ApiErrorResponse(code, message);
+            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(json);
+        }
+        else
+        {
+            context.Response.Redirect("/Home/StatusCodePage?code=500");
+        }
     }
 
     private static bool IsApiRequest(HttpContext context)

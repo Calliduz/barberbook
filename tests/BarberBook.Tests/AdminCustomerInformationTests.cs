@@ -87,8 +87,14 @@ public class AdminCustomerInformationTests : IClassFixture<WebApplicationFactory
         await EnsureSeededAsync();
         var adminClient = await CreateAuthenticatedClientAsync(AdminEmail, AdminPassword);
 
-        // Juan Dela Cruz has ID = 5
-        var detailResp = await adminClient.GetAsync("/api/admin/customers/5");
+        int juanId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            juanId = (await db.Users.FirstAsync(u => u.Email == "juan@barberbook.local")).Id;
+        }
+
+        var detailResp = await adminClient.GetAsync($"/api/admin/customers/{juanId}");
         detailResp.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var doc = await detailResp.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
@@ -102,7 +108,7 @@ public class AdminCustomerInformationTests : IClassFixture<WebApplicationFactory
         apps.GetArrayLength().Should().BeGreaterThan(0);
 
         // MVC View test
-        var htmlResp = await adminClient.GetAsync("/admin/customers/5");
+        var htmlResp = await adminClient.GetAsync($"/admin/customers/{juanId}");
         htmlResp.StatusCode.Should().Be(HttpStatusCode.OK);
         var html = await htmlResp.Content.ReadAsStringAsync();
         html.Should().Contain("Juan Dela Cruz");

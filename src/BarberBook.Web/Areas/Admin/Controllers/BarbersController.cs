@@ -173,11 +173,54 @@ public class BarbersController : Controller
             return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
         }
 
+        // 1. Enforce maximum file size (5 MB limit to prevent disk exhaustion DoS)
+        const long maxFileSize = 5 * 1024 * 1024;
+        if (file.Length > maxFileSize)
+        {
+            return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+        }
+
+        // 2. Disallow SVG and non-raster formats to prevent Stored XSS via embedded scripts
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".webp", ".svg" };
+        var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".webp" };
         if (!allowedExts.Contains(ext))
         {
             return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+        }
+
+        // 3. Verify magic bytes / file signatures to prevent disguised executables
+        using (var stream = file.OpenReadStream())
+        {
+            var header = new byte[12];
+            var bytesRead = await stream.ReadAsync(header, 0, header.Length);
+            if (bytesRead < 4)
+            {
+                return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+            }
+
+            bool isValidHeader = false;
+            // JPEG: FF D8 FF
+            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            {
+                isValidHeader = true;
+            }
+            // PNG: 89 50 4E 47
+            else if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            {
+                isValidHeader = true;
+            }
+            // WEBP: RIFF....WEBP
+            else if (bytesRead >= 12 &&
+                     header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+                     header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
+            {
+                isValidHeader = true;
+            }
+
+            if (!isValidHeader)
+            {
+                return string.IsNullOrWhiteSpace(fallbackUrl) ? null : fallbackUrl.Trim();
+            }
         }
 
         var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "barbers");
@@ -198,6 +241,7 @@ public class BarbersController : Controller
     }
 
     [HttpPost("admin/barbers")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateForm([FromForm] CreateBarberRequest request, IFormFile? photoFile)
     {
         if (photoFile != null && photoFile.Length > 0)
@@ -310,6 +354,7 @@ public class BarbersController : Controller
     }
 
     [HttpPost("admin/barbers/{id:int}/edit")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateForm(int id, [FromForm] UpdateBarberRequest request, IFormFile? photoFile)
     {
         if (photoFile != null && photoFile.Length > 0)

@@ -113,6 +113,7 @@ public class BranchesController : Controller
     }
 
     [HttpPost("admin/branches")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([FromForm] CreateBranchRequest request)
     {
         return await ProcessCreateAsync(request, isApi: false);
@@ -182,6 +183,7 @@ public class BranchesController : Controller
     }
 
     [HttpPost("admin/branches/{id:int}/edit")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(int id, [FromForm] UpdateBranchRequest request)
     {
         return await ProcessUpdateAsync(id, request, isApi: false);

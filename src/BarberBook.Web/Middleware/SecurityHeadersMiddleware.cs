@@ -19,6 +19,8 @@ public class SecurityHeadersMiddleware
         {
             var headers = context.Response.Headers;
 
+            headers.Remove("Server");
+
             if (!headers.ContainsKey("X-Content-Type-Options"))
             {
                 headers.Append("X-Content-Type-Options", "nosniff");
@@ -39,12 +41,22 @@ public class SecurityHeadersMiddleware
                 headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
             }
 
+            if (!headers.ContainsKey("X-Permitted-Cross-Domain-Policies"))
+            {
+                headers.Append("X-Permitted-Cross-Domain-Policies", "none");
+            }
+
+            if (!headers.ContainsKey("X-XSS-Protection"))
+            {
+                headers.Append("X-XSS-Protection", "0");
+            }
+
             if (!headers.ContainsKey("Content-Security-Policy"))
             {
                 // Permits local inline Razor scripts, Google Fonts, and self origin assets
                 headers.Append("Content-Security-Policy",
                     "default-src 'self'; " +
-                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                    "script-src 'self' 'unsafe-inline'; " +
                     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                     "font-src 'self' https://fonts.gstatic.com data:; " +
                     "img-src 'self' data: https:; " +

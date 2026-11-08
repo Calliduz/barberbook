@@ -10,9 +10,22 @@ using NodaTime;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Disable Kestrel Server header for security reconnaissance defense
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+
 // 1. Database & EF Core
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost;Port=5432;Database=barberbook_dev;Username=barberbook;Password=barberbook_dev_password";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    if (builder.Environment.IsProduction())
+    {
+        throw new InvalidOperationException("ConnectionStrings:DefaultConnection must be configured in Production environment.");
+    }
+    connectionString = "Host=localhost;Port=5432;Database=barberbook_dev;Username=barberbook;Password=barberbook_dev_password";
+}
 
 builder.Services.AddDbContext<BarberBookDbContext>(options =>
 {
@@ -31,6 +44,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
     options.User.RequireUniqueEmail = true;
+
+    // Lockout protection against brute-force attacks
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<BarberBookDbContext>()
 .AddDefaultTokenProviders();
@@ -40,7 +58,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromHours(4);
@@ -132,8 +152,15 @@ if (args.Contains("--seed"))
 // Development automatic schema migration & seed hygiene
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    await BarberBook.Data.Seeding.DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        await BarberBook.Data.Seeding.DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "Initial database migration/seeding skipped (database unreachable).");
+    }
 }
 
 // Security Headers & Centralized Error Handler Middleware

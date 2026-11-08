@@ -49,12 +49,15 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult ApiLoginGetRedirect(string? returnUrl = null)
     {
-        var target = string.IsNullOrEmpty(returnUrl) ? "/login" : $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        var target = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
+            ? $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}"
+            : "/login";
         return Redirect(target);
     }
 
     [HttpPost]
     [AllowAnonymous]
+    [ValidateAntiForgeryToken]
     [EnableRateLimiting("auth-policy")]
     [Route("login")]
     [Route("Account/Login")]
@@ -109,7 +112,18 @@ public class AccountController : Controller
             return View("Login", model);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: true);
+        if (result.IsLockedOut)
+        {
+            _logger.LogWarning("Login rejected: Account locked out for email {Email}", model.Email);
+            if (isApi)
+            {
+                return StatusCode(StatusCodes.Status423Locked, new ApiErrorResponse("ACCOUNT_LOCKED", "Your account has been temporarily locked due to multiple failed login attempts. Please try again later."));
+            }
+            ModelState.AddModelError(string.Empty, "Your account has been temporarily locked due to multiple failed login attempts. Please try again in 5 minutes.");
+            return View("Login", model);
+        }
+
         if (!result.Succeeded)
         {
             _logger.LogWarning("Login failed: Incorrect password for email {Email}", model.Email);
@@ -157,12 +171,15 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult ApiRegisterGetRedirect(string? returnUrl = null)
     {
-        var target = string.IsNullOrEmpty(returnUrl) ? "/register" : $"/register?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        var target = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
+            ? $"/register?returnUrl={Uri.EscapeDataString(returnUrl)}"
+            : "/register";
         return Redirect(target);
     }
 
     [HttpPost]
     [AllowAnonymous]
+    [ValidateAntiForgeryToken]
     [EnableRateLimiting("auth-policy")]
     [Route("register")]
     [Route("Account/Register")]
@@ -317,6 +334,7 @@ public class AccountController : Controller
 
     [HttpPost("Account/ChangePassword")]
     [Authorize]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordModel formModel)
     {
         return await ProcessChangePasswordAsync(formModel, isApi: false);
