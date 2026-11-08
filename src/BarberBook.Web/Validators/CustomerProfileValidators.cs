@@ -21,7 +21,8 @@ public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequ
             .MaximumLength(256).WithMessage("Email must not exceed 256 characters.");
 
         RuleFor(x => x.PhoneNumber)
-            .MaximumLength(25).WithMessage("Phone number must not exceed 25 characters.");
+            .MaximumLength(25).WithMessage("Phone number must not exceed 25 characters.")
+            .Matches(@"^[0-9+\-\s()]*$").WithMessage("Phone number contains invalid characters.");
     }
 }
 

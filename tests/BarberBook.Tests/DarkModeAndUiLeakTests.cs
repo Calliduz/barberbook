@@ -127,5 +127,51 @@ public class DarkModeAndUiLeakTests : IClassFixture<WebApplicationFactory<Progra
         html.Should().Contain("barberbook_theme");
         html.Should().Contain("document.documentElement.classList.add('dark')");
     }
+
+    [Fact]
+    public void EO4_EmptyPlaceholder_SharedComponents_ContainDarkMode()
+    {
+        var basePath = AppContext.BaseDirectory;
+        var currentDir = new DirectoryInfo(basePath);
+        while (currentDir != null && !Directory.Exists(Path.Combine(currentDir.FullName, "src")))
+        {
+            currentDir = currentDir.Parent;
+        }
+
+        var root = currentDir!.FullName;
+        var skeleton = File.ReadAllText(Path.Combine(root, "src", "BarberBook.Web", "Views", "Shared", "_Skeleton.cshtml"));
+        var emptyState = File.ReadAllText(Path.Combine(root, "src", "BarberBook.Web", "Views", "Shared", "_EmptyState.cshtml"));
+        var errorState = File.ReadAllText(Path.Combine(root, "src", "BarberBook.Web", "Views", "Shared", "_ErrorState.cshtml"));
+
+        skeleton.Should().Contain("dark:bg-slate-900");
+        skeleton.Should().Contain("dark:border-slate-800");
+        skeleton.Should().Contain("dark:bg-slate-800");
+
+        emptyState.Should().Contain("dark:bg-slate-900");
+        emptyState.Should().Contain("dark:border-slate-800");
+
+        errorState.Should().Contain("dark:bg-rose-950/40");
+        errorState.Should().Contain("dark:border-rose-900/60");
+    }
+
+    [Fact]
+    public void CF1_FormViews_DoNotContainEmptyPlaceholders()
+    {
+        var basePath = AppContext.BaseDirectory;
+        var currentDir = new DirectoryInfo(basePath);
+        while (currentDir != null && !Directory.Exists(Path.Combine(currentDir.FullName, "src")))
+        {
+            currentDir = currentDir.Parent;
+        }
+
+        var root = currentDir!.FullName;
+        var files = Directory.GetFiles(Path.Combine(root, "src", "BarberBook.Web"), "*.cshtml", SearchOption.AllDirectories);
+
+        foreach (var file in files)
+        {
+            var text = File.ReadAllText(file);
+            text.Should().NotContain("placeholder=\"\"", $"View {Path.GetFileName(file)} must not contain empty placeholder attributes.");
+        }
+    }
 }
 

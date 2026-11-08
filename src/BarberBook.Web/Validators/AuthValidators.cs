@@ -44,6 +44,7 @@ public class RegisterModelValidator : AbstractValidator<RegisterModel>
 
         RuleFor(x => x.Phone)
             .MaximumLength(20).WithMessage("Phone number cannot exceed 20 characters.")
+            .Matches(@"^[0-9+\-\s()]*$").WithMessage("Phone number contains invalid characters.")
             .When(x => !string.IsNullOrEmpty(x.Phone));
     }
 }
