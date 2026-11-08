@@ -111,7 +111,7 @@
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-amber-600">@Model.PendingBookings.Count</span>
+                <span class="text-3xl font-serif font-black text-amber-600">@Model.TotalPendingBookingsCount</span>
                 <span class="text-xs text-slate-500 font-medium">needs action</span>
             </div>
             <p class="mt-2 text-xs text-slate-500">Requires inline confirm or reject</p>
@@ -150,7 +150,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                    @Model.PendingBookings.Count pending
+                    @Model.TotalPendingBookingsCount pending
                 </span>
                 <a href="/admin/appointments?status=pending" class="text-xs font-bold text-amber-700 hover:text-amber-800 hidden sm:inline">
                     View All Bookings &rarr;

@@ -75,14 +75,17 @@ public class DashboardController : Controller
             Total = todayAppointments.Count
         };
 
-        // 2. Pending bookings needing action (oldest first, up to 10) across all dates
+        // 2. Pending bookings needing action (latest first) across all dates
+        var totalPendingCount = await _dbContext.Appointments
+            .CountAsync(a => a.Status == AppointmentStatus.Pending);
+
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
             .Include(a => a.Customer)
             .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
-            .OrderBy(a => a.CreatedAt)
-            .Take(10)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(15)
             .ToListAsync();
 
         var pendingBookings = pendingRaw.Select(a =>
@@ -214,6 +217,7 @@ public class DashboardController : Controller
             FormattedMonthToDateGrandTotal = monthlyReport.FormattedGrandTotal,
             LowStockProductsCount = lowStock.Count,
             LowStockProducts = lowStock,
+            TotalPendingBookingsCount = totalPendingCount,
             PendingBookings = pendingBookings,
             TodayAppointmentsByBarber = todayByBarber,
             RecentAppointments = recentAppts
@@ -255,13 +259,16 @@ public class DashboardController : Controller
             Total = todayAppointments.Count
         };
 
-        // 2. Pending bookings (oldest first, up to 10)
+        // 2. Pending bookings (latest first, up to 10)
+        var totalPendingCount = await _dbContext.Appointments
+            .CountAsync(a => a.Status == AppointmentStatus.Pending);
+
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
             .Include(a => a.Customer)
             .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
-            .OrderBy(a => a.CreatedAt)
+            .OrderByDescending(a => a.CreatedAt)
             .Take(10)
             .ToListAsync();
 
@@ -350,6 +357,7 @@ public class DashboardController : Controller
         var dto = new AdminDashboardDto
         {
             TodayCounts = todayCounts,
+            TotalPendingBookingsCount = totalPendingCount,
             PendingBookings = pendingBookings,
             TodayServiceSales = dailyReport.TotalSales,
             FormattedTodayServiceSales = dailyReport.FormattedTotalSales,

@@ -5,6 +5,7 @@ namespace BarberBook.Web.Models.Admin;
 public class AdminDashboardDto
 {
     public TodayCountsDto TodayCounts { get; set; } = new();
+    public int TotalPendingBookingsCount { get; set; }
     public List<AdminDashboardPendingItemDto> PendingBookings { get; set; } = new();
     public decimal TodayServiceSales { get; set; }
     public string FormattedTodayServiceSales { get; set; } = "₱0.00";

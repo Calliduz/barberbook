@@ -98,7 +98,7 @@
         </div>
 
         <!-- Filter Dropdowns & Date Controls -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-3 border-t border-slate-100 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-sm">
             <div>
                 <label for="filterBranch" class="filter-label">Branch</label>
                 <select id="filterBranch" onchange="applyFilters()" class="filter-control w-full text-xs">
@@ -129,6 +129,18 @@
                     {
                         <option value="@s.Id">@s.Name (@s.FormattedPrice)</option>
                     }
+                </select>
+            </div>
+
+            <div>
+                <label for="filterSort" class="filter-label">Sort By</label>
+                <select id="filterSort" onchange="applyFilters()" class="filter-control w-full text-xs">
+                    <option value="created_desc" selected>Newest Bookings First</option>
+                    <option value="date_asc">Appointment Date (Earliest)</option>
+                    <option value="date_desc">Appointment Date (Latest)</option>
+                    <option value="created_asc">Oldest Bookings First</option>
+                    <option value="customer_asc">Customer Name (A-Z)</option>
+                    <option value="price_desc">Price (Highest)</option>
                 </select>
             </div>
 
@@ -640,7 +652,16 @@
             </div>`;
         }
 
-        let url = `/api/admin/appointments?page=${currentPage}&pageSize=${pageSize}&sortOrder=desc`;
+        const sortVal = document.getElementById('filterSort') ? document.getElementById('filterSort').value : 'created_desc';
+        let sortBy = 'created';
+        let sortOrder = 'desc';
+        if (sortVal === 'date_asc') { sortBy = 'date'; sortOrder = 'asc'; }
+        else if (sortVal === 'date_desc') { sortBy = 'date'; sortOrder = 'desc'; }
+        else if (sortVal === 'created_asc') { sortBy = 'created'; sortOrder = 'asc'; }
+        else if (sortVal === 'customer_asc') { sortBy = 'customer'; sortOrder = 'asc'; }
+        else if (sortVal === 'price_desc') { sortBy = 'price'; sortOrder = 'desc'; }
+
+        let url = `/api/admin/appointments?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
         if (currentStatus) url += `&status=${encodeURIComponent(currentStatus)}`;
         const barberId = document.getElementById('filterBarber').value;
         if (barberId) url += `&barberId=${barberId}`;

@@ -30,7 +30,8 @@ public class AdminDashboardViewModel
     public int LowStockProductsCount { get; set; }
     public List<BarberBook.Web.Models.Inventory.ProductDto> LowStockProducts { get; set; } = new();
 
-    // Needs action (pending bookings, oldest first, up to 10)
+    // Needs action (pending bookings, latest first, up to 10-15)
+    public int TotalPendingBookingsCount { get; set; }
     public List<AdminDashboardPendingItemDto> PendingBookings { get; set; } = new();
 
     // Today's schedule grouped by barber

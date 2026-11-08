@@ -276,4 +276,51 @@ public class AdminAppointmentEndpointTests : IClassFixture<WebApplicationFactory
         var historyHtml = await historyResponse.Content.ReadAsStringAsync();
         historyHtml.Should().Contain("Appointment History");
     }
+
+    [Fact]
+    public async Task AF1_OB4_NewlyBookedAppointment_ReflectsOnAdminDashboardPendingList()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        // 1. Create a brand new pending appointment
+        var newPendingApp = await CreateIsolatedAppointmentAsync(AppointmentStatus.Pending, barberId: 1, customerId: 5);
+
+        // 2. Query admin dashboard API
+        var apiRes = await adminClient.GetAsync("/api/admin/dashboard");
+        apiRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var dashboardDto = await apiRes.Content.ReadFromJsonAsync<AdminDashboardDto>();
+
+        dashboardDto.Should().NotBeNull();
+        dashboardDto!.TotalPendingBookingsCount.Should().BeGreaterThan(0);
+        // Newly booked appointment must appear in the pending list
+        dashboardDto.PendingBookings.Should().Contain(p => p.ReferenceCode == newPendingApp.ReferenceCode);
+        // And must be at the very top (first item) because it is the latest created
+        dashboardDto.PendingBookings[0].ReferenceCode.Should().Be(newPendingApp.ReferenceCode);
+
+        // 3. Query admin dashboard HTML view
+        var htmlRes = await adminClient.GetAsync("/admin");
+        htmlRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await htmlRes.Content.ReadAsStringAsync();
+        html.Should().Contain(newPendingApp.ReferenceCode);
+    }
+
+    [Fact]
+    public async Task AF6_AdminAppointments_DefaultSort_ReturnsNewestBookingsFirst()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        // Create a new appointment
+        var newApp = await CreateIsolatedAppointmentAsync(AppointmentStatus.Pending, barberId: 1, customerId: 5);
+
+        // Query /api/admin/appointments without explicit sortBy (default should be created desc)
+        var response = await adminClient.GetAsync("/api/admin/appointments");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadFromJsonAsync<AdminAppointmentPagedResultDto>();
+        result.Should().NotBeNull();
+        result!.Items.Should().NotBeEmpty();
+        result.Items.Take(3).Should().Contain(i => i.ReferenceCode == newApp.ReferenceCode, "Latest created appointment should reflect among the top items");
+    }
 }

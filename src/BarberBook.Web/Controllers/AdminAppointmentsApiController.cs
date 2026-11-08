@@ -129,7 +129,9 @@ public class AdminAppointmentsApiController : ControllerBase
             "price" => isAsc ? dbQuery.OrderBy(a => a.Price) : dbQuery.OrderByDescending(a => a.Price),
             "status" => isAsc ? dbQuery.OrderBy(a => a.Status) : dbQuery.OrderByDescending(a => a.Status),
             "customer" => isAsc ? dbQuery.OrderBy(a => a.Customer.FullName) : dbQuery.OrderByDescending(a => a.Customer.FullName),
-            _ => isAsc ? dbQuery.OrderBy(a => a.StartsAt) : dbQuery.OrderByDescending(a => a.StartsAt)
+            "date" => isAsc ? dbQuery.OrderBy(a => a.StartsAt) : dbQuery.OrderByDescending(a => a.StartsAt),
+            "created" => isAsc ? dbQuery.OrderBy(a => a.Id) : dbQuery.OrderByDescending(a => a.Id),
+            _ => isAsc ? dbQuery.OrderBy(a => a.Id) : dbQuery.OrderByDescending(a => a.Id)
         };
 
         // 8. Pagination
