@@ -3,14 +3,14 @@
     ViewData["Title"] = "Log In";
 }
 
-<div class="max-w-md mx-auto my-6 sm:my-12 bg-white/95 rounded-2xl shadow-xl border border-amber-900/10 p-8 sm:p-10 backdrop-blur-sm">
+<div class="max-w-md mx-auto my-6 sm:my-12 bg-white/95 dark:bg-slate-900/95 rounded-2xl shadow-xl border border-amber-900/10 dark:border-slate-800 p-8 sm:p-10 backdrop-blur-sm">
     <div class="text-center mb-8">
         <div class="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
             <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
             <span>BARBERBOOK MANILA</span>
         </div>
-        <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Welcome Back</h1>
-        <p class="text-sm text-slate-600 mt-2 font-sans">Sign in to manage your appointments and schedule</p>
+        <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white tracking-tight">Welcome Back</h1>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-2 font-sans">Sign in to manage your appointments and schedule</p>
     </div>
 
     @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
@@ -64,12 +64,12 @@
         </div>
     </form>
 
-    <div class="mt-8 text-center text-xs text-slate-600 pt-6 border-t border-slate-200">
+    <div class="mt-8 text-center text-xs text-slate-600 dark:text-slate-400 pt-6 border-t border-slate-200 dark:border-slate-800">
         Don't have an account?
         @{
             var regUrl = string.IsNullOrEmpty(Model?.ReturnUrl) ? "/register" : $"/register?returnUrl={Uri.EscapeDataString(Model.ReturnUrl)}";
         }
-        <a href="@regUrl" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-500/40 ml-1">
+        <a href="@regUrl" class="font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500 underline decoration-amber-500/40 ml-1">
             Register as a customer
         </a>
     </div>

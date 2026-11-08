@@ -5,14 +5,14 @@
 
 <div class="max-w-4xl mx-auto px-4 py-8 sm:px-6 space-y-8">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-amber-900/10">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-amber-900/10 dark:border-slate-800">
         <div>
             <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                 <span>CLIENT APPOINTMENT PORTAL</span>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-serif font-black text-slate-900 tracking-tight">My Appointments</h1>
-            <p class="mt-1 text-sm text-slate-600 font-light">Manage your upcoming bookings, view real-time status updates, or review your past grooming history.</p>
+            <h1 class="text-3xl sm:text-4xl font-serif font-black text-slate-900 dark:text-white tracking-tight">My Appointments</h1>
+            <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 font-light">Manage your upcoming bookings, view real-time status updates, or review your past grooming history.</p>
         </div>
         <a href="/book" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition shadow-md hover:shadow-lg shrink-0">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -26,23 +26,23 @@
     <div id="status-alert" class="hidden p-4 rounded-2xl text-sm transition-all shadow-sm"></div>
 
     <!-- Tabs Navigation -->
-    <div class="flex border-b border-slate-200">
+    <div class="flex border-b border-slate-200 dark:border-slate-800">
         <button type="button" id="tab-upcoming-btn" onclick="switchTab('upcoming')"
-                class="px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 flex items-center gap-2 transition-colors">
+                class="px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 dark:text-amber-400 flex items-center gap-2 transition-colors">
             <span>Upcoming Visits</span>
-            <span id="badge-upcoming-count" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">0</span>
+            <span id="badge-upcoming-count" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 font-bold">0</span>
         </button>
         <button type="button" id="tab-history-btn" onclick="switchTab('history')"
-                class="px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors">
+                class="px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 transition-colors">
             <span>Visit History</span>
-            <span id="badge-history-count" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">0</span>
+            <span id="badge-history-count" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">0</span>
         </button>
     </div>
 
     <!-- Loading State -->
     <div id="appointments-loading" class="py-16 text-center">
         <div class="inline-block w-8 h-8 border-3 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"></div>
-        <p class="text-xs text-slate-500 mt-2 font-medium">Loading appointments...</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">Loading appointments...</p>
     </div>
 
     <!-- Appointments List Container -->
@@ -51,14 +51,14 @@
     </div>
 
     <!-- Empty State -->
-    <div id="appointments-empty" class="hidden py-16 text-center bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-12 shadow-sm max-w-lg mx-auto">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 mb-4">
+    <div id="appointments-empty" class="hidden py-16 text-center bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-sm max-w-lg mx-auto">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 mb-4">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
             </svg>
         </div>
-        <h3 id="empty-title" class="text-lg font-serif font-bold text-slate-900">No appointments found</h3>
-        <p id="empty-subtitle" class="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">Ready for a fresh cut or master hot towel shave? Book your preferred barber in seconds.</p>
+        <h3 id="empty-title" class="text-lg font-serif font-bold text-slate-900 dark:text-white">No appointments found</h3>
+        <p id="empty-subtitle" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">Ready for a fresh cut or master hot towel shave? Book your preferred barber in seconds.</p>
         <div class="mt-6">
             <a href="/book" class="inline-flex items-center px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm">
                 Book an Appointment &rarr;
@@ -69,24 +69,24 @@
 
 <!-- Cancel Modal -->
 <div id="cancel-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-4">
         <div>
-            <h3 class="text-xl font-serif font-black text-slate-900">Cancel Appointment</h3>
-            <p class="text-xs text-slate-500 mt-1">Are you sure you want to cancel this booking? This slot will immediately be released for other clients.</p>
+            <h3 class="text-xl font-serif font-black text-slate-900 dark:text-white">Cancel Appointment</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Are you sure you want to cancel this booking? This slot will immediately be released for other clients.</p>
         </div>
         
-        <div class="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200 text-xs text-slate-800 leading-relaxed">
+        <div class="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/60 text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
             <div id="cancel-modal-summary"></div>
         </div>
 
         <div>
-            <label for="cancel-reason" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Reason for cancellation <span class="text-slate-400 font-normal lowercase">(optional)</span></label>
+            <label for="cancel-reason" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Reason for cancellation <span class="text-slate-400 font-normal lowercase">(optional)</span></label>
             <textarea id="cancel-reason" rows="2" maxlength="300" placeholder="e.g. Schedule conflict, feeling unwell..."
-                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"></textarea>
         </div>
 
-        <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
-            <button type="button" onclick="closeCancelModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+        <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onclick="closeCancelModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
                 Keep Appointment
             </button>
             <button type="button" id="confirm-cancel-btn" onclick="executeCancel()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-sm">
@@ -98,13 +98,13 @@
 
 <!-- Reschedule Modal -->
 <div id="reschedule-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl my-8 space-y-5">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl my-8 space-y-5">
         <div class="flex justify-between items-start">
             <div>
-                <h3 class="text-xl font-serif font-black text-slate-900">Reschedule Appointment</h3>
-                <p class="text-xs text-slate-500 mt-1">Choose a new date and open time slot with your barber.</p>
+                <h3 class="text-xl font-serif font-black text-slate-900 dark:text-white">Reschedule Appointment</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Choose a new date and open time slot with your barber.</p>
             </div>
-            <button type="button" onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-700 p-1">
+            <button type="button" onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -112,23 +112,23 @@
         </div>
 
         <!-- Current Appointment Info -->
-        <div class="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-200 text-xs text-slate-800 leading-relaxed" id="reschedule-modal-summary"></div>
+        <div class="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/60 text-xs text-slate-800 dark:text-slate-200 leading-relaxed" id="reschedule-modal-summary"></div>
 
         <!-- Date Picker -->
         <div>
-            <label for="reschedule-date" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Select New Date</label>
+            <label for="reschedule-date" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Select New Date</label>
             <input type="date" id="reschedule-date" onchange="onRescheduleDateChanged()"
-                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-medium" />
+                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-medium" />
         </div>
 
         <!-- Slot Picker -->
         <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Available Slots (Asia/Manila)</label>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Available Slots (Asia/Manila)</label>
             <div id="reschedule-slots-loading" class="hidden py-6 text-center">
                 <div class="inline-block w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"></div>
-                <p class="text-[11px] text-slate-500 mt-1 font-medium">Checking live schedule...</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Checking live schedule...</p>
             </div>
-            <div id="reschedule-slots-empty" class="hidden py-6 text-center text-xs text-slate-500 bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div id="reschedule-slots-empty" class="hidden py-6 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
                 No available slots for this date. Please pick another date.
             </div>
             <div id="reschedule-slots-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
@@ -136,8 +136,8 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
-            <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+        <div class="flex justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
                 Cancel
             </button>
             <button type="button" id="confirm-reschedule-btn" disabled onclick="executeReschedule()"
@@ -222,16 +222,16 @@
     function renderAppointments(list, container) {
         list.forEach(app => {
             const card = document.createElement('div');
-            card.className = 'bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-amber-500/50 transition duration-200';
+            card.className = 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-amber-500/50 transition duration-200';
             
             const statusBadgeHtml = getStatusBadge(app.status, app.statusDisplay);
 
             const actionsHtml = app.canCancelOrReschedule ? `
-                <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-end gap-2.5">
-                    <button type="button" onclick="openRescheduleModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition">
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-2.5">
+                    <button type="button" onclick="openRescheduleModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition">
                         Reschedule
                     </button>
-                    <button type="button" onclick="openCancelModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition">
+                    <button type="button" onclick="openCancelModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-800 transition">
                         Cancel
                     </button>
                 </div>
@@ -243,29 +243,29 @@
                 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xs font-mono font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
+                            <span class="text-xs font-mono font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
                                 ${app.referenceCode}
                             </span>
                             ${statusBadgeHtml}
                         </div>
-                        <h3 class="text-xl font-serif font-bold text-slate-900">${app.serviceName}</h3>
-                        <p class="text-xs text-slate-600 mt-1">Barber: <strong class="text-slate-900 font-bold">${app.barberName}</strong>${app.branchName ? ` &bull; <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200">${app.branchName}</span>` : ''} &bull; ${app.durationMinutes} mins</p>
+                        <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-white">${app.serviceName}</h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Barber: <strong class="text-slate-900 dark:text-slate-100 font-bold">${app.barberName}</strong>${app.branchName ? ` &bull; <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800">${app.branchName}</span>` : ''} &bull; ${app.durationMinutes} mins</p>
                     </div>
                     <div class="text-left sm:text-right">
-                        <span class="text-xl font-black text-slate-900 font-mono">${app.formattedPrice}</span>
-                        <p class="text-xs font-bold text-slate-800 mt-1">${app.formattedDate}</p>
-                        <p class="text-xs text-amber-700 font-bold">${app.formattedTime}</p>
+                        <span class="text-xl font-black text-slate-900 dark:text-white font-mono">${app.formattedPrice}</span>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">${app.formattedDate}</p>
+                        <p class="text-xs text-amber-700 dark:text-amber-400 font-bold">${app.formattedTime}</p>
                     </div>
                 </div>
 
                 ${app.notes ? `
-                    <div class="mt-3 text-xs bg-amber-50/40 p-3 rounded-2xl border border-amber-200/60 text-slate-700">
-                        <span class="text-slate-500 font-semibold">Special Instructions:</span> "${app.notes}"
+                    <div class="mt-3 text-xs bg-amber-50/40 dark:bg-amber-950/30 p-3 rounded-2xl border border-amber-200/60 dark:border-amber-800/60 text-slate-700 dark:text-slate-300">
+                        <span class="text-slate-500 dark:text-slate-400 font-semibold">Special Instructions:</span> "${app.notes}"
                     </div>
                 ` : ''}
 
                 <div class="mt-4 flex items-center justify-between text-xs">
-                    <button type="button" onclick="toggleTimeline(${app.id})" class="text-xs text-slate-500 hover:text-amber-800 font-semibold flex items-center gap-1 transition">
+                    <button type="button" onclick="toggleTimeline(${app.id})" class="text-xs text-slate-500 dark:text-slate-400 hover:text-amber-800 dark:hover:text-amber-400 font-semibold flex items-center gap-1 transition">
                         <span id="timeline-toggle-text-${app.id}">View Status History</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -273,7 +273,7 @@
                     </button>
                 </div>
 
-                <div id="timeline-${app.id}" class="hidden mt-3 pt-3 border-t border-slate-100">
+                <div id="timeline-${app.id}" class="hidden mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                     ${timelineHtml}
                 </div>
 
@@ -462,11 +462,11 @@
             slots.forEach(s => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 transition-all';
+                btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 transition-all';
                 btn.innerText = s.formattedTime;
                 btn.onclick = () => {
                     document.querySelectorAll('.reschedule-slot-btn').forEach(b => {
-                        b.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 transition-all';
+                        b.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 transition-all';
                     });
                     btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-amber-500 text-slate-950 border border-amber-500 text-xs font-extrabold shadow-sm transition-all';
                     selectedRescheduleSlotUtc = s.startsAtUtc;

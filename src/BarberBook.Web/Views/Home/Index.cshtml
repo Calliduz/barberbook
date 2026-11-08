@@ -94,17 +94,17 @@
 
     <!-- SERVICES SHOWCASE ("Apothecary Grooming Menu") -->
     <div class="space-y-8">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 dark:border-amber-500/20 pb-5">
             <div>
-                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 dark:text-brand-400 mb-1">
                     <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                     <span>Service Catalog</span>
                 </div>
-                <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Handcrafted Grooming Menu</h2>
-                <p class="mt-1 text-sm text-slate-600">Every service includes personalized consultation, hot towel finish, and classic tonic styling.</p>
+                <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-white">Handcrafted Grooming Menu</h2>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Every service includes personalized consultation, hot towel finish, and classic tonic styling.</p>
             </div>
             <div class="mt-4 sm:mt-0">
-                <a href="/services" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                <a href="/services" class="text-sm font-bold text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 flex items-center group">
                     <span>View All Services</span>
                     <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -115,30 +115,30 @@
             @foreach (var svc in Model)
             {
                 var imgUrl = GetServiceImage(svc.Name);
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:border-brand-500/60 hover:shadow-md transition group">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:border-brand-500/60 hover:shadow-md transition group">
                     <div class="sm:w-44 h-48 sm:h-auto vintage-img-container shrink-0 bg-slate-900">
                         <img src="@imgUrl" alt="@svc.Name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
                     </div>
                     <div class="p-6 flex-1 flex flex-col justify-between">
                         <div>
                             <div class="flex items-baseline justify-between">
-                                <h3 class="text-xl font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
+                                <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-white group-hover:text-brand-700 dark:group-hover:text-brand-400 transition-colors">
                                     @svc.Name
                                 </h3>
-                                <span class="text-lg font-extrabold text-slate-900 ml-2 font-mono">
+                                <span class="text-lg font-extrabold text-slate-900 dark:text-amber-400 ml-2 font-mono">
                                     ₱@svc.Price.ToString("N2")
                                 </span>
                             </div>
-                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">
+                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50">
                                 @svc.DurationMinutes mins
                             </span>
-                            <p class="mt-3 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                            <p class="mt-3 text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
                                 @svc.Description
                             </p>
                         </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-600 font-medium italic">Snapshot price guaranteed</span>
-                            <a href="/book?serviceId=@svc.Id" class="inline-flex items-center text-xs font-bold text-brand-700 hover:text-brand-900">
+                        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium italic">Snapshot price guaranteed</span>
+                            <a href="/book?serviceId=@svc.Id" class="inline-flex items-center text-xs font-bold text-brand-700 dark:text-brand-400 hover:text-brand-900 dark:hover:text-brand-300">
                                 Book This Service &rarr;
                             </a>
                         </div>
@@ -152,17 +152,17 @@
     @if (products.Any())
     {
         <div class="space-y-8 pt-4">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 dark:border-amber-500/20 pb-5">
                 <div>
-                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 dark:text-brand-400 mb-1">
                         <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                         <span>Apothecary &amp; Grooming Essentials</span>
                     </div>
-                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Artisan Grooming Products</h2>
-                    <p class="mt-1 text-sm text-slate-600">Premium pomades, beard oils, and soothing tonics crafted for master styling and daily maintenance.</p>
+                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-white">Artisan Grooming Products</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Premium pomades, beard oils, and soothing tonics crafted for master styling and daily maintenance.</p>
                 </div>
                 <div class="mt-4 sm:mt-0">
-                    <a href="/products" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                    <a href="/products" class="text-sm font-bold text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 flex items-center group">
                         <span>View Complete Apothecary Catalog</span>
                         <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -172,7 +172,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach (var p in products.Take(6))
                 {
-                    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
                         <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
                             <div>
                                 <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -188,10 +188,10 @@
                         <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
                             <div>
                                 <div class="flex items-baseline justify-between gap-2">
-                                    <h3 class="text-xl font-serif font-bold text-slate-900 group-hover:text-amber-800 transition">
+                                    <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-300 transition">
                                         @p.Name
                                     </h3>
-                                    <span class="text-xl font-black text-slate-900 font-mono shrink-0">
+                                    <span class="text-xl font-black text-slate-900 dark:text-amber-400 font-mono shrink-0">
                                         @p.FormattedSellPrice
                                     </span>
                                 </div>
@@ -199,32 +199,32 @@
                                 <div class="flex items-center gap-2 mt-2">
                                     @if (p.CurrentStock > p.ReorderLevel)
                                     {
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             <span>In Stock (@p.CurrentStock @p.Unit)</span>
                                         </span>
                                     }
                                     else if (p.CurrentStock > 0)
                                     {
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                             <span>Low Stock (Only @p.CurrentStock left)</span>
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                             <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                                             <span>Out of Stock</span>
                                         </span>
                                     }
-                                    <span class="text-[11px] text-slate-500">Unit: @p.Unit</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Unit: @p.Unit</span>
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                                <span class="text-[11px] text-slate-500 italic">Available in-shop</span>
-                                <a href="/products" class="inline-flex items-center font-bold text-amber-700 hover:text-amber-900 group-hover:translate-x-0.5 transition-transform">
+                            <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400 italic">Available in-shop</span>
+                                <a href="/products" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 transition-transform">
                                     Explore Product Details &rarr;
                                 </a>
                             </div>
@@ -239,17 +239,17 @@
     @if (barbers.Any())
     {
         <div class="space-y-8 pt-4">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 dark:border-amber-500/20 pb-5">
                 <div>
-                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 dark:text-brand-400 mb-1">
                         <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                         <span>The Artisans</span>
                     </div>
-                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Meet Our Master Barbers</h2>
-                    <p class="mt-1 text-sm text-slate-600">Dedicated professionals with distinct grooming specialties and master techniques.</p>
+                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-white">Meet Our Master Barbers</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Dedicated professionals with distinct grooming specialties and master techniques.</p>
                 </div>
                 <div class="mt-4 sm:mt-0">
-                    <a href="/barbers" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                    <a href="/barbers" class="text-sm font-bold text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 flex items-center group">
                         <span>View Profiles &amp; Weekly Schedules</span>
                         <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -260,7 +260,7 @@
                 @foreach (var b in barbers)
                 {
                     var barberPhoto = GetBarberImage(b.DisplayName, b.PhotoUrl);
-                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col hover:border-brand-500/60 hover:shadow-lg transition group">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col hover:border-brand-500/60 hover:shadow-lg transition group">
                         <div class="h-64 vintage-img-container bg-slate-900 relative">
                             <img src="@barberPhoto" alt="@b.DisplayName" class="w-full h-full object-cover object-top opacity-95 group-hover:opacity-100" />
                             <div class="absolute bottom-3 left-3 bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-slate-700">
@@ -271,19 +271,19 @@
 
                         <div class="p-6 flex-1 flex flex-col justify-between">
                             <div>
-                                <h3 class="text-2xl font-serif font-bold text-slate-900">
+                                <h3 class="text-2xl font-serif font-bold text-slate-900 dark:text-white">
                                     @b.DisplayName
                                 </h3>
-                                <p class="text-xs text-brand-700 font-semibold mt-1">
+                                <p class="text-xs text-brand-700 dark:text-brand-400 font-semibold mt-1">
                                     @b.Specialties
                                 </p>
-                                <p class="mt-3 text-xs text-slate-600 leading-relaxed line-clamp-3">
+                                <p class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
                                     @b.Bio
                                 </p>
                             </div>
 
-                            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                <a href="/barbers/@b.Id" class="text-xs font-semibold text-slate-600 hover:text-slate-900">
+                            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <a href="/barbers/@b.Id" class="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                                     View Schedule
                                 </a>
                                 <a href="/book?barberId=@b.Id" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-sm transition">
@@ -301,17 +301,17 @@
     @if (branches.Any())
     {
         <div class="space-y-8 pt-4">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-amber-900/10 dark:border-amber-500/20 pb-5">
                 <div>
-                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 mb-1">
+                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700 dark:text-brand-400 mb-1">
                         <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                         <span>Locations &amp; Lounges</span>
                     </div>
-                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900">Our Shop Locations</h2>
-                    <p class="mt-1 text-sm text-slate-600">Experience premium master grooming at our strategically situated parlors across Metro Manila.</p>
+                    <h2 class="text-3xl font-serif font-black tracking-tight text-slate-900 dark:text-white">Our Shop Locations</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Experience premium master grooming at our strategically situated parlors across Metro Manila.</p>
                 </div>
                 <div class="mt-4 sm:mt-0">
-                    <a href="/book" class="text-sm font-bold text-brand-700 hover:text-brand-800 flex items-center group">
+                    <a href="/book" class="text-sm font-bold text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 flex items-center group">
                         <span>Book an Appointment</span>
                         <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -322,14 +322,14 @@
                 @foreach (var br in branches)
                 {
                     var branchBarbers = barbers.Where(b => b.BranchId == br.Id).ToList();
-                    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
                         <div class="p-6 sm:p-7 space-y-4">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border border-amber-200/80 mb-2">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-700/50 mb-2">
                                         Active Parlor
                                     </span>
-                                    <h3 class="text-2xl font-serif font-black text-slate-900 group-hover:text-amber-800 transition">
+                                    <h3 class="text-2xl font-serif font-black text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-300 transition">
                                         @br.Name
                                     </h3>
                                 </div>
@@ -338,30 +338,30 @@
                                 </div>
                             </div>
 
-                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed flex items-start gap-2">
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex items-start gap-2">
                                 <svg class="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>@br.Address</span>
                             </p>
 
-                            <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
+                            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-3 text-xs">
                                 <div>
                                     <span class="text-slate-400 block text-[11px] font-medium uppercase tracking-wider">Hours</span>
-                                    <span class="font-bold text-slate-800 font-mono">@BarberBook.Web.Common.FormattingHelpers.FormatTime12h(br.OpeningTime) &ndash; @BarberBook.Web.Common.FormattingHelpers.FormatTime12h(br.ClosingTime)</span>
+                                    <span class="font-bold text-slate-800 dark:text-slate-200 font-mono">@BarberBook.Web.Common.FormattingHelpers.FormatTime12h(br.OpeningTime) &ndash; @BarberBook.Web.Common.FormattingHelpers.FormatTime12h(br.ClosingTime)</span>
                                 </div>
                                 <div>
                                     <span class="text-slate-400 block text-[11px] font-medium uppercase tracking-wider">Contact</span>
-                                    <span class="font-bold text-slate-800">@(string.IsNullOrWhiteSpace(br.PhoneNumber) ? "In-Shop" : br.PhoneNumber)</span>
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">@(string.IsNullOrWhiteSpace(br.PhoneNumber) ? "In-Shop" : br.PhoneNumber)</span>
                                 </div>
                             </div>
 
                             @if (branchBarbers.Any())
                             {
-                                <div class="pt-3 border-t border-slate-100">
+                                <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
                                     <span class="text-slate-400 block text-[11px] font-medium uppercase tracking-wider mb-2">Stationed Artisans</span>
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach (var bb in branchBarbers)
                                         {
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                 @bb.DisplayName
                                             </span>

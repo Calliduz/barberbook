@@ -25,23 +25,23 @@
             <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
             <span>MASTER APOTHECARY &amp; RETAIL</span>
         </div>
-        <h1 class="text-3xl sm:text-5xl font-serif font-black text-slate-900 tracking-tight">Artisan Grooming Products</h1>
-        <p class="text-base text-slate-600 font-light">
+        <h1 class="text-3xl sm:text-5xl font-serif font-black text-slate-900 dark:text-white tracking-tight">Artisan Grooming Products</h1>
+        <p class="text-base text-slate-600 dark:text-slate-400 font-light">
             Take home the master-crafted pomades, nourishing beard oils, and soothing tonic formulas used daily at our styling chairs.
         </p>
     </div>
 
     <!-- Filter & Search Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <!-- Category Filter Pills -->
         <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <a href="/products" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.IsNullOrEmpty(selectedCat) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 text-slate-600 hover:text-slate-900")">
+            <a href="/products" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.IsNullOrEmpty(selectedCat) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
                 All Products
             </a>
             @foreach (var cat in categories)
             {
                 <a href="/products?category=@cat@(string.IsNullOrEmpty(searchTerm) ? "" : $"&search={searchTerm}")"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.Equals(selectedCat, cat, StringComparison.OrdinalIgnoreCase) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 text-slate-600 hover:text-slate-900")">
+                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.Equals(selectedCat, cat, StringComparison.OrdinalIgnoreCase) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
                     @cat
                 </a>
             }
@@ -55,7 +55,7 @@
             }
             <div class="relative flex-1">
                 <input type="text" name="search" value="@searchTerm" placeholder="Search by name or SKU..."
-                       class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900" />
+                       class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" />
                 <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-xs">
@@ -71,11 +71,11 @@
     <!-- Product Grid -->
     @if (!Model.Any())
     {
-        <div class="text-center py-16 bg-white rounded-3xl border border-slate-200 text-slate-400">
-            <div class="inline-flex p-3 rounded-full bg-slate-100 mb-3">
+        <div class="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 text-slate-400">
+            <div class="inline-flex p-3 rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
             </div>
-            <p class="text-base font-semibold text-slate-600">No retail products found matching your search.</p>
+            <p class="text-base font-semibold text-slate-600 dark:text-slate-300">No retail products found matching your search.</p>
             <p class="text-xs text-slate-400 mt-1">Try clearing your filters or check our service menu for in-shop styling.</p>
             <a href="/products" class="inline-block mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
                 Reset Catalog
@@ -88,7 +88,7 @@
             @foreach (var p in Model)
             {
                 var iconType = GetProductIcon(p.Category, p.Name);
-                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-amber-500/50 transition duration-300 group">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-amber-500/50 transition duration-300 group">
                     <!-- Product Header Box with Vintage Motif -->
                     <div class="p-6 bg-slate-900 text-white relative overflow-hidden flex items-center justify-between">
                         <div class="space-y-1 relative z-10">
@@ -118,10 +118,10 @@
                     <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
                         <div>
                             <div class="flex items-baseline justify-between gap-2 mb-2">
-                                <h2 class="text-xl font-serif font-bold text-slate-900 group-hover:text-amber-800 transition">
+                                <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-300 transition">
                                     @p.Name
                                 </h2>
-                                <span class="text-xl font-black text-slate-900 font-mono shrink-0">
+                                <span class="text-xl font-black text-slate-900 dark:text-amber-400 font-mono shrink-0">
                                     @p.FormattedSellPrice
                                 </span>
                             </div>
@@ -130,37 +130,37 @@
                             <div class="flex items-center gap-2 mt-2">
                                 @if (p.CurrentStock > p.ReorderLevel)
                                 {
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                         <span>In Stock (@p.CurrentStock @p.Unit)</span>
                                     </span>
                                 }
                                 else if (p.CurrentStock > 0)
                                 {
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                         <span>Low Stock (Only @p.CurrentStock left)</span>
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                         <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                                         <span>Out of Stock</span>
                                     </span>
                                 }
-                                <span class="text-[11px] text-slate-500">Unit: @p.Unit</span>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Unit: @p.Unit</span>
                             </div>
 
-                            <p class="mt-3 text-xs text-slate-600 leading-relaxed">
+                            <p class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                 Formulated specifically for professional barbershop application and home styling. Tested and approved by our resident artisans.
                             </p>
                         </div>
 
                         <!-- Card Footer -->
-                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <span class="text-[11px] text-slate-500 italic">Available in-shop</span>
-                            <a href="/book" class="inline-flex items-center font-bold text-amber-700 hover:text-amber-900 group-hover:translate-x-0.5 transition-transform">
+                        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 italic">Available in-shop</span>
+                            <a href="/book" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 transition-transform">
                                 Book &amp; Visit Shop &rarr;
                             </a>
                         </div>

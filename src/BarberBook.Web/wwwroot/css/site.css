@@ -515,6 +515,7 @@ textarea:focus-visible {
 html.dark {
     background-color: #090e17 !important;
     color: #f1f5f9 !important;
+    color-scheme: dark;
 }
 
 html.dark body {
@@ -522,74 +523,244 @@ html.dark body {
     color: #f1f5f9 !important;
 }
 
-html.dark .vintage-table-container {
-    background-color: #0f172a;
-    border-color: #1e293b;
+/* Card & Surface Overrides */
+html.dark .bg-white,
+html.dark .bg-white\/95,
+html.dark .bg-white\/90,
+html.dark .bg-white\/80 {
+    background-color: #0f172a !important;
 }
 
-html.dark .vintage-table thead th {
-    background-color: #141c2e;
-    color: #94a3b8;
-    border-bottom-color: #1e293b;
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/80,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/60,
+html.dark .bg-slate-50\/50 {
+    background-color: #090e17 !important;
 }
 
-html.dark .vintage-table tbody td {
-    border-bottom-color: #1e293b;
-    color: #cbd5e1;
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/80 {
+    background-color: #1e293b !important;
 }
 
-html.dark .vintage-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.035);
+html.dark .bg-slate-200,
+html.dark .bg-slate-200\/80 {
+    background-color: #334155 !important;
+    color: #e2e8f0 !important;
 }
 
+/* Border Overrides */
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/90,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/60,
+html.dark .border-amber-900\/10 {
+    border-color: #1e293b !important;
+}
+
+html.dark .border-slate-300 {
+    border-color: #334155 !important;
+}
+
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200\/90 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1e293b !important;
+}
+
+/* Universal Form Controls in Dark Mode */
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="tel"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark input[type="search"],
+html.dark select,
+html.dark textarea,
 html.dark .form-input,
 html.dark .form-select,
 html.dark .form-textarea {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f8fafc;
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
 }
 
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #64748b !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+    background-color: #0b1120 !important;
+    border-color: #f59e0b !important;
+    outline: none !important;
+}
+
+/* Modals & Drawers */
 html.dark .vintage-modal-card {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f8fafc;
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
 }
 
-html.dark .bg-white {
-    background-color: #0f172a;
+/* Text Hierarchy in Dark Mode (protecting button text) */
+html.dark h1.text-slate-900,
+html.dark h2.text-slate-900,
+html.dark h3.text-slate-900,
+html.dark h4.text-slate-900,
+html.dark p.text-slate-900,
+html.dark div.text-slate-900,
+html.dark span.text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500) {
+    color: #f8fafc !important;
 }
 
-html.dark .text-slate-900 {
-    color: #f8fafc;
-}
-
-html.dark .text-slate-800 {
-    color: #e2e8f0;
+html.dark p.text-slate-800,
+html.dark span.text-slate-800:not(.bg-amber-500):not(.bg-amber-400),
+html.dark div.text-slate-800 {
+    color: #e2e8f0 !important;
 }
 
 html.dark .text-slate-700 {
-    color: #cbd5e1;
+    color: #cbd5e1 !important;
 }
 
 html.dark .text-slate-600 {
-    color: #94a3b8;
+    color: #94a3b8 !important;
 }
 
-html.dark .border-slate-200 {
-    border-color: #1e293b;
+html.dark .text-slate-500 {
+    color: #64748b !important;
 }
 
-html.dark .border-slate-100 {
-    border-color: #1e293b;
+/* Amber / Gold CTA Buttons Keep Dark Contrast Text */
+html.dark .bg-amber-500,
+html.dark .bg-amber-400,
+html.dark .bg-brand-500,
+html.dark .bg-brand-400 {
+    color: #020617 !important;
 }
 
-html.dark .bg-slate-50 {
-    background-color: #090e17;
+/* Hover States */
+html.dark .hover\:text-slate-700:hover,
+html.dark .hover\:text-slate-800:hover,
+html.dark .hover\:text-slate-900:hover {
+    color: #ffffff !important;
 }
 
-html.dark .bg-slate-100 {
-    background-color: #1e293b;
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover {
+    background-color: #1e293b !important;
+}
+
+/* Tinted Info Containers */
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/60,
+html.dark .bg-amber-50\/40 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+    color: #fbbf24 !important;
+}
+
+html.dark .text-amber-800,
+html.dark .text-amber-900 {
+    color: #fbbf24 !important;
+}
+
+html.dark .border-amber-200,
+html.dark .border-amber-200\/90,
+html.dark .border-amber-200\/60 {
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-50\/60 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+    color: #34d399 !important;
+}
+
+html.dark .text-emerald-800,
+html.dark .text-emerald-900 {
+    color: #34d399 !important;
+}
+
+html.dark .bg-rose-50,
+html.dark .bg-red-50 {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+    color: #fb7185 !important;
+}
+
+html.dark .text-rose-800,
+html.dark .text-red-800,
+html.dark .text-rose-700 {
+    color: #fb7185 !important;
+}
+
+html.dark .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.12) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+    color: #60a5fa !important;
+}
+
+/* Status Badges */
+html.dark .badge-status-pending {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark .badge-status-confirmed {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark .badge-status-completed {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark .badge-status-cancelled {
+    background-color: rgba(100, 116, 139, 0.2) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(100, 116, 139, 0.35) !important;
+}
+
+html.dark .badge-status-rejected {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #fb7185 !important;
+    border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+/* Table Dark Overrides */
+html.dark .vintage-table-container {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+}
+
+html.dark .vintage-table thead th,
+html.dark table thead th {
+    background-color: #141c2e !important;
+    color: #94a3b8 !important;
+    border-bottom-color: #1e293b !important;
+}
+
+html.dark .vintage-table tbody td,
+html.dark table tbody td {
+    border-bottom-color: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+html.dark .vintage-table tbody tr:hover,
+html.dark table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.035) !important;
 }
 
 /* 7. STANDARDIZED SAAS DESIGN SYSTEM UTILITIES */

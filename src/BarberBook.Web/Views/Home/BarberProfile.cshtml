@@ -24,33 +24,33 @@
 
 <div class="max-w-4xl mx-auto py-6 space-y-8">
     <!-- Breadcrumbs -->
-    <nav class="flex text-sm text-slate-500 space-x-2">
-        <a href="/" class="hover:text-slate-700">Home</a>
+    <nav class="flex text-sm text-slate-500 dark:text-slate-400 space-x-2">
+        <a href="/" class="hover:text-slate-700 dark:hover:text-slate-200">Home</a>
         <span>/</span>
-        <a href="/barbers" class="hover:text-slate-700">Barbers</a>
+        <a href="/barbers" class="hover:text-slate-700 dark:hover:text-slate-200">Barbers</a>
         <span>/</span>
-        <span class="text-slate-900 font-medium">@Model.DisplayName</span>
+        <span class="text-slate-900 dark:text-white font-medium">@Model.DisplayName</span>
     </nav>
 
     <!-- Barber Bio Card -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="flex items-center space-x-6">
             <img src="@photoUrl" alt="@Model.DisplayName" class="h-24 w-24 rounded-full object-cover object-top border-4 border-brand-500 shadow-md shrink-0" />
             <div>
-                <h1 class="text-3xl font-serif font-black text-slate-900">@Model.DisplayName</h1>
-                <p class="text-xs text-brand-700 font-semibold uppercase tracking-wider mt-1">
+                <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white">@Model.DisplayName</h1>
+                <p class="text-xs text-brand-700 dark:text-amber-400 font-semibold uppercase tracking-wider mt-1">
                     @(string.IsNullOrWhiteSpace(Model.Specialties) ? "Master Barber" : Model.Specialties)
                 </p>
                 @if (Model.Branch != null)
                 {
                     <div class="mt-2 flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                             <span>@Model.Branch.Name</span>
                         </span>
                     </div>
                 }
-                <div class="mt-3 flex items-center text-xs text-slate-500 gap-1.5">
+                <div class="mt-3 flex items-center text-xs text-slate-500 dark:text-slate-400 gap-1.5">
                     <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
                     </svg>
@@ -66,9 +66,9 @@
     </div>
 
     <!-- Bio & Summary -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-4">
-        <h2 class="text-xl font-serif font-bold text-slate-900">About @Model.DisplayName</h2>
-        <p class="text-slate-600 leading-relaxed text-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 space-y-4">
+        <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-white">About @Model.DisplayName</h2>
+        <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
             @(string.IsNullOrWhiteSpace(Model.Bio) ? "Experienced barber delivering quality grooming services and customized haircuts." : Model.Bio)
         </p>
     </div>
@@ -76,34 +76,34 @@
     @if (Model.Branch != null)
     {
         <!-- Stationed Branch Card -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 space-y-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-2xl bg-slate-900 text-amber-400 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
                     </div>
                     <div>
-                        <h3 class="text-xl font-serif font-bold text-slate-900">@Model.Branch.Name</h3>
-                        <p class="text-xs text-slate-500">Master Barber Station &bull; Metro Manila</p>
+                        <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-white">@Model.Branch.Name</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Master Barber Station &bull; Metro Manila</p>
                     </div>
                 </div>
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     Active Parlor
                 </span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60">
                     <span class="text-slate-400 uppercase text-[10px] font-bold block mb-1">Address</span>
-                    <p class="font-semibold text-slate-800">@Model.Branch.Address</p>
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">@Model.Branch.Address</p>
                 </div>
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60">
                     <span class="text-slate-400 uppercase text-[10px] font-bold block mb-1">Parlor Hours</span>
-                    <p class="font-semibold text-slate-800 font-mono">@FormattingHelpers.FormatTime12h(Model.Branch.OpeningTime) &ndash; @FormattingHelpers.FormatTime12h(Model.Branch.ClosingTime)</p>
+                    <p class="font-semibold text-slate-800 dark:text-slate-200 font-mono">@FormattingHelpers.FormatTime12h(Model.Branch.OpeningTime) &ndash; @FormattingHelpers.FormatTime12h(Model.Branch.ClosingTime)</p>
                 </div>
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60">
                     <span class="text-slate-400 uppercase text-[10px] font-bold block mb-1">Direct Phone</span>
-                    <p class="font-semibold text-slate-800">@(string.IsNullOrWhiteSpace(Model.Branch.PhoneNumber) ? "Direct In-Shop" : Model.Branch.PhoneNumber)</p>
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">@(string.IsNullOrWhiteSpace(Model.Branch.PhoneNumber) ? "Direct In-Shop" : Model.Branch.PhoneNumber)</p>
                 </div>
             </div>
         </div>
@@ -112,29 +112,29 @@
     <!-- Schedule Grid: Weekly Hours & Days Off -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Weekly Hours -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
             <div>
-                <h3 class="text-lg font-bold text-slate-900">Weekly Schedule</h3>
-                <p class="text-xs text-brand-700 font-medium mt-0.5">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Weekly Schedule</h3>
+                <p class="text-xs text-brand-700 dark:text-amber-400 font-medium mt-0.5">
                     @FormattingHelpers.FormatWeeklySchedule(Model.WorkingHours)
                 </p>
             </div>
-            <div class="divide-y divide-slate-100 text-sm">
+            <div class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
                 @for (int dow = 1; dow <= 7; dow++)
                 {
                     int dayIndex = dow == 7 ? 0 : dow;
                     var ranges = Model.WorkingHours.Where(w => w.DayOfWeek == dayIndex).OrderBy(w => w.StartTime).ToList();
                     <div class="py-2.5 flex items-center justify-between">
-                        <span class="font-medium text-slate-700">@dayNames[dayIndex]</span>
+                        <span class="font-medium text-slate-700 dark:text-slate-300">@dayNames[dayIndex]</span>
                         @if (ranges.Any())
                         {
-                            <span class="text-slate-900 font-semibold text-xs">
+                            <span class="text-slate-900 dark:text-slate-100 font-semibold text-xs">
                                 @string.Join(", ", ranges.Select(r => $"{FormattingHelpers.FormatTime12h(r.StartTime)} – {FormattingHelpers.FormatTime12h(r.EndTime)}"))
                             </span>
                         }
                         else
                         {
-                            <span class="text-slate-400 text-xs italic">Closed</span>
+                            <span class="text-slate-400 dark:text-slate-500 text-xs italic">Closed</span>
                         }
                     </div>
                 }
@@ -142,15 +142,15 @@
         </div>
 
         <!-- Upcoming Days Off -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
             <div>
-                <h3 class="text-lg font-bold text-slate-900">Upcoming Days Off</h3>
-                <p class="text-xs text-slate-500">Dates when @Model.DisplayName will be out of shop.</p>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Upcoming Days Off</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Dates when @Model.DisplayName will be out of shop.</p>
             </div>
             <div class="space-y-2">
                 @if (!upcomingDaysOff.Any())
                 {
-                    <div class="text-center py-8 text-xs text-slate-400">
+                    <div class="text-center py-8 text-xs text-slate-400 dark:text-slate-500">
                         No upcoming days off scheduled. Available on regular weekly shifts!
                     </div>
                 }
@@ -158,11 +158,11 @@
                 {
                     @foreach (var doff in upcomingDaysOff)
                     {
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                            <span class="font-semibold text-slate-800">
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">
                                 @doff.Date.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)
                             </span>
-                            <span class="text-slate-500 italic">
+                            <span class="text-slate-500 dark:text-slate-400 italic">
                                 @(string.IsNullOrWhiteSpace(doff.Reason) ? "Scheduled Day Off" : doff.Reason)
                             </span>
                         </div>
