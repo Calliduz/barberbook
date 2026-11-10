@@ -94,7 +94,16 @@ public class ApiExceptionMiddleware
             return false;
         }
 
-        return accept.Contains("application/json", StringComparison.OrdinalIgnoreCase);
+        // If the client explicitly requests JSON and is NOT a top-level document navigation
+        var secFetchDest = context.Request.Headers["Sec-Fetch-Dest"].ToString();
+        var isDocumentNavigation = string.Equals(secFetchDest, "document", StringComparison.OrdinalIgnoreCase);
+
+        if (!isDocumentNavigation && accept.Contains("application/json", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
     }
 }
 

@@ -321,6 +321,9 @@
     });
 
     function showError(msg) {
+        if (window.showToast) {
+            window.showToast(msg, 'error');
+        }
         const box = document.getElementById('wizard-error-box');
         const text = document.getElementById('wizard-error-message');
         text.innerText = msg;

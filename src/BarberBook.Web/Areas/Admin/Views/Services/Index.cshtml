@@ -347,17 +347,6 @@
     </div>
 </div>
 
-<!-- Toggle Status Confirmation Dialog -->
-<div id="confirmStatusModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
-        <h3 id="confirmStatusTitle" class="text-lg font-bold text-slate-900 mb-2">Confirm Action</h3>
-        <p id="confirmStatusMessage" class="text-sm text-slate-600 mb-6"></p>
-        <form id="toggleStatusForm" method="post" action="" class="flex justify-end space-x-3">
-            <button type="button" onclick="closeModal('confirmStatusModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-            <button type="submit" id="confirmStatusBtn" class="rounded-lg px-4 py-2 text-sm font-semibold text-white transition"></button>
-        </form>
-    </div>
-</div>
 
 <script>
     function openCreateModal() {
@@ -373,22 +362,34 @@
         document.getElementById('editModal').classList.remove('hidden');
     }
 
-    function confirmToggleStatus(id, name, isActive) {
-        document.getElementById('toggleStatusForm').action = '/admin/services/' + id + '/toggle-status';
+    async function confirmToggleStatus(id, name, isActive) {
         const title = isActive ? 'Deactivate Service' : 'Activate Service';
         const msg = isActive
             ? 'Are you sure you want to deactivate "' + name + '"? It will be removed from customer booking and service lists, but will remain visible in past appointment histories and sales reports.'
             : 'Are you sure you want to activate "' + name + '"? It will immediately become available for customer bookings.';
-        const btnClass = isActive ? 'bg-rose-600 hover:bg-rose-500' : 'bg-emerald-600 hover:bg-emerald-500';
-        const btnText = isActive ? 'Deactivate' : 'Activate';
 
-        document.getElementById('confirmStatusTitle').innerText = title;
-        document.getElementById('confirmStatusMessage').innerText = msg;
-        const confirmBtn = document.getElementById('confirmStatusBtn');
-        confirmBtn.className = 'rounded-lg px-4 py-2 text-sm font-semibold text-white transition ' + btnClass;
-        confirmBtn.innerText = btnText;
+        const confirmed = await window.showConfirmDialog({
+            title: title,
+            message: msg,
+            confirmText: isActive ? 'Deactivate' : 'Activate',
+            isDestructive: isActive
+        });
 
-        document.getElementById('confirmStatusModal').classList.remove('hidden');
+        if (confirmed) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/services/' + id + '/toggle-status';
+            const csrf = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (csrf) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '__RequestVerificationToken';
+                input.value = csrf.value;
+                form.appendChild(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 
     function closeModal(id) {

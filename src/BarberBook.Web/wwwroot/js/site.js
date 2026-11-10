@@ -244,6 +244,21 @@
         }
     };
 
+    // 7. TOAST & CONFIRMATION FALLBACK EXPORTS
+    if (!window.toast) {
+        window.toast = {
+            success: (msg, dur) => (window.showToast ? window.showToast(msg, 'success', dur) : console.log('[Toast Success]', msg)),
+            error: (msg, dur) => (window.showToast ? window.showToast(msg, 'error', dur) : console.error('[Toast Error]', msg)),
+            warning: (msg, dur) => (window.showToast ? window.showToast(msg, 'warning', dur) : console.warn('[Toast Warning]', msg)),
+            info: (msg, dur) => (window.showToast ? window.showToast(msg, 'info', dur) : console.info('[Toast Info]', msg))
+        };
+    }
+    if (!window.confirmModal) {
+        window.confirmModal = function (opts) {
+            return window.showConfirmDialog ? window.showConfirmDialog(opts) : Promise.resolve(window.confirm(typeof opts === 'string' ? opts : (opts && opts.message) || 'Proceed?'));
+        };
+    }
+
     // DOM Ready Initialization
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();

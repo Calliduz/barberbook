@@ -73,7 +73,12 @@
 
             <!-- Sign Out -->
             <div class="py-1">
-                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0"
+                      data-confirm="Are you sure you want to end your BarberBook session and sign out?"
+                      data-confirm-title="Confirm Sign Out"
+                      data-confirm-button="Sign Out"
+                      data-cancel-button="Stay Logged In"
+                      data-confirm-destructive="true">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-rose-400 hover:text-rose-300 hover:bg-slate-800/80 transition font-semibold">
                         <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
