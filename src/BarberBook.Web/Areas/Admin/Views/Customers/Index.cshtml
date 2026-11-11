@@ -7,10 +7,6 @@
     <!-- Header Section -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
-                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>CLIENT DIRECTORY & PROFILES</span>
-            </div>
             <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Customer Management</h1>
             <p class="mt-1 text-sm text-slate-500 font-sans">
                 Review client dossiers, booking visit histories, lifetime spend, and manage profile records across all branches.
@@ -160,7 +156,7 @@
                                         </div>
                                     }
                                 </td>
-                                <td class="py-4 px-6 font-serif font-black text-slate-900 text-sm">
+                                <td class="py-4 px-6 kpi-value font-sans font-black tabular-nums text-slate-900 text-sm">
                                     @c.FormattedTotalSpent
                                 </td>
                                 <td class="py-4 px-6 text-slate-600">
@@ -267,7 +263,7 @@
                             </div>
                             <div>
                                 <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Lifetime Spend</span>
-                                <span class="font-serif font-black text-slate-900 text-xs">@c.FormattedTotalSpent</span>
+                                <span class="kpi-value font-sans font-black tabular-nums text-slate-900 text-xs">@c.FormattedTotalSpent</span>
                             </div>
                             <div>
                                 <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Last Visit</span>

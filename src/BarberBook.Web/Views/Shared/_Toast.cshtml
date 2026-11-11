@@ -1,64 +1,119 @@
-@* Global Accessible Toast Notification Component (P18, EO-4) *@
+@* Global Accessible Stackable Toast Notification Engine (P18, EO-4) *@
+@{
+    var successMsg = TempData["Success"]?.ToString() ?? TempData["SuccessMessage"]?.ToString() ?? TempData["ToastSuccess"]?.ToString();
+    var errorMsg = TempData["Error"]?.ToString() ?? TempData["ErrorMessage"]?.ToString() ?? TempData["ToastError"]?.ToString();
+    var warningMsg = TempData["Warning"]?.ToString() ?? TempData["WarningMessage"]?.ToString();
+    var infoMsg = TempData["Info"]?.ToString() ?? TempData["InfoMessage"]?.ToString();
+}
+
 <div id="barberbook-toast-container" 
-     class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+     class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"
      aria-live="polite" 
      aria-atomic="true">
 </div>
 
 <script>
-    window.showToast = function (message, type = 'info', durationMs = 4000) {
-        const container = document.getElementById('barberbook-toast-container');
-        if (!container) return;
+    (function () {
+        window.showToast = function (message, type = 'success', durationMs = 4000) {
+            const container = document.getElementById('barberbook-toast-container');
+            if (!container) return;
 
-        const toast = document.createElement('div');
-        toast.className = 'pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-2xl shadow-xl border text-xs font-semibold transform transition-all duration-300 translate-y-2 opacity-0';
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto flex flex-col rounded-xl shadow-2xl border text-xs overflow-hidden transform transition-all duration-300 translate-y-3 opacity-0';
 
-        let iconSvg = '';
-        if (type === 'success') {
-            toast.className += ' bg-emerald-50 border-emerald-200 text-emerald-900';
-            iconSvg = `<svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>`;
-        } else if (type === 'error') {
-            toast.className += ' bg-rose-50 border-rose-200 text-rose-900';
-            iconSvg = `<svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>`;
-        } else if (type === 'warning') {
-            toast.className += ' bg-amber-50 border-amber-200 text-amber-900';
-            iconSvg = `<svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
-        } else {
-            toast.className += ' bg-slate-900 border-slate-800 text-white';
-            iconSvg = `<div class="barber-pole-icon" style="height: 16px; width: 8px;"></div>`;
+            let iconSvg = '';
+            let title = 'Notification';
+            let bgBorderClasses = '';
+            let progressBg = '';
+
+            if (type === 'success') {
+                title = 'Success';
+                bgBorderClasses = 'bg-white border-emerald-300 text-slate-800 dark:bg-slate-900 dark:border-emerald-600 dark:text-slate-100';
+                progressBg = 'bg-emerald-500';
+                iconSvg = `<div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>`;
+            } else if (type === 'error') {
+                title = 'Error Occurred';
+                bgBorderClasses = 'bg-white border-rose-300 text-slate-800 dark:bg-slate-900 dark:border-rose-600 dark:text-slate-100';
+                progressBg = 'bg-rose-500';
+                iconSvg = `<div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                </div>`;
+            } else if (type === 'warning') {
+                title = 'Attention';
+                bgBorderClasses = 'bg-white border-amber-300 text-slate-800 dark:bg-slate-900 dark:border-amber-600 dark:text-slate-100';
+                progressBg = 'bg-amber-500';
+                iconSvg = `<div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>`;
+            } else {
+                title = 'Information';
+                bgBorderClasses = 'bg-white border-slate-300 text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100';
+                progressBg = 'bg-amber-500';
+                iconSvg = `<div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                </div>`;
+            }
+
+            toast.className += ' ' + bgBorderClasses;
+            toast.innerHTML = `
+                <div class="flex items-start justify-between gap-3 p-3.5">
+                    <div class="flex items-start gap-3">
+                        ${iconSvg}
+                        <div>
+                            <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">${title}</span>
+                            <p class="text-xs font-semibold mt-0.5 text-slate-900 dark:text-slate-100">${message}</p>
+                        </div>
+                    </div>
+                    <button type="button" aria-label="Close notification" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 text-sm font-bold leading-none focus:outline-none rounded transition">
+                        &times;
+                    </button>
+                </div>
+                ${durationMs > 0 ? `<div class="toast-progress ${progressBg}"></div>` : ''}
+            `;
+
+            const closeBtn = toast.querySelector('button');
+            closeBtn.onclick = () => dismissToast(toast);
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-3', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Auto dismiss
+            if (durationMs > 0) {
+                setTimeout(() => dismissToast(toast), durationMs);
+            }
+        };
+
+        function dismissToast(toast) {
+            if (!toast || !toast.parentElement) return;
+            toast.classList.add('opacity-0', 'translate-y-3');
+            setTimeout(() => toast.remove(), 250);
         }
 
-        toast.innerHTML = `
-            <div class="flex items-center gap-2.5">
-                ${iconSvg}
-                <span>${message}</span>
-            </div>
-            <button type="button" aria-label="Close notification" class="text-slate-400 hover:text-slate-700 p-1 font-bold text-sm leading-none focus:outline-none focus:ring-1 focus:ring-amber-500 rounded">
-                &times;
-            </button>
-        `;
-
-        const closeBtn = toast.querySelector('button');
-        closeBtn.onclick = () => dismissToast(toast);
-
-        container.appendChild(toast);
-
-        // Animate in
-        requestAnimationFrame(() => {
-            toast.classList.remove('translate-y-2', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+        // On initial page load: fire toasts for any queued TempData
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (!string.IsNullOrEmpty(successMsg))
+            {
+                <text>window.showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(successMsg)), 'success');</text>
+            }
+            @if (!string.IsNullOrEmpty(errorMsg))
+            {
+                <text>window.showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(errorMsg)), 'error', 6000);</text>
+            }
+            @if (!string.IsNullOrEmpty(warningMsg))
+            {
+                <text>window.showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(warningMsg)), 'warning');</text>
+            }
+            @if (!string.IsNullOrEmpty(infoMsg))
+            {
+                <text>window.showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(infoMsg)), 'info');</text>
+            }
         });
-
-        // Auto dismiss
-        if (durationMs > 0) {
-            setTimeout(() => dismissToast(toast), durationMs);
-        }
-    };
-
-    function dismissToast(toast) {
-        if (!toast || !toast.parentElement) return;
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-    }
+    })();
 </script>
-

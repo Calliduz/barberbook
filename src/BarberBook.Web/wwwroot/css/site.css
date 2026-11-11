@@ -511,53 +511,132 @@ textarea:focus-visible {
     transform: scale(0.92);
 }
 
-/* 6. PERSISTENT DARK MODE STYLING */
+/* 6. PERSISTENT DARK MODE SYSTEM TOKENS & INHERITANCE */
+:root {
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --input-bg: #ffffff;
+    --table-row-hover: #f1f5f9;
+}
+
 html.dark {
     background-color: #090e17 !important;
     color: #f1f5f9 !important;
     color-scheme: dark;
 }
 
-html.dark body {
-    background-color: #090e17 !important;
-    color: #f1f5f9 !important;
+html.dark,
+html[data-theme="dark"],
+body.dark-mode,
+[data-theme="dark"] {
+    --bg-main: #090e17;
+    --card-bg: #0f172a;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #1e293b;
+    --input-bg: #0f172a;
+    --table-row-hover: rgba(255, 255, 255, 0.035);
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+}
+
+html.dark body,
+body.dark-mode,
+[data-theme="dark"] body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
 }
 
 /* Card & Surface Overrides */
+html.dark .card,
+html.dark .dashboard-card,
+html.dark .modal-content,
+html.dark .modal-dialog,
+html.dark .vintage-modal-card,
+html.dark .kpi-accent-card,
+html.dark .vintage-table-container,
 html.dark .bg-white,
 html.dark .bg-white\/95,
 html.dark .bg-white\/90,
-html.dark .bg-white\/80 {
-    background-color: #0f172a !important;
+html.dark .bg-white\/80,
+html.dark [class*="bg-white/"],
+html.dark div[class*="bg-white"],
+body.dark-mode .card,
+body.dark-mode .dashboard-card,
+body.dark-mode .modal-content,
+body.dark-mode .modal-dialog,
+body.dark-mode .vintage-modal-card,
+body.dark-mode .kpi-accent-card,
+body.dark-mode .vintage-table-container,
+body.dark-mode .bg-white,
+body.dark-mode [class*="bg-white/"],
+body.dark-mode div[class*="bg-white"],
+[data-theme="dark"] .card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-dialog,
+[data-theme="dark"] .vintage-modal-card,
+[data-theme="dark"] .kpi-accent-card,
+[data-theme="dark"] .vintage-table-container,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] [class*="bg-white/"],
+[data-theme="dark"] div[class*="bg-white"] {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
 }
 
+/* Secondary & Muted Backgrounds */
 html.dark .bg-slate-50,
 html.dark .bg-slate-50\/80,
 html.dark .bg-slate-50\/70,
 html.dark .bg-slate-50\/60,
-html.dark .bg-slate-50\/50 {
-    background-color: #090e17 !important;
+html.dark .bg-slate-50\/50,
+html.dark div[class*="bg-slate-50"],
+body.dark-mode .bg-slate-50,
+body.dark-mode div[class*="bg-slate-50"],
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] div[class*="bg-slate-50"] {
+    background-color: var(--bg-main) !important;
+    border-color: var(--border-color) !important;
 }
 
 html.dark .bg-slate-100,
-html.dark .bg-slate-100\/80 {
+html.dark .bg-slate-100\/80,
+html.dark div[class*="bg-slate-100"],
+body.dark-mode .bg-slate-100,
+body.dark-mode div[class*="bg-slate-100"],
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] div[class*="bg-slate-100"] {
     background-color: #1e293b !important;
+    border-color: var(--border-color) !important;
 }
 
 html.dark .bg-slate-200,
-html.dark .bg-slate-200\/80 {
+html.dark .bg-slate-200\/80,
+body.dark-mode .bg-slate-200,
+[data-theme="dark"] .bg-slate-200 {
     background-color: #334155 !important;
     color: #e2e8f0 !important;
 }
 
-/* Border Overrides */
+/* Border & Divider Overrides */
 html.dark .border-slate-100,
 html.dark .border-slate-200,
 html.dark .border-slate-200\/90,
 html.dark .border-slate-200\/80,
 html.dark .border-slate-200\/60,
-html.dark .border-amber-900\/10 {
-    border-color: #1e293b !important;
+html.dark .border-amber-900\/10,
+html.dark [class*="border-slate-"],
+html.dark [class*="border-amber-900/10"],
+body.dark-mode [class*="border-slate-"],
+body.dark-mode [class*="border-amber-900/10"],
+[data-theme="dark"] [class*="border-slate-"],
+[data-theme="dark"] [class*="border-amber-900/10"] {
+    border-color: var(--border-color) !important;
 }
 
 html.dark .border-slate-300 {
@@ -567,10 +646,75 @@ html.dark .border-slate-300 {
 html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
 html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
 html.dark .divide-slate-200\/90 > :not([hidden]) ~ :not([hidden]) {
-    border-color: #1e293b !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Tables, Thead, Tbody, Rows & Cells */
+html.dark table,
+html.dark .table,
+html.dark .vintage-table,
+body.dark-mode table,
+body.dark-mode .table,
+body.dark-mode .vintage-table,
+[data-theme="dark"] table,
+[data-theme="dark"] .table,
+[data-theme="dark"] .vintage-table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+html.dark thead,
+html.dark thead th,
+html.dark th,
+html.dark .vintage-table thead th,
+html.dark .table-header-cell,
+body.dark-mode thead,
+body.dark-mode thead th,
+body.dark-mode th,
+body.dark-mode .vintage-table thead th,
+body.dark-mode .table-header-cell,
+[data-theme="dark"] thead,
+[data-theme="dark"] thead th,
+[data-theme="dark"] th,
+[data-theme="dark"] .vintage-table thead th,
+[data-theme="dark"] .table-header-cell {
+    background-color: #141c2e !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+html.dark tbody,
+html.dark tbody tr,
+html.dark tbody td,
+html.dark td,
+html.dark .vintage-table tbody td,
+body.dark-mode tbody,
+body.dark-mode tbody tr,
+body.dark-mode tbody td,
+body.dark-mode td,
+body.dark-mode .vintage-table tbody td,
+[data-theme="dark"] tbody,
+[data-theme="dark"] tbody tr,
+[data-theme="dark"] tbody td,
+[data-theme="dark"] td,
+[data-theme="dark"] .vintage-table tbody td {
+    background-color: var(--card-bg) !important;
+    color: #cbd5e1 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+html.dark tbody tr:hover,
+html.dark .vintage-table tbody tr:hover,
+body.dark-mode tbody tr:hover,
+body.dark-mode .vintage-table tbody tr:hover,
+[data-theme="dark"] tbody tr:hover,
+[data-theme="dark"] .vintage-table tbody tr:hover {
+    background-color: var(--table-row-hover) !important;
 }
 
 /* Universal Form Controls in Dark Mode */
+html.dark input,
 html.dark input[type="text"],
 html.dark input[type="email"],
 html.dark input[type="password"],
@@ -582,66 +726,137 @@ html.dark select,
 html.dark textarea,
 html.dark .form-input,
 html.dark .form-select,
-html.dark .form-textarea {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+html.dark .form-textarea,
+html.dark .filter-control,
+html.dark .modal-input,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .form-textarea,
+body.dark-mode .filter-control,
+body.dark-mode .modal-input,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .filter-control,
+[data-theme="dark"] .modal-input {
+    background-color: var(--input-bg) !important;
+    border: 1.5px solid #334155 !important;
     color: #f8fafc !important;
 }
 
 html.dark input::placeholder,
-html.dark textarea::placeholder {
+html.dark textarea::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
     color: #64748b !important;
 }
 
 html.dark input:focus,
 html.dark select:focus,
-html.dark textarea:focus {
+html.dark textarea:focus,
+html.dark .form-input:focus,
+html.dark .form-select:focus,
+html.dark .form-textarea:focus,
+html.dark .filter-control:focus,
+html.dark .modal-input:focus,
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus,
+body.dark-mode .form-input:focus,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-textarea:focus,
+body.dark-mode .filter-control:focus,
+body.dark-mode .modal-input:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] .form-textarea:focus,
+[data-theme="dark"] .filter-control:focus,
+[data-theme="dark"] .modal-input:focus {
     background-color: #0b1120 !important;
     border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
     outline: none !important;
 }
 
-/* Modals & Drawers */
-html.dark .vintage-modal-card {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+/* Modals, Drawers & Dark Backdrops */
+.modal-backdrop,
+#walkInModal,
+#checkoutModal,
+#detailDrawerBackdrop,
+div[id$="Modal"][class*="fixed"],
+div[id$="DrawerBackdrop"] {
+    background-color: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
+html.dark #detailDrawer,
+body.dark-mode #detailDrawer,
+[data-theme="dark"] #detailDrawer {
+    background-color: var(--card-bg) !important;
+    border-left: 1px solid #334155 !important;
+    color: var(--text-main) !important;
+}
+
+/* Text Hierarchy in Dark Mode (protecting amber/brand button text) */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark .text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500):not(.bg-brand-400),
+html.dark span.text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500):not(.bg-brand-400),
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
+body.dark-mode .text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500):not(.bg-brand-400),
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4,
+[data-theme="dark"] .text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500):not(.bg-brand-400) {
     color: #f8fafc !important;
 }
 
-/* Text Hierarchy in Dark Mode (protecting button text) */
-html.dark h1.text-slate-900,
-html.dark h2.text-slate-900,
-html.dark h3.text-slate-900,
-html.dark h4.text-slate-900,
-html.dark p.text-slate-900,
-html.dark div.text-slate-900,
-html.dark span.text-slate-900:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500) {
-    color: #f8fafc !important;
-}
-
-html.dark p.text-slate-800,
+html.dark .text-slate-800:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500),
 html.dark span.text-slate-800:not(.bg-amber-500):not(.bg-amber-400),
-html.dark div.text-slate-800 {
+body.dark-mode .text-slate-800:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500),
+[data-theme="dark"] .text-slate-800:not(.bg-amber-500):not(.bg-amber-400):not(.bg-brand-500) {
     color: #e2e8f0 !important;
 }
 
-html.dark .text-slate-700 {
+html.dark .text-slate-700,
+body.dark-mode .text-slate-700,
+[data-theme="dark"] .text-slate-700 {
     color: #cbd5e1 !important;
 }
 
-html.dark .text-slate-600 {
+html.dark .text-slate-600,
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+body.dark-mode .text-slate-600,
+body.dark-mode .text-slate-500,
+body.dark-mode .text-slate-400,
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-400 {
     color: #94a3b8 !important;
-}
-
-html.dark .text-slate-500 {
-    color: #64748b !important;
 }
 
 /* Amber / Gold CTA Buttons Keep Dark Contrast Text */
 html.dark .bg-amber-500,
 html.dark .bg-amber-400,
 html.dark .bg-brand-500,
-html.dark .bg-brand-400 {
+html.dark .bg-brand-400,
+html.dark .bg-amber-500 span,
+html.dark .bg-amber-400 span,
+html.dark .bg-brand-500 span,
+html.dark .bg-brand-400 span {
     color: #020617 !important;
 }
 
@@ -737,30 +952,6 @@ html.dark .badge-status-rejected {
     background-color: rgba(244, 63, 94, 0.15) !important;
     color: #fb7185 !important;
     border-color: rgba(244, 63, 94, 0.35) !important;
-}
-
-/* Table Dark Overrides */
-html.dark .vintage-table-container {
-    background-color: #0f172a !important;
-    border-color: #1e293b !important;
-}
-
-html.dark .vintage-table thead th,
-html.dark table thead th {
-    background-color: #141c2e !important;
-    color: #94a3b8 !important;
-    border-bottom-color: #1e293b !important;
-}
-
-html.dark .vintage-table tbody td,
-html.dark table tbody td {
-    border-bottom-color: #1e293b !important;
-    color: #cbd5e1 !important;
-}
-
-html.dark .vintage-table tbody tr:hover,
-html.dark table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.035) !important;
 }
 
 /* 7. STANDARDIZED SAAS DESIGN SYSTEM UTILITIES */
@@ -909,5 +1100,190 @@ html.dark .page-subtitle {
 html.dark .table-header-cell {
     color: #94a3b8;
 }
+
+/* ==========================================================================
+   EXECUTIVE DESIGN SYSTEM UNIFICATION TOKENS & CONTRAST FIXES
+   ========================================================================== */
+
+/* Strict Contrast for Dark Active Buttons & Tabs (Zero Dark-on-Dark Text) */
+.filter-btn-active,
+.tab-btn-active,
+button.bg-slate-900,
+.status-pill.bg-slate-900,
+.view-btn-active,
+[data-active="true"] {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-color: #0f172a !important;
+}
+
+html.dark .filter-btn-active,
+html.dark .tab-btn-active,
+html.dark button.bg-slate-900,
+html.dark .status-pill.bg-slate-900,
+html.dark .view-btn-active {
+    background-color: #d97706 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    border-color: #d97706 !important;
+}
+
+/* Navigation Dropdown Containers */
+.nav-dropdown,
+.navbar-nav .dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Nav Dropdown Menus: Positioned cleanly below the navbar, never overlapping */
+.nav-dropdown .dropdown-menu,
+.group > .dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    z-index: 1000 !important;
+}
+
+/* Dropdown Hover Bridge: prevents menu dismissal when traversing margin gap */
+.nav-dropdown .dropdown-menu::before,
+.group > .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: transparent;
+    pointer-events: auto;
+}
+
+/* Click-to-Pin Dropdown State */
+.group.is-pinned > .dropdown-menu,
+.nav-dropdown.is-pinned > .dropdown-menu {
+    display: block !important;
+}
+
+/* Top Nav Links & Dropdown Triggers */
+.nav-link,
+.nav-dropdown-trigger {
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link svg,
+.nav-dropdown-trigger svg {
+    color: #94a3b8;
+    stroke: currentColor;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover,
+.nav-dropdown:hover .nav-dropdown-trigger,
+.nav-dropdown.is-pinned .nav-dropdown-trigger,
+.nav-link.active,
+.nav-dropdown.active .nav-dropdown-trigger {
+    color: #ffffff !important;
+}
+
+.nav-link:hover svg,
+.nav-dropdown:hover .nav-dropdown-trigger svg,
+.nav-dropdown.is-pinned .nav-dropdown-trigger svg,
+.nav-link.active svg,
+.nav-dropdown.active .nav-dropdown-trigger svg {
+    color: #f59e0b !important;
+}
+
+/* Modal Dialog Layout & High-Contrast Input Discipline */
+.modal-dialog {
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.modal-body {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.modal-input {
+    border: 1.5px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    transition: all 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    outline: none !important;
+    background-color: #ffffff !important;
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+html.dark .modal-input {
+    border-color: #334155 !important;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+html.dark .modal-input:focus {
+    background-color: #0b1120 !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Toast Progress Bar Keyframe */
+@keyframes toastProgressBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.toast-progress {
+    height: 3px;
+    width: 100%;
+    animation: toastProgressBar 4000ms linear forwards;
+}
+
+/* KPI Card Accent Borders */
+.kpi-accent-card {
+    border: 1px solid #e2e8f0 !important;
+    border-top: 3px solid #d97706 !important;
+}
+
+html.dark .kpi-accent-card {
+    border: 1px solid #1e293b !important;
+    border-top: 3px solid #d97706 !important;
+}
+
+/* Force modern sans-serif tabular numbers on KPI metrics */
+.kpi-value,
+.stat-value,
+.kpi-accent-card .text-3xl,
+.kpi-accent-card .text-2xl,
+.kpi-accent-card h3 {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-variant-numeric: tabular-nums !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
+}
+
+.kpi-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 
 

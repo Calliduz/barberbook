@@ -31,6 +31,9 @@ public class CreateBarberRequestValidator : AbstractValidator<CreateBarberReques
             .EmailAddress().WithMessage("A valid email address is required.")
             .MaximumLength(256).WithMessage("Email must not exceed 256 characters.");
 
+        RuleFor(x => x.PhoneNumber)
+            .MaximumLength(20).WithMessage("Phone number must not exceed 20 characters.");
+
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Temporary password is required.")
             .MinimumLength(6).WithMessage("Temporary password must be at least 6 characters long.");

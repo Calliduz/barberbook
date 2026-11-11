@@ -53,7 +53,7 @@ public class SecurityHeadersMiddleware
 
             if (!headers.ContainsKey("Content-Security-Policy"))
             {
-                // Permits local inline Razor scripts, Google Fonts, and self origin assets
+                // Permits local inline Razor scripts, Google Fonts, CDN assets, and self origin assets
                 headers.Append("Content-Security-Policy",
                     "default-src 'self'; " +
                     "script-src 'self' 'unsafe-inline'; " +

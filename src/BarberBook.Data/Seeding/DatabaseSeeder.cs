@@ -82,6 +82,9 @@ public static class DatabaseSeeder
                         e.Name.Contains("Ramon Private Trimmer") ||
                         e.Name.Contains("Alpha Clipper Station") ||
                         e.Name.Contains("Retirable Trimmer") ||
+                        e.Name.StartsWith("Master Clipper") ||
+                        e.AssetTag.StartsWith("ASSET-") ||
+                        e.AssetTag.Contains("1793") ||
                         e.AssetTag.StartsWith("EQ-TEST") ||
                         e.AssetTag.StartsWith("TEST-"))
             .ToListAsync();
@@ -110,6 +113,7 @@ public static class DatabaseSeeder
                         p.Name.Contains("Limited Beard Balm") ||
                         p.Name.Contains("Matte Clay Styling Wax") ||
                         p.Name.Contains("Precision Shave Gel") ||
+                        p.Sku.StartsWith("POM-") ||
                         p.Sku.StartsWith("SKU-") ||
                         p.Sku.StartsWith("TEST-"))
             .ToListAsync();
@@ -623,7 +627,10 @@ public static class DatabaseSeeder
             new { Tag = "EQ-002", Name = "Skeleton FX Trimmer", Category = "Trimmers", Brand = "BaBylissPRO", Serial = "BBL-FX-4402", Cost = 5200.00m, Condition = EquipmentCondition.Excellent, Status = EquipmentStatus.InService, Interval = 30, Notes = "Zero-gapped blade" },
             new { Tag = "EQ-003", Name = "Master Pro Clipper", Category = "Clippers", Brand = "Andis Master", Serial = "AND-MP-1048", Cost = 7200.00m, Condition = EquipmentCondition.Fair, Status = EquipmentStatus.UnderMaintenance, Interval = 30, Notes = "Motor alignment check required" },
             new { Tag = "EQ-004", Name = "Handcrafted Japanese Shears 6.0\"", Category = "Shears", Brand = "Kashiwa Steel", Serial = "KSH-SH-0881", Cost = 8900.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 60, Notes = "Convex edge precision shears" },
-            new { Tag = "EQ-005", Name = "Vintage Heavy-Duty Barber Chair", Category = "Furniture", Brand = "Takara Belmont Classic", Serial = "TKB-CH-0012", Cost = 45000.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 90, Notes = "Hydraulic pump serviced recently" }
+            new { Tag = "EQ-005", Name = "Vintage Heavy-Duty Barber Chair", Category = "Furniture", Brand = "Takara Belmont Classic", Serial = "TKB-CH-0012", Cost = 45000.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 90, Notes = "Hydraulic pump serviced recently" },
+            new { Tag = "EQ-MNL-01", Name = "Wahl Cordless Magic Clip #1", Category = "Clippers", Brand = "Wahl 5-Star", Serial = "WHL-MC-8148", Cost = 6800.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 30, Notes = "Stagger-tooth blade clipper" },
+            new { Tag = "EQ-BGC-02", Name = "BabylissPRO GoldFX Trimmer", Category = "Trimmers", Brand = "BaBylissPRO", Serial = "BBL-FX-787G", Cost = 5800.00m, Condition = EquipmentCondition.Excellent, Status = EquipmentStatus.InService, Interval = 30, Notes = "Skeleton gold detail trimmer" },
+            new { Tag = "EQ-MNL-03", Name = "Andis ProFoil Lithium Shaver", Category = "Shavers", Brand = "Andis ProFoil", Serial = "AND-TS-17150", Cost = 4200.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 30, Notes = "Hypoallergenic titanium foil" }
         };
 
         foreach (var eqSeed in equipmentSeed)

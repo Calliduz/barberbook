@@ -7,10 +7,6 @@
     <!-- Header Section -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
-                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
-                <span>STAFF SCHEDULING & SHIFTS</span>
-            </div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-serif">Barber Schedules & Availability</h1>
             <p class="mt-1 text-sm text-slate-500">Configure weekly recurring working hours, shift windows, and days off per barber.</p>
         </div>
@@ -122,21 +118,24 @@
     }
 </div>
 
-<!-- Modal: Add Shift Window -->
-<div id="workingHourModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-bold text-slate-900">Add Working Hours Shift</h3>
-            <button type="button" onclick="closeModal('workingHourModal')" class="text-slate-400 hover:text-slate-500">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<!-- Modal: Add Working Hours Shift -->
+<div id="workingHourModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-lg font-serif font-bold text-slate-900">Add Shift Window</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Define recurring 30-minute booking capacity</p>
+            </div>
+            <button type="button" onclick="closeModal('workingHourModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <form id="addWorkingHourForm" onsubmit="submitAddWorkingHour(event)" class="space-y-4">
+        <form id="addWorkingHourForm" onsubmit="submitAddWorkingHour(event)" class="modal-body space-y-4">
             <div>
-                <label class="block text-sm font-medium text-slate-700">Day of Week</label>
-                <select id="whDayOfWeek" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Day of Week</label>
+                <select id="whDayOfWeek" class="modal-input mt-1">
                     <option value="1">Monday</option>
                     <option value="2">Tuesday</option>
                     <option value="3">Wednesday</option>
@@ -147,77 +146,80 @@
                 </select>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Start Time</label>
-                    <input type="time" id="whStartTime" value="09:00" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Start Time</label>
+                    <input type="time" id="whStartTime" value="09:00" required class="modal-input mt-1" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">End Time</label>
-                    <input type="time" id="whEndTime" value="18:00" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">End Time</label>
+                    <input type="time" id="whEndTime" value="18:00" required class="modal-input mt-1" />
                 </div>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('workingHourModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Add Shift</button>
+                <button type="button" onclick="closeModal('workingHourModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Add Shift</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal: Add Day Off -->
-<div id="dayOffModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-bold text-slate-900">Add Day(s) Off</h3>
-            <button type="button" onclick="closeModal('dayOffModal')" class="text-slate-400 hover:text-slate-500">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<div id="dayOffModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-lg font-serif font-bold text-slate-900">Add Day(s) Off</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Schedule leave or rest days with appointment conflict protection</p>
+            </div>
+            <button type="button" onclick="closeModal('dayOffModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <form id="addDayOffForm" onsubmit="submitAddDayOff(event)" class="space-y-4">
+        <form id="addDayOffForm" onsubmit="submitAddDayOff(event)" class="modal-body space-y-4">
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Start Date *</label>
-                    <input type="date" id="doStartDate" required class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Start Date *</label>
+                    <input type="date" id="doStartDate" required class="modal-input mt-1" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">End Date (Optional)</label>
-                    <input type="date" id="doEndDate" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Leave empty for single day" />
+                <div class="min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">End Date (Optional)</label>
+                    <input type="date" id="doEndDate" class="modal-input mt-1" placeholder="Leave empty for single day" />
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700">Reason</label>
-                <input type="text" id="doReason" placeholder="e.g. Vacation, Personal, Sick Leave" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" />
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Reason</label>
+                <input type="text" id="doReason" placeholder="e.g. Vacation, Personal, Sick Leave" class="modal-input mt-1" />
             </div>
-            <p class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+            <p class="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200">
                 <strong>Appointment Safeguard:</strong> If this day off coincides with existing pending or confirmed bookings, a conflict warning will be displayed. Existing bookings are <strong>never automatically cancelled</strong>.
             </p>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('dayOffModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Save Day Off</button>
+                <button type="button" onclick="closeModal('dayOffModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Day Off</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal: Conflict Warning Display -->
-<div id="conflictWarningModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl border border-amber-200">
+<div id="conflictWarningModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="modal-dialog bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-amber-200">
         <div class="flex items-center space-x-3 mb-3 text-amber-600">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h3 class="text-lg font-bold text-slate-900">Appointment Conflict Warning</h3>
+            <h3 class="text-lg font-serif font-bold text-slate-900">Appointment Conflict Warning</h3>
         </div>
-        <p class="text-sm text-slate-600 mb-4">
+        <p class="text-xs text-slate-600 mb-4">
             The day(s) off have been saved. However, the following existing appointments are scheduled on these dates. <strong>Per shop policy, they have NOT been auto-cancelled</strong>. Please contact the customers to reschedule.
         </p>
-        <div id="conflictListContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-100 bg-slate-50 rounded-xl p-3 border border-slate-200 mb-5">
+        <div id="conflictListContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-100 bg-slate-50 rounded-xl p-3 border border-slate-200 mb-5 text-xs">
             <!-- Dynamically populated -->
         </div>
         <div class="flex justify-end">
-            <button type="button" onclick="window.location.reload()" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition">Understood, Refresh Schedule</button>
+            <button type="button" onclick="window.location.reload()" class="rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition">Understood, Refresh Schedule</button>
         </div>
     </div>
 </div>
@@ -243,45 +245,57 @@
         const startTime = document.getElementById('whStartTime').value;
         const endTime = document.getElementById('whEndTime').value;
 
-        // Fetch current working hours
-        const getRes = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours');
-        const currentHours = await getRes.json();
+        try {
+            const getRes = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours');
+            const currentHours = await getRes.json();
 
-        const updatedRanges = currentHours.map(h => ({
-            dayOfWeek: h.dayOfWeek,
-            startTime: h.startTime,
-            endTime: h.endTime
-        }));
+            const updatedRanges = currentHours.map(h => ({
+                dayOfWeek: h.dayOfWeek,
+                startTime: h.startTime,
+                endTime: h.endTime
+            }));
 
-        updatedRanges.push({
-            dayOfWeek: dow,
-            startTime: startTime,
-            endTime: endTime
-        });
+            updatedRanges.push({
+                dayOfWeek: dow,
+                startTime: startTime,
+                endTime: endTime
+            });
 
-        const res = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ranges: updatedRanges })
-        });
+            const res = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ranges: updatedRanges })
+            });
 
-        if (res.ok) {
-            window.location.reload();
-        } else {
-            const err = await res.json();
-            alert(err?.error?.message || 'Failed to add shift window. Check for overlapping hours.');
+            if (res.ok) {
+                if (window.showToast) window.showToast('Shift window added successfully.', 'success');
+                setTimeout(() => window.location.reload(), 600);
+            } else {
+                const err = await res.json();
+                const msg = err?.error?.message || 'Failed to add shift window. Check for overlapping hours.';
+                if (window.showToast) window.showToast(msg, 'error');
+                else alert(msg);
+            }
+        } catch (ex) {
+            if (window.showToast) window.showToast('Failed to add shift: ' + ex.message, 'error');
         }
     }
 
     async function deleteWorkingHour(id) {
         if (!confirm('Are you sure you want to remove this shift window?')) return;
-        const res = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours/' + id, {
-            method: 'DELETE'
-        });
-        if (res.ok) {
-            window.location.reload();
-        } else {
-            alert('Failed to remove shift window.');
+        try {
+            const res = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours/' + id, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                if (window.showToast) window.showToast('Shift window removed.', 'info');
+                setTimeout(() => window.location.reload(), 600);
+            } else {
+                if (window.showToast) window.showToast('Failed to remove shift window.', 'error');
+                else alert('Failed to remove shift window.');
+            }
+        } catch (ex) {
+            if (window.showToast) window.showToast('Failed to remove shift: ' + ex.message, 'error');
         }
     }
 
@@ -291,52 +305,64 @@
         const endDate = document.getElementById('doEndDate').value;
         const reason = document.getElementById('doReason').value;
 
-        const res = await fetch('/api/admin/barbers/' + currentBarberId + '/days-off', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                startDate: startDate,
-                endDate: endDate || null,
-                reason: reason || null
-            })
-        });
+        try {
+            const res = await fetch('/api/admin/barbers/' + currentBarberId + '/days-off', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    startDate: startDate,
+                    endDate: endDate || null,
+                    reason: reason || null
+                })
+            });
 
-        const data = await res.json();
-        closeModal('dayOffModal');
+            const data = await res.json();
+            closeModal('dayOffModal');
 
-        if (res.ok) {
-            if (data.hasConflicts && data.conflicts && data.conflicts.length > 0) {
-                // Show conflict warning dialog
-                const container = document.getElementById('conflictListContainer');
-                container.innerHTML = data.conflicts.map(c => `
-                    <div class="py-2 text-xs text-slate-700">
-                        <div class="flex justify-between font-semibold">
-                            <span>Ref: ${c.referenceCode} · ${c.customerName}</span>
-                            <span class="uppercase text-amber-700">${c.status}</span>
+            if (res.ok) {
+                if (data.conflicts && data.conflicts.length > 0) {
+                    const container = document.getElementById('conflictListContainer');
+                    container.innerHTML = data.conflicts.map(c => `
+                        <div class="py-2 text-xs text-slate-700">
+                            <div class="flex justify-between font-semibold">
+                                <span>Ref: #${c.referenceCode} · ${c.customerName}</span>
+                                <span class="uppercase text-amber-700 font-bold">${c.status}</span>
+                            </div>
+                            <div class="text-slate-500 mt-0.5">
+                                ${c.scheduledDate} at ${c.scheduledTime} (${c.serviceName})
+                            </div>
                         </div>
-                        <div class="text-slate-500 mt-0.5">
-                            ${c.scheduledDate} at ${c.scheduledTime} (${c.serviceName})
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('conflictWarningModal').classList.remove('hidden');
+                    `).join('');
+                    document.getElementById('conflictWarningModal').classList.remove('hidden');
+                } else {
+                    if (window.showToast) window.showToast('Day off saved successfully.', 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                }
             } else {
-                window.location.reload();
+                const msg = data?.error?.message || 'Failed to save day off.';
+                if (window.showToast) window.showToast(msg, 'error');
+                else alert(msg);
             }
-        } else {
-            alert(data?.error?.message || 'Failed to save day off.');
+        } catch (ex) {
+            if (window.showToast) window.showToast('Error saving day off: ' + ex.message, 'error');
         }
     }
 
     async function deleteDayOff(id) {
         if (!confirm('Are you sure you want to remove this day off?')) return;
-        const res = await fetch('/api/admin/barbers/' + currentBarberId + '/days-off/' + id, {
-            method: 'DELETE'
-        });
-        if (res.ok) {
-            window.location.reload();
-        } else {
-            alert('Failed to remove day off.');
+        try {
+            const res = await fetch('/api/admin/barbers/' + currentBarberId + '/days-off/' + id, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                if (window.showToast) window.showToast('Day off removed.', 'info');
+                setTimeout(() => window.location.reload(), 600);
+            } else {
+                if (window.showToast) window.showToast('Failed to remove day off.', 'error');
+                else alert('Failed to remove day off.');
+            }
+        } catch (ex) {
+            if (window.showToast) window.showToast('Error removing day off: ' + ex.message, 'error');
         }
     }
 </script>

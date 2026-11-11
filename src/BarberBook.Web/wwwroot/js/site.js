@@ -11,22 +11,31 @@
     window.initTheme = function () {
         const storedTheme = localStorage.getItem('barberbook_theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = storedTheme === 'dark' || (!storedTheme && systemPrefersDark);
         
-        if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
+        if (isDark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (document.body) document.body.classList.add('dark-mode');
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (document.body) document.body.classList.remove('dark-mode');
         }
         updateThemeIcons();
     };
 
     window.toggleDarkMode = function () {
-        const isDark = document.documentElement.classList.contains('dark');
+        const isDark = document.documentElement.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
         if (isDark) {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (document.body) document.body.classList.remove('dark-mode');
             localStorage.setItem('barberbook_theme', 'light');
         } else {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (document.body) document.body.classList.add('dark-mode');
             localStorage.setItem('barberbook_theme', 'dark');
         }
         updateThemeIcons();
@@ -244,11 +253,49 @@
         }
     };
 
+    // 6. TOP NAVIGATION CLICK-TO-PIN DROPDOWNS & ESCAPE HANDLER
+    window.initNavDropdowns = function () {
+        document.querySelectorAll('header nav .group > button').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const group = btn.closest('.group');
+                if (!group) return;
+
+                const isAlreadyPinned = group.classList.contains('is-pinned');
+                // Close any other open dropdowns
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => {
+                    if (g !== group) g.classList.remove('is-pinned');
+                });
+
+                if (isAlreadyPinned) {
+                    group.classList.remove('is-pinned');
+                } else {
+                    group.classList.add('is-pinned');
+                }
+            });
+        });
+
+        // Close pinned dropdowns on outside click
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('header nav .group')) {
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => g.classList.remove('is-pinned'));
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('header nav .group.is-pinned').forEach(g => g.classList.remove('is-pinned'));
+            }
+        });
+    };
+
     // DOM Ready Initialization
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
         initDoubleSubmitPrevention();
         initBackToTop();
         initCommandPalette();
+        initNavDropdowns();
     });
 })();
