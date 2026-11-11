@@ -1,4 +1,4 @@
-@* Global Accessible Stackable Toast Notification Engine (P18, EO-4) *@
+@* Global Accessible Stackable Toast Notification Engine (P18, EO-4, BR-13) *@
 @{
     var successMsg = TempData["Success"]?.ToString() ?? TempData["SuccessMessage"]?.ToString() ?? TempData["ToastSuccess"]?.ToString();
     var errorMsg = TempData["Error"]?.ToString() ?? TempData["ErrorMessage"]?.ToString() ?? TempData["ToastError"]?.ToString();
@@ -6,73 +6,61 @@
     var infoMsg = TempData["Info"]?.ToString() ?? TempData["InfoMessage"]?.ToString();
 }
 
-<div id="barberbook-toast-container" 
-     class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"
+<div id="barberbook-toast-container"
+     class="fixed bottom-5 right-5 z-[10000] flex flex-col gap-2.5 max-w-sm w-[calc(100vw-2.5rem)] pointer-events-none"
      aria-live="polite" 
      aria-atomic="true">
 </div>
 
 <script>
     (function () {
-        window.showToast = function (message, type = 'success', durationMs = 4000) {
+        'use strict';
+
+        window.showToast = function (message, type = 'info', durationMs = 4500) {
             const container = document.getElementById('barberbook-toast-container');
-            if (!container) return;
+            if (!container || !message) return null;
 
             const toast = document.createElement('div');
-            toast.className = 'pointer-events-auto flex flex-col rounded-xl shadow-2xl border text-xs overflow-hidden transform transition-all duration-300 translate-y-3 opacity-0';
+            toast.className = 'pointer-events-auto relative overflow-hidden flex items-start justify-between gap-3 p-4 rounded-2xl shadow-2xl border text-xs font-semibold transform transition-all duration-300 translate-y-3 opacity-0 backdrop-blur-md';
 
             let iconSvg = '';
-            let title = 'Notification';
-            let bgBorderClasses = '';
-            let progressBg = '';
+            let progressBarColor = 'bg-amber-500';
 
-            if (type === 'success') {
-                title = 'Success';
-                bgBorderClasses = 'bg-white border-emerald-300 text-slate-800 dark:bg-slate-900 dark:border-emerald-600 dark:text-slate-100';
-                progressBg = 'bg-emerald-500';
-                iconSvg = `<div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                </div>`;
-            } else if (type === 'error') {
-                title = 'Error Occurred';
-                bgBorderClasses = 'bg-white border-rose-300 text-slate-800 dark:bg-slate-900 dark:border-rose-600 dark:text-slate-100';
-                progressBg = 'bg-rose-500';
-                iconSvg = `<div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
-                </div>`;
-            } else if (type === 'warning') {
-                title = 'Attention';
-                bgBorderClasses = 'bg-white border-amber-300 text-slate-800 dark:bg-slate-900 dark:border-amber-600 dark:text-slate-100';
-                progressBg = 'bg-amber-500';
-                iconSvg = `<div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>`;
-            } else {
-                title = 'Information';
-                bgBorderClasses = 'bg-white border-slate-300 text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100';
-                progressBg = 'bg-amber-500';
-                iconSvg = `<div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
-                </div>`;
+            switch (type) {
+                case 'success':
+                    toast.classList.add('bg-emerald-50', 'dark:bg-emerald-950/90', 'border-emerald-300', 'dark:border-emerald-700', 'text-emerald-900', 'dark:text-emerald-100');
+                    iconSvg = `<svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>`;
+                    progressBarColor = 'bg-emerald-500 dark:bg-emerald-400';
+                    break;
+                case 'error':
+                    toast.classList.add('bg-rose-50', 'dark:bg-rose-950/90', 'border-rose-300', 'dark:border-rose-700', 'text-rose-900', 'dark:text-rose-100');
+                    iconSvg = `<svg class="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>`;
+                    progressBarColor = 'bg-rose-500 dark:bg-rose-400';
+                    break;
+                case 'warning':
+                    toast.classList.add('bg-amber-50', 'dark:bg-amber-950/90', 'border-amber-300', 'dark:border-amber-700', 'text-amber-900', 'dark:text-amber-100');
+                    iconSvg = `<svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+                    progressBarColor = 'bg-amber-500 dark:bg-amber-400';
+                    break;
+                default:
+                    toast.classList.add('bg-slate-900', 'dark:bg-slate-900/95', 'border-slate-700', 'dark:border-amber-500/40', 'text-slate-100');
+                    iconSvg = `<div class="barber-pole-icon shrink-0 mt-0.5" style="height: 16px; width: 8px;"></div>`;
+                    progressBarColor = 'bg-amber-500';
+                    break;
             }
 
-            toast.className += ' ' + bgBorderClasses;
             toast.innerHTML = `
-                <div class="flex items-start justify-between gap-3 p-3.5">
-                    <div class="flex items-start gap-3">
-                        ${iconSvg}
-                        <div>
-                            <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">${title}</span>
-                            <p class="text-xs font-semibold mt-0.5 text-slate-900 dark:text-slate-100">${message}</p>
-                        </div>
-                    </div>
-                    <button type="button" aria-label="Close notification" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 text-sm font-bold leading-none focus:outline-none rounded transition">
-                        &times;
-                    </button>
+                <div class="flex items-start gap-2.5 flex-1 pr-1">
+                    ${iconSvg}
+                    <div class="toast-message flex-1 leading-snug break-words"></div>
                 </div>
-                ${durationMs > 0 ? `<div class="toast-progress ${progressBg}"></div>` : ''}
+                <button type="button" aria-label="Close notification" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 font-bold text-base leading-none focus:outline-none focus:ring-1 focus:ring-amber-500 rounded transition shrink-0">
+                    &times;
+                </button>
+                <div class="toast-progress absolute bottom-0 left-0 h-1 ${progressBarColor} transition-all" style="width: 100%;"></div>
             `;
 
+            toast.querySelector('.toast-message').textContent = String(message);
             const closeBtn = toast.querySelector('button');
             closeBtn.onclick = () => dismissToast(toast);
 
@@ -84,20 +72,62 @@
                 toast.classList.add('translate-y-0', 'opacity-100');
             });
 
-            // Auto dismiss
+            // Progress bar and auto-dismiss with hover pause
             if (durationMs > 0) {
-                setTimeout(() => dismissToast(toast), durationMs);
+                const progressBar = toast.querySelector('.toast-progress');
+                let remaining = durationMs;
+                let lastTick = Date.now();
+                let isPaused = false;
+
+                const updateProgress = () => {
+                    const now = Date.now();
+                    if (!isPaused) {
+                        remaining -= (now - lastTick);
+                        const percentage = Math.max(0, (remaining / durationMs) * 100);
+                        if (progressBar) progressBar.style.width = percentage + '%';
+                        if (remaining <= 0) {
+                            dismissToast(toast);
+                            return;
+                        }
+                    }
+                    lastTick = now;
+                    requestAnimationFrame(updateProgress);
+                };
+
+                requestAnimationFrame(updateProgress);
+
+                toast.addEventListener('mouseenter', () => {
+                    isPaused = true;
+                });
+                toast.addEventListener('mouseleave', () => {
+                    lastTick = Date.now();
+                    isPaused = false;
+                });
             }
+
+            return toast;
         };
 
-        function dismissToast(toast) {
+        window.dismissToast = function (toast) {
             if (!toast || !toast.parentElement) return;
-            toast.classList.add('opacity-0', 'translate-y-3');
-            setTimeout(() => toast.remove(), 250);
-        }
+            toast.classList.add('opacity-0', 'translate-y-3', 'scale-95');
+            setTimeout(() => {
+                if (toast && toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        };
 
-        // On initial page load: fire toasts for any queued TempData
-        document.addEventListener('DOMContentLoaded', function () {
+        // Modern developer API
+        window.toast = {
+            success: (msg, dur) => window.showToast(msg, 'success', dur),
+            error: (msg, dur) => window.showToast(msg, 'error', dur),
+            warning: (msg, dur) => window.showToast(msg, 'warning', dur),
+            info: (msg, dur) => window.showToast(msg, 'info', dur)
+        };
+
+        // Auto-trigger toasts from queued server TempData
+        document.addEventListener('DOMContentLoaded', () => {
             @if (!string.IsNullOrEmpty(successMsg))
             {
                 <text>window.showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(successMsg)), 'success');</text>

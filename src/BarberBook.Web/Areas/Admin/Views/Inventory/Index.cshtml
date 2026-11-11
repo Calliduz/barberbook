@@ -201,7 +201,11 @@
                                         class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
                                     Edit
                                 </button>
-                                <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline">
+                                <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline"
+                                      data-confirm="Are you sure you want to @(p.IsActive ? "deactivate" : "activate") '@p.Name'? @(p.IsActive ? "The product will no longer appear on the customer shop or checkout menus." : "The product will immediately be available for catalog display and sales.")"
+                                      data-confirm-title="@(p.IsActive ? "Deactivate Product" : "Activate Product")"
+                                      data-confirm-button="@(p.IsActive ? "Deactivate" : "Activate")"
+                                      data-confirm-destructive="@(p.IsActive ? "true" : "false")">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="isActive" value="@(p.IsActive ? "false" : "true")" />
                                     <button type="submit" class="px-2 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700">
@@ -303,7 +307,11 @@
                                             class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
                                         Edit
                                     </button>
-                                    <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline">
+                                    <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline"
+                                      data-confirm="Are you sure you want to @(p.IsActive ? "deactivate" : "activate") '@p.Name'? @(p.IsActive ? "The product will no longer appear on the customer shop or checkout menus." : "The product will immediately be available for catalog display and sales.")"
+                                      data-confirm-title="@(p.IsActive ? "Deactivate Product" : "Activate Product")"
+                                      data-confirm-button="@(p.IsActive ? "Deactivate" : "Activate")"
+                                      data-confirm-destructive="@(p.IsActive ? "true" : "false")">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="isActive" value="@(p.IsActive ? "false" : "true")" />
                                         <button type="submit" class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700" title="@(p.IsActive ? "Deactivate" : "Activate")">

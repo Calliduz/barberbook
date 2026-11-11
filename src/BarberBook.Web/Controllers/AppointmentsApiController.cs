@@ -105,7 +105,7 @@ public class AppointmentsApiController : ControllerBase
                     FormattedChangedAt = FormattingHelpers.FormatDateTime(h.ChangedAt)
                 }).ToList();
 
-            bool canCancelOrReschedule = app.Status == AppointmentStatus.Pending || app.Status == AppointmentStatus.Confirmed;
+            bool canCancelOrReschedule = (app.Status == AppointmentStatus.Pending || app.Status == AppointmentStatus.Confirmed) && app.StartsAt > now;
 
             return new AppointmentSummaryDto
             {

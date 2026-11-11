@@ -1,24 +1,27 @@
-@* Accessible Confirmation Dialog Component (P18, EO-4) *@
+@* Accessible Confirmation Dialog Component (P18, EO-4, BR-13) *@
 <div id="barberbook-confirm-dialog" 
-     class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4"
+     class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[10001] hidden flex items-center justify-center p-4 transition-opacity duration-200 opacity-0"
      role="dialog"
      aria-modal="true"
      aria-labelledby="confirm-dialog-title"
      aria-describedby="confirm-dialog-desc">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative transform transition-all">
-        <div class="flex items-center gap-3 mb-4">
-            <div id="confirm-dialog-icon-container" class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 shrink-0">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <div id="confirm-dialog-card" class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative transform transition-all duration-200 scale-95">
+        <div class="flex items-center gap-3.5 mb-4">
+            <div id="confirm-dialog-icon-container" class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 transition-colors">
+                <svg id="confirm-dialog-icon-standard" class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <svg id="confirm-dialog-icon-destructive" class="w-5 h-5 text-rose-600 dark:text-rose-400 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                 </svg>
             </div>
             <div>
                 <h3 id="confirm-dialog-title" class="text-lg font-serif font-bold text-slate-900 dark:text-white leading-tight">Confirm Action</h3>
-                <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">BarberBook Verification</span>
+                <span id="confirm-dialog-subtitle" class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">BarberBook Verification</span>
             </div>
         </div>
 
-        <p id="confirm-dialog-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        <p id="confirm-dialog-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed break-words">
             Are you sure you want to proceed with this action?
         </p>
 
@@ -36,61 +39,189 @@
 </div>
 
 <script>
-    let _confirmResolve = null;
+    (function () {
+        'use strict';
 
-    window.showConfirmDialog = function ({
-        title = 'Confirm Action',
-        message = 'Are you sure you want to proceed?',
-        confirmText = 'Proceed',
-        cancelText = 'Cancel',
-        isDestructive = false
-    } = {}) {
-        return new Promise((resolve) => {
-            _confirmResolve = resolve;
+        let _confirmResolve = null;
 
+        window.showConfirmDialog = function ({
+            title = 'Confirm Action',
+            message = 'Are you sure you want to proceed?',
+            confirmText = 'Proceed',
+            cancelText = 'Cancel',
+            isDestructive = false
+        } = {}) {
+            return new Promise((resolve) => {
+                _confirmResolve = resolve;
+
+                const dialog = document.getElementById('barberbook-confirm-dialog');
+                const card = document.getElementById('confirm-dialog-card');
+                const iconContainer = document.getElementById('confirm-dialog-icon-container');
+                const iconStandard = document.getElementById('confirm-dialog-icon-standard');
+                const iconDestructive = document.getElementById('confirm-dialog-icon-destructive');
+                const titleEl = document.getElementById('confirm-dialog-title');
+                const descEl = document.getElementById('confirm-dialog-desc');
+                const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
+                const cancelBtn = document.getElementById('confirm-dialog-cancel-btn');
+
+                if (!dialog || !card) {
+                    // Fallback to native confirm if DOM is missing
+                    resolve(window.confirm(message));
+                    return;
+                }
+
+                titleEl.textContent = title;
+                descEl.textContent = message;
+                proceedBtn.textContent = confirmText;
+                cancelBtn.textContent = cancelText;
+
+                if (isDestructive) {
+                    iconContainer.className = 'w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0';
+                    iconStandard.classList.add('hidden');
+                    iconDestructive.classList.remove('hidden');
+                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500';
+                } else {
+                    iconContainer.className = 'w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0';
+                    iconStandard.classList.remove('hidden');
+                    iconDestructive.classList.add('hidden');
+                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500';
+                }
+
+                dialog.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    dialog.classList.remove('opacity-0');
+                    dialog.classList.add('opacity-100');
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                });
+
+                proceedBtn.focus();
+            });
+        };
+
+        window.confirmModal = window.showConfirmDialog;
+
+        function closeDialog(confirmed) {
             const dialog = document.getElementById('barberbook-confirm-dialog');
-            document.getElementById('confirm-dialog-title').textContent = title;
-            document.getElementById('confirm-dialog-desc').textContent = message;
+            const card = document.getElementById('confirm-dialog-card');
+            if (!dialog || !card) return;
 
-            const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
-            proceedBtn.textContent = confirmText;
-            if (isDestructive) {
-                proceedBtn.className = 'px-5 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500';
-            } else {
-                proceedBtn.className = 'px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500';
-            }
+            dialog.classList.remove('opacity-100');
+            dialog.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
 
-            document.getElementById('confirm-dialog-cancel-btn').textContent = cancelText;
-
-            dialog.classList.remove('hidden');
-            proceedBtn.focus();
-        });
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const dialog = document.getElementById('barberbook-confirm-dialog');
-        if (!dialog) return;
-
-        const cancelBtn = document.getElementById('confirm-dialog-cancel-btn');
-        const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
-
-        cancelBtn.addEventListener('click', () => {
-            dialog.classList.add('hidden');
-            if (_confirmResolve) _confirmResolve(false);
-        });
-
-        proceedBtn.addEventListener('click', () => {
-            dialog.classList.add('hidden');
-            if (_confirmResolve) _confirmResolve(true);
-        });
-
-        // Close on escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !dialog.classList.contains('hidden')) {
+            setTimeout(() => {
                 dialog.classList.add('hidden');
-                if (_confirmResolve) _confirmResolve(false);
-            }
-        });
-    });
-</script>
+                if (_confirmResolve) {
+                    _confirmResolve(confirmed);
+                    _confirmResolve = null;
+                }
+            }, 200);
+        }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const dialog = document.getElementById('barberbook-confirm-dialog');
+            if (!dialog) return;
+
+            const cancelBtn = document.getElementById('confirm-dialog-cancel-btn');
+            const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
+
+            cancelBtn.addEventListener('click', () => closeDialog(false));
+            proceedBtn.addEventListener('click', () => closeDialog(true));
+
+            // Click backdrop to cancel
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    closeDialog(false);
+                }
+            });
+
+            // Escape key to dismiss
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !dialog.classList.contains('hidden')) {
+                    closeDialog(false);
+                }
+            });
+
+            // Declarative data-confirm handler for buttons, links, and forms
+            document.addEventListener('click', async (e) => {
+                const trigger = e.target.closest('[data-confirm]');
+                if (!trigger) return;
+
+                // If already confirmed by this handler, permit natural execution
+                if (trigger.dataset.confirmedByModal === 'true') {
+                    delete trigger.dataset.confirmedByModal;
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const message = trigger.getAttribute('data-confirm') || 'Are you sure you want to proceed?';
+                const title = trigger.getAttribute('data-confirm-title') || 'Confirm Action';
+                const confirmText = trigger.getAttribute('data-confirm-button') || 'Proceed';
+                const cancelText = trigger.getAttribute('data-cancel-button') || 'Cancel';
+                const isDestructive = trigger.getAttribute('data-confirm-destructive') === 'true';
+
+                const confirmed = await window.showConfirmDialog({
+                    title,
+                    message,
+                    confirmText,
+                    cancelText,
+                    isDestructive
+                });
+
+                if (confirmed) {
+                    trigger.dataset.confirmedByModal = 'true';
+                    if (trigger.tagName === 'A' && trigger.href) {
+                        window.location.href = trigger.href;
+                    } else if (trigger.type === 'submit' || trigger.tagName === 'BUTTON') {
+                        const form = trigger.closest('form');
+                        if (form) {
+                            // If form has a submit button, dispatch or submit
+                            form.requestSubmit ? form.requestSubmit(trigger) : form.submit();
+                        } else {
+                            trigger.click();
+                        }
+                    } else {
+                        trigger.click();
+                    }
+                }
+            }, true);
+
+            // Declarative data-confirm handler for form submission
+            document.addEventListener('submit', async (e) => {
+                const form = e.target;
+                if (!form.hasAttribute('data-confirm')) return;
+
+                if (form.dataset.confirmedByModal === 'true') {
+                    delete form.dataset.confirmedByModal;
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const message = form.getAttribute('data-confirm') || 'Are you sure you want to submit this form?';
+                const title = form.getAttribute('data-confirm-title') || 'Confirm Submission';
+                const confirmText = form.getAttribute('data-confirm-button') || 'Proceed';
+                const cancelText = form.getAttribute('data-cancel-button') || 'Cancel';
+                const isDestructive = form.getAttribute('data-confirm-destructive') === 'true';
+
+                const confirmed = await window.showConfirmDialog({
+                    title,
+                    message,
+                    confirmText,
+                    cancelText,
+                    isDestructive
+                });
+
+                if (confirmed) {
+                    form.dataset.confirmedByModal = 'true';
+                    form.requestSubmit ? form.requestSubmit() : form.submit();
+                }
+            }, true);
+        });
+    })();
+</script>
