@@ -45,8 +45,7 @@ public class BranchesController : Controller
         if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
         var query = _dbContext.Branches
-            .Include(b => b.Barbers)
-            .Include(b => b.Appointments)
+            .AsNoTracking()
             .AsQueryable();
 
         if (status.Equals("active", StringComparison.OrdinalIgnoreCase))
@@ -69,23 +68,41 @@ public class BranchesController : Controller
 
         var totalCount = await query.CountAsync();
 
-        var branches = await query
+        var rawBranches = await query
             .OrderBy(b => b.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(b => new AdminBranchItemDto
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Address = b.Address,
-                PhoneNumber = b.PhoneNumber,
-                OpeningTime = b.OpeningTime.ToString("HH:mm", null),
-                ClosingTime = b.ClosingTime.ToString("HH:mm", null),
-                IsActive = b.IsActive,
-                BarbersCount = b.Barbers.Count(bar => bar.IsActive),
-                CompletedAppointmentsCount = b.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
-            })
             .ToListAsync();
+
+        var branchIds = rawBranches.Select(b => b.Id).ToList();
+        var barberCounts = (await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(bar => bar.BranchId.HasValue && branchIds.Contains(bar.BranchId.Value) && bar.IsActive)
+            .Select(bar => bar.BranchId!.Value)
+            .ToListAsync())
+            .GroupBy(bid => bid)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var apptCounts = (await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.BranchId.HasValue && branchIds.Contains(a.BranchId.Value) && a.Status == AppointmentStatus.Completed)
+            .Select(a => a.BranchId!.Value)
+            .ToListAsync())
+            .GroupBy(bid => bid)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var branches = rawBranches.Select(b => new AdminBranchItemDto
+        {
+            Id = b.Id,
+            Name = b.Name,
+            Address = b.Address,
+            PhoneNumber = b.PhoneNumber,
+            OpeningTime = b.OpeningTime.ToString("HH:mm", null),
+            ClosingTime = b.ClosingTime.ToString("HH:mm", null),
+            IsActive = b.IsActive,
+            BarbersCount = barberCounts.TryGetValue(b.Id, out var bc) ? bc : 0,
+            CompletedAppointmentsCount = apptCounts.TryGetValue(b.Id, out var ac) ? ac : 0
+        }).ToList();
 
         var viewModel = new BranchListViewModel
         {
@@ -288,19 +305,23 @@ public class BranchesController : Controller
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Branch with ID {id} not found."));
         }
 
-        var barbers = await _dbContext.Barbers
-            .Include(b => b.Branch)
+        var rawBarbers = await _dbContext.Barbers
+            .AsNoTracking()
             .Where(b => b.IsActive)
             .OrderBy(b => b.DisplayName)
-            .Select(b => new BranchBarberItemDto
-            {
-                BarberId = b.Id,
-                DisplayName = b.DisplayName,
-                Specialties = b.Specialties,
-                IsAssignedToThisBranch = b.BranchId == id,
-                CurrentBranchName = b.Branch != null ? b.Branch.Name : "Unassigned"
-            })
             .ToListAsync();
+
+        var bBranchIds = rawBarbers.Where(b => b.BranchId.HasValue).Select(b => b.BranchId!.Value).Distinct().ToList();
+        var allBranches = await _dbContext.Branches.AsNoTracking().Where(br => bBranchIds.Contains(br.Id)).ToDictionaryAsync(br => br.Id);
+
+        var barbers = rawBarbers.Select(b => new BranchBarberItemDto
+        {
+            BarberId = b.Id,
+            DisplayName = b.DisplayName,
+            Specialties = b.Specialties,
+            IsAssignedToThisBranch = b.BranchId == id,
+            CurrentBranchName = b.BranchId.HasValue && allBranches.TryGetValue(b.BranchId.Value, out var br) ? br.Name : "Unassigned"
+        }).ToList();
 
         return Ok(new
         {

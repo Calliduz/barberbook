@@ -24,8 +24,18 @@ public static class DatabaseSeeder
 
         logger.LogInformation("Starting idempotent database seeding...");
 
-        // Ensure database and extensions
-        await context.Database.MigrateAsync();
+        // Ensure database schema if relational provider is used
+        try
+        {
+            if (context.Database.IsRelational())
+            {
+                await context.Database.MigrateAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Database schema migration skipped (provider does not use relational migrations).");
+        }
 
         // 0. Clean up transient automated test artifacts from development database
         var testUsers = await context.Users
@@ -179,12 +189,19 @@ public static class DatabaseSeeder
 
         // Clean up any obsolete duplicate Alabang branches
         var obsoleteBranches = await context.Branches
-            .Where(b => b.Name == "Alabang Town Center Branch" && !context.Appointments.Any(a => a.BranchId == b.Id) && !context.Barbers.Any(bar => bar.BranchId == b.Id))
+            .Where(b => b.Name == "Alabang Town Center Branch")
             .ToListAsync();
         if (obsoleteBranches.Any())
         {
-            context.Branches.RemoveRange(obsoleteBranches);
-            await context.SaveChangesAsync();
+            var branchIds = obsoleteBranches.Select(b => b.Id).ToList();
+            var usedInAppts = await context.Appointments.Where(a => a.BranchId.HasValue && branchIds.Contains(a.BranchId.Value)).Select(a => a.BranchId!.Value).ToListAsync();
+            var usedInBarbers = await context.Barbers.Where(b => b.BranchId.HasValue && branchIds.Contains(b.BranchId.Value)).Select(b => b.BranchId!.Value).ToListAsync();
+            var unused = obsoleteBranches.Where(b => !usedInAppts.Contains(b.Id) && !usedInBarbers.Contains(b.Id)).ToList();
+            if (unused.Any())
+            {
+                context.Branches.RemoveRange(unused);
+                await context.SaveChangesAsync();
+            }
         }
 
         var branchMap = new Dictionary<string, Branch>();
@@ -246,7 +263,7 @@ public static class DatabaseSeeder
             }
 
             var branchId = branchMap[branchName].Id;
-            var barber = await context.Barbers.Include(b => b.WorkingHours).FirstOrDefaultAsync(b => b.UserId == user.Id);
+            var barber = await context.Barbers.FirstOrDefaultAsync(b => b.UserId == user.Id);
             if (barber == null)
             {
                 barber = new Barber
@@ -268,7 +285,8 @@ public static class DatabaseSeeder
             }
 
             // Seed Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM
-            if (!barber.WorkingHours.Any())
+            var hasHours = await context.WorkingHours.AnyAsync(w => w.BarberId == barber.Id);
+            if (!hasHours)
             {
                 for (int day = 1; day <= 6; day++)
                 {

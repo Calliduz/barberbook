@@ -14,6 +14,21 @@ from psycopg2.extras import RealDictCursor
 import pymongo
 from bson.decimal128 import Decimal128
 
+def load_dotenv():
+    env_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
+    if os.path.exists(env_file):
+        with open(env_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, val = line.split("=", 1)
+                    key = key.strip()
+                    val = val.strip().strip('"').strip("'")
+                    if key not in os.environ:
+                        os.environ[key] = val
+
+load_dotenv()
+
 MONGO_URI = os.environ.get(
     "MONGODB_URI",
     "mongodb+srv://cabunocjoshlisteristuris_db_user:QtjA8IW2dDSZkdVF@cluster0.ivvillv.mongodb.net/?appName=Cluster0"
@@ -34,7 +49,10 @@ def serialize_value(val):
     if isinstance(val, (datetime.date, datetime.time)):
         return val.isoformat()
     if isinstance(val, datetime.datetime):
-        return val
+        if val.tzinfo is not None:
+            utc_dt = val.astimezone(datetime.timezone.utc)
+            return utc_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ") if utc_dt.microsecond > 0 else utc_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return val.strftime("%Y-%m-%dT%H:%M:%SZ")
     if isinstance(val, bytes):
         return val.decode("utf-8", errors="replace")
     if isinstance(val, list):
@@ -75,9 +93,13 @@ def transfer_database_tables(pg_conn, mongo_db):
             documents = []
             for row in rows:
                 doc = {k: serialize_value(v) for k, v in row.items()}
-                # Set a friendly string _id if 'id' exists
+                # Set integer _id if 'id' or 'Id' exists so MongoDB primary key matches relational Id
                 if "id" in doc:
+                    doc["_id"] = doc["id"]
                     doc["_pg_id"] = doc["id"]
+                elif "Id" in doc:
+                    doc["_id"] = doc["Id"]
+                    doc["_pg_id"] = doc["Id"]
                 documents.append(doc)
 
             coll.insert_many(documents)

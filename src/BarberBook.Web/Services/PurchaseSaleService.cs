@@ -2,9 +2,11 @@ using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Inventory;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NodaTime;
 using NodaTime.Text;
 
@@ -12,6 +14,7 @@ namespace BarberBook.Web.Services;
 
 public class PurchaseSaleService : IPurchaseSaleService
 {
+    private static readonly SemaphoreSlim _inventoryLock = new(1, 1);
     private readonly BarberBookDbContext _dbContext;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
@@ -64,7 +67,13 @@ public class PurchaseSaleService : IPurchaseSaleService
         var now = _clock.GetCurrentInstant();
         var purchasedAt = ParseInstantOrNow(request.PurchasedAt, now);
 
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        await _inventoryLock.WaitAsync(ct);
+        IDbContextTransaction? transaction = null;
+        if (_dbContext.Database.IsRelational())
+        {
+            transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        }
+
         try
         {
             decimal totalCost = 0;
@@ -124,15 +133,20 @@ public class PurchaseSaleService : IPurchaseSaleService
             }
 
             await _dbContext.SaveChangesAsync(ct);
-            await transaction.CommitAsync(ct);
+            if (transaction != null) await transaction.CommitAsync(ct);
 
             var dto = await GetPurchaseByIdAsync(purchase.Id, ct);
             return (true, null, dto);
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync(ct);
+            if (transaction != null) await transaction.RollbackAsync(ct);
             return (false, $"Failed to record purchase: {ex.Message}", null);
+        }
+        finally
+        {
+            if (transaction != null) await transaction.DisposeAsync();
+            _inventoryLock.Release();
         }
     }
 
@@ -141,9 +155,6 @@ public class PurchaseSaleService : IPurchaseSaleService
     {
         var query = _dbContext.Purchases
             .AsNoTracking()
-            .Include(p => p.CreatedBy)
-            .Include(p => p.Items)
-                .ThenInclude(i => i.Product)
             .AsQueryable();
 
         if (startDate.HasValue)
@@ -162,6 +173,8 @@ public class PurchaseSaleService : IPurchaseSaleService
             .OrderByDescending(p => p.PurchasedAt)
             .ToListAsync(ct);
 
+        await _dbContext.HydratePurchasesAsync(list, ct);
+
         return list.Select(MapPurchaseDto).ToList();
     }
 
@@ -169,10 +182,12 @@ public class PurchaseSaleService : IPurchaseSaleService
     {
         var p = await _dbContext.Purchases
             .AsNoTracking()
-            .Include(p => p.CreatedBy)
-            .Include(p => p.Items)
-                .ThenInclude(i => i.Product)
             .FirstOrDefaultAsync(p => p.Id == id, ct);
+
+        if (p != null)
+        {
+            await _dbContext.HydratePurchasesAsync(new[] { p }, ct);
+        }
 
         return p != null ? MapPurchaseDto(p) : null;
     }
@@ -194,20 +209,28 @@ public class PurchaseSaleService : IPurchaseSaleService
         var now = _clock.GetCurrentInstant();
         var soldAt = ParseInstantOrNow(request.SoldAt, now);
 
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        await _inventoryLock.WaitAsync(ct);
+        IDbContextTransaction? transaction = null;
+        if (_dbContext.Database.IsRelational())
+        {
+            transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        }
+
         try
         {
             // Lock product rows in ascending order to prevent deadlocks and race conditions
             var productsDict = new Dictionary<int, Product>();
             foreach (var pid in distinctProductIds)
             {
-                var lockedProduct = await _dbContext.Products
-                    .FromSqlInterpolated($"SELECT * FROM products WHERE id = {pid} FOR UPDATE")
-                    .FirstOrDefaultAsync(ct);
+                var lockedProduct = _dbContext.Database.IsRelational()
+                    ? await _dbContext.Products
+                        .FromSqlInterpolated($"SELECT * FROM products WHERE id = {pid} FOR UPDATE")
+                        .FirstOrDefaultAsync(ct)
+                    : await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == pid, ct);
 
                 if (lockedProduct == null)
                 {
-                    await transaction.RollbackAsync(ct);
+                    if (transaction != null) await transaction.RollbackAsync(ct);
                     return (false, $"Product with ID {pid} was not found.", "NOT_FOUND", null);
                 }
                 productsDict[pid] = lockedProduct;
@@ -227,18 +250,20 @@ public class PurchaseSaleService : IPurchaseSaleService
 
                 if (requestedQty <= 0)
                 {
-                    await transaction.RollbackAsync(ct);
+                    if (transaction != null) await transaction.RollbackAsync(ct);
                     return (false, $"Quantity for product '{product.Name}' must be greater than zero.", "INVALID_QUANTITY", null);
                 }
 
-                var currentStock = await _dbContext.StockMovements
+                var stockMovements = await _dbContext.StockMovements
                     .Where(sm => sm.ProductId == pid)
-                    .SumAsync(sm => (int?)sm.Quantity, ct) ?? 0;
+                    .Select(sm => sm.Quantity)
+                    .ToListAsync(ct);
+                var currentStock = stockMovements.Sum();
 
                 // INV-03: Refuse the whole sale if any item exceeds the stock (409 INSUFFICIENT_STOCK)
                 if (requestedQty > currentStock)
                 {
-                    await transaction.RollbackAsync(ct);
+                    if (transaction != null) await transaction.RollbackAsync(ct);
                     return (false, $"Insufficient stock for product '{product.Name}'. Current stock is {currentStock}, requested {requestedQty}.", "INSUFFICIENT_STOCK", null);
                 }
             }
@@ -298,15 +323,20 @@ public class PurchaseSaleService : IPurchaseSaleService
             }
 
             await _dbContext.SaveChangesAsync(ct);
-            await transaction.CommitAsync(ct);
+            if (transaction != null) await transaction.CommitAsync(ct);
 
             var dto = await GetProductSaleByIdAsync(sale.Id, ct);
             return (true, null, null, dto);
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync(ct);
+            if (transaction != null) await transaction.RollbackAsync(ct);
             return (false, $"Failed to record product sale: {ex.Message}", "SERVER_ERROR", null);
+        }
+        finally
+        {
+            if (transaction != null) await transaction.DisposeAsync();
+            _inventoryLock.Release();
         }
     }
 
@@ -315,10 +345,6 @@ public class PurchaseSaleService : IPurchaseSaleService
     {
         var query = _dbContext.ProductSales
             .AsNoTracking()
-            .Include(s => s.RecordedBy)
-            .Include(s => s.Customer)
-            .Include(s => s.Appointment)
-            .Include(s => s.Items)
             .AsQueryable();
 
         if (startDate.HasValue)
@@ -335,12 +361,20 @@ public class PurchaseSaleService : IPurchaseSaleService
 
         if (productId.HasValue)
         {
-            query = query.Where(s => s.Items.Any(i => i.ProductId == productId.Value));
+            var matchingSaleIds = await _dbContext.ProductSaleItems
+                .AsNoTracking()
+                .Where(i => i.ProductId == productId.Value)
+                .Select(i => i.ProductSaleId)
+                .Distinct()
+                .ToListAsync(ct);
+            query = query.Where(s => matchingSaleIds.Contains(s.Id));
         }
 
         var list = await query
             .OrderByDescending(s => s.SoldAt)
             .ToListAsync(ct);
+
+        await _dbContext.HydrateProductSalesAsync(list, ct);
 
         return list.Select(MapProductSaleDto).ToList();
     }
@@ -349,11 +383,12 @@ public class PurchaseSaleService : IPurchaseSaleService
     {
         var s = await _dbContext.ProductSales
             .AsNoTracking()
-            .Include(s => s.RecordedBy)
-            .Include(s => s.Customer)
-            .Include(s => s.Appointment)
-            .Include(s => s.Items)
             .FirstOrDefaultAsync(s => s.Id == id, ct);
+
+        if (s != null)
+        {
+            await _dbContext.HydrateProductSalesAsync(new[] { s }, ct);
+        }
 
         return s != null ? MapProductSaleDto(s) : null;
     }
@@ -361,25 +396,35 @@ public class PurchaseSaleService : IPurchaseSaleService
     public async Task<List<ProductSalesSummaryItemDto>> GetProductSalesSummaryAsync(
         LocalDate? startDate = null, LocalDate? endDate = null, CancellationToken ct = default)
     {
-        var query = _dbContext.ProductSaleItems
-            .AsNoTracking()
-            .Include(i => i.ProductSale)
-            .Include(i => i.Product)
-            .AsQueryable();
-
+        var salesQuery = _dbContext.ProductSales.AsNoTracking();
         if (startDate.HasValue)
         {
             var startUtc = startDate.Value.AtStartOfDayInZone(_zone).ToInstant();
-            query = query.Where(i => i.ProductSale.SoldAt >= startUtc);
+            salesQuery = salesQuery.Where(s => s.SoldAt >= startUtc);
         }
 
         if (endDate.HasValue)
         {
             var endExclusiveUtc = endDate.Value.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
-            query = query.Where(i => i.ProductSale.SoldAt < endExclusiveUtc);
+            salesQuery = salesQuery.Where(s => s.SoldAt < endExclusiveUtc);
         }
 
-        var items = await query.ToListAsync(ct);
+        var validSaleIds = await salesQuery.Select(s => s.Id).ToListAsync(ct);
+
+        var items = await _dbContext.ProductSaleItems
+            .AsNoTracking()
+            .Where(i => validSaleIds.Contains(i.ProductSaleId))
+            .ToListAsync(ct);
+
+        var productIds = items.Select(i => i.ProductId).Distinct().ToList();
+        var products = productIds.Count > 0
+            ? await _dbContext.Products.AsNoTracking().Where(p => productIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id, ct)
+            : new Dictionary<int, Product>();
+
+        foreach (var i in items)
+        {
+            if (products.TryGetValue(i.ProductId, out var pr)) i.Product = pr;
+        }
 
         return items
             .GroupBy(i => new { i.ProductId, i.ProductName })

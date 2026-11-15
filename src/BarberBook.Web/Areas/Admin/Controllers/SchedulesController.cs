@@ -2,6 +2,7 @@ using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Schedule;
@@ -38,18 +39,20 @@ public class SchedulesController : Controller
     [HttpGet("admin/schedules")]
     public async Task<IActionResult> Index([FromQuery] int? barberId = null)
     {
-        var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
+        var rawBarbers = await _dbContext.Barbers
+            .AsNoTracking()
             .OrderBy(b => b.DisplayName)
-            .Select(b => new AdminBarberItemDto
-            {
-                Id = b.Id,
-                DisplayName = b.DisplayName,
-                FullName = b.User.FullName,
-                Email = b.User.Email ?? string.Empty,
-                IsActive = b.IsActive && b.User.IsActive
-            })
             .ToListAsync();
+        await _dbContext.HydrateBarbersAsync(rawBarbers, includeUser: true, includeBranch: false);
+
+        var barbers = rawBarbers.Select(b => new AdminBarberItemDto
+        {
+            Id = b.Id,
+            DisplayName = b.DisplayName,
+            FullName = b.User?.FullName ?? string.Empty,
+            Email = b.User?.Email ?? string.Empty,
+            IsActive = b.IsActive && (b.User?.IsActive ?? false)
+        }).ToList();
 
         int selectedId = barberId ?? barbers.FirstOrDefault()?.Id ?? 0;
         var selectedBarber = barbers.FirstOrDefault(b => b.Id == selectedId);
@@ -113,10 +116,13 @@ public class SchedulesController : Controller
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {barberId} not found."));
         }
 
-        var hours = await _dbContext.WorkingHours
+        var rawHours = await _dbContext.WorkingHours
             .Where(w => w.BarberId == barberId)
             .OrderBy(w => w.DayOfWeek)
             .ThenBy(w => w.StartTime)
+            .ToListAsync();
+
+        var hours = rawHours
             .Select(w => new WorkingHoursItemDto
             {
                 Id = w.Id,
@@ -125,7 +131,7 @@ public class SchedulesController : Controller
                 StartTime = w.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
                 EndTime = w.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)
             })
-            .ToListAsync();
+            .ToList();
 
         return Ok(hours);
     }
@@ -200,9 +206,12 @@ public class SchedulesController : Controller
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {barberId} not found."));
         }
 
-        var daysOff = await _dbContext.DaysOff
+        var rawDaysOff = await _dbContext.DaysOff
             .Where(d => d.BarberId == barberId)
             .OrderBy(d => d.Date)
+            .ToListAsync();
+
+        var daysOff = rawDaysOff
             .Select(d => new DayOffItemDto
             {
                 Id = d.Id,
@@ -210,7 +219,7 @@ public class SchedulesController : Controller
                 FormattedDate = d.Date.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture),
                 Reason = d.Reason
             })
-            .ToListAsync();
+            .ToList();
 
         return Ok(daysOff);
     }
@@ -247,14 +256,14 @@ public class SchedulesController : Controller
         var rangeEndUtc = endDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
 
         var conflictingAppointments = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
+            .AsNoTracking()
             .Where(a => a.BarberId == barberId &&
                         (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed) &&
                         a.StartsAt < rangeEndUtc &&
                         a.EndsAt > rangeStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(conflictingAppointments, includeCustomer: true, includeBarber: false, includeService: true);
 
         var conflicts = conflictingAppointments.Select(a =>
         {

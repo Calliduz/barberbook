@@ -1,10 +1,68 @@
+using System.Collections.Concurrent;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.EntityFrameworkCore.Extensions;
+using NodaTime;
+using NodaTime.Text;
 
 namespace BarberBook.Data;
+
+public class MongoDbSequentialIdValueGenerator : ValueGenerator<int>
+{
+    public override bool GeneratesTemporaryValues => false;
+
+    public override int Next(EntityEntry entry)
+    {
+        if (entry.Context is BarberBookDbContext db)
+        {
+            var collectionName = entry.Metadata.GetCollectionName()
+                ?? entry.Metadata.GetTableName()
+                ?? entry.Metadata.ClrType.Name;
+            return db.GetNextSequenceValue(collectionName);
+        }
+        return 0;
+    }
+}
+
+public class InstantToIsoConverter : ValueConverter<Instant, string>
+{
+    public InstantToIsoConverter()
+        : base(
+            v => v.ToString(),
+            v => Instant.FromDateTimeOffset(DateTimeOffset.Parse(v)))
+    {
+    }
+}
+
+public class LocalTimeToIsoConverter : ValueConverter<LocalTime, string>
+{
+    private static readonly LocalTimePattern Pattern = LocalTimePattern.ExtendedIso;
+    public LocalTimeToIsoConverter()
+        : base(
+            v => Pattern.Format(v),
+            v => Pattern.Parse(v).Value)
+    {
+    }
+}
+
+public class LocalDateToIsoConverter : ValueConverter<LocalDate, string>
+{
+    private static readonly LocalDatePattern Pattern = LocalDatePattern.Iso;
+    public LocalDateToIsoConverter()
+        : base(
+            v => Pattern.Format(v),
+            v => Pattern.Parse(v).Value)
+    {
+    }
+}
 
 public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
 {
@@ -25,9 +83,160 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<ProductSaleItem> ProductSaleItems => Set<ProductSaleItem>();
     public DbSet<Branch> Branches => Set<Branch>();
 
-    public BarberBookDbContext(DbContextOptions<BarberBookDbContext> options)
+    private readonly IMongoClient? _mongoClient;
+    private readonly string _databaseName;
+    private static readonly ConcurrentDictionary<string, int> _localFallbacks = new();
+    private static readonly object _sequenceLock = new();
+
+    public BarberBookDbContext(
+        DbContextOptions<BarberBookDbContext> options,
+        IMongoClient? mongoClient = null)
         : base(options)
     {
+        _mongoClient = mongoClient;
+        _databaseName = Environment.GetEnvironmentVariable("MONGODB_DB_NAME") ?? "barberbook";
+    }
+
+    public int GetNextSequenceValue(string collectionName)
+    {
+        if (_mongoClient != null)
+        {
+            try
+            {
+                var db = _mongoClient.GetDatabase(_databaseName);
+                var counters = db.GetCollection<BsonDocument>("counters");
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", collectionName);
+                var update = Builders<BsonDocument>.Update.Inc("seq", 1);
+                var opts = new FindOneAndUpdateOptions<BsonDocument>
+                {
+                    IsUpsert = true,
+                    ReturnDocument = ReturnDocument.After
+                };
+                var doc = counters.FindOneAndUpdate(filter, update, opts);
+                return doc["seq"].AsInt32;
+            }
+            catch
+            {
+                // Fallback to local sequence if database operation fails
+            }
+        }
+
+        lock (_sequenceLock)
+        {
+            var current = _localFallbacks.GetOrAdd(collectionName, 2000);
+            _localFallbacks[collectionName] = current + 1;
+            return current + 1;
+        }
+    }
+
+    public async Task<int> GetNextSequenceValueAsync(string collectionName, CancellationToken cancellationToken = default)
+    {
+        if (_mongoClient != null)
+        {
+            try
+            {
+                var db = _mongoClient.GetDatabase(_databaseName);
+                var counters = db.GetCollection<BsonDocument>("counters");
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", collectionName);
+                var update = Builders<BsonDocument>.Update.Inc("seq", 1);
+                var opts = new FindOneAndUpdateOptions<BsonDocument>
+                {
+                    IsUpsert = true,
+                    ReturnDocument = ReturnDocument.After
+                };
+                var doc = await counters.FindOneAndUpdateAsync(filter, update, opts, cancellationToken);
+                return doc["seq"].AsInt32;
+            }
+            catch
+            {
+                // Fallback to local sequence if database operation fails
+            }
+        }
+
+        lock (_sequenceLock)
+        {
+            var current = _localFallbacks.GetOrAdd(collectionName, 2000);
+            _localFallbacks[collectionName] = current + 1;
+            return Task.FromResult(current + 1).Result;
+        }
+    }
+
+    private void AssignSequentialIds()
+    {
+        if (Database.IsRelational()) return;
+
+        var addedEntries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added)
+            .ToList();
+
+        if (addedEntries.Count == 0) return;
+
+        foreach (var entry in addedEntries)
+        {
+            var pk = entry.Metadata.FindPrimaryKey();
+            if (pk != null && pk.Properties.Count == 1 && pk.Properties[0].ClrType == typeof(int))
+            {
+                var prop = entry.Property(pk.Properties[0].Name);
+                if (prop.CurrentValue is int val && val <= 0)
+                {
+                    var collectionName = entry.Metadata.GetCollectionName() ?? entry.Metadata.GetTableName() ?? entry.Metadata.ClrType.Name;
+                    var nextId = GetNextSequenceValue(collectionName);
+                    prop.CurrentValue = nextId;
+                }
+            }
+        }
+    }
+
+    private async Task AssignSequentialIdsAsync(CancellationToken cancellationToken)
+    {
+        if (Database.IsRelational()) return;
+
+        var addedEntries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added)
+            .ToList();
+
+        if (addedEntries.Count == 0) return;
+
+        foreach (var entry in addedEntries)
+        {
+            var pk = entry.Metadata.FindPrimaryKey();
+            if (pk != null && pk.Properties.Count == 1 && pk.Properties[0].ClrType == typeof(int))
+            {
+                var prop = entry.Property(pk.Properties[0].Name);
+                if (prop.CurrentValue is int val && val <= 0)
+                {
+                    var collectionName = entry.Metadata.GetCollectionName() ?? entry.Metadata.GetTableName() ?? entry.Metadata.ClrType.Name;
+                    var nextId = await GetNextSequenceValueAsync(collectionName, cancellationToken);
+                    prop.CurrentValue = nextId;
+                }
+            }
+        }
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        AssignSequentialIds();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        await AssignSequentialIdsAsync(cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        configurationBuilder.Properties<Instant>()
+            .HaveConversion<InstantToIsoConverter>();
+
+        configurationBuilder.Properties<LocalTime>()
+            .HaveConversion<LocalTimeToIsoConverter>();
+
+        configurationBuilder.Properties<LocalDate>()
+            .HaveConversion<LocalDateToIsoConverter>();
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -202,9 +411,9 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired();
             entity.Property(e => e.FromStatus)
                 .HasColumnName("from_status")
-                .HasConversion(
-                    v => v.HasValue ? v.Value.ToString().ToLowerInvariant() : null,
-                    v => !string.IsNullOrEmpty(v) ? Enum.Parse<AppointmentStatus>(v, true) : (AppointmentStatus?)null)
+                .HasConversion(new ValueConverter<AppointmentStatus, string>(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => Enum.Parse<AppointmentStatus>(v, true)))
                 .HasMaxLength(20);
             entity.Property(e => e.ToStatus)
                 .HasColumnName("to_status")
@@ -507,5 +716,38 @@ public class BarberBookDbContext : IdentityDbContext<ApplicationUser, IdentityRo
 
             entity.HasIndex(e => e.Name);
         });
+
+        // Global MongoDB mapping conventions: table -> collection, single PK -> _id, columns -> elements
+        foreach (var entity in builder.Model.GetEntityTypes())
+        {
+            var tableName = entity.GetTableName();
+            if (!string.IsNullOrEmpty(tableName))
+            {
+                entity.SetCollectionName(tableName);
+            }
+
+            var pkProps = entity.FindPrimaryKey()?.Properties;
+            var hasSinglePk = pkProps != null && pkProps.Count == 1;
+            var singlePkProp = hasSinglePk ? pkProps![0] : null;
+
+            if (hasSinglePk && singlePkProp!.ClrType == typeof(int))
+            {
+                singlePkProp.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
+                singlePkProp.SetValueGeneratorFactory((_, _) => new MongoDbSequentialIdValueGenerator());
+            }
+
+            foreach (var prop in entity.GetProperties())
+            {
+                var colName = prop.GetColumnName();
+                if (prop == singlePkProp)
+                {
+                    prop.SetElementName("_id");
+                }
+                else if (!string.IsNullOrEmpty(colName))
+                {
+                    prop.SetElementName(colName);
+                }
+            }
+        }
     }
 }

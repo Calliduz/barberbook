@@ -12,7 +12,13 @@ test.describe('FL-C — Customer End-to-End Booking Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // 2. Register as a new customer
-    await page.fill('input[name="FullName"]', testName);
+    const hasFirstName = (await page.locator('input[name="FirstName"]').count()) > 0;
+    if (hasFirstName) {
+      await page.fill('input[name="FirstName"]', 'Juan');
+      await page.fill('input[name="LastName"]', `Customer ${timestamp}`);
+    } else {
+      await page.fill('input[name="FullName"]', testName);
+    }
     await page.fill('input[name="Email"]', testEmail);
     await page.fill('input[name="Phone"]', '09171112233');
     await page.fill('input[name="Password"]', 'Demo@BarberBook2026!');

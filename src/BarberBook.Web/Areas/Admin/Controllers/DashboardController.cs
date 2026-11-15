@@ -1,6 +1,8 @@
 using System.Globalization;
 using BarberBook.Data;
+using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Services;
@@ -59,11 +61,10 @@ public class DashboardController : Controller
         // 1. Today's appointments query
         var todayAppointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(todayAppointments, includeCustomer: true, includeBarber: true, includeService: false);
 
         var todayCounts = new TodayCountsDto
         {
@@ -81,12 +82,11 @@ public class DashboardController : Controller
 
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
             .OrderByDescending(a => a.CreatedAt)
             .Take(15)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(pendingRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var pendingBookings = pendingRaw.Select(a =>
         {
@@ -114,8 +114,9 @@ public class DashboardController : Controller
         var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
 
         // 4. Entity counts
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var activeBarbersCount = await _dbContext.Barbers
-            .CountAsync(b => b.IsActive && b.User.IsActive);
+            .CountAsync(b => b.IsActive && activeUserIds.Contains(b.UserId));
 
         var totalCustomersCount = await _dbContext.Users
             .CountAsync(u => u.Role == UserRole.Customer);
@@ -160,11 +161,10 @@ public class DashboardController : Controller
         // 6. Recent appointments live feed
         var recentApptsRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .OrderByDescending(a => a.StartsAt)
             .Take(8)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(recentApptsRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var recentAppts = recentApptsRaw.Select(a =>
         {
@@ -243,11 +243,10 @@ public class DashboardController : Controller
         // 1. Today's appointments query
         var todayAppointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(todayAppointments, includeCustomer: true, includeBarber: true, includeService: false);
 
         var todayCounts = new TodayCountsDto
         {
@@ -265,12 +264,11 @@ public class DashboardController : Controller
 
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
             .OrderByDescending(a => a.CreatedAt)
             .Take(10)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(pendingRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var pendingBookings = pendingRaw.Select(a =>
         {
@@ -298,8 +296,9 @@ public class DashboardController : Controller
         var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
 
         // 4. Entity counts
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var activeBarbersCount = await _dbContext.Barbers
-            .CountAsync(b => b.IsActive && b.User.IsActive);
+            .CountAsync(b => b.IsActive && activeUserIds.Contains(b.UserId));
 
         var totalCustomersCount = await _dbContext.Users
             .CountAsync(u => u.Role == UserRole.Customer);

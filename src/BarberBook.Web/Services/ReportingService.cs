@@ -1,6 +1,7 @@
 using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Reports;
 using Microsoft.EntityFrameworkCore;
@@ -30,13 +31,12 @@ public class ReportingService : IReportingService
         // Rule BR-08: Amount taken from appointment's price snapshot
         var appointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Completed &&
                         a.StartsAt >= dayStartUtc &&
                         a.StartsAt < nextDayStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: true, includeBarber: true, includeService: false, ct: ct);
 
         int counter = 1;
         var items = appointments.Select(a =>
@@ -87,9 +87,9 @@ public class ReportingService : IReportingService
         // HW-2, INV-06: Query product sales on that day in Asia/Manila
         var daySales = await _dbContext.ProductSales
             .AsNoTracking()
-            .Include(s => s.Items)
             .Where(s => s.SoldAt >= dayStartUtc && s.SoldAt < nextDayStartUtc)
             .ToListAsync(ct);
+        await _dbContext.HydrateProductSalesAsync(daySales, ct);
 
         var productSalesItems = daySales.SelectMany(s => s.Items).ToList();
         var productSalesTotal = productSalesItems.Sum(i => i.LineTotal);
@@ -178,11 +178,11 @@ public class ReportingService : IReportingService
         // Query all completed appointments in the month in Asia/Manila (BR-07, BR-11)
         var appointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Completed &&
                         a.StartsAt >= monthStartUtc &&
                         a.StartsAt < nextMonthStartUtc)
             .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: false, ct: ct);
 
         // Group appointments by their local calendar date in Asia/Manila
         var appointmentsByDate = appointments
@@ -192,9 +192,9 @@ public class ReportingService : IReportingService
         // HW-2, INV-06: Query product sales in month
         var monthProductSales = await _dbContext.ProductSales
             .AsNoTracking()
-            .Include(s => s.Items)
             .Where(s => s.SoldAt >= monthStartUtc && s.SoldAt < nextMonthStartUtc)
             .ToListAsync(ct);
+        await _dbContext.HydrateProductSalesAsync(monthProductSales, ct);
 
         var productSalesByDate = monthProductSales
             .GroupBy(s => s.SoldAt.InZone(_zone).Date)
@@ -321,7 +321,6 @@ public class ReportingService : IReportingService
 
         var query = _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Barber)
             .Where(a => a.CustomerId == customerId && a.Status == AppointmentStatus.Completed);
 
         if (startDate.HasValue)
@@ -340,6 +339,7 @@ public class ReportingService : IReportingService
         var appointments = await query
             .OrderByDescending(a => a.StartsAt)
             .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: false, ct: ct);
 
         var items = appointments.Select(a =>
         {
@@ -386,7 +386,6 @@ public class ReportingService : IReportingService
 
         var query = _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
             .Where(a => a.BarberId == barberId && a.Status == AppointmentStatus.Completed);
 
         if (startDate.HasValue)
@@ -405,6 +404,7 @@ public class ReportingService : IReportingService
         var appointments = await query
             .OrderByDescending(a => a.StartsAt)
             .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: true, includeBarber: false, includeService: false, ct: ct);
 
         var effectiveRate = barber?.CommissionRate > 0 ? barber.CommissionRate : 0.50m;
 

@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
@@ -26,9 +27,6 @@ public class AppointmentTransitionService : IAppointmentTransitionService
         CancellationToken cancellationToken = default)
     {
         var appointment = await _dbContext.Appointments
-            .Include(a => a.Barber).ThenInclude(b => b.User)
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
             .FirstOrDefaultAsync(a => a.Id == appointmentId, cancellationToken);
 
         if (appointment == null)
@@ -97,7 +95,10 @@ public class AppointmentTransitionService : IAppointmentTransitionService
         else if (string.Equals(actor.Role, "Barber", StringComparison.OrdinalIgnoreCase))
         {
             // Barber can only transition own appointments
-            bool isOwnAppointment = appointment.Barber.UserId == actor.UserId;
+            var barber = await _dbContext.Barbers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == appointment.BarberId, cancellationToken);
+            bool isOwnAppointment = barber != null && barber.UserId == actor.UserId;
             if (!isOwnAppointment)
             {
                 return AppointmentTransitionResult.Forbidden(

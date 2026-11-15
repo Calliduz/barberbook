@@ -175,20 +175,20 @@ public class AdminAppointmentEndpointTests : IClassFixture<WebApplicationFactory
         var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
         var transitionService = scope.ServiceProvider.GetRequiredService<IAppointmentTransitionService>();
 
-        var ramon = await db.Barbers.Include(b => b.User).FirstAsync(b => b.DisplayName == "Ramon");
-        var dennis = await db.Barbers.Include(b => b.User).FirstAsync(b => b.DisplayName == "Dennis");
+        var ramon = await db.Barbers.FirstAsync(b => b.DisplayName == "Ramon");
+        var dennis = await db.Barbers.FirstAsync(b => b.DisplayName == "Dennis");
 
         // Ramon's appointment
         var ramonApp = await CreateIsolatedAppointmentAsync(AppointmentStatus.Pending, barberId: ramon.Id);
 
         // Dennis tries to confirm Ramon's appointment -> 403 Forbidden
-        var dennisActor = new TransitionActor(dennis.User.Id, "Barber", BarberId: dennis.Id);
+        var dennisActor = new TransitionActor(dennis.UserId, "Barber", BarberId: dennis.Id);
         var dennisAttempt = await transitionService.TransitionAsync(ramonApp.Id, AppointmentStatus.Confirmed, dennisActor, "Dennis trying Ramon app");
         dennisAttempt.StatusCode.Should().Be(403);
         dennisAttempt.ErrorCode.Should().Be("FORBIDDEN");
 
         // Ramon confirms his own appointment -> 200 OK
-        var ramonActor = new TransitionActor(ramon.User.Id, "Barber", BarberId: ramon.Id);
+        var ramonActor = new TransitionActor(ramon.UserId, "Barber", BarberId: ramon.Id);
         var ramonAttempt = await transitionService.TransitionAsync(ramonApp.Id, AppointmentStatus.Confirmed, ramonActor, "Ramon confirmed own app");
         ramonAttempt.StatusCode.Should().Be(200);
         ramonAttempt.Success.Should().BeTrue();

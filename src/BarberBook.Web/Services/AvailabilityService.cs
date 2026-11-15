@@ -1,5 +1,6 @@
 using BarberBook.Data;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
@@ -29,10 +30,15 @@ public class AvailabilityService : IAvailabilityService
     {
         // 1. Check if barber exists and is active
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == barberId, cancellationToken);
 
-        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        if (barber != null)
+        {
+            await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, ct: cancellationToken);
+        }
+
+        if (barber == null || !barber.IsActive || barber.User == null || !barber.User.IsActive)
         {
             return new List<AvailableSlotDto>();
         }
@@ -161,10 +167,15 @@ public class AvailabilityService : IAvailabilityService
 
         // Check barber
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == barberId, cancellationToken);
 
-        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        if (barber != null)
+        {
+            await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, ct: cancellationToken);
+        }
+
+        if (barber == null || !barber.IsActive || barber.User == null || !barber.User.IsActive)
         {
             return false;
         }

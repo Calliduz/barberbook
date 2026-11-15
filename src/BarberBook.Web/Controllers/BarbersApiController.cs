@@ -1,5 +1,6 @@
 using System.Globalization;
 using BarberBook.Data;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Schedule;
 using BarberBook.Web.Services;
@@ -34,12 +35,13 @@ public class BarbersApiController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.WorkingHours)
-            .Where(b => b.IsActive && b.User.IsActive)
+            .AsNoTracking()
+            .Where(b => b.IsActive && activeUserIds.Contains(b.UserId))
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
+        await _dbContext.HydrateBarbersAsync(barbers, includeUser: true, includeBranch: false, includeWorkingHours: true);
 
         var dtoList = barbers.Select(b => new
         {
@@ -58,26 +60,35 @@ public class BarbersApiController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.WorkingHours)
-            .FirstOrDefaultAsync(b => b.Id == id);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.IsActive);
 
-        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        if (barber == null)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found or inactive."));
+        }
+
+        await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, includeWorkingHours: true);
+
+        if (barber.User == null || !barber.User.IsActive)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found or inactive."));
         }
 
         var today = _clock.GetCurrentInstant().InZone(_zone).Date;
-        var upcomingDaysOff = await _dbContext.DaysOff
+        var rawUpcomingDaysOff = await _dbContext.DaysOff
             .Where(d => d.BarberId == id && d.Date >= today)
             .OrderBy(d => d.Date)
             .Take(30)
+            .ToListAsync();
+
+        var upcomingDaysOff = rawUpcomingDaysOff
             .Select(d => new PublicDayOffDto
             {
                 Date = d.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 Reason = d.Reason
             })
-            .ToListAsync();
+            .ToList();
 
         var weeklyHours = barber.WorkingHours
             .OrderBy(w => w.DayOfWeek)
@@ -110,18 +121,28 @@ public class BarbersApiController : ControllerBase
     public async Task<IActionResult> GetSchedule(int id)
     {
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
-            .FirstOrDefaultAsync(b => b.Id == id);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.IsActive);
 
-        if (barber == null || !barber.IsActive || !barber.User.IsActive)
+        if (barber == null)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found or inactive."));
         }
 
-        var weeklyHours = await _dbContext.WorkingHours
+        await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, includeWorkingHours: false);
+
+        if (barber.User == null || !barber.User.IsActive)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found or inactive."));
+        }
+
+        var rawWeeklyHours = await _dbContext.WorkingHours
             .Where(w => w.BarberId == id)
             .OrderBy(w => w.DayOfWeek)
             .ThenBy(w => w.StartTime)
+            .ToListAsync();
+
+        var weeklyHours = rawWeeklyHours
             .Select(w => new PublicWorkingHoursDto
             {
                 DayOfWeek = w.DayOfWeek,
@@ -129,19 +150,22 @@ public class BarbersApiController : ControllerBase
                 StartTime = w.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
                 EndTime = w.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)
             })
-            .ToListAsync();
+            .ToList();
 
         var today = _clock.GetCurrentInstant().InZone(_zone).Date;
-        var upcomingDaysOff = await _dbContext.DaysOff
+        var rawUpcomingDaysOff = await _dbContext.DaysOff
             .Where(d => d.BarberId == id && d.Date >= today)
             .OrderBy(d => d.Date)
             .Take(30)
+            .ToListAsync();
+
+        var upcomingDaysOff = rawUpcomingDaysOff
             .Select(d => new PublicDayOffDto
             {
                 Date = d.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 Reason = d.Reason
             })
-            .ToListAsync();
+            .ToList();
 
         var response = new PublicBarberScheduleDto
         {

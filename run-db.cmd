@@ -1,4 +1,3 @@
 @echo off
-echo [BarberBook] Starting PostgreSQL server...
-"%USERPROFILE%\.pgsql\pgsql\bin\postgres.exe" -D "%USERPROFILE%\.pgsql\data"
-
+echo [BarberBook] Database is hosted on MongoDB Atlas (Cloud).
+echo Using barberbook database cluster.

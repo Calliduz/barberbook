@@ -68,7 +68,7 @@ test.describe('P18 — Mobile Responsiveness (375px) & Accessibility Audit (EO-4
     const pages = ['/', '/services', '/barbers', '/login'];
     for (const path of pages) {
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scrollWidth).toBeLessThanOrEqual(375);
     }

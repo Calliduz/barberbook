@@ -40,7 +40,7 @@ public class ServicesController : Controller
         if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
         var query = _dbContext.Services
-            .Include(s => s.Appointments)
+            .AsNoTracking()
             .AsQueryable();
 
         // Status filter
@@ -64,21 +64,31 @@ public class ServicesController : Controller
 
         var totalCount = await query.CountAsync();
 
-        var services = await query
+        var rawServices = await query
             .OrderBy(s => s.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(s => new AdminServiceItemDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Description = s.Description,
-                Price = s.Price,
-                DurationMinutes = s.DurationMinutes,
-                IsActive = s.IsActive,
-                CompletedBookingsCount = s.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
-            })
             .ToListAsync();
+
+        var serviceIds = rawServices.Select(s => s.Id).ToList();
+        var completedCounts = (await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => serviceIds.Contains(a.ServiceId) && a.Status == AppointmentStatus.Completed)
+            .Select(a => a.ServiceId)
+            .ToListAsync())
+            .GroupBy(id => id)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var services = rawServices.Select(s => new AdminServiceItemDto
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Description = s.Description,
+            Price = s.Price,
+            DurationMinutes = s.DurationMinutes,
+            IsActive = s.IsActive,
+            CompletedBookingsCount = completedCounts.TryGetValue(s.Id, out var cnt) ? cnt : 0
+        }).ToList();
 
         var viewModel = new ServiceListViewModel
         {
@@ -103,7 +113,7 @@ public class ServicesController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var service = await _dbContext.Services
-            .Include(s => s.Appointments)
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (service == null)
@@ -113,6 +123,9 @@ public class ServicesController : Controller
                 : NotFound();
         }
 
+        var completedCount = await _dbContext.Appointments
+            .CountAsync(a => a.ServiceId == id && a.Status == AppointmentStatus.Completed);
+
         var dto = new AdminServiceItemDto
         {
             Id = service.Id,
@@ -121,7 +134,7 @@ public class ServicesController : Controller
             Price = service.Price,
             DurationMinutes = service.DurationMinutes,
             IsActive = service.IsActive,
-            CompletedBookingsCount = service.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
+            CompletedBookingsCount = completedCount
         };
 
         if (IsJsonRequest())

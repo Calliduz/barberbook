@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using FluentValidation;
@@ -55,60 +56,78 @@ public class BarbersController : Controller
         if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
         var query = _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Appointments)
+            .AsNoTracking()
             .AsQueryable();
 
         // Status filter
         if (status.Equals("active", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(b => b.IsActive && b.User.IsActive);
+            var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
+            query = query.Where(b => b.IsActive && activeUserIds.Contains(b.UserId));
         }
         else if (status.Equals("inactive", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(b => !b.IsActive || !b.User.IsActive);
+            var inactiveUserIds = await _dbContext.Users.AsNoTracking().Where(u => !u.IsActive).Select(u => u.Id).ToListAsync();
+            query = query.Where(b => !b.IsActive || inactiveUserIds.Contains(b.UserId));
         }
 
         // Search query
         if (!string.IsNullOrWhiteSpace(q))
         {
             var search = q.Trim().ToLower();
+            var matchingUserIds = await _dbContext.Users.AsNoTracking()
+                .Where(u => u.FullName.ToLower().Contains(search) || (u.Email != null && u.Email.ToLower().Contains(search)))
+                .Select(u => u.Id)
+                .ToListAsync();
+
             query = query.Where(b =>
                 b.DisplayName.ToLower().Contains(search) ||
-                b.User.FullName.ToLower().Contains(search) ||
-                (b.User.Email != null && b.User.Email.ToLower().Contains(search)) ||
+                matchingUserIds.Contains(b.UserId) ||
                 (b.Specialties != null && b.Specialties.ToLower().Contains(search)));
         }
 
         var totalCount = await query.CountAsync();
 
         var branches = await _dbContext.Branches
+            .AsNoTracking()
             .Where(br => br.IsActive)
             .OrderBy(br => br.Name)
             .Select(br => new BranchOptionDto { Id = br.Id, Name = br.Name })
             .ToListAsync();
 
-        var barbers = await query
+        var rawBarbers = await query
             .OrderBy(b => b.DisplayName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(b => new AdminBarberItemDto
-            {
-                Id = b.Id,
-                UserId = b.UserId,
-                FullName = b.User.FullName,
-                Email = b.User.Email ?? string.Empty,
-                DisplayName = b.DisplayName,
-                Bio = b.Bio,
-                PhotoUrl = b.PhotoUrl,
-                Specialties = b.Specialties,
-                BranchId = b.BranchId,
-                BranchName = b.Branch != null ? b.Branch.Name : null,
-                CommissionRate = b.CommissionRate,
-                IsActive = b.IsActive && b.User.IsActive,
-                CompletedAppointmentsCount = b.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
-            })
             .ToListAsync();
+
+        await _dbContext.HydrateBarbersAsync(rawBarbers, includeUser: true, includeBranch: true);
+
+        var barberIds = rawBarbers.Select(b => b.Id).ToList();
+        var completedCounts = (await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => barberIds.Contains(a.BarberId) && a.Status == AppointmentStatus.Completed)
+            .Select(a => a.BarberId)
+            .ToListAsync())
+            .GroupBy(id => id)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var barbers = rawBarbers.Select(b => new AdminBarberItemDto
+        {
+            Id = b.Id,
+            UserId = b.UserId,
+            FullName = b.User?.FullName ?? string.Empty,
+            Email = b.User?.Email ?? string.Empty,
+            DisplayName = b.DisplayName,
+            Bio = b.Bio,
+            PhotoUrl = b.PhotoUrl,
+            Specialties = b.Specialties,
+            BranchId = b.BranchId,
+            BranchName = b.Branch != null ? b.Branch.Name : null,
+            CommissionRate = b.CommissionRate,
+            IsActive = b.IsActive && (b.User?.IsActive ?? false),
+            CompletedAppointmentsCount = completedCounts.TryGetValue(b.Id, out var cnt) ? cnt : 0
+        }).ToList();
 
         var viewModel = new BarberListViewModel
         {
@@ -134,8 +153,7 @@ public class BarbersController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Appointments)
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (barber == null)
@@ -145,18 +163,26 @@ public class BarbersController : Controller
                 : NotFound();
         }
 
+        await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: true);
+
+        var completedCount = await _dbContext.Appointments
+            .CountAsync(a => a.BarberId == id && a.Status == AppointmentStatus.Completed);
+
         var dto = new AdminBarberItemDto
         {
             Id = barber.Id,
             UserId = barber.UserId,
-            FullName = barber.User.FullName,
-            Email = barber.User.Email ?? string.Empty,
+            FullName = barber.User?.FullName ?? string.Empty,
+            Email = barber.User?.Email ?? string.Empty,
             DisplayName = barber.DisplayName,
             Bio = barber.Bio,
             PhotoUrl = barber.PhotoUrl,
             Specialties = barber.Specialties,
-            IsActive = barber.IsActive && barber.User.IsActive,
-            CompletedAppointmentsCount = barber.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
+            BranchId = barber.BranchId,
+            BranchName = barber.Branch != null ? barber.Branch.Name : null,
+            CommissionRate = barber.CommissionRate,
+            IsActive = barber.IsActive && (barber.User?.IsActive ?? false),
+            CompletedAppointmentsCount = completedCount
         };
 
         if (IsJsonRequest())
@@ -397,7 +423,6 @@ public class BarbersController : Controller
 
         // 2. Find barber
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (barber == null)
@@ -406,6 +431,9 @@ public class BarbersController : Controller
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found."))
                 : NotFound();
         }
+
+        var barberUser = await _userManager.FindByIdAsync(barber.UserId.ToString());
+        if (barberUser != null) barber.User = barberUser;
 
         // 3. Update barber & user details
         barber.DisplayName = request.DisplayName.Trim();
@@ -470,7 +498,6 @@ public class BarbersController : Controller
         }
 
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (barber == null)
@@ -479,6 +506,13 @@ public class BarbersController : Controller
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found."))
                 : NotFound();
         }
+
+        var barberUser = await _userManager.FindByIdAsync(barber.UserId.ToString());
+        if (barberUser == null)
+        {
+            return NotFound(new ApiErrorResponse("NOT_FOUND", "User account not found."));
+        }
+        barber.User = barberUser;
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(barber.User);
         var result = await _userManager.ResetPasswordAsync(barber.User, token, request.NewPassword);
@@ -509,7 +543,6 @@ public class BarbersController : Controller
     public async Task<IActionResult> ToggleStatus(int id)
     {
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (barber == null)
@@ -519,10 +552,12 @@ public class BarbersController : Controller
                 : NotFound();
         }
 
+        var barberUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == barber.UserId);
+
         // Toggle both barber profile and user account
         var newStatus = !barber.IsActive;
         barber.IsActive = newStatus;
-        barber.User.IsActive = newStatus;
+        if (barberUser != null) barberUser.IsActive = newStatus;
 
         await _dbContext.SaveChangesAsync();
 

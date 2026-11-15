@@ -42,8 +42,8 @@ test.describe('FL-A — Admin Operations End-to-End Flow', () => {
     });
     expect(createRes.status()).toBe(201);
 
-    // Reload page to verify created barber is in the table
-    await page.reload();
+    // Navigate with search query to verify created barber is in the table regardless of page count
+    await page.goto(`/admin/barbers?q=${encodeURIComponent(barberName)}`);
     await page.waitForLoadState('networkidle');
     await expect(page.locator('body')).toContainText(barberName);
 
