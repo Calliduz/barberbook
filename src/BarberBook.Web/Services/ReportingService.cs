@@ -48,8 +48,8 @@ public class ReportingService : IReportingService
                 AppointmentId = a.Id,
                 ReferenceCode = a.ReferenceCode,
                 Time = zonedTime.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                Customer = a.Customer.FullName,
-                Barber = a.Barber.DisplayName,
+                Customer = a.Customer?.FullName ?? "Walk-in Guest",
+                Barber = a.Barber?.DisplayName ?? "Staff",
                 Service = a.ServiceName,
                 Amount = a.Price,
                 FormattedAmount = FormattingHelpers.FormatPeso(a.Price)
@@ -72,7 +72,7 @@ public class ReportingService : IReportingService
             .ToList();
 
         var byBarber = appointments
-            .GroupBy(a => a.Barber.DisplayName)
+            .GroupBy(a => a.Barber?.DisplayName ?? "Staff")
             .Select(g => new GroupSalesBreakdownDto
             {
                 Name = g.Key,
@@ -258,7 +258,7 @@ public class ReportingService : IReportingService
             .ToList();
 
         var byBarber = appointments
-            .GroupBy(a => a.Barber.DisplayName)
+            .GroupBy(a => a.Barber?.DisplayName ?? "Staff")
             .Select(g => new GroupSalesBreakdownDto
             {
                 Name = g.Key,
@@ -352,7 +352,7 @@ public class ReportingService : IReportingService
                 DateFormatted = zoned.Date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
                 TimeFormatted = zoned.ToString("h:mm tt", CultureInfo.InvariantCulture),
                 Service = a.ServiceName,
-                Barber = a.Barber.DisplayName,
+                Barber = a.Barber?.DisplayName ?? "Staff",
                 Status = "Completed",
                 Amount = a.Price,
                 FormattedAmount = FormattingHelpers.FormatPeso(a.Price)
@@ -420,7 +420,7 @@ public class ReportingService : IReportingService
                 Date = zoned.Date,
                 DateFormatted = zoned.Date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
                 TimeFormatted = zoned.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                Customer = a.Customer.FullName,
+                Customer = a.Customer?.FullName ?? "Walk-in Guest",
                 Service = a.ServiceName,
                 Amount = a.Price,
                 FormattedAmount = FormattingHelpers.FormatPeso(a.Price),

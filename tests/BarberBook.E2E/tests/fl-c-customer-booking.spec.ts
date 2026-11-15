@@ -68,5 +68,66 @@ test.describe('FL-C — Customer End-to-End Booking Flow', () => {
     }
   });
 
+  test('User_Can_Sign_Out_Via_Profile_Menu', async ({ page }) => {
+    // 1. Log in as Juan
+    await page.goto('/login');
+    await page.fill('input[name="Email"]', 'juan@barberbook.local');
+    await page.fill('input[name="Password"]', 'Demo@BarberBook2026!');
+    await page.click('button[type="submit"]');
+    await page.waitForLoadState('networkidle');
+
+    // 2. Click avatar profile button to open dropdown
+    const profileBtn = page.locator('#user-profile-btn');
+    await expect(profileBtn).toBeVisible();
+    await profileBtn.click();
+
+    // 3. Click Sign Out button
+    const signOutBtn = page.locator('#btn-sign-out');
+    await expect(signOutBtn).toBeVisible();
+    await signOutBtn.click();
+
+    // 4. Handle confirmation modal
+    const confirmModalProceed = page.locator('#confirm-dialog-proceed-btn');
+    await expect(confirmModalProceed).toBeVisible({ timeout: 3000 });
+    await confirmModalProceed.click();
+
+    // 5. Verify user is redirected and signed out (login link visible)
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('a[href="/login"]').first()).toBeVisible();
+  });
+
+  test('User_Can_Cancel_Sign_Out_Via_Confirmation_Modal', async ({ page }) => {
+    // 1. Log in as Juan
+    await page.goto('/login');
+    await page.fill('input[name="Email"]', 'juan@barberbook.local');
+    await page.fill('input[name="Password"]', 'Demo@BarberBook2026!');
+    await page.click('button[type="submit"]');
+    await page.waitForLoadState('networkidle');
+
+    // 2. Click avatar profile button
+    const profileBtn = page.locator('#user-profile-btn');
+    await expect(profileBtn).toBeVisible();
+    await profileBtn.click();
+
+    // 3. Click Sign Out button
+    const signOutBtn = page.locator('#btn-sign-out');
+    await expect(signOutBtn).toBeVisible();
+    await signOutBtn.click();
+
+    // 4. Confirmation modal should be visible
+    const dialog = page.locator('#barberbook-confirm-dialog');
+    await expect(dialog).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('#confirm-dialog-title')).toContainText('Sign Out');
+
+    // 5. Click Cancel
+    const cancelBtn = page.locator('#confirm-dialog-cancel-btn');
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+
+    // 6. Dialog hides, user remains logged in
+    await expect(dialog).toBeHidden({ timeout: 2000 });
+    await expect(page.locator('#user-profile-btn')).toBeVisible();
+  });
+
 });
 

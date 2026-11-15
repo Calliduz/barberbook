@@ -111,7 +111,11 @@
                                 </button>
                                 <form method="post" action="/admin/inventory/equipment/@a.EquipmentId/return" class="inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="py-1 px-3 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                    <button type="submit"
+                                            data-confirm="Are you sure you want to return '@a.EquipmentName' to storage? It will be marked available in the central inventory pool."
+                                            data-confirm-title="Return Equipment to Storage"
+                                            data-confirm-button="Return to Storage"
+                                            class="py-1 px-3 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
                                         Return to Storage
                                     </button>
                                 </form>

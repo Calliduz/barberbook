@@ -41,6 +41,7 @@
             bool isServices = currentPath.StartsWith("/services");
             bool isBarbers = currentPath.StartsWith("/barbers");
             bool isProducts = currentPath.StartsWith("/products");
+            bool isBranches = currentPath.StartsWith("/branches");
             bool isBooking = currentPath.StartsWith("/book");
             bool isMyAppts = currentPath.StartsWith("/my-appointments");
             bool isProfile = currentPath.StartsWith("/profile");
@@ -65,6 +66,7 @@
                         <a href="/services" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isServices ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Services</a>
                         <a href="/products" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isProducts ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Grooming Products</a>
                         <a href="/barbers" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isBarbers ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Master Barbers</a>
+                        <a href="/branches" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isBranches ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Branches</a>
                         <a href="/book" class="ml-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold bg-brand-500 text-slate-950 shadow-md hover:bg-brand-400 transition transform hover:-translate-y-0.5 whitespace-nowrap">
                             Book Appointment
                         </a>
@@ -120,6 +122,7 @@
             <a href="/" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isHome ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Home</a>
             <a href="/services" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isServices ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Services Menu</a>
             <a href="/barbers" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isBarbers ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Master Barbers</a>
+            <a href="/branches" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isBranches ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Shop Branches</a>
             <a href="/book" class="block px-3.5 py-2.5 rounded-xl text-sm font-bold bg-amber-500 text-slate-950 text-center shadow-md hover:bg-amber-400 transition">
                 Book Appointment
             </a>
@@ -128,6 +131,18 @@
                 <div class="pt-2 border-t border-slate-800 space-y-1">
                     <a href="/my-appointments" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isMyAppts ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">My Appointments</a>
                     <a href="/profile" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isProfile ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Profile</a>
+                    <form action="/logout" method="post" class="pt-1 m-0" data-no-double-submit="true">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                data-confirm="Are you sure you want to sign out of BarberBook?"
+                                data-confirm-title="Sign Out"
+                                data-confirm-button="Sign Out"
+                                data-confirm-destructive="true"
+                                class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-950/30 transition flex items-center gap-2">
+                            <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                            <span>Sign Out</span>
+                        </button>
+                    </form>
                 </div>
             }
             else if (User.Identity?.IsAuthenticated != true)
@@ -229,6 +244,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Global CSRF Token for Dynamic Forms & Modals -->
+    @Html.AntiForgeryToken()
 
     <!-- Shared Accessible Toast & Confirm Modal Components -->
     <partial name="_Toast" />

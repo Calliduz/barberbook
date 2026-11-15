@@ -96,9 +96,9 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                CustomerPhone = a.Customer.PhoneNumber,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = a.Customer?.PhoneNumber,
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -140,7 +140,7 @@ public class DashboardController : Controller
                         Id = a.Id,
                         ReferenceCode = a.ReferenceCode,
                         TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                        CustomerName = a.Customer.FullName,
+                        CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
                         ServiceName = a.ServiceName,
                         Status = a.Status,
                         StatusString = a.Status.ToString(),
@@ -173,8 +173,8 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -195,6 +195,55 @@ public class DashboardController : Controller
         // 8. Low-stock products alert (HW-1, INV-05)
         var products = await _inventoryService.GetProductsAsync(includeInactive: false);
         var lowStock = products.Where(p => p.IsLowStock).ToList();
+
+        // 9. Visual Analytics & Trends: Past 7 Days Cuts vs Products Sales
+        var recentDailySales = new List<AdminDashboardDailySalesPointDto>();
+        for (int i = 6; i >= 0; i--)
+        {
+            var dayDate = today.PlusDays(-i);
+            var dayReport = await _reportingService.GetDailySalesAsync(dayDate);
+            recentDailySales.Add(new AdminDashboardDailySalesPointDto
+            {
+                DateLabel = dayDate.ToString("MMM d", CultureInfo.InvariantCulture),
+                DayName = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
+                ServiceSales = dayReport.TotalSales,
+                ProductSales = dayReport.ProductSales.Total,
+                GrandTotal = dayReport.GrandTotal,
+                FormattedServiceSales = dayReport.FormattedTotalSales,
+                FormattedProductSales = dayReport.ProductSales.FormattedTotal,
+                FormattedGrandTotal = dayReport.FormattedGrandTotal,
+                CompletedCutsCount = dayReport.CompletedCount,
+                ProductItemsSold = dayReport.ProductSales.PerProduct.Sum(x => x.Count)
+            });
+        }
+
+        // 10. Multi-Branch Operations Overview
+        var branchesRaw = await _dbContext.Branches.AsNoTracking().ToListAsync();
+        var allBarbers = await _dbContext.Barbers.AsNoTracking().ToListAsync();
+        var allCompletedAppts = await _dbContext.Appointments.AsNoTracking()
+            .Where(a => a.Status == AppointmentStatus.Completed)
+            .Select(a => new { a.Id, a.BarberId, a.BranchId })
+            .ToListAsync();
+
+        var branchesOverview = branchesRaw.Select(br =>
+        {
+            var bBarberIds = allBarbers.Where(b => b.BranchId == br.Id).Select(b => b.Id).ToList();
+            var cutsCount = allCompletedAppts.Count(a => a.BranchId == br.Id || (a.BranchId == null && bBarberIds.Contains(a.BarberId)));
+            var openTimeStr = br.OpeningTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+            var closeTimeStr = br.ClosingTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+
+            return new AdminDashboardBranchSummaryDto
+            {
+                Id = br.Id,
+                Name = br.Name,
+                Address = br.Address,
+                PhoneNumber = br.PhoneNumber ?? "0917-000-0000",
+                OpeningHours = $"{openTimeStr} – {closeTimeStr}",
+                ActiveBarbersCount = allBarbers.Count(b => b.BranchId == br.Id && b.IsActive),
+                CompletedCutsCount = cutsCount,
+                IsActive = br.IsActive
+            };
+        }).OrderByDescending(b => b.IsActive).ThenBy(b => b.Name).ToList();
 
         var model = new AdminDashboardViewModel
         {
@@ -220,7 +269,9 @@ public class DashboardController : Controller
             TotalPendingBookingsCount = totalPendingCount,
             PendingBookings = pendingBookings,
             TodayAppointmentsByBarber = todayByBarber,
-            RecentAppointments = recentAppts
+            RecentAppointments = recentAppts,
+            RecentDailySales = recentDailySales,
+            BranchesOverview = branchesOverview
         };
 
         return View(model);
@@ -278,9 +329,9 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                CustomerPhone = a.Customer.PhoneNumber,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = a.Customer?.PhoneNumber,
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -322,7 +373,7 @@ public class DashboardController : Controller
                         Id = a.Id,
                         ReferenceCode = a.ReferenceCode,
                         TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                        CustomerName = a.Customer.FullName,
+                        CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
                         ServiceName = a.ServiceName,
                         Status = a.Status,
                         StatusString = a.Status.ToString(),

@@ -50,6 +50,10 @@
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
             <span>Customer Records</span>
         </a>
+        <a href="/admin/branches" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+            <span>Branches & Locations</span>
+        </a>
         <a href="/admin/schedules" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <span>Shop Hours</span>
@@ -130,6 +134,216 @@
                 <span class="text-xs text-slate-500 font-medium">appointments</span>
             </div>
             <p class="mt-2 text-xs text-slate-500">@Model.TodayCounts.Confirmed confirmed &bull; @Model.TodayCounts.Pending pending</p>
+        </div>
+    </div>
+
+    <!-- REVENUE ANALYTICS & TRENDS: CUTS (SERVICES) VS. PRODUCTS (RETAIL) -->
+    <div class="bg-white/95 rounded-3xl border border-amber-900/10 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div>
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                    <span>VISUAL REVENUE ANALYTICS & TRENDS</span>
+                </div>
+                <h2 class="text-2xl font-serif font-black text-slate-900 tracking-tight">Cuts (Service Sales) vs. Product Sales</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Comparative 7-day revenue stream and month-to-date category distribution.</p>
+            </div>
+            <!-- Legend & Reports Link -->
+            <div class="flex flex-wrap items-center gap-4 text-xs font-bold">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3.5 h-3.5 rounded bg-amber-500 inline-block shadow-2xs"></span>
+                    <span class="text-slate-800">✂ Cuts & Services</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shadow-2xs"></span>
+                    <span class="text-slate-800">🧴 Grooming Products</span>
+                </div>
+                <a href="/admin/reports?tab=monthly" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 transition flex items-center gap-1">
+                    <span>Full Journal</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+            <!-- 7-Day Grouped Bar Chart (8 Columns) -->
+            <div class="lg:col-span-8 space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+                    <span>Past 7 Days (Asia/Manila)</span>
+                    <span>Daily In-Shop Settlement</span>
+                </div>
+
+                @{
+                    var maxGraphSales = Model.RecentDailySales.Any() ? Model.RecentDailySales.Max(d => Math.Max(d.ServiceSales, d.ProductSales)) : 0m;
+                    if (maxGraphSales <= 0) maxGraphSales = 1000m;
+                }
+
+                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200">
+                    <div class="flex items-end justify-between gap-2 sm:gap-4 h-48 pt-6 border-b border-slate-200 pb-2">
+                        @foreach (var pt in Model.RecentDailySales)
+                        {
+                            var cutsHeightPct = Math.Min(100, (int)Math.Round((pt.ServiceSales / maxGraphSales) * 100));
+                            var prodHeightPct = Math.Min(100, (int)Math.Round((pt.ProductSales / maxGraphSales) * 100));
+
+                            <div class="flex-1 flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@(DateTime.UtcNow.ToString("yyyy-MM-dd"))'">
+                                <!-- Value Pill for Day Total -->
+                                <div class="mb-1 text-[10px] font-bold font-mono text-slate-700 opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all">
+                                    @(pt.GrandTotal > 0 ? pt.FormattedGrandTotal : "₱0")
+                                </div>
+
+                                <!-- Paired Bars Container -->
+                                <div class="w-full flex items-end justify-center gap-1 h-36">
+                                    <!-- Cuts Bar (Amber) -->
+                                    <div class="w-1/2 max-w-[20px] bg-amber-500 hover:bg-amber-600 rounded-t transition-all relative" style="height: @(Math.Max(cutsHeightPct, 4))%;"></div>
+                                    <!-- Products Bar (Emerald) -->
+                                    <div class="w-1/2 max-w-[20px] bg-emerald-500 hover:bg-emerald-600 rounded-t transition-all relative" style="height: @(Math.Max(prodHeightPct, 4))%;"></div>
+                                </div>
+
+                                <!-- Day Label -->
+                                <div class="mt-2 text-center">
+                                    <span class="block text-[11px] font-bold text-slate-800">@pt.DayName</span>
+                                    <span class="block text-[9px] text-slate-400 font-medium">@pt.DateLabel</span>
+                                </div>
+
+                                <!-- Interactive Hover Tooltip -->
+                                <div class="absolute bottom-full mb-3 hidden group-hover:flex flex-col items-center z-20 whitespace-nowrap pointer-events-none">
+                                    <div class="bg-slate-900 text-white text-[11px] rounded-xl px-3 py-2 shadow-xl border border-slate-700 space-y-1">
+                                        <div class="font-bold border-b border-slate-700 pb-1 text-slate-300">@pt.DateLabel (@pt.DayName)</div>
+                                        <div class="flex items-center justify-between gap-3 text-amber-300">
+                                            <span>✂ Cuts Sales:</span>
+                                            <span class="font-bold font-mono">@pt.FormattedServiceSales</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 pl-4">@pt.CompletedCutsCount completed cuts</div>
+                                        <div class="flex items-center justify-between gap-3 text-emerald-300">
+                                            <span>🧴 Products:</span>
+                                            <span class="font-bold font-mono">@pt.FormattedProductSales</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 pl-4">@pt.ProductItemsSold unit(s) sold</div>
+                                        <div class="border-t border-slate-700 pt-1 font-bold text-white flex items-center justify-between gap-3">
+                                            <span>Day Total:</span>
+                                            <span class="font-mono text-amber-400">@pt.FormattedGrandTotal</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-2 h-2 bg-slate-900 rotate-45 -mt-1"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Split & Performance Gauge (4 Columns) -->
+            <div class="lg:col-span-4 bg-slate-50/80 rounded-2xl p-5 border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Month-to-Date Mix</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">REVENUE SHARE</span>
+                </div>
+
+                @{
+                    var mtdGrand = Model.MonthToDateGrandTotal > 0 ? Model.MonthToDateGrandTotal : 1m;
+                    var cutsSharePct = (int)Math.Round((Model.MonthToDateCompletedSales / mtdGrand) * 100);
+                    var prodSharePct = 100 - cutsSharePct;
+                }
+
+                <!-- Segmented Revenue Bar -->
+                <div class="space-y-1.5">
+                    <div class="h-4 w-full bg-slate-200 rounded-full overflow-hidden flex shadow-inner">
+                        <div class="bg-amber-500 h-full transition-all" style="width: @cutsSharePct%;" title="Cuts: @cutsSharePct%"></div>
+                        <div class="bg-emerald-500 h-full transition-all" style="width: @prodSharePct%;" title="Products: @prodSharePct%"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                        <span class="text-amber-800">✂ Cuts @cutsSharePct%</span>
+                        <span class="text-emerald-800">🧴 Products @prodSharePct%</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown Rows -->
+                <div class="space-y-2 pt-2 border-t border-slate-200 text-xs">
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="font-bold text-slate-800">Cuts & Services</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-900">@Model.FormattedMonthToDateCompletedSales</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-slate-800">Retail Grooming</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-900">@Model.FormattedMonthToDateProductSales</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 text-white font-bold">
+                        <span>Total Month Revenue</span>
+                        <span class="font-mono text-amber-400 text-sm">@Model.FormattedMonthToDateGrandTotal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRANCH NETWORK & WORKSTATIONS OVERVIEW -->
+    <div class="bg-white/95 rounded-3xl border border-amber-900/10 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div>
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    <span>METRO MANILA SHOP LOCATIONS</span>
+                </div>
+                <h2 class="text-2xl font-serif font-black text-slate-900 tracking-tight">Active Branches & Workstations</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Physical barbershop locations, assigned staff capacity, and completed visits.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/branches" target="_blank" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                    <span>Public View</span>
+                </a>
+                <a href="/admin/branches" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-2xs flex items-center gap-1.5">
+                    <span>Manage All Branches</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach (var br in Model.BranchesOverview)
+            {
+                <div class="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 hover:border-amber-400/80 hover:shadow-md transition space-y-3.5">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <h3 class="font-serif font-bold text-slate-900 text-base">@br.Name</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                                <span>@br.Address</span>
+                            </p>
+                        </div>
+                        @if (br.IsActive)
+                        {
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Inactive</span>
+                        }
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/80 text-xs">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Master Barbers</span>
+                            <span class="font-serif font-bold text-slate-900 text-sm">@br.ActiveBarbersCount On Duty</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Completed Cuts</span>
+                            <span class="font-serif font-bold text-amber-700 text-sm">@br.CompletedCutsCount visits</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                        <span class="font-medium">⏰ @br.OpeningHours</span>
+                        <a href="/admin/branches?q=@Uri.EscapeDataString(br.Name)" class="font-bold text-amber-800 hover:text-amber-900 hover:underline">Edit Branch &rarr;</a>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 
@@ -251,10 +465,15 @@
                                         </form>
 
                                         <!-- Inline Reject Button (Softer tinted/outline style that fills on hover) -->
-                                        <form method="post" action="/admin/appointments/@pending.Id/status" class="inline" onsubmit="return confirm('Reject booking #@pending.ReferenceCode?');">
+                                        <form method="post" action="/admin/appointments/@pending.Id/status" class="inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="to" value="rejected" />
                                             <input type="hidden" name="note" value="Rejected via dashboard action" />
                                             <button type="submit"
+                                                    data-confirm="Are you sure you want to reject booking #@pending.ReferenceCode? The customer will be informed and the time slot will be reopened."
+                                                    data-confirm-title="Reject Booking"
+                                                    data-confirm-button="Reject"
+                                                    data-confirm-destructive="true"
                                                     class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-300 transition flex items-center gap-1 shadow-2xs">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                                 <span>Reject</span>
@@ -323,10 +542,15 @@
                             </form>
 
                             <!-- Inline Reject Button -->
-                            <form method="post" action="/admin/appointments/@pending.Id/status" class="flex-1" onsubmit="return confirm('Reject booking #@pending.ReferenceCode?');">
+                            <form method="post" action="/admin/appointments/@pending.Id/status" class="flex-1">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" name="to" value="rejected" />
                                 <input type="hidden" name="note" value="Rejected via admin dashboard one-click action" />
                                 <button type="submit"
+                                        data-confirm="Are you sure you want to reject booking #@pending.ReferenceCode? The customer will be informed and the time slot will be reopened."
+                                        data-confirm-title="Reject Booking"
+                                        data-confirm-button="Reject"
+                                        data-confirm-destructive="true"
                                         class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-sm transition flex items-center justify-center gap-1.5 active:scale-[0.98]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                     <span>Reject</span>

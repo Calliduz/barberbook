@@ -153,6 +153,52 @@ public class HomeController : Controller
         return View(barber);
     }
 
+    [HttpGet("branches")]
+    [HttpGet("api/branches")]
+    public async Task<IActionResult> Branches()
+    {
+        var branches = await _dbContext.Branches
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.Name)
+            .ToListAsync();
+
+        var activeBarbers = await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+        await _dbContext.HydrateBarbersAsync(activeBarbers, includeUser: true, includeBranch: false, includeWorkingHours: true);
+
+        foreach (var br in branches)
+        {
+            br.Barbers = activeBarbers.Where(b => b.BranchId == br.Id).ToList();
+        }
+
+        if (IsJsonRequest())
+        {
+            return Ok(branches.Select(b => new
+            {
+                b.Id,
+                b.Name,
+                b.Address,
+                b.PhoneNumber,
+                OpeningTime = b.OpeningTime.ToString("h:mm tt", null),
+                ClosingTime = b.ClosingTime.ToString("h:mm tt", null),
+                b.IsActive,
+                Barbers = b.Barbers.Select(barber => new
+                {
+                    barber.Id,
+                    barber.DisplayName,
+                    barber.Specialties,
+                    barber.PhotoUrl
+                })
+            }));
+        }
+
+        return View(branches);
+    }
+
     [HttpGet("products")]
     [HttpGet("api/products")]
     public async Task<IActionResult> Products([FromQuery] string? category = null, [FromQuery] string? search = null)

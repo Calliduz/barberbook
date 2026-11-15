@@ -40,6 +40,38 @@ public class AdminDashboardViewModel
     // Live recent activity
     public List<AdminDashboardAppointmentItem> RecentAppointments { get; set; } = new();
     public List<AdminDashboardBarberItem> Barbers { get; set; } = new();
+
+    // Visual Analytics & Trends: Cuts vs Products Sales (Past 7 Days)
+    public List<AdminDashboardDailySalesPointDto> RecentDailySales { get; set; } = new();
+
+    // Branch Network & Overview
+    public List<AdminDashboardBranchSummaryDto> BranchesOverview { get; set; } = new();
+}
+
+public class AdminDashboardDailySalesPointDto
+{
+    public string DateLabel { get; set; } = string.Empty;
+    public string DayName { get; set; } = string.Empty;
+    public decimal ServiceSales { get; set; }
+    public decimal ProductSales { get; set; }
+    public decimal GrandTotal { get; set; }
+    public string FormattedServiceSales { get; set; } = "₱0.00";
+    public string FormattedProductSales { get; set; } = "₱0.00";
+    public string FormattedGrandTotal { get; set; } = "₱0.00";
+    public int CompletedCutsCount { get; set; }
+    public int ProductItemsSold { get; set; }
+}
+
+public class AdminDashboardBranchSummaryDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string OpeningHours { get; set; } = string.Empty;
+    public int ActiveBarbersCount { get; set; }
+    public int CompletedCutsCount { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public class AdminDashboardAppointmentItem

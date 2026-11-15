@@ -144,10 +144,14 @@
                 }
             });
 
-            // Declarative data-confirm handler for buttons, links, and forms
+            // Declarative data-confirm handler for buttons and links
             document.addEventListener('click', async (e) => {
                 const trigger = e.target.closest('[data-confirm]');
                 if (!trigger) return;
+
+                // Forms with data-confirm should be handled by the 'submit' event listener,
+                // not on click (otherwise clicking on an input or label inside the form would trigger the modal)
+                if (trigger.tagName === 'FORM') return;
 
                 // If already confirmed by this handler, permit natural execution
                 if (trigger.dataset.confirmedByModal === 'true') {
@@ -176,11 +180,11 @@
                     trigger.dataset.confirmedByModal = 'true';
                     if (trigger.tagName === 'A' && trigger.href) {
                         window.location.href = trigger.href;
-                    } else if (trigger.type === 'submit' || trigger.tagName === 'BUTTON') {
+                    } else if (trigger.type === 'submit' || (trigger.tagName === 'BUTTON' && trigger.type !== 'button')) {
                         const form = trigger.closest('form');
                         if (form) {
-                            // If form has a submit button, dispatch or submit
-                            form.requestSubmit ? form.requestSubmit(trigger) : form.submit();
+                            form.dataset.confirmedByModal = 'true';
+                            form.requestSubmit ? form.requestSubmit(trigger) : HTMLFormElement.prototype.submit.call(form);
                         } else {
                             trigger.click();
                         }

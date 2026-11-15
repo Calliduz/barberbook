@@ -40,6 +40,7 @@ public class AppointmentsApiController : ControllerBase
     }
 
     [Authorize(Roles = "Customer")]
+    [HttpGet("mine")]
     [HttpGet("~/api/me/appointments")]
     public async Task<IActionResult> GetMyAppointments(
         [FromQuery] string? scope,
@@ -552,8 +553,9 @@ public class AppointmentsApiController : ControllerBase
                 .Where(w => w.BarberId == appointment.BarberId && w.DayOfWeek == dow)
                 .ToListAsync(cancellationToken);
 
+            int durationMinutes = appointment.Service?.DurationMinutes ?? (int)(appointment.EndsAt - appointment.StartsAt).TotalMinutes;
             int startMin = timeOfDay.Hour * 60 + timeOfDay.Minute;
-            int endMin = startMin + appointment.Service.DurationMinutes;
+            int endMin = startMin + durationMinutes;
 
             bool fitsInsideRange = workingRanges.Any(range =>
             {
@@ -572,7 +574,7 @@ public class AppointmentsApiController : ControllerBase
             }
 
             // 5. Check slot collision (ignoring this appointment itself via ignoreAppointmentId)
-            var newEndsAt = newStartsAtInstant.Plus(Duration.FromMinutes(appointment.Service.DurationMinutes));
+            var newEndsAt = newStartsAtInstant.Plus(Duration.FromMinutes(durationMinutes));
 
             var slotTaken = await _dbContext.Appointments.AnyAsync(
                 a => a.BarberId == appointment.BarberId &&
@@ -623,9 +625,9 @@ public class AppointmentsApiController : ControllerBase
                 Id = appointment.Id,
                 ReferenceCode = appointment.ReferenceCode,
                 CustomerId = customerId,
-                CustomerName = appointment.Customer.FullName,
-                CustomerPhone = appointment.Customer.PhoneNumber ?? string.Empty,
-                CustomerEmail = appointment.Customer.Email ?? string.Empty,
+                CustomerName = appointment.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = appointment.Customer?.PhoneNumber ?? string.Empty,
+                CustomerEmail = appointment.Customer?.Email ?? string.Empty,
                 BarberId = barber.Id,
                 BarberName = barber.DisplayName,
                 ServiceId = appointment.ServiceId,
@@ -634,7 +636,7 @@ public class AppointmentsApiController : ControllerBase
                 FormattedPrice = FormattingHelpers.FormatPeso(appointment.Price),
                 StartsAt = appointment.StartsAt.ToString(),
                 EndsAt = appointment.EndsAt.ToString(),
-                DurationMinutes = appointment.Service.DurationMinutes,
+                DurationMinutes = durationMinutes,
                 FormattedDate = FormattingHelpers.FormatDate(appointment.StartsAt),
                 FormattedTime = $"{FormattingHelpers.FormatTime12h(startsAtManila.TimeOfDay)} – {FormattingHelpers.FormatTime12h(endsAtManila.TimeOfDay)}",
                 Status = appointment.Status.ToString().ToLowerInvariant(),
@@ -679,7 +681,7 @@ public class AppointmentsApiController : ControllerBase
         }
 
         bool isAdmin = User.IsInRole("Admin");
-        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber.UserId == currentUserId;
+        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber?.UserId == currentUserId;
         bool isOwnerCustomer = User.IsInRole("Customer") && app.CustomerId == currentUserId;
 
         if (!isAdmin && !isAssignedBarber && !isOwnerCustomer)
@@ -708,11 +710,11 @@ public class AppointmentsApiController : ControllerBase
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
             CustomerId = app.CustomerId,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
-            CustomerEmail = app.Customer.Email ?? string.Empty,
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? string.Empty,
+            CustomerEmail = app.Customer?.Email ?? string.Empty,
             BarberId = app.BarberId,
-            BarberName = app.Barber.DisplayName,
+            BarberName = app.Barber?.DisplayName ?? "Staff",
             ServiceId = app.ServiceId,
             ServiceName = app.ServiceName,
             Price = app.Price,
@@ -754,7 +756,7 @@ public class AppointmentsApiController : ControllerBase
         }
 
         bool isAdmin = User.IsInRole("Admin");
-        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber.UserId == currentUserId;
+        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber?.UserId == currentUserId;
         bool isOwnerCustomer = User.IsInRole("Customer") && app.CustomerId == currentUserId;
 
         if (!isAdmin && !isAssignedBarber && !isOwnerCustomer)
@@ -783,11 +785,11 @@ public class AppointmentsApiController : ControllerBase
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
             CustomerId = app.CustomerId,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
-            CustomerEmail = app.Customer.Email ?? string.Empty,
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? string.Empty,
+            CustomerEmail = app.Customer?.Email ?? string.Empty,
             BarberId = app.BarberId,
-            BarberName = app.Barber.DisplayName,
+            BarberName = app.Barber?.DisplayName ?? "Staff",
             ServiceId = app.ServiceId,
             ServiceName = app.ServiceName,
             Price = app.Price,

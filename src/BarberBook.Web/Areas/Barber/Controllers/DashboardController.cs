@@ -748,9 +748,9 @@ public class DashboardController : Controller
         {
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? "No phone provided",
-            CustomerEmail = app.Customer.Email ?? "No email provided",
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? "No phone provided",
+            CustomerEmail = app.Customer?.Email ?? "No email provided",
             ServiceName = app.ServiceName,
             Price = app.Price,
             FormattedPrice = FormattingHelpers.FormatPeso(app.Price),

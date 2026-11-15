@@ -94,6 +94,29 @@
                 </div>
             </div>
 
+            <!-- Daily Revenue Split Visual Bar (Cuts vs Products) -->
+            @{
+                var dailyGrand = Model.DailyReport.GrandTotal > 0 ? Model.DailyReport.GrandTotal : 1m;
+                var dailyCutsPct = (int)Math.Round((Model.DailyReport.TotalSales / dailyGrand) * 100);
+                var dailyProdPct = 100 - dailyCutsPct;
+            }
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold">
+                    <span class="text-amber-800 flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-amber-500 inline-block"></span>
+                        <span>Cuts & Services: @Model.DailyReport.FormattedTotalSales (@dailyCutsPct%)</span>
+                    </span>
+                    <span class="text-emerald-800 flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span>
+                        <span>Retail Products: @Model.DailyReport.ProductSales.FormattedTotal (@dailyProdPct%)</span>
+                    </span>
+                </div>
+                <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                    <div class="bg-amber-500 h-full transition-all" style="width: @dailyCutsPct%;"></div>
+                    <div class="bg-emerald-500 h-full transition-all" style="width: @dailyProdPct%;"></div>
+                </div>
+            </div>
+
             <!-- Daily Journal Table matching paper sample: No., Time, Customer, Barber, Service, Amount -->
             <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -314,32 +337,67 @@
                 </div>
             </div>
 
-            <!-- Visual Bar Chart (Income at a glance) -->
+            <!-- Visual Comparative Bar Chart (Cuts vs Products Sales) -->
             @{
-                var maxDaySales = Model.MonthlyReport.DailyTotals.Any() ? Model.MonthlyReport.DailyTotals.Max(d => d.GrandTotal) : 0m;
-                if (maxDaySales == 0) maxDaySales = 1m; // Avoid division by zero
+                var maxDaySales = Model.MonthlyReport.DailyTotals.Any() ? Model.MonthlyReport.DailyTotals.Max(d => Math.Max(d.ServiceSales, d.ProductSales)) : 0m;
+                if (maxDaySales <= 0) maxDaySales = 1000m; // Avoid division by zero
             }
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Income at a Glance · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
-                    <span class="text-xs text-slate-500 font-medium">Daily Revenue Distribution (Services + Products)</span>
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-0.5">
+                            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                            <span>COMPARATIVE DAILY REVENUE DISTRIBUTION</span>
+                        </div>
+                        <h3 class="text-base font-serif font-bold text-slate-900">Cuts Sales vs. Product Sales · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
+                        <p class="text-xs text-slate-500">Visual comparison of daily grooming service revenues vs retail counter sales.</p>
+                    </div>
+                    <!-- Chart Legend -->
+                    <div class="flex items-center gap-4 text-xs font-bold">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3.5 h-3.5 rounded bg-amber-500 inline-block shadow-2xs"></span>
+                            <span class="text-slate-800">✂ Cuts: @Model.MonthlyReport.FormattedTotalSales</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shadow-2xs"></span>
+                            <span class="text-slate-800">🧴 Products: @Model.MonthlyReport.FormattedProductSales</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-end gap-1 sm:gap-2 h-36 pt-6 border-b border-slate-200 overflow-x-auto pb-2">
+
+                <div class="flex items-end gap-1 sm:gap-2 h-44 pt-6 border-b border-slate-200 overflow-x-auto pb-2">
                     @foreach (var d in Model.MonthlyReport.DailyTotals)
                     {
-                        var heightPct = (int)Math.Round((d.GrandTotal / maxDaySales) * 100);
-                        var barColor = d.GrandTotal > 0 ? "bg-amber-500 hover:bg-amber-600" : "bg-slate-100";
-                        <div class="flex-1 min-w-[20px] flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@d.Date.ToString("yyyy-MM-dd", null)'">
-                            <div class="w-full @barColor rounded-t transition-all" style="height: @(Math.Max(heightPct, 4))%;"></div>
-                            <span class="text-[10px] text-slate-400 mt-1 font-semibold">@d.Day</span>
+                        var cutsHeightPct = Math.Min(100, (int)Math.Round((d.ServiceSales / maxDaySales) * 100));
+                        var prodHeightPct = Math.Min(100, (int)Math.Round((d.ProductSales / maxDaySales) * 100));
+
+                        <div class="flex-1 min-w-[22px] flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@d.Date.ToString("yyyy-MM-dd", null)'">
+                            <!-- Paired Bars Container -->
+                            <div class="w-full flex items-end justify-center gap-0.5 h-32">
+                                <!-- Cuts Bar (Amber) -->
+                                <div class="w-1/2 max-w-[12px] bg-amber-500 hover:bg-amber-600 rounded-t transition-all" style="height: @(Math.Max(cutsHeightPct, 3))%;"></div>
+                                <!-- Products Bar (Emerald) -->
+                                <div class="w-1/2 max-w-[12px] bg-emerald-500 hover:bg-emerald-600 rounded-t transition-all" style="height: @(Math.Max(prodHeightPct, 3))%;"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 mt-1 font-semibold group-hover:text-amber-800">@d.Day</span>
                             <!-- Hover Tooltip -->
-                            <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-10 whitespace-nowrap">
-                                <div class="bg-slate-900 text-white text-[10px] rounded px-2 py-1 shadow-md">
-                                    <div class="font-bold">@d.DateFormatted</div>
-                                    <div>Services: @d.FormattedTotalSales</div>
-                                    <div>Products: @d.FormattedProductSales</div>
-                                    <div class="font-bold border-t border-slate-700 mt-0.5 pt-0.5">Grand: @d.FormattedGrandTotal</div>
+                            <div class="absolute bottom-full mb-3 hidden group-hover:flex flex-col items-center z-20 whitespace-nowrap pointer-events-none">
+                                <div class="bg-slate-900 text-white text-[11px] rounded-xl px-3 py-2 shadow-xl border border-slate-700 space-y-1">
+                                    <div class="font-bold border-b border-slate-700 pb-1 text-slate-300">@d.DateFormatted</div>
+                                    <div class="flex items-center justify-between gap-3 text-amber-300">
+                                        <span>✂ Cuts:</span>
+                                        <span class="font-bold font-mono">@d.FormattedTotalSales</span>
+                                    </div>
+                                    <div class="flex items-center justify-between gap-3 text-emerald-300">
+                                        <span>🧴 Products:</span>
+                                        <span class="font-bold font-mono">@d.FormattedProductSales</span>
+                                    </div>
+                                    <div class="border-t border-slate-700 pt-1 font-bold text-white flex items-center justify-between gap-3">
+                                        <span>Grand Total:</span>
+                                        <span class="font-mono text-amber-400">@d.FormattedGrandTotal</span>
+                                    </div>
                                 </div>
+                                <div class="w-2 h-2 bg-slate-900 rotate-45 -mt-1"></div>
                             </div>
                         </div>
                     }
