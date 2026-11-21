@@ -6,19 +6,23 @@
 
 <div class="space-y-8">
     <!-- Header -->
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Shop Inventory & Equipment</h1>
-            <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">Inventory & Assets</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Shop Inventory & Equipment</h1>
+            <p class="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-sans">
                 Manage retail grooming products, monitor derived stock levels, execute audited stock adjustments, and maintain equipment assets.
             </p>
         </div>
 
         <!-- Tab Toggle Buttons -->
-        <div class="inline-flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 shadow-inner">
+        <div class="inline-flex p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-inner">
             <a href="/admin/inventory?tab=products"
-               class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 @(isProductsTab ? "bg-white text-slate-950 shadow-sm border border-slate-200/60" : "text-slate-600 hover:text-slate-900")">
-                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+               class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 active:scale-95 @(isProductsTab ? "bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-sm border border-slate-200/60 dark:border-slate-700" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200")">
+                <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                 <span>Products (@Model.TotalProducts)</span>
                 @if (Model.LowStockCount > 0)
                 {
@@ -26,8 +30,8 @@
                 }
             </a>
             <a href="/admin/inventory?tab=equipment"
-               class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 @(!isProductsTab ? "bg-white text-slate-950 shadow-sm border border-slate-200/60" : "text-slate-600 hover:text-slate-900")">
-                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+               class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 active:scale-95 @(!isProductsTab ? "bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-sm border border-slate-200/60 dark:border-slate-700" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200")">
+                <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <span>Equipment (@Model.TotalEquipment)</span>
             </a>
         </div>
@@ -36,74 +40,74 @@
     <!-- Alert / Flash Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between">
+        <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span>@TempData["SuccessMessage"]</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 font-bold">&times;</button>
+            <button onclick="this.parentElement.remove()" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 font-bold active:scale-95">&times;</button>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold flex items-center justify-between">
+        <div class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-300 text-xs font-semibold flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 <span>@TempData["ErrorMessage"]</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-rose-700 hover:text-rose-900 font-bold">&times;</button>
+            <button onclick="this.parentElement.remove()" class="text-rose-700 dark:text-rose-400 hover:text-rose-900 font-bold active:scale-95">&times;</button>
         </div>
     }
 
     <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
-    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
-        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl @(isProductsTab ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition")">
+    <nav aria-label="Inventory navigation" class="inline-flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-inner">
+        <a href="/admin/inventory?tab=products" class="px-3.5 py-1.5 rounded-xl transition active:scale-95 @(isProductsTab ? "bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-xs border border-slate-200/80 dark:border-slate-700" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100")">
             Retail Products
         </a>
-        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/purchases" class="px-3.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-95">
             Buy (Purchases)
         </a>
-        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/product-sales" class="px-3.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-95">
             Sell (Product Sales)
         </a>
-        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl @(!isProductsTab ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition")">
+        <a href="/admin/inventory?tab=equipment" class="px-3.5 py-1.5 rounded-xl transition active:scale-95 @(!isProductsTab ? "bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-xs border border-slate-200/80 dark:border-slate-700" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100")">
             Equipment Assets
         </a>
-        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/equipment/per-barber" class="px-3.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-95">
             Equipment per Barber
         </a>
-        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/equipment/quality" class="px-3.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition active:scale-95">
             Quality Monitoring
         </a>
-    </div>
+    </nav>
 
     <!-- Stat Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-            <span class="text-xs uppercase font-bold text-slate-500 block">Retail Products</span>
+        <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
+            <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Retail Products</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.TotalProducts</span>
-                <span class="text-xs text-slate-500 font-medium">active SKUs</span>
+                <span class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalProducts</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">active SKUs</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Styling, beard care, and shave essentials</p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Styling, beard care, and shave essentials</p>
         </div>
 
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-            <span class="text-xs uppercase font-bold text-slate-500 block">Low Stock Alerts</span>
+        <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
+            <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Low Stock Alerts</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black @(Model.LowStockCount > 0 ? "text-rose-600" : "text-slate-900")">@Model.LowStockCount</span>
-                <span class="text-xs font-medium @(Model.LowStockCount > 0 ? "text-rose-600" : "text-slate-500")">at or below reorder level</span>
+                <span class="text-3xl font-serif font-black tabular-nums @(Model.LowStockCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100")">@Model.LowStockCount</span>
+                <span class="text-xs font-medium @(Model.LowStockCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-500 dark:text-slate-400")">at or below reorder level</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Requires restocking purchase</p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Requires restocking purchase</p>
         </div>
 
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-            <span class="text-xs uppercase font-bold text-slate-500 block">Equipment Assets</span>
+        <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
+            <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Equipment Assets</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900">@Model.TotalEquipment</span>
-                <span class="text-xs text-slate-500 font-medium">registered assets</span>
+                <span class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalEquipment</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">registered assets</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Clippers, shears, trimmers and workstations</p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Clippers, shears, trimmers and workstations</p>
         </div>
     </div>
 
@@ -112,7 +116,7 @@
         <!-- ========================================== -->
         <!-- TAB 1: PRODUCTS INVENTORY                 -->
         <!-- ========================================== -->
-        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden space-y-4 p-5">
+        <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden space-y-4 p-5 transition">
             <!-- Search & Actions Bar -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <form method="get" action="/admin/inventory" class="flex flex-wrap items-center gap-2.5 flex-1">
@@ -219,9 +223,9 @@
             </div>
 
             <!-- Products Table (Hidden on small screens, visible on desktop) -->
-            <div class="hidden lg:block overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+            <div class="hidden lg:block overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-slate-50 dark:bg-slate-850 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th class="py-3 px-4">SKU</th>
                             <th class="py-3 px-4">Product Name</th>
@@ -234,56 +238,58 @@
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 bg-white">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         @if (Model.Products.Count == 0)
                         {
                             <tr>
-                                <td colspan="9" class="py-8 text-center text-slate-400 text-xs italic">
+                                <td colspan="9" class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
                                     No products found matching the criteria.
                                 </td>
                             </tr>
                         }
                         @foreach (var p in Model.Products)
                         {
-                            <tr class="hover:bg-slate-50/80 transition @(p.IsActive && p.IsLowStock ? "bg-rose-50/40" : (!p.IsActive ? "opacity-60 bg-slate-50/50" : ""))">
-                                <td class="py-3.5 px-4 font-mono font-bold text-xs text-slate-500">@p.Sku</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-900">
+                            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition @(p.IsActive && p.IsLowStock ? "bg-rose-50/40 dark:bg-rose-950/20" : (!p.IsActive ? "opacity-60 bg-slate-50/50 dark:bg-slate-850" : ""))">
+                                <td class="py-3.5 px-4 font-mono font-bold text-xs text-slate-500 dark:text-slate-400">@p.Sku</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100">
                                     <div>@p.Name</div>
-                                    <span class="text-[10px] text-slate-400 font-normal">Unit: @p.Unit</span>
+                                    <span class="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Unit: @p.Unit</span>
                                 </td>
                                 <td class="py-3.5 px-4 text-xs">
-                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">@p.Category</span>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">@p.Category</span>
                                 </td>
-                                <td class="py-3.5 px-4 text-center">
-                                    <div class="font-bold text-sm @(p.IsLowStock ? "text-rose-600" : "text-slate-800")">
-                                        @p.CurrentStock @p.Unit
-                                    </div>
-                                    @if (p.IsLowStock)
-                                    {
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200 mt-0.5">
-                                            Low Stock
+                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-1.5 justify-center">
+                                        <span class="font-bold text-sm tabular-nums @(p.IsLowStock ? "text-rose-600 dark:text-rose-400" : "text-slate-800 dark:text-slate-200")">
+                                            @p.CurrentStock @p.Unit
                                         </span>
-                                    }
+                                        @if (p.IsLowStock)
+                                        {
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800 whitespace-nowrap">
+                                                Low Stock
+                                            </span>
+                                        }
+                                    </div>
                                 </td>
-                                <td class="py-3.5 px-4 text-center text-xs text-slate-500 font-medium">
+                                <td class="py-3.5 px-4 text-center text-xs text-slate-500 dark:text-slate-400 font-medium tabular-nums">
                                     @p.ReorderLevel @p.Unit
                                 </td>
-                                <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-500">
+                                <td class="py-3.5 px-4 text-right font-sans font-medium text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                                     @p.FormattedCostPrice
                                 </td>
-                                <td class="py-3.5 px-4 text-right font-serif font-bold text-slate-900">
+                                <td class="py-3.5 px-4 text-right font-sans font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                                     @p.FormattedSellPrice
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
                                     @if (p.IsActive)
                                     {
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
                                             Active
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                             Deactivated
                                         </span>
                                     }
@@ -292,19 +298,19 @@
                                     <button type="button"
                                             data-id="@p.Id" data-name="@p.Name" data-sku="@p.Sku" data-stock="@p.CurrentStock" data-unit="@p.Unit"
                                             onclick="openAdjustModal(this)"
-                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 hover:bg-amber-500/20 dark:hover:bg-amber-900/60 transition active:scale-95">
                                         Adjust
                                     </button>
                                     <button type="button"
                                             data-id="@p.Id" data-name="@p.Name" data-sku="@p.Sku"
                                             onclick="openHistoryDrawer(this)"
-                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">
                                         History
                                     </button>
                                     <button type="button"
                                             data-id="@p.Id" data-name="@p.Name" data-category="@p.Category" data-unit="@p.Unit" data-sell-price="@p.SellPrice" data-cost-price="@p.CostPrice" data-reorder-level="@p.ReorderLevel"
                                             onclick="openEditProductModal(this)"
-                                            class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition active:scale-95">
                                         Edit
                                     </button>
                                     <form method="post" action="/admin/inventory/products/@p.Id/toggle-status" class="inline"
@@ -314,7 +320,7 @@
                                       data-confirm-destructive="@(p.IsActive ? "true" : "false")">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="isActive" value="@(p.IsActive ? "false" : "true")" />
-                                        <button type="submit" class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700" title="@(p.IsActive ? "Deactivate" : "Activate")">
+                                        <button type="submit" class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition active:scale-95" title="@(p.IsActive ? "Deactivate" : "Activate")">
                                             @(p.IsActive ? "Deactivate" : "Activate")
                                         </button>
                                     </form>
@@ -397,9 +403,9 @@
             </div>
 
             <!-- Equipment Table -->
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-slate-50 dark:bg-slate-850 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th class="py-3 px-4">Asset Tag</th>
                             <th class="py-3 px-4">Equipment Name</th>
@@ -412,11 +418,11 @@
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 bg-white">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         @if (Model.Equipment.Count == 0)
                         {
                             <tr>
-                                <td colspan="9" class="py-8 text-center text-slate-400 text-xs italic">
+                                <td colspan="9" class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
                                     No equipment records found matching the criteria.
                                 </td>
                             </tr>
@@ -424,27 +430,27 @@
                         @foreach (var eq in Model.Equipment)
                         {
                             var isRetired = eq.Status == "retired";
-                            <tr class="hover:bg-slate-50/80 transition @(isRetired ? "opacity-60 bg-slate-50/50" : (eq.IsFlagged ? "bg-amber-50/30" : ""))">
-                                <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700">@eq.AssetTag</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-900">
+                            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition @(isRetired ? "opacity-60 bg-slate-50/50 dark:bg-slate-850" : (eq.IsFlagged ? "bg-amber-50/30 dark:bg-amber-950/20" : ""))">
+                                <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700 dark:text-amber-400">@eq.AssetTag</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100">
                                     <div>@eq.Name</div>
-                                    <div class="text-[10px] text-slate-400 font-normal">
+                                    <div class="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
                                         @(eq.BrandModel ?? "Standard") @(string.IsNullOrEmpty(eq.SerialNo) ? "" : $"• SN: {eq.SerialNo}")
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-4 text-xs">
-                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">@eq.Category</span>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">@eq.Category</span>
                                 </td>
                                 <td class="py-3.5 px-4 text-xs">
                                     @if (!string.IsNullOrEmpty(eq.CurrentBarberName))
                                     {
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                                             @eq.CurrentBarberName
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="text-xs text-slate-400 italic">Unassigned (Shop)</span>
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Unassigned (Shop)</span>
                                     }
                                 </td>
                                 <td class="py-3.5 px-4 text-center">

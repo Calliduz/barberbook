@@ -454,5 +454,23 @@ public class AdminInventoryTests : IClassFixture<WebApplicationFactory<Program>>
         movements.Should().Contain(m => m.Quantity == 20 && m.Reason == "Initial inventory stock count");
         movements.Should().Contain(m => m.Quantity == -2 && m.Reason == "Damaged during handling");
     }
+
+    [Fact]
+    public async Task INV01_AdminInventory_View_RendersSegmentedSubNav_AndTabularStockFormatting()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync(AdminEmail, AdminPassword);
+
+        var response = await adminClient.GetAsync("/admin/inventory");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must render cohesive segmented sub-navigation container
+        html.Should().Contain("aria-label=\"Inventory navigation\"", "Sub-navigation links must be structured in an accessible nav rail");
+        html.Should().Contain("inline-flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border", "Must render segmented pill container rail");
+
+        // Must render tabular alignment
+        html.Should().Contain("tabular-nums", "Numeric and currency values must use tabular-nums font feature");
+    }
 }
 
