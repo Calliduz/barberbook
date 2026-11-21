@@ -323,4 +323,20 @@ public class AdminAppointmentEndpointTests : IClassFixture<WebApplicationFactory
         result!.Items.Should().NotBeEmpty();
         result.Items.Take(3).Should().Contain(i => i.ReferenceCode == newApp.ReferenceCode, "Latest created appointment should reflect among the top items");
     }
+
+    [Fact]
+    public async Task AF6_AdminAppointments_View_RendersCrispHeroiconEyeAndCleanClipboardSvgs()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/appointments");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must render clean Heroicon eye path and document clipboard path
+        html.Should().Contain("M2.036 12.322", "Must render optically verified Heroicon eye path to eliminate @ glyph");
+        html.Should().Contain("M8 16H6a2 2 0 01-2-2", "Must render crisp two-document clipboard path to prevent empty square box glyphs");
+        html.Should().NotContain("M15.666 3.888A2.25", "Must not use buggy multi-curve clipboard path that collapses into box artifacts");
+    }
 }

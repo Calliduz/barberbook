@@ -22,9 +22,9 @@
 
     <!-- Filters Bar -->
     <article class="card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-4 space-y-4 transition">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
             <!-- Search -->
-            <div class="lg:col-span-2">
+            <div class="sm:col-span-2 lg:col-span-2">
                 <label for="historySearch" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Search Records</label>
                 <div class="relative">
                     <input type="text" id="historySearch" placeholder="Reference code, customer, phone..." onkeydown="if(event.key==='Enter') applyFilters()" class="filter-control w-full pl-9 pr-3 text-xs font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" />
@@ -43,19 +43,6 @@
                     {
                         <option value="@br.Id">@br.Name</option>
                     }
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label for="historyStatus" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Status</label>
-                <select id="historyStatus" onchange="applyFilters()" class="filter-control w-full text-xs font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
-                    <option value="">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                    <option value="rejected">Rejected</option>
                 </select>
             </div>
 
@@ -82,37 +69,54 @@
                     }
                 </select>
             </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-sm">
+            <!-- Status Filter -->
+            <div>
+                <label for="historyStatus" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Status</label>
+                <select id="historyStatus" onchange="applyFilters()" class="filter-control w-full text-xs font-semibold h-10 rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="noshow">No-Show</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
 
             <!-- Sort By -->
             <div>
                 <label for="historySortBy" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Sort By</label>
-                <select id="historySortBy" onchange="applyFilters()" class="filter-control w-full text-xs font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                <select id="historySortBy" onchange="applyFilters()" class="filter-control w-full text-xs font-semibold h-10 rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                     <option value="date">Date & Time</option>
                     <option value="customer">Customer Name</option>
                     <option value="price">Price</option>
                     <option value="status">Status</option>
                 </select>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-sm">
             <div>
-                <label for="historyStartDate" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">From Date</label>
-                <input type="date" id="historyStartDate" onchange="applyFilters()" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-1.5 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
-            </div>
-            <div>
-                <label for="historyEndDate" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">To Date</label>
-                <input type="date" id="historyEndDate" onchange="applyFilters()" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-1.5 px-3 text-sm focus:border-brand-500 focus:ring-brand-500" />
-            </div>
-            <div>
-                <label for="historySortOrder" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Order</label>
-                <select id="historySortOrder" onchange="applyFilters()" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-1.5 px-3 text-sm focus:border-brand-500 focus:ring-brand-500">
-                    <option value="desc">Newest First (Descending)</option>
-                    <option value="asc">Oldest First (Ascending)</option>
+                <label for="historySortOrder" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Order</label>
+                <select id="historySortOrder" onchange="applyFilters()" class="filter-control w-full h-10 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 text-xs font-medium focus:border-amber-500 focus:ring-amber-500">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
                 </select>
             </div>
+
+            <div>
+                <label for="historyStartDate" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">From Date</label>
+                <input type="date" id="historyStartDate" onchange="applyFilters()" class="filter-control w-full h-10 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 text-xs font-medium focus:border-amber-500 focus:ring-amber-500" />
+            </div>
+
+            <div>
+                <label for="historyEndDate" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">To Date</label>
+                <input type="date" id="historyEndDate" onchange="applyFilters()" class="filter-control w-full h-10 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 text-xs font-medium focus:border-amber-500 focus:ring-amber-500" />
+            </div>
+
             <div class="flex items-end">
-                <button type="button" onclick="resetFilters()" class="w-full py-1.5 px-3 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition">
+                <button type="button" onclick="resetFilters()" class="w-full h-10 px-3 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition">
                     Reset Filters
                 </button>
             </div>
@@ -290,33 +294,33 @@
         let cardHtml = '';
         items.forEach(app => {
             const badge = getStatusBadgeHtml(app.status, app.statusDisplay);
-            html += `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="openDrawer(${app.id})">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-brand-700">
+            html += `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition cursor-pointer" onclick="openDrawer(${app.id})">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-amber-700 dark:text-amber-400">
                     <div class="flex items-center gap-1.5">
                         <span>${app.referenceCode}</span>
-                        <button type="button" class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('${app.referenceCode}', this)" title="Copy reference code" aria-label="Copy reference code">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                        <button type="button" class="copy-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" onclick="event.stopPropagation(); copyToClipboard('${app.referenceCode}', this)" title="Copy reference code" aria-label="Copy reference code">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
                     </div>
-                    ${app.branchName ? `<div class="text-[10px] text-slate-400 font-sans font-normal">${escapeHtml(app.branchName)}</div>` : ''}
+                    ${app.branchName ? `<div class="text-[10px] text-slate-400 dark:text-slate-500 font-sans font-normal">${escapeHtml(app.branchName)}</div>` : ''}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-slate-900">${escapeHtml(app.customerName)}</div>
-                    <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
+                    <div class="font-medium text-slate-900 dark:text-slate-100">${escapeHtml(app.customerName)}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(app.customerPhone || app.customerEmail || 'No contact')}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700 font-medium">${escapeHtml(app.barberName)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700">
-                    <div>${escapeHtml(app.serviceName)}</div>
-                    <div class="text-xs text-slate-400">${app.durationMinutes} mins</div>
+                <td class="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(app.barberName)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                    <div class="font-medium text-slate-800 dark:text-slate-200">${escapeHtml(app.serviceName)}</div>
+                    <div class="text-xs text-slate-400 dark:text-slate-500">${app.durationMinutes} mins</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-slate-900">${app.formattedDate}</div>
-                    <div class="text-xs text-slate-500">${app.formattedTime}</div>
+                    <div class="font-medium text-slate-900 dark:text-slate-100">${app.formattedDate}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-mono">${app.formattedTime}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-slate-900">${app.formattedPrice}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-slate-900 dark:text-slate-100 tabular-nums">${app.formattedPrice}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">${badge}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-right" onclick="event.stopPropagation()">
-                    <button type="button" onclick="openDrawer(${app.id})" class="inline-flex items-center text-xs font-semibold text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-md">
+                    <button type="button" onclick="openDrawer(${app.id})" class="inline-flex items-center text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700 px-2.5 py-1 rounded-md transition active:scale-95 shadow-2xs">
                         <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Timeline
                     </button>
@@ -324,40 +328,40 @@
             </tr>`;
 
             cardHtml += `
-            <div class="p-4 space-y-3 hover:bg-slate-50/60 transition cursor-pointer" onclick="openDrawer(${app.id})">
+            <div class="p-4 space-y-3 hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition cursor-pointer" onclick="openDrawer(${app.id})">
                 <div class="flex items-start justify-between gap-2">
                     <div>
                         <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="font-mono text-xs font-bold text-brand-700">${app.referenceCode}</span>
-                            <button type="button" class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('${app.referenceCode}', this)" title="Copy reference code" aria-label="Copy reference code">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                            <span class="font-mono text-xs font-bold text-amber-700 dark:text-amber-400">${app.referenceCode}</span>
+                            <button type="button" class="copy-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" onclick="event.stopPropagation(); copyToClipboard('${app.referenceCode}', this)" title="Copy reference code" aria-label="Copy reference code">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                             </button>
-                            ${app.branchName ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">${escapeHtml(app.branchName)}</span>` : ''}
+                            ${app.branchName ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">${escapeHtml(app.branchName)}</span>` : ''}
                         </div>
-                        <div class="font-bold text-slate-900 text-sm mt-0.5">${escapeHtml(app.customerName)}</div>
-                        <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || app.customerEmail)}</div>
+                        <div class="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">${escapeHtml(app.customerName)}</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(app.customerPhone || app.customerEmail || 'No contact')}</div>
                     </div>
                     <div class="shrink-0">
                         ${badge}
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/60">
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300 bg-slate-50/80 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-700">
                     <div>
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Barber & Service</span>
-                        <span class="font-semibold text-slate-800">${escapeHtml(app.barberName)}</span>
-                        <span class="block text-[11px] text-slate-500">${escapeHtml(app.serviceName)} (${app.durationMinutes}m)</span>
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Barber & Service</span>
+                        <span class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(app.barberName)}</span>
+                        <span class="block text-[11px] text-slate-500 dark:text-slate-400">${escapeHtml(app.serviceName)} (${app.durationMinutes}m)</span>
                     </div>
                     <div class="text-right">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Schedule</span>
-                        <span class="font-semibold text-slate-900">${app.formattedDate}</span>
-                        <span class="block text-[11px] text-slate-500 font-mono">${app.formattedTime}</span>
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Schedule</span>
+                        <span class="font-semibold text-slate-900 dark:text-slate-100">${app.formattedDate}</span>
+                        <span class="block text-[11px] text-slate-500 dark:text-slate-400 font-mono">${app.formattedTime}</span>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
-                    <span class="text-sm font-bold text-slate-900">${app.formattedPrice}</span>
-                    <button type="button" onclick="event.stopPropagation(); openDrawer(${app.id})" class="inline-flex items-center text-xs font-bold text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition">
+                    <span class="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">${app.formattedPrice}</span>
+                    <button type="button" onclick="event.stopPropagation(); openDrawer(${app.id})" class="inline-flex items-center text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700 px-3 py-1.5 rounded-lg transition active:scale-95 shadow-2xs">
                         <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Timeline &rarr;
                     </button>
@@ -409,59 +413,59 @@
         let timelineHtml = '<div class="space-y-4 mt-4">';
         if (app.timeline && app.timeline.length > 0) {
             app.timeline.forEach(t => {
-                timelineHtml += `<div class="relative pl-6 pb-2 border-l-2 border-slate-200 last:border-transparent">
-                    <span class="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-brand-500 ring-4 ring-white"></span>
-                    <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
-                        <span>${t.toStatus ? t.toStatus.toUpperCase() : 'EVENT'} <span class="text-slate-400 font-normal">by ${escapeHtml(t.changedByRole)}</span></span>
-                        <span class="text-[10px] text-slate-500">${t.formattedChangedAt || ''}</span>
+                timelineHtml += `<div class="relative pl-6 pb-2 border-l-2 border-slate-200 dark:border-slate-700 last:border-transparent">
+                    <span class="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-amber-500 ring-4 ring-white dark:ring-slate-900"></span>
+                    <div class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center justify-between">
+                        <span>${t.toStatus ? t.toStatus.toUpperCase() : 'EVENT'} <span class="text-slate-400 dark:text-slate-500 font-normal">by ${escapeHtml(t.changedByRole)}</span></span>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${t.formattedChangedAt || ''}</span>
                     </div>
-                    <div class="text-xs text-slate-600 mt-1 bg-slate-50 p-2 rounded border border-slate-100">${escapeHtml(t.note || '')}</div>
+                    <div class="text-xs text-slate-600 dark:text-slate-400 mt-1 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">${escapeHtml(t.note || '')}</div>
                 </div>`;
             });
         } else {
-            timelineHtml += '<p class="text-xs text-slate-500">No status timeline events recorded.</p>';
+            timelineHtml += '<p class="text-xs text-slate-500 dark:text-slate-400">No status timeline events recorded.</p>';
         }
         timelineHtml += '</div>';
 
         content.innerHTML = `
-            <div class="border-b border-slate-200 pb-4">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
                 <div class="flex items-center justify-between">
-                    <span class="font-mono text-sm font-bold text-brand-700">${app.referenceCode}</span>
+                    <span class="font-mono text-sm font-bold text-amber-700 dark:text-amber-400">${app.referenceCode}</span>
                     <span>${badge}</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mt-1">${escapeHtml(app.serviceName)}</h3>
-                <div class="text-lg font-semibold text-slate-800 mt-1">${app.formattedPrice} <span class="text-xs text-slate-500 font-normal">(${app.durationMinutes} minutes)</span></div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">${escapeHtml(app.serviceName)}</h3>
+                <div class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-1">${app.formattedPrice} <span class="text-xs text-slate-500 dark:text-slate-400 font-normal">(${app.durationMinutes} minutes)</span></div>
             </div>
 
             <div class="space-y-3 text-sm">
                 <div>
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer</span>
-                    <div class="font-medium text-slate-900">${escapeHtml(app.customerName)}</div>
-                    <div class="text-xs text-slate-500">${escapeHtml(app.customerPhone || 'No phone')} · ${escapeHtml(app.customerEmail || 'No email')}</div>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer</span>
+                    <div class="font-medium text-slate-900 dark:text-slate-100">${escapeHtml(app.customerName)}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(app.customerPhone || 'No phone')} · ${escapeHtml(app.customerEmail || 'No email')}</div>
                 </div>
 
                 <div>
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Assigned Barber</span>
-                    <div class="font-medium text-slate-900">${escapeHtml(app.barberName)}</div>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assigned Barber</span>
+                    <div class="font-medium text-slate-900 dark:text-slate-100">${escapeHtml(app.barberName)}</div>
                 </div>
 
                 ${app.branchName ? `<div>
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Branch Station</span>
-                    <div class="font-medium text-slate-900 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Branch Station</span>
+                    <div class="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                         <span>${escapeHtml(app.branchName)}</span>
                     </div>
                 </div>` : ''}
 
                 <div>
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Scheduled Time</span>
-                    <div class="font-medium text-slate-900">${app.formattedDate}</div>
-                    <div class="text-xs text-slate-600 font-medium">${app.formattedTime}</div>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Scheduled Time</span>
+                    <div class="font-medium text-slate-900 dark:text-slate-100">${app.formattedDate}</div>
+                    <div class="text-xs text-slate-600 dark:text-slate-400 font-medium">${app.formattedTime}</div>
                 </div>
 
                 ${app.notes ? `<div>
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer Notes</span>
-                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-700 mt-1">${escapeHtml(app.notes)}</div>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer Notes</span>
+                    <div class="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-700 dark:text-slate-300 mt-1">${escapeHtml(app.notes)}</div>
                 </div>` : ''}
             </div>
 
