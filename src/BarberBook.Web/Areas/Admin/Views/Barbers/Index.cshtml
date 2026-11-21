@@ -1,4 +1,5 @@
 @model BarberBook.Web.Models.Admin.BarberListViewModel
+@using BarberBook.Web.Common
 @{
     ViewData["Title"] = "Barber Accounts";
 }
@@ -54,25 +55,25 @@
 
     <!-- Search & Filters -->
     <article class="card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3.5 transition">
-        <form method="get" action="/admin/barbers" class="flex flex-col sm:flex-row gap-3 justify-between items-center">
-            <div class="w-full sm:w-80 relative">
-                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by name, email, specialty..." class="filter-control w-full pl-9 pr-4 text-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" />
+        <form method="get" action="/admin/barbers" class="flex flex-wrap items-center gap-3">
+            <div class="w-full sm:w-96 relative">
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by name, email, specialty..." class="filter-control w-full pl-9 pr-4 text-xs h-10 rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" />
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex items-center gap-2">
                 <label for="statusFilter" class="text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap uppercase tracking-wider">Status:</label>
-                <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs h-10 rounded-xl px-3 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                     <option value="all" selected="@(Model.StatusFilter == "all")">All Statuses</option>
                     <option value="active" selected="@(Model.StatusFilter == "active")">Active</option>
                     <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive</option>
                 </select>
                 @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.StatusFilter != "all")
                 {
-                    <a href="/admin/barbers" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition flex items-center whitespace-nowrap">
+                    <a href="/admin/barbers" class="h-10 px-3.5 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition flex items-center whitespace-nowrap">
                         Reset
                     </a>
                 }
@@ -90,9 +91,9 @@
                         <th class="py-3.5 pl-6 pr-3">Barber</th>
                         <th class="px-3 py-3.5">Email</th>
                         <th class="px-3 py-3.5">Specialties</th>
-                        <th class="px-3 py-3.5">Commission Split</th>
-                        <th class="px-3 py-3.5">Completed Bookings</th>
-                        <th class="px-3 py-3.5">Status</th>
+                        <th class="px-3 py-3.5 text-center">Commission Split</th>
+                        <th class="px-3 py-3.5 text-center">Completed Bookings</th>
+                        <th class="px-3 py-3.5 text-center">Status</th>
                         <th class="py-3.5 pl-3 pr-6 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -100,77 +101,68 @@
                     @if (!Model.Items.Any())
                     {
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400">
+                            <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500">
                                 No barber accounts found matching the criteria.
                             </td>
                         </tr>
                     }
                     @foreach (var barber in Model.Items)
                     {
-                        <tr class="hover:bg-slate-50 transition">
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition">
                             <td class="py-4 pl-6 pr-3">
                                 <div class="flex items-center space-x-3">
-                                    @if (!string.IsNullOrWhiteSpace(barber.PhotoUrl))
-                                    {
-                                        <img src="@barber.PhotoUrl" alt="@barber.DisplayName" class="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-slate-200" />
-                                    }
-                                    else
-                                    {
-                                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-base">
-                                            @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
-                                        </div>
-                                    }
+                                    <img src="@ImageHelpers.GetBarberImage(barber.DisplayName, barber.PhotoUrl)" alt="@barber.DisplayName" class="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-xs" />
                                     <div>
-                                        <div class="font-semibold text-slate-900">@barber.DisplayName</div>
-                                        <div class="text-xs text-slate-500">@(string.IsNullOrWhiteSpace(barber.Specialties) ? "Master Barber" : barber.Specialties)</div>
+                                        <div class="font-semibold text-slate-900 dark:text-slate-100">@barber.DisplayName</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">@(string.IsNullOrWhiteSpace(barber.Specialties) ? "Master Barber" : barber.Specialties)</div>
                                         @if (!string.IsNullOrWhiteSpace(barber.BranchName))
                                         {
-                                            <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
-                                                <svg class="w-2.5 h-2.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                            <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 whitespace-nowrap">
+                                                <svg class="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                                                 @barber.BranchName
                                             </span>
                                         }
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-3 py-4 text-slate-600">
+                            <td class="px-3 py-4 text-slate-600 dark:text-slate-400">
                                 <span class="cell-truncate block" title="@barber.Email">@barber.Email</span>
                             </td>
-                            <td class="px-3 py-4 text-slate-600">
+                            <td class="px-3 py-4 text-slate-600 dark:text-slate-400">
                                 @(string.IsNullOrWhiteSpace(barber.Specialties) ? "General Grooming" : barber.Specialties)
                             </td>
-                            <td class="px-3 py-4">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200">
+                            <td class="px-3 py-4 text-center">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
                                     @barber.FormattedCommissionRate
                                 </span>
                             </td>
-                            <td class="px-3 py-4">
-                                <span class="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                            <td class="px-3 py-4 text-center">
+                                <span class="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-800 dark:text-slate-300">
                                     @barber.CompletedAppointmentsCount appointments
                                 </span>
                             </td>
-                            <td class="px-3 py-4">
+                            <td class="px-3 py-4 text-center">
                                 @if (barber.IsActive)
                                 {
-                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                         Active
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 border border-rose-200">
+                                    <span class="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-950/50 px-2.5 py-1 text-xs font-semibold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                                         Inactive
                                     </span>
                                 }
                             </td>
-                            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap space-x-2">
-                                <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="text-amber-700 hover:text-amber-900 font-bold text-xs">Edit</button>
-                                <span class="text-slate-300">|</span>
-                                <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="text-slate-600 hover:text-slate-900 font-medium text-xs">Reset Password</button>
-                                <span class="text-slate-300">|</span>
-                                <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="@(barber.IsActive ? "text-rose-600 hover:text-rose-800" : "text-emerald-600 hover:text-emerald-800") font-medium text-xs">
-                                    @(barber.IsActive ? "Deactivate" : "Activate")
-                                </button>
+                            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap">
+                                <div class="inline-flex items-center gap-1.5 justify-end">
+                                    <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition">Edit</button>
+                                    <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition">Reset</button>
+                                    <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="px-2.5 py-1 rounded-lg text-xs font-semibold @(barber.IsActive ? "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50" : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50") active:scale-95 transition">
+                                        @(barber.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -179,10 +171,10 @@
         </div>
 
         <!-- Mobile Stacked Card View -->
-        <div class="sm:hidden divide-y divide-slate-100">
+        <div class="sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
             @if (!Model.Items.Any())
             {
-                <div class="py-12 text-center text-slate-400 text-xs">
+                <div class="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
                     No barber accounts found matching the criteria.
                 </div>
             }
@@ -191,62 +183,53 @@
                 <div class="p-4 space-y-3">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center space-x-3">
-                            @if (!string.IsNullOrWhiteSpace(barber.PhotoUrl))
-                            {
-                                <img src="@barber.PhotoUrl" alt="@barber.DisplayName" class="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-slate-200" />
-                            }
-                            else
-                            {
-                                <div class="h-10 w-10 flex-shrink-0 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-sm">
-                                    @barber.DisplayName.Substring(0, Math.Min(1, barber.DisplayName.Length)).ToUpperInvariant()
-                                </div>
-                            }
+                            <img src="@ImageHelpers.GetBarberImage(barber.DisplayName, barber.PhotoUrl)" alt="@barber.DisplayName" class="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-xs" />
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">@barber.DisplayName</h3>
-                                <p class="text-xs text-slate-500">@barber.FullName</p>
+                                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">@barber.DisplayName</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">@barber.FullName</p>
                             </div>
                         </div>
                         @if (barber.IsActive)
                         {
-                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                 Active
                             </span>
                         }
                         else
                         {
-                            <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">
+                            <span class="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                                 Inactive
                             </span>
                         }
                     </div>
 
-                    <div class="space-y-1 text-xs text-slate-600">
-                        <p><span class="text-slate-400">Email:</span> @barber.Email</p>
-                        <p><span class="text-slate-400">Specialties:</span> @(string.IsNullOrWhiteSpace(barber.Specialties) ? "General Grooming" : barber.Specialties)</p>
-                        <p><span class="text-slate-400">Split:</span> <span class="font-bold text-amber-900">@barber.FormattedCommissionRate</span></p>
+                    <div class="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                        <p><span class="text-slate-400 dark:text-slate-500">Email:</span> @barber.Email</p>
+                        <p><span class="text-slate-400 dark:text-slate-500">Specialties:</span> @(string.IsNullOrWhiteSpace(barber.Specialties) ? "General Grooming" : barber.Specialties)</p>
+                        <p><span class="text-slate-400 dark:text-slate-500">Split:</span> <span class="font-bold text-amber-900 dark:text-amber-200">@barber.FormattedCommissionRate</span></p>
                     </div>
 
                     <div class="flex items-center gap-2 pt-1">
                         @if (!string.IsNullOrWhiteSpace(barber.BranchName))
                         {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                                <svg class="w-2.5 h-2.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                <svg class="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                                 @barber.BranchName
                             </span>
                         }
-                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-800">
+                        <span class="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-800 dark:text-slate-300">
                             @barber.CompletedAppointmentsCount cuts
                         </span>
                     </div>
 
-                    <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2 text-xs">
-                        <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="px-2.5 py-1 rounded bg-amber-50 text-amber-900 border border-amber-200 font-bold hover:bg-amber-100 transition">
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2 text-xs">
+                        <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800 font-bold hover:bg-amber-100 dark:hover:bg-amber-900/60 transition active:scale-95">
                             Edit
                         </button>
-                        <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition font-medium">
+                        <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition font-medium active:scale-95">
                             Reset Pass
                         </button>
-                        <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="px-2.5 py-1 rounded @(barber.IsActive ? "bg-rose-50 text-rose-700 border border-rose-200" : "bg-emerald-50 text-emerald-700 border border-emerald-200") font-bold transition">
+                        <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="px-2.5 py-1 rounded @(barber.IsActive ? "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800" : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800") font-bold transition active:scale-95">
                             @(barber.IsActive ? "Deactivate" : "Activate")
                         </button>
                     </div>

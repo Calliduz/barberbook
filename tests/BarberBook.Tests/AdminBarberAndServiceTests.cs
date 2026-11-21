@@ -510,6 +510,27 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         }
     }
 
+    [Fact]
+    public async Task AF2_AdminBarbers_View_RendersTactileActionButtons_AndConsolidatedToolbar()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/barbers");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must render consolidated flex toolbar
+        html.Should().Contain("flex flex-wrap items-center gap-3", "Must group search input and status filter in a compact flex container");
+
+        // Must render tactile action button pills with active:scale-95 and tint styling
+        html.Should().Contain("bg-amber-500/10", "Must render modern tinted button pill for Edit");
+        html.Should().Contain("active:scale-95", "Must provide tactile press micro-interaction");
+
+        // Must eliminate raw pipe separators
+        html.Should().NotContain("<span class=\"text-slate-300 dark:text-slate-700\">|</span>", "Must not use raw pipe text separators in action rows");
+    }
+
     public Task InitializeAsync() => Task.CompletedTask;
 
     public async Task DisposeAsync()
