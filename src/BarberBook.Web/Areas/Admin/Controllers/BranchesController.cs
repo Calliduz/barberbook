@@ -87,10 +87,17 @@ public class BranchesController : Controller
             })
             .ToListAsync();
 
+        var totalActive = await _dbContext.Branches.CountAsync(br => br.IsActive);
+        var totalAssignedBarbers = await _dbContext.Barbers.CountAsync(b => b.BranchId != null && b.IsActive && b.User.IsActive);
+        var totalCompletedCuts = await _dbContext.Appointments.CountAsync(a => a.Status == AppointmentStatus.Completed);
+
         var viewModel = new BranchListViewModel
         {
             Items = branches,
             TotalCount = totalCount,
+            TotalActiveCount = totalActive,
+            TotalAssignedBarbersCount = totalAssignedBarbers,
+            TotalCompletedAppointmentsCount = totalCompletedCuts,
             Page = page,
             PageSize = pageSize,
             SearchQuery = q,

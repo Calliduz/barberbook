@@ -127,17 +127,17 @@
     <article class="card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition">
         <!-- Desktop Table View -->
         <div class="hidden sm:block overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+            <table class="w-full divide-y divide-slate-200 dark:divide-slate-800 text-sm">
                 <thead class="bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                        <th scope="col" class="px-6 py-3.5 text-left">Reference Code</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Customer</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Barber</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Service</th>
-                        <th scope="col" class="px-6 py-3.5 text-left">Date & Time</th>
-                        <th scope="col" class="px-6 py-3.5 text-right">Price Snapshot</th>
-                        <th scope="col" class="px-6 py-3.5 text-center">Status</th>
-                        <th scope="col" class="px-6 py-3.5 text-right">Timeline</th>
+                        <th scope="col" class="px-3.5 py-3 text-left w-[16%]">Reference Code</th>
+                        <th scope="col" class="px-3.5 py-3 text-left w-[18%]">Customer</th>
+                        <th scope="col" class="px-3.5 py-3 text-left w-[12%]">Barber</th>
+                        <th scope="col" class="px-3.5 py-3 text-left w-[14%]">Service</th>
+                        <th scope="col" class="px-3.5 py-3 text-left w-[14%]">Date & Time</th>
+                        <th scope="col" class="px-3.5 py-3 text-right w-[9%]">Price Snapshot</th>
+                        <th scope="col" class="px-3.5 py-3 text-center w-[9%]">Status</th>
+                        <th scope="col" class="px-3.5 py-3 text-right w-[8%]">Timeline</th>
                     </tr>
                 </thead>
                 <tbody id="historyTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
@@ -295,32 +295,32 @@
         items.forEach(app => {
             const badge = getStatusBadgeHtml(app.status, app.statusDisplay);
             html += `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition cursor-pointer" onclick="openDrawer(${app.id})">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-xs font-bold text-amber-700 dark:text-amber-400">
+                <td class="px-3.5 py-3 font-mono text-xs font-bold text-amber-700 dark:text-amber-400">
                     <div class="flex items-center gap-1.5">
                         <span>${app.referenceCode}</span>
                         <button type="button" class="copy-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" onclick="event.stopPropagation(); copyToClipboard('${app.referenceCode}', this)" title="Copy reference code" aria-label="Copy reference code">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
                     </div>
-                    ${app.branchName ? `<div class="text-[10px] text-slate-400 dark:text-slate-500 font-sans font-normal">${escapeHtml(app.branchName)}</div>` : ''}
+                    ${app.branchName ? `<div class="text-[10px] text-slate-400 dark:text-slate-500 font-sans font-normal truncate max-w-[130px]">${escapeHtml(app.branchName)}</div>` : ''}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-slate-900 dark:text-slate-100">${escapeHtml(app.customerName)}</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(app.customerPhone || app.customerEmail || 'No contact')}</div>
+                <td class="px-3.5 py-3">
+                    <div class="font-medium text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate max-w-[180px]">${escapeHtml(app.customerName)}</div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[150px]">${escapeHtml(app.customerPhone || app.customerEmail || 'No contact')}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(app.barberName)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                    <div class="font-medium text-slate-800 dark:text-slate-200">${escapeHtml(app.serviceName)}</div>
-                    <div class="text-xs text-slate-400 dark:text-slate-500">${app.durationMinutes} mins</div>
+                <td class="px-3.5 py-3 text-slate-700 dark:text-slate-300 font-medium text-xs sm:text-sm truncate max-w-[120px]">${escapeHtml(app.barberName)}</td>
+                <td class="px-3.5 py-3 text-slate-700 dark:text-slate-300 text-xs sm:text-sm">
+                    <div class="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[140px]">${escapeHtml(app.serviceName)}</div>
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500">${app.durationMinutes} mins</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-3.5 py-3 text-xs sm:text-sm whitespace-nowrap">
                     <div class="font-medium text-slate-900 dark:text-slate-100">${app.formattedDate}</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 font-mono">${app.formattedTime}</div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">${app.formattedTime}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-slate-900 dark:text-slate-100 tabular-nums">${app.formattedPrice}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">${badge}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right" onclick="event.stopPropagation()">
-                    <button type="button" onclick="openDrawer(${app.id})" class="inline-flex items-center text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700 px-2.5 py-1 rounded-md transition active:scale-95 shadow-2xs">
+                <td class="px-3.5 py-3 text-right font-semibold text-slate-900 dark:text-slate-100 tabular-nums text-xs sm:text-sm whitespace-nowrap">${app.formattedPrice}</td>
+                <td class="px-3.5 py-3 text-center whitespace-nowrap">${badge}</td>
+                <td class="px-3.5 py-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                    <button type="button" onclick="openDrawer(${app.id})" class="inline-flex items-center text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700 px-2.5 py-1 rounded-lg transition active:scale-95 shadow-2xs">
                         <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Timeline
                     </button>

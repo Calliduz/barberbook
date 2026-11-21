@@ -53,13 +53,15 @@
         <!-- DAILY SALES VIEW -->
         <div class="space-y-6">
             <!-- Filter & Preset Bar -->
-            <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-3.5 sm:p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <form id="dailyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-3.5 sm:p-4 flex flex-wrap items-center gap-4">
+                <form id="dailyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-2.5">
                     <input type="hidden" name="tab" value="daily" />
                     <label for="date" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Select Date:</label>
                     <input type="date" id="date" name="date" value="@Model.SelectedDateString" onchange="this.form.submit()"
                            class="filter-control h-[38px] text-xs font-bold text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-700" />
                 </form>
+
+                <div class="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1">Presets:</span>
@@ -127,9 +129,20 @@
                             </div>
                             <span class="text-xs font-bold text-slate-400 dark:text-slate-500">@Model.DailyReport.ByBarber.Count active</span>
                         </div>
-                        <div class="mt-4 relative h-56 w-full">
-                            <canvas id="dailyBarberBarChart"></canvas>
-                        </div>
+                        @if (Model.DailyReport.TotalSales > 0 && Model.DailyReport.ByBarber.Any(b => b.TotalSales > 0))
+                        {
+                            <div class="mt-4 relative h-56 w-full">
+                                <canvas id="dailyBarberBarChart"></canvas>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mt-4 h-56 w-full flex flex-col items-center justify-center text-center p-6 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700">
+                                <svg class="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                                <p class="text-xs font-semibold text-slate-600 dark:text-slate-300">No haircut service sales recorded for this date</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Barber sales distribution activates when completed bookings are recorded.</p>
+                            </div>
+                        }
                     </article>
                 </div>
             }

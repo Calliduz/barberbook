@@ -523,12 +523,85 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         // Must render consolidated flex toolbar
         html.Should().Contain("flex flex-wrap items-center gap-3", "Must group search input and status filter in a compact flex container");
 
+        // Must render KPI summary cards
+        html.Should().Contain("Total Staff", "Must render top KPI staff card");
+        html.Should().Contain("Active Master Barbers", "Must render top KPI active barbers card");
+        html.Should().Contain("Completed Cuts", "Must render top KPI completed cuts card");
+
         // Must render tactile action button pills with active:scale-95 and tint styling
-        html.Should().Contain("bg-amber-500/10", "Must render modern tinted button pill for Edit");
         html.Should().Contain("active:scale-95", "Must provide tactile press micro-interaction");
 
         // Must eliminate raw pipe separators
         html.Should().NotContain("<span class=\"text-slate-300 dark:text-slate-700\">|</span>", "Must not use raw pipe text separators in action rows");
+
+        // Must not contain redundant duplicate Specialties header column
+        html.Should().NotContain("<th class=\"px-3 py-3.5\">Specialties</th>", "Must eliminate redundant standalone Specialties column in barber accounts table");
+    }
+
+    [Fact]
+    public async Task AF3_AdminBranches_View_RendersMetricCards_AndNoRawPipes()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/branches");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must render metric overview cards
+        html.Should().Contain("Total Locations", "Must render total branches KPI");
+        html.Should().Contain("Active Operations", "Must render active branches KPI");
+        html.Should().Contain("Assigned Master Barbers", "Must render assigned barbers KPI");
+
+        // Must eliminate raw pipe separators
+        html.Should().NotContain("<span class=\"text-slate-300 dark:text-slate-700\">|</span>", "Must not use raw pipe text separators in branch action rows");
+
+        // Must use tactile button pills
+        html.Should().Contain("Arrange Barbers");
+        html.Should().Contain("active:scale-95");
+    }
+
+    [Fact]
+    public async Task AF1_AdminServices_View_RendersMetricCards_AndNoRawPipes_AndSansPrice()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/services");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must render metric overview cards
+        html.Should().Contain("Total Services", "Must render total services KPI");
+        html.Should().Contain("Active Services", "Must render active services KPI");
+        html.Should().Contain("Average Price", "Must render average price KPI");
+
+        // Must eliminate raw pipe separators
+        html.Should().NotContain("<span class=\"text-slate-300 dark:text-slate-700\">|</span>", "Must not use raw pipe text separators in service action rows");
+
+        // Price must use clean sans-serif tabular numbers
+        html.Should().Contain("font-sans font-bold text-slate-900 dark:text-slate-100 tabular-nums");
+    }
+
+    [Fact]
+    public async Task AF5_AdminCustomers_View_RendersCrispSvg_AndStandardizedActions()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/customers");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must not contain broken legacy clipboard SVG path
+        html.Should().NotContain("M15.666 3.888A2.25", "Must replace broken legacy clipboard SVG with crisp document copy SVG");
+
+        // Must contain crisp document copy SVG path
+        html.Should().Contain("M8 16H6a2 2 0 01-2-2V6", "Must use crisp document copy SVG");
+
+        // Must contain standardized action buttons
+        html.Should().Contain("Details");
+        html.Should().Contain("active:scale-95");
     }
 
     public Task InitializeAsync() => Task.CompletedTask;

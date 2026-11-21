@@ -251,6 +251,7 @@ public static class DatabaseSeeder
 
             var branchId = branchMap[branchName].Id;
             var barber = await context.Barbers.Include(b => b.WorkingHours).FirstOrDefaultAsync(b => b.UserId == user.Id);
+            var expectedPhoto = $"/images/barbers/{name.ToLowerInvariant()}.jpg";
             if (barber == null)
             {
                 barber = new Barber
@@ -260,15 +261,29 @@ public static class DatabaseSeeder
                     Bio = bio,
                     Specialties = specialties,
                     BranchId = branchId,
+                    PhotoUrl = expectedPhoto,
                     IsActive = true
                 };
                 context.Barbers.Add(barber);
                 await context.SaveChangesAsync();
             }
-            else if (barber.BranchId != branchId)
+            else
             {
-                barber.BranchId = branchId;
-                await context.SaveChangesAsync();
+                bool changed = false;
+                if (barber.BranchId != branchId)
+                {
+                    barber.BranchId = branchId;
+                    changed = true;
+                }
+                if (string.IsNullOrWhiteSpace(barber.PhotoUrl) || barber.PhotoUrl.EndsWith(".svg"))
+                {
+                    barber.PhotoUrl = expectedPhoto;
+                    changed = true;
+                }
+                if (changed)
+                {
+                    await context.SaveChangesAsync();
+                }
             }
 
             // Seed Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM

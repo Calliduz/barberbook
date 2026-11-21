@@ -1,3 +1,5 @@
+using BarberBook.Web.Common;
+
 namespace BarberBook.Web.Models.Admin;
 
 public class CreateServiceRequest
@@ -31,6 +33,10 @@ public class ServiceListViewModel
 {
     public List<AdminServiceItemDto> Items { get; set; } = new();
     public int TotalCount { get; set; }
+    public int TotalActiveCount { get; set; }
+    public int TotalCompletedBookingsCount { get; set; }
+    public decimal AveragePrice { get; set; }
+    public string FormattedAveragePrice => FormattingHelpers.FormatPeso(AveragePrice);
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);

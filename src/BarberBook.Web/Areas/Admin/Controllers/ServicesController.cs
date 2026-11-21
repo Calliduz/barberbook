@@ -80,10 +80,17 @@ public class ServicesController : Controller
             })
             .ToListAsync();
 
+        var totalActive = await _dbContext.Services.CountAsync(s => s.IsActive);
+        var totalCompletedBookings = await _dbContext.Appointments.CountAsync(a => a.Status == AppointmentStatus.Completed);
+        var averagePrice = await _dbContext.Services.Where(s => s.IsActive).Select(s => (decimal?)s.Price).AverageAsync() ?? 0m;
+
         var viewModel = new ServiceListViewModel
         {
             Items = services,
             TotalCount = totalCount,
+            TotalActiveCount = totalActive,
+            TotalCompletedBookingsCount = totalCompletedBookings,
+            AveragePrice = averagePrice,
             Page = page,
             PageSize = pageSize,
             SearchQuery = q,

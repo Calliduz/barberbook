@@ -111,11 +111,16 @@ public class BarbersController : Controller
             })
             .ToListAsync();
 
+        var totalActive = await _dbContext.Barbers.CountAsync(b => b.IsActive && b.User.IsActive);
+        var totalCompletedCuts = await _dbContext.Appointments.CountAsync(a => a.Status == AppointmentStatus.Completed);
+
         var viewModel = new BarberListViewModel
         {
             Items = barbers,
             Branches = branches,
             TotalCount = totalCount,
+            TotalActiveCount = totalActive,
+            TotalCompletedAppointmentsCount = totalCompletedCuts,
             Page = page,
             PageSize = pageSize,
             SearchQuery = q,

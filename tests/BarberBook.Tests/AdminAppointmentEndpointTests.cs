@@ -339,4 +339,23 @@ public class AdminAppointmentEndpointTests : IClassFixture<WebApplicationFactory
         html.Should().Contain("M8 16H6a2 2 0 01-2-2", "Must render crisp two-document clipboard path to prevent empty square box glyphs");
         html.Should().NotContain("M15.666 3.888A2.25", "Must not use buggy multi-curve clipboard path that collapses into box artifacts");
     }
+
+    [Fact]
+    public async Task AF6_AdminAppointments_View_ProportionsTableColumnsAndEliminatesEmptyVoidInFilters()
+    {
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var response = await adminClient.GetAsync("/admin/appointments");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await response.Content.ReadAsStringAsync();
+
+        // Must not contain justify-between in the date presets row (which creates a 1000px chasm)
+        html.Should().NotContain("flex flex-wrap items-center justify-between gap-3 pt-3 border-t", "Date range and presets must be grouped together without justify-between gap");
+        // Must have properly closed article tag
+        html.Should().Contain("</article>", "Filter card article must be closed properly");
+        // Must contain proportional column widths
+        html.Should().Contain("w-[16%]");
+        html.Should().Contain("w-[18%]");
+    }
 }

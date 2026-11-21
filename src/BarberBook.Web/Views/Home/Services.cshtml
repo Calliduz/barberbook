@@ -1,18 +1,6 @@
 @model List<BarberBook.Data.Entities.Service>
 @{
     ViewData["Title"] = "Grooming Services & Pricing";
-
-    string GetServiceImage(string name)
-    {
-        var lower = name.ToLowerInvariant();
-        if (lower.Contains("beard"))
-            return "/images/services/beard.svg";
-        if (lower.Contains("color") || lower.Contains("treatment"))
-            return "/images/services/color.svg";
-        if (lower.Contains("shave"))
-            return "/images/services/shave.svg";
-        return "/images/services/haircut.svg";
-    }
 }
 
 <div class="py-6 space-y-10">
@@ -40,10 +28,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach (var service in Model)
             {
-                var imgUrl = GetServiceImage(service.Name);
+                var imgUrl = BarberBook.Web.Common.ImageHelpers.GetServiceImage(service.Name);
                 <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-brand-500/50 hover:-translate-y-0.5 transition-all duration-200 group">
-                    <div class="h-48 vintage-img-container bg-slate-900 shrink-0 overflow-hidden">
-                        <img src="@imgUrl" alt="@service.Name" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out opacity-90 group-hover:opacity-100" />
+                    <div class="h-48 vintage-img-container bg-slate-900 shrink-0 overflow-hidden relative">
+                        <img src="@imgUrl" alt="@service.Name" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out opacity-90 group-hover:opacity-100" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none"></div>
                     </div>
 
                     <div class="p-6 flex-1 flex flex-col justify-between">

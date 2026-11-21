@@ -1,21 +1,6 @@
 @model List<BarberBook.Data.Entities.Barber>
 @{
     ViewData["Title"] = "Our Master Barbers";
-
-    string GetBarberImage(string name, string? existingUrl)
-    {
-        if (!string.IsNullOrWhiteSpace(existingUrl) && !existingUrl.StartsWith("http"))
-            return existingUrl;
-
-        var lower = name.ToLowerInvariant();
-        if (lower.Contains("ramon"))
-            return "/images/barbers/ramon.svg";
-        if (lower.Contains("dennis"))
-            return "/images/barbers/dennis.svg";
-        if (lower.Contains("miguel"))
-            return "/images/barbers/miguel.svg";
-        return "/images/barbers/default-barber.svg";
-    }
 }
 
 <div class="py-6 space-y-10">
@@ -43,10 +28,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach (var barber in Model)
             {
-                var photo = GetBarberImage(barber.DisplayName, barber.PhotoUrl);
+                var photo = BarberBook.Web.Common.ImageHelpers.GetBarberImage(barber.DisplayName, barber.PhotoUrl);
                 <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-brand-500/50 hover:-translate-y-0.5 transition-all duration-200 group">
                     <div class="h-64 vintage-img-container bg-slate-900 relative shrink-0 overflow-hidden">
-                        <img src="@photo" alt="@barber.DisplayName" class="w-full h-full object-cover object-top opacity-95 group-hover:scale-[1.02] transition-transform duration-300 ease-out" />
+                        <img src="@photo" alt="@barber.DisplayName" loading="lazy" class="w-full h-full object-cover object-top opacity-95 group-hover:scale-105 transition-transform duration-300 ease-out" />
                         <div class="absolute bottom-3 left-3 bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-slate-700">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span>Active Master Staff</span>

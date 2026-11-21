@@ -86,7 +86,7 @@
         <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
             <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Retail Products</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalProducts</span>
+                <span class="text-3xl kpi-value font-sans font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalProducts</span>
                 <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">active SKUs</span>
             </div>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Styling, beard care, and shave essentials</p>
@@ -95,7 +95,7 @@
         <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
             <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Low Stock Alerts</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black tabular-nums @(Model.LowStockCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100")">@Model.LowStockCount</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums @(Model.LowStockCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100")">@Model.LowStockCount</span>
                 <span class="text-xs font-medium @(Model.LowStockCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-500 dark:text-slate-400")">at or below reorder level</span>
             </div>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Requires restocking purchase</p>
@@ -104,7 +104,7 @@
         <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition">
             <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Equipment Assets</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalEquipment</span>
+                <span class="text-3xl kpi-value font-sans font-black text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalEquipment</span>
                 <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">registered assets</span>
             </div>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Clippers, shears, trimmers and workstations</p>

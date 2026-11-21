@@ -3,23 +3,7 @@
     ViewData["Title"] = $"{Model.DisplayName}'s Profile & Schedule";
     var upcomingDaysOff = ViewData["UpcomingDaysOff"] as List<BarberBook.Data.Entities.DayOff> ?? new List<BarberBook.Data.Entities.DayOff>();
     string[] dayNames = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
-
-    string GetBarberImage(string name, string? existingUrl)
-    {
-        if (!string.IsNullOrWhiteSpace(existingUrl) && !existingUrl.StartsWith("http"))
-            return existingUrl;
-
-        var lower = name.ToLowerInvariant();
-        if (lower.Contains("ramon"))
-            return "/images/barbers/ramon.svg";
-        if (lower.Contains("dennis"))
-            return "/images/barbers/dennis.svg";
-        if (lower.Contains("miguel"))
-            return "/images/barbers/miguel.svg";
-        return "/images/barbers/default-barber.svg";
-    }
-
-    var photoUrl = GetBarberImage(Model.DisplayName, Model.PhotoUrl);
+    var photoUrl = BarberBook.Web.Common.ImageHelpers.GetBarberImage(Model.DisplayName, Model.PhotoUrl);
 }
 
 <div class="max-w-4xl mx-auto py-6 space-y-8">

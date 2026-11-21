@@ -8,11 +8,15 @@
     <!-- Header Section -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-serif">Barber Accounts</h1>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">Staff &amp; Talent</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Barber Accounts</h1>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage barber shop staff profiles, credentials, specialties, and active statuses.</p>
         </div>
         <div class="mt-4 sm:mt-0">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center h-[38px] rounded-lg bg-amber-500 px-4 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-[0.98] transition whitespace-nowrap">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center h-[38px] rounded-xl bg-amber-500 px-4 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition whitespace-nowrap">
                 <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
@@ -53,6 +57,34 @@
         </div>
     }
 
+    <!-- Metric Overview Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Staff</span>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-sans text-slate-900 dark:text-slate-100 tabular-nums">@Model.TotalCount</span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">barbers</span>
+            </div>
+            <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Shop barber accounts</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Master Barbers</span>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-sans text-emerald-600 dark:text-emerald-400 tabular-nums">@Model.TotalActiveCount</span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">active duty</span>
+            </div>
+            <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Bookable in calendar</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Completed Cuts</span>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-sans text-amber-600 dark:text-amber-400 tabular-nums">@Model.TotalCompletedAppointmentsCount</span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">lifetime</span>
+            </div>
+            <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Delivered client cuts</p>
+        </div>
+    </div>
+
     <!-- Search & Filters -->
     <article class="card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3.5 transition">
         <form method="get" action="/admin/barbers" class="flex flex-wrap items-center gap-3">
@@ -85,23 +117,22 @@
     <article class="card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition">
         <!-- Desktop Table View -->
         <div class="hidden sm:block overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
-                <thead class="bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+            <table class="w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
+                <thead class="bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="py-3.5 pl-6 pr-3">Barber</th>
-                        <th class="px-3 py-3.5">Email</th>
-                        <th class="px-3 py-3.5">Specialties</th>
-                        <th class="px-3 py-3.5 text-center">Commission Split</th>
-                        <th class="px-3 py-3.5 text-center">Completed Bookings</th>
-                        <th class="px-3 py-3.5 text-center">Status</th>
-                        <th class="py-3.5 pl-3 pr-6 text-right">Actions</th>
+                        <th class="py-3.5 pl-6 pr-3 w-[26%]">Barber</th>
+                        <th class="px-3 py-3.5 w-[22%]">Email</th>
+                        <th class="px-3 py-3.5 text-center w-[16%]">Commission Split</th>
+                        <th class="px-3 py-3.5 text-center w-[16%]">Completed Bookings</th>
+                        <th class="px-3 py-3.5 text-center w-[10%]">Status</th>
+                        <th class="py-3.5 pl-3 pr-6 text-right w-[10%]">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                     @if (!Model.Items.Any())
                     {
                         <tr>
-                            <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                            <td colspan="6" class="py-12 text-center text-slate-400 dark:text-slate-500">
                                 No barber accounts found matching the criteria.
                             </td>
                         </tr>
@@ -128,20 +159,17 @@
                             <td class="px-3 py-4 text-slate-600 dark:text-slate-400">
                                 <span class="cell-truncate block" title="@barber.Email">@barber.Email</span>
                             </td>
-                            <td class="px-3 py-4 text-slate-600 dark:text-slate-400">
-                                @(string.IsNullOrWhiteSpace(barber.Specialties) ? "General Grooming" : barber.Specialties)
-                            </td>
                             <td class="px-3 py-4 text-center">
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
                                     @barber.FormattedCommissionRate
                                 </span>
                             </td>
-                            <td class="px-3 py-4 text-center">
+                            <td class="px-3 py-3.5 text-center">
                                 <span class="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-800 dark:text-slate-300">
-                                    @barber.CompletedAppointmentsCount appointments
+                                    @barber.CompletedAppointmentsCount @(barber.CompletedAppointmentsCount == 1 ? "appointment" : "appointments")
                                 </span>
                             </td>
-                            <td class="px-3 py-4 text-center">
+                            <td class="px-3 py-3.5 text-center">
                                 @if (barber.IsActive)
                                 {
                                     <span class="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
@@ -155,11 +183,11 @@
                                     </span>
                                 }
                             </td>
-                            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap">
+                            <td class="py-3.5 pl-3 pr-6 text-right whitespace-nowrap">
                                 <div class="inline-flex items-center gap-1.5 justify-end">
-                                    <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition">Edit</button>
-                                    <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition">Reset</button>
-                                    <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="px-2.5 py-1 rounded-lg text-xs font-semibold @(barber.IsActive ? "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50" : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50") active:scale-95 transition">
+                                    <button type="button" onclick="openEditModal(@barber.Id, '@Html.Raw(Html.Encode(barber.FullName))', '@Html.Raw(Html.Encode(barber.DisplayName))', '@Html.Raw(Html.Encode(barber.Specialties ?? ""))', '@Html.Raw(Html.Encode(barber.Bio ?? ""))', '@Html.Raw(Html.Encode(barber.PhotoUrl ?? ""))', '@(barber.BranchId?.ToString() ?? "")', @((int)(barber.CommissionRate * 100)), '@Html.Raw(Html.Encode(barber.PhoneNumber ?? ""))')" class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/60 transition active:scale-95 shadow-2xs">Edit</button>
+                                    <button type="button" onclick="openResetPasswordModal(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))')" class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition active:scale-95 shadow-2xs">Reset</button>
+                                    <button type="button" onclick="confirmToggleStatus(@barber.Id, '@Html.Raw(Html.Encode(barber.DisplayName))', @(barber.IsActive ? "true" : "false"))" class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs font-bold @(barber.IsActive ? "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/60" : "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60") transition active:scale-95 shadow-2xs">
                                         @(barber.IsActive ? "Deactivate" : "Activate")
                                     </button>
                                 </div>

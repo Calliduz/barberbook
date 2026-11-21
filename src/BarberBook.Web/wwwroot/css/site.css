@@ -1285,5 +1285,51 @@ html.dark .kpi-accent-card {
     flex-shrink: 0;
 }
 
+/* 7. MODERN SLIM SCROLLBARS (WCAG 1.4.11 & Modern Web Guidance) */
+:root {
+    --bb-scrollbar-thumb: rgba(148, 163, 184, 0.4);
+    --bb-scrollbar-thumb-hover: rgba(180, 131, 44, 0.7);
+    --bb-scrollbar-track: transparent;
+}
+
+html.dark {
+    --bb-scrollbar-thumb: rgba(148, 163, 184, 0.25);
+    --bb-scrollbar-thumb-hover: rgba(212, 163, 89, 0.7);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bb-scrollbar-thumb) var(--bb-scrollbar-track);
+}
+
+*:hover {
+    scrollbar-color: var(--bb-scrollbar-thumb-hover) var(--bb-scrollbar-track);
+}
+
+@supports not (scrollbar-color: auto) {
+    * {
+        scrollbar-width: auto;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--bb-scrollbar-thumb);
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--bb-scrollbar-thumb-hover);
+}
+
+
 
 
