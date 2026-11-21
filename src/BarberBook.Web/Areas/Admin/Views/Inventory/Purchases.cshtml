@@ -5,110 +5,114 @@
 
 <div class="space-y-8">
     <!-- Header -->
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Buy & Restock Inventory</h1>
-            <p class="mt-1 text-xs sm:text-sm text-slate-500 font-sans">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">Inventory Procurement</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Buy & Restock Inventory</h1>
+            <p class="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-sans">
                 Record supplier inventory restocks that increase retail product stock levels and optionally update cost prices.
             </p>
         </div>
 
-        <button onclick="openPurchaseModal()" class="py-2.5 px-5 rounded-2xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2">
+        <button onclick="openPurchaseModal()" class="py-2.5 px-5 rounded-2xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm flex items-center gap-2 active:scale-95 whitespace-nowrap">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
             <span>Record New Purchase</span>
         </button>
-    </div>
+    </article>
 
     <!-- Alert / Flash Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between">
+        <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span>@TempData["SuccessMessage"]</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 font-bold">&times;</button>
+            <button onclick="this.parentElement.remove()" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 font-bold active:scale-95">&times;</button>
         </div>
     }
 
     <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
-    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
-        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold">
+        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Retail Products
         </a>
-        <span class="px-4 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
+        <span class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-white shadow-xs">
             Buy (Purchases)
         </span>
-        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Sell (Product Sales)
         </a>
-        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Equipment Assets
         </a>
-        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Equipment per Barber
         </a>
-        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Quality Monitoring
         </a>
     </div>
 
     <!-- Stat Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-            <span class="text-xs uppercase font-bold text-slate-500 block">Total Restocking Spend</span>
+        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block">Total Restocking Spend</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.FormattedTotalPurchasedCost</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-amber-700 dark:text-amber-400">@Model.FormattedTotalPurchasedCost</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Total cost outlay for purchased inventory stock</p>
-        </div>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Total cost outlay for purchased inventory stock</p>
+        </article>
 
-        <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-            <span class="text-xs uppercase font-bold text-slate-500 block">Purchase Batches</span>
+        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5">
+            <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block">Purchase Batches</span>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900">@Model.Purchases.Count</span>
-                <span class="text-xs text-slate-500 font-medium">supplier orders</span>
+                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900 dark:text-slate-100">@Model.Purchases.Count</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">supplier orders</span>
             </div>
-            <p class="mt-1 text-xs text-slate-500">Restock orders settled in-shop with suppliers</p>
-        </div>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Restock orders settled in-shop with suppliers</p>
+        </article>
     </div>
 
     <!-- Purchases History Table & Filter Bar -->
-    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+    <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <form method="get" action="/admin/purchases" class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">From:</label>
+                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">From:</label>
                     <input type="date" name="startDate" value="@Model.StartDate"
-                           class="filter-control font-medium" />
+                           class="filter-control font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-1.5 px-3 text-xs focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">To:</label>
+                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">To:</label>
                     <input type="date" name="endDate" value="@Model.EndDate"
-                           class="filter-control font-medium" />
+                           class="filter-control font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-1.5 px-3 text-xs focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                 </div>
-                <button type="submit" class="py-2 px-4 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-xs">
+                <button type="submit" class="py-2 px-4 rounded-xl text-xs font-bold bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700 transition shadow-xs active:scale-95">
                     Filter
                 </button>
                 @if (!string.IsNullOrEmpty(Model.StartDate) || !string.IsNullOrEmpty(Model.EndDate))
                 {
-                    <a href="/admin/purchases" class="text-xs font-bold text-amber-700 hover:text-amber-800 underline">Clear</a>
+                    <a href="/admin/purchases" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 underline active:scale-95">Clear</a>
                 }
             </form>
         </div>
 
         @if (!Model.Purchases.Any())
         {
-            <div class="p-12 text-center text-slate-400 text-sm">
-                <p class="font-semibold text-slate-600">No purchases recorded yet.</p>
-                <p class="text-xs text-slate-400 mt-1">Use "Record New Purchase" above to restock retail grooming inventory.</p>
+            <div class="p-12 text-center text-slate-400 dark:text-slate-500 text-sm">
+                <p class="font-semibold text-slate-600 dark:text-slate-400">No purchases recorded yet.</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Use "Record New Purchase" above to restock retail grooming inventory.</p>
             </div>
         }
         else
         {
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-slate-50/90 dark:bg-slate-850 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th class="py-3 px-4">Order Date</th>
                             <th class="py-3 px-4">Supplier</th>
@@ -119,44 +123,44 @@
                             <th class="py-3 px-4 text-right">Details</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @foreach (var p in Model.Purchases)
                         {
-                            <tr class="hover:bg-slate-50/80 transition">
-                                <td class="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">
+                            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+                                <td class="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                                     @p.PurchasedAt
                                 </td>
-                                <td class="py-3 px-4 font-bold text-slate-900">
+                                <td class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
                                     @p.SupplierName
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                                         @p.Items.Count item@(p.Items.Count > 1 ? "s" : "")
                                     </span>
                                 </td>
-                                <td class="py-3 px-4 text-right font-serif font-bold text-amber-800 whitespace-nowrap">
+                                <td class="py-3 px-4 text-right font-serif font-bold text-amber-800 dark:text-amber-400 whitespace-nowrap">
                                     @p.FormattedTotalCost
                                 </td>
-                                <td class="py-3 px-4 text-xs text-slate-600">
+                                <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-400">
                                     @(p.CreatedByName ?? "Administrator")
                                 </td>
-                                <td class="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
+                                <td class="py-3 px-4 text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate">
                                     @(p.Notes ?? "-")
                                 </td>
                                 <td class="py-3 px-4 text-right">
                                     <button type="button" onclick="showPurchaseItems(@p.Id)"
-                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 hover:bg-amber-500/20 transition active:scale-95">
                                         View Items
                                     </button>
                                 </td>
                             </tr>
-                            <!-- Hidden Line Items Row -->
-                            <tr id="purchase-details-@p.Id" class="hidden bg-slate-50/90 border-b border-slate-200">
+                            <!-- Line Items Row -->
+                            <tr id="purchase-details-@p.Id" class="hidden bg-slate-50/90 dark:bg-slate-850/60 border-b border-slate-200 dark:border-slate-800">
                                 <td colspan="7" class="p-4">
-                                    <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-2">
-                                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Order Items Breakdown</h4>
+                                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Order Items Breakdown</h4>
                                         <table class="w-full text-xs text-left">
-                                            <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100">
+                                            <thead class="text-slate-400 dark:text-slate-500 uppercase font-semibold border-b border-slate-100 dark:border-slate-800">
                                                 <tr>
                                                     <th class="py-1.5">Product</th>
                                                     <th class="py-1.5">SKU</th>
@@ -165,15 +169,15 @@
                                                     <th class="py-1.5 text-right">Line Total</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-slate-100">
+                                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                                 @foreach (var item in p.Items)
                                                 {
                                                     <tr>
-                                                        <td class="py-2 font-bold text-slate-900">@item.ProductName</td>
-                                                        <td class="py-2 font-mono text-slate-500">@item.Sku</td>
-                                                        <td class="py-2 text-center font-bold text-emerald-700">+@item.Quantity</td>
-                                                        <td class="py-2 text-right">@item.FormattedUnitCost</td>
-                                                        <td class="py-2 text-right font-serif font-bold text-slate-900">@item.FormattedLineTotal</td>
+                                                        <td class="py-2 font-bold text-slate-900 dark:text-slate-100">@item.ProductName</td>
+                                                        <td class="py-2 font-mono text-slate-500 dark:text-slate-400">@item.Sku</td>
+                                                        <td class="py-2 text-center font-bold text-emerald-700 dark:text-emerald-400">+@item.Quantity</td>
+                                                        <td class="py-2 text-right text-slate-600 dark:text-slate-300">@item.FormattedUnitCost</td>
+                                                        <td class="py-2 text-right font-serif font-bold text-slate-900 dark:text-slate-100">@item.FormattedLineTotal</td>
                                                     </tr>
                                                 }
                                             </tbody>
@@ -186,20 +190,20 @@
                 </table>
             </div>
         }
-    </div>
+    </article>
 </div>
 
 <!-- ========================================== -->
 <!-- RECORD PURCHASE MODAL                     -->
 <!-- ========================================== -->
-<div id="purchaseModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+<dialog id="purchaseModal" closedby="any" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-2xl w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
-                <h3 class="text-xl font-serif font-black text-slate-900">Record Wholesale Purchase (Buy)</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Restock retail inventory and update cost prices.</p>
+                <h3 class="text-xl font-serif font-black text-slate-900 dark:text-slate-100">Record Wholesale Purchase (Buy)</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Restock retail inventory and update cost prices.</p>
             </div>
-            <button onclick="closePurchaseModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
+            <button type="button" onclick="closePurchaseModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-lg font-bold active:scale-95" aria-label="Close dialog">&times;</button>
         </div>
 
         <form id="purchaseForm" onsubmit="submitPurchase(event)" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
@@ -207,22 +211,22 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Supplier Name *</label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Supplier Name *</label>
                     <input type="text" id="pSupplierName" required placeholder="e.g. Wahl Direct Dist., Reuzel PH"
-                           class="modal-input font-medium" />
+                           class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                 </div>
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Purchase Date</label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Purchase Date</label>
                     <input type="date" id="pPurchasedAt"
-                           class="modal-input font-medium" />
+                           class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                 </div>
             </div>
 
             <!-- Line Items Editor -->
             <div class="space-y-2 pt-2">
                 <div class="flex items-center justify-between">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Purchase Items *</label>
-                    <button type="button" onclick="addPurchaseLine()" class="text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Purchase Items *</label>
+                    <button type="button" onclick="addPurchaseLine()" class="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-800 flex items-center gap-1 active:scale-95">
                         + Add Product Line
                     </button>
                 </div>
@@ -233,36 +237,36 @@
             </div>
 
             <!-- Running Total & Options -->
-            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between shrink-0">
+            <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" id="pUpdateCostPrice" checked class="rounded text-amber-600 focus:ring-amber-500" />
-                    <label for="pUpdateCostPrice" class="text-xs text-slate-700 font-medium">Update Product Cost Price to this invoice</label>
+                    <input type="checkbox" id="pUpdateCostPrice" checked class="rounded text-amber-600 focus:ring-amber-500 dark:bg-slate-800 dark:border-slate-700" />
+                    <label for="pUpdateCostPrice" class="text-xs text-slate-700 dark:text-slate-300 font-medium">Update Product Cost Price to this invoice</label>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Total Cost</span>
-                    <span id="pTotalCostDisplay" class="text-xl font-serif font-black text-amber-800">₱0.00</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block tracking-wider">Total Cost</span>
+                    <span id="pTotalCostDisplay" class="text-xl font-serif font-black text-amber-800 dark:text-amber-400">₱0.00</span>
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Order Notes (Optional)</label>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Order Notes (Optional)</label>
                 <textarea id="pNotes" rows="2" placeholder="e.g. Invoice #99102, cash on delivery"
-                          class="modal-input font-medium"></textarea>
+                          class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
             </div>
 
-            <div id="purchaseError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold"></div>
+            <div id="purchaseError" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-800 dark:text-rose-300 text-xs font-semibold"></div>
 
-            <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-100 shrink-0">
-                <button type="button" onclick="closePurchaseModal()" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+            <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <button type="button" onclick="closePurchaseModal()" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
                     Cancel
                 </button>
-                <button type="submit" id="pSubmitBtn" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                <button type="submit" id="pSubmitBtn" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">
                     Record Purchase
                 </button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
 <script>
     const activeProducts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ActiveProducts.Select(p => new {
@@ -283,11 +287,35 @@
         document.getElementById('pNotes').value = '';
         document.getElementById('purchaseError').classList.add('hidden');
         addPurchaseLine();
-        document.getElementById('purchaseModal').classList.remove('hidden');
+        const modal = document.getElementById('purchaseModal');
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            modal.showModal();
+        }
     }
 
     function closePurchaseModal() {
-        document.getElementById('purchaseModal').classList.add('hidden');
+        const modal = document.getElementById('purchaseModal');
+        if (modal) {
+            if (typeof modal.close === 'function' && modal.open) {
+                modal.close();
+            }
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Modern light-dismiss & cancel listeners
+    const purchaseDialog = document.getElementById('purchaseModal');
+    if (purchaseDialog) {
+        purchaseDialog.addEventListener('click', (e) => {
+            if (e.target === purchaseDialog) {
+                closePurchaseModal();
+            }
+        });
+        purchaseDialog.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            closePurchaseModal();
+        });
     }
 
     function addPurchaseLine() {
@@ -298,6 +326,156 @@
 
         const index = purchaseLines.length;
         const defaultProduct = activeProducts[0];
+        purchaseLines.push({
+            productId: defaultProduct.id,
+            quantity: 1,
+            unitCost: defaultProduct.cost
+        });
+
+        renderPurchaseLines();
+    }
+
+    function removePurchaseLine(index) {
+        if (purchaseLines.length <= 1) return;
+        purchaseLines.splice(index, 1);
+        renderPurchaseLines();
+    }
+
+    function onProductSelected(index, selectElem) {
+        const pId = parseInt(selectElem.value);
+        const prod = activeProducts.find(p => p.id === pId);
+        if (prod) {
+            purchaseLines[index].productId = pId;
+            purchaseLines[index].unitCost = prod.cost;
+            const costInput = document.getElementById(`pCost_${index}`);
+            if (costInput) costInput.value = prod.cost;
+            calculateTotal();
+        }
+    }
+
+    function onQtyChanged(index, val) {
+        purchaseLines[index].quantity = parseInt(val) || 0;
+        calculateTotal();
+    }
+
+    function onCostChanged(index, val) {
+        purchaseLines[index].unitCost = parseFloat(val) || 0;
+        calculateTotal();
+    }
+
+    function renderPurchaseLines() {
+        const container = document.getElementById('purchaseLinesContainer');
+        container.innerHTML = '';
+
+        purchaseLines.forEach((line, i) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700';
+
+            let optionsHtml = '';
+            activeProducts.forEach(p => {
+                optionsHtml += `<option value="${p.id}" ${p.id === line.productId ? 'selected' : ''}>${p.name} (${p.sku})</option>`;
+            });
+
+            row.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <select onchange="onProductSelected(${i}, this)" class="modal-input font-medium text-xs py-1.5 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="w-20 shrink-0">
+                    <input type="number" min="1" value="${line.quantity}" oninput="onQtyChanged(${i}, this.value)"
+                           placeholder="Qty" class="modal-input font-bold text-xs py-1.5 text-center w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+                </div>
+                <div class="w-28 shrink-0">
+                    <input type="number" step="0.01" min="0" id="pCost_${i}" value="${line.unitCost}" oninput="onCostChanged(${i}, this.value)"
+                           placeholder="Cost ₱" class="modal-input font-mono text-xs py-1.5 text-right font-semibold w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+                </div>
+                <div class="shrink-0">
+                    <button type="button" onclick="removePurchaseLine(${i})" class="text-rose-500 hover:text-rose-700 p-1 font-bold text-sm active:scale-95" title="Remove">&times;</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        purchaseLines.forEach(l => {
+            total += (l.quantity || 0) * (l.unitCost || 0);
+        });
+        document.getElementById('pTotalCostDisplay').textContent = `₱${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    async function submitPurchase(e) {
+        e.preventDefault();
+        const errDiv = document.getElementById('purchaseError');
+        errDiv.classList.add('hidden');
+
+        const supplier = document.getElementById('pSupplierName').value.trim();
+        if (!supplier) {
+            errDiv.textContent = 'Supplier name is required.';
+            errDiv.classList.remove('hidden');
+            return;
+        }
+
+        const validItems = purchaseLines.filter(l => l.quantity > 0 && l.productId > 0);
+        if (validItems.length === 0) {
+            errDiv.textContent = 'Please specify at least one valid item with quantity > 0.';
+            errDiv.classList.remove('hidden');
+            return;
+        }
+
+        const payload = {
+            supplierName: supplier,
+            purchasedAt: document.getElementById('pPurchasedAt').value || null,
+            notes: document.getElementById('pNotes').value.trim() || null,
+            updateCostPrice: document.getElementById('pUpdateCostPrice').checked,
+            items: validItems.map(l => ({
+                productId: l.productId,
+                quantity: l.quantity,
+                unitCost: l.unitCost
+            }))
+        };
+
+        const btn = document.getElementById('pSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            const resp = await fetch('/admin/purchases', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                const data = await resp.json();
+                errDiv.textContent = data.error || 'Failed to record purchase.';
+                errDiv.classList.remove('hidden');
+            }
+        } catch (err) {
+            errDiv.textContent = 'Network or server error while recording purchase.';
+            errDiv.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Record Purchase';
+        }
+    }
+
+    function showPurchaseItems(id) {
+        const row = document.getElementById(`purchase-details-${id}`);
+        if (row) {
+            row.classList.toggle('hidden');
+        }
+    }
+</script>
         purchaseLines.push({
             productId: defaultProduct.id,
             quantity: 1,

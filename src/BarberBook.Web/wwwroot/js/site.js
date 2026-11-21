@@ -22,6 +22,11 @@
             document.documentElement.setAttribute('data-theme', 'light');
             if (document.body) document.body.classList.remove('dark-mode');
         }
+
+        const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+        if (metaColorScheme) {
+            metaColorScheme.content = storedTheme ? (isDark ? 'dark' : 'light') : 'light dark';
+        }
         updateThemeIcons();
     };
 
@@ -37,6 +42,11 @@
             document.documentElement.setAttribute('data-theme', 'dark');
             if (document.body) document.body.classList.add('dark-mode');
             localStorage.setItem('barberbook_theme', 'dark');
+        }
+
+        const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+        if (metaColorScheme) {
+            metaColorScheme.content = !isDark ? 'dark' : 'light';
         }
         updateThemeIcons();
         window.dispatchEvent(new CustomEvent('barberbook-theme-change', { detail: { isDark: !isDark } }));
@@ -199,12 +209,18 @@
 
         window.openCommandPalette = function () {
             palette.classList.remove('hidden');
+            if (typeof palette.showModal === 'function') {
+                try { palette.showModal(); } catch (_) {}
+            }
             input.value = '';
             filterCommands('');
             setTimeout(() => input.focus(), 50);
         };
 
         window.closeCommandPalette = function () {
+            if (typeof palette.close === 'function') {
+                try { palette.close(); } catch (_) {}
+            }
             palette.classList.add('hidden');
         };
 

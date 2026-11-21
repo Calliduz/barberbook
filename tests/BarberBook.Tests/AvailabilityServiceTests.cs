@@ -234,6 +234,14 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
             StartTime = new LocalTime(9, 0),
             EndTime = new LocalTime(18, 0)
         });
+
+        var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == barber.Id && d.Date == date).ToListAsync();
+        db.DaysOff.RemoveRange(existingDaysOff);
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+
         await db.SaveChangesAsync();
 
         // "Now" is set to 2026-11-20 at 14:15 Asia/Manila (06:15 UTC)
@@ -469,6 +477,14 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
             StartTime = new LocalTime(9, 0),
             EndTime = new LocalTime(18, 0)
         });
+
+        var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == barber.Id && d.Date == date).ToListAsync();
+        db.DaysOff.RemoveRange(existingDaysOff);
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+
         await db.SaveChangesAsync();
 
         var fixedClock = new FixedTestClock(Instant.FromUtc(2026, 11, 20, 0, 0));

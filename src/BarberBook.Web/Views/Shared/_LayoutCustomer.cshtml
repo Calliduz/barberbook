@@ -3,17 +3,24 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>@ViewData["Title"] - BarberBook Master Grooming</title>
     
-    <!-- Dark Mode Init to prevent FOUC -->
+    <!-- Dark Mode Init to prevent FOUC & synchronize color-scheme meta -->
     <script>
-        if (localStorage.getItem('barberbook_theme') === 'dark' || (!localStorage.getItem('barberbook_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
+        (function() {
+            var stored = localStorage.getItem('barberbook_theme');
+            var isDark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            var meta = document.querySelector('meta[name="color-scheme"]');
+            if (meta) meta.content = stored ? (isDark ? 'dark' : 'light') : 'light dark';
+        })();
     </script>
 
     <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
@@ -67,7 +74,7 @@
                         <a href="/services" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isServices ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Services</a>
                         <a href="/products" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isProducts ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Grooming Products</a>
                         <a href="/barbers" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap @(isBarbers ? "bg-amber-500/15 text-amber-300 border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-800/80")">Master Barbers</a>
-                        <a href="/book" class="ml-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold bg-brand-500 text-slate-950 shadow-md hover:bg-brand-400 transition transform hover:-translate-y-0.5 whitespace-nowrap">
+                        <a href="/book" class="ml-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold bg-brand-500 text-slate-950 shadow-md hover:bg-brand-400 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 transition-all duration-150 whitespace-nowrap">
                             Book Appointment
                         </a>
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
@@ -81,7 +88,7 @@
                 <div class="flex items-center space-x-2">
                     <!-- Global Command Palette Search Button -->
                     <button type="button" onclick="openCommandPalette()"
-                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 transition"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                             title="Search pages and bookings (Ctrl+K or /)"
                             aria-label="Search pages and bookings">
                         <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
@@ -91,7 +98,7 @@
 
                     <!-- Dark Mode Toggle Button -->
                     <button type="button" onclick="toggleDarkMode()"
-                            class="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 transition"
+                            class="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                             title="Toggle Light / Dark Mode"
                             aria-label="Toggle Light or Dark Mode">
                         <!-- Sun Icon (shown in dark mode) -->
@@ -121,8 +128,9 @@
         <div id="customer-mobile-menu" class="hidden md:hidden bg-slate-950/95 border-t border-slate-800 px-4 pt-3 pb-5 space-y-2 backdrop-blur-md">
             <a href="/" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isHome ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Home</a>
             <a href="/services" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isServices ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Services Menu</a>
+            <a href="/products" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isProducts ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Grooming Products</a>
             <a href="/barbers" class="block px-3.5 py-2.5 rounded-xl text-sm font-semibold transition @(isBarbers ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30" : "text-slate-300 hover:text-white hover:bg-slate-900")">Master Barbers</a>
-            <a href="/book" class="block px-3.5 py-2.5 rounded-xl text-sm font-bold bg-amber-500 text-slate-950 text-center shadow-md hover:bg-amber-400 transition">
+            <a href="/book" class="block px-3.5 py-2.5 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 text-center shadow-md transition-all duration-150">
                 Book Appointment
             </a>
             @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))

@@ -76,6 +76,7 @@ public class BarberAppointmentItemViewModel
     public string FormattedPrice { get; set; } = string.Empty;
     public Instant StartsAt { get; set; }
     public Instant EndsAt { get; set; }
+    public int DurationMinutes => (int)(EndsAt - StartsAt).TotalMinutes;
     public string ScheduledDateFormatted { get; set; } = string.Empty;
     public string ScheduledDateString { get; set; } = string.Empty;
     public string ScheduledTime12h { get; set; } = string.Empty;

@@ -6,42 +6,42 @@
 
 <div class="space-y-6">
     <!-- Header -->
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Equipment Quality Monitoring</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white tracking-tight">Equipment Quality Monitoring</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Monitor equipment condition, track overdue inspection schedules, and review tool maintenance logs.
             </p>
         </div>
 
         <div class="flex items-center gap-2">
-            <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+            <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">
                 &larr; Back to Equipment
             </a>
-            <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+            <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">
                 Equipment per Barber
             </a>
         </div>
     </div>
 
     <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
-    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
-        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold">
+        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Retail Products
         </a>
-        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Buy (Purchases)
         </a>
-        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Sell (Product Sales)
         </a>
-        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Equipment Assets
         </a>
-        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <a href="/admin/equipment/per-barber" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
             Equipment per Barber
         </a>
-        <span class="px-4 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
+        <span class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 shadow-xs font-bold">
             Quality Monitoring
         </span>
     </div>
@@ -49,17 +49,17 @@
     <!-- Alert Banner if Flagged Items Exist -->
     @if (m.TotalFlaggedCount > 0)
     {
-        <div class="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-950 dark:text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 rounded-xl bg-rose-600 text-white shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
                 <div>
                     <h3 class="text-sm font-bold">@m.TotalFlaggedCount Flagged Equipment Items Require Action</h3>
-                    <p class="text-xs text-rose-700 mt-0.5">Items in poor condition, under maintenance, or overdue for scheduled inspection.</p>
+                    <p class="text-xs text-rose-700 dark:text-rose-400 mt-0.5">Items in poor condition, under maintenance, or overdue for scheduled inspection.</p>
                 </div>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-black bg-rose-200 text-rose-900 border border-rose-300">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-rose-200 dark:bg-rose-900/60 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
                 Action Required
             </span>
         </div>
@@ -67,53 +67,53 @@
 
     <!-- 4 Monitoring Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span class="text-xs uppercase font-bold text-rose-600 block">Poor Condition</span>
-            <div class="mt-2 text-3xl font-serif font-black @(m.PoorCondition.Count > 0 ? "text-rose-600" : "text-slate-900")">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700">
+            <span class="text-xs uppercase font-bold text-rose-600 dark:text-rose-400 block tracking-wider">Poor Condition</span>
+            <div class="mt-2 text-3xl font-serif font-black @(m.PoorCondition.Count > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white")">
                 @m.PoorCondition.Count
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Requires repair or replacement</p>
-        </div>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Requires repair or replacement</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span class="text-xs uppercase font-bold text-amber-600 block">Under Maintenance / Out</span>
-            <div class="mt-2 text-3xl font-serif font-black @(m.UnderMaintenanceOrOutOfService.Count > 0 ? "text-amber-600" : "text-slate-900")">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700">
+            <span class="text-xs uppercase font-bold text-amber-600 dark:text-amber-400 block tracking-wider">Under Maintenance / Out</span>
+            <div class="mt-2 text-3xl font-serif font-black @(m.UnderMaintenanceOrOutOfService.Count > 0 ? "text-amber-600 dark:text-amber-400" : "text-slate-900 dark:text-white")">
                 @m.UnderMaintenanceOrOutOfService.Count
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Currently removed from service</p>
-        </div>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Currently removed from service</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span class="text-xs uppercase font-bold text-rose-600 block">Overdue Inspection</span>
-            <div class="mt-2 text-3xl font-serif font-black @(m.OverdueForInspection.Count > 0 ? "text-rose-600" : "text-slate-900")">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700">
+            <span class="text-xs uppercase font-bold text-rose-600 dark:text-rose-400 block tracking-wider">Overdue Inspection</span>
+            <div class="mt-2 text-3xl font-serif font-black @(m.OverdueForInspection.Count > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white")">
                 @m.OverdueForInspection.Count
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Past scheduled inspection date</p>
-        </div>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Past scheduled inspection date</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span class="text-xs uppercase font-bold text-emerald-600 block">Healthy In-Service</span>
-            <div class="mt-2 text-3xl font-serif font-black text-emerald-600">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700">
+            <span class="text-xs uppercase font-bold text-emerald-600 dark:text-emerald-400 block tracking-wider">Healthy In-Service</span>
+            <div class="mt-2 text-3xl font-serif font-black text-emerald-600 dark:text-emerald-400">
                 @m.Healthy.Count
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Fully operational and up-to-date</p>
-        </div>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Fully operational and up-to-date</p>
+        </article>
     </div>
 
     <!-- Group 1: Overdue for Inspection -->
     @if (m.OverdueForInspection.Count > 0)
     {
-        <div class="bg-white/95 rounded-2xl border border-rose-200 shadow-sm overflow-hidden p-5 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-rose-100">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900/60 shadow-sm overflow-hidden p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-rose-950">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-rose-600"></span>
-                    <h2 class="text-base font-serif font-bold text-rose-950">Overdue for Inspection (@m.OverdueForInspection.Count)</h2>
+                    <h2 class="text-base font-serif font-bold text-rose-950 dark:text-rose-200">Overdue for Inspection (@m.OverdueForInspection.Count)</h2>
                 </div>
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-rose-200">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-rose-50 text-[11px] uppercase font-bold tracking-wider text-rose-900 border-b border-rose-200">
+            <div class="overflow-x-auto rounded-xl border border-rose-200 dark:border-rose-900/50">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-rose-50 dark:bg-rose-950/40 text-[11px] uppercase font-bold tracking-wider text-rose-900 dark:text-rose-300 border-b border-rose-200 dark:border-rose-900/50">
                         <tr>
                             <th class="py-3 px-4">Asset Tag</th>
                             <th class="py-3 px-4">Equipment Name</th>
@@ -123,16 +123,16 @@
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-rose-100 bg-white">
+                    <tbody class="divide-y divide-rose-100 dark:divide-rose-950 bg-white dark:bg-slate-900">
                         @foreach (var o in m.OverdueForInspection)
                         {
-                            <tr class="hover:bg-rose-50/50 transition">
-                                <td class="py-3 px-4 font-mono font-bold text-xs text-rose-800">@o.AssetTag</td>
-                                <td class="py-3 px-4 font-bold text-slate-900">@o.Name</td>
+                            <tr class="hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition">
+                                <td class="py-3 px-4 font-mono font-bold text-xs text-rose-800 dark:text-rose-400">@o.AssetTag</td>
+                                <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">@o.Name</td>
                                 <td class="py-3 px-4 text-xs">@(o.CurrentBarberName ?? "Unassigned (Shop)")</td>
-                                <td class="py-3 px-4 text-center font-mono text-xs text-rose-700">@o.NextCheckDue</td>
+                                <td class="py-3 px-4 text-center font-mono text-xs text-rose-700 dark:text-rose-400">@o.NextCheckDue</td>
                                 <td class="py-3 px-4 text-center">
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-800">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300">
                                         @o.DaysOverdue days late
                                     </span>
                                 </td>
@@ -141,12 +141,12 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="condition" value="Good" />
                                         <input type="hidden" name="notes" value="Inspection verified: tool sanitized and fully operational." />
-                                        <button type="submit" class="py-1 px-2.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition" title="Quick log as Good & Sanitized">
+                                        <button type="submit" class="py-1 px-2.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition active:scale-95" title="Quick log as Good & Sanitized">
                                             ✓ Pass Inspection
                                         </button>
                                     </form>
                                     <button onclick="openQualityInspectModal(@o.Id, '@o.Name', '@o.AssetTag')"
-                                            class="py-1 px-3 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
+                                            class="py-1 px-3 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition active:scale-95 shadow-xs">
                                         Log Details
                                     </button>
                                 </td>
@@ -155,23 +155,23 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </article>
     }
 
     <!-- Group 2: Poor Condition Items -->
     @if (m.PoorCondition.Count > 0)
     {
-        <div class="bg-white/95 rounded-2xl border border-rose-200 shadow-sm overflow-hidden p-5 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-rose-100">
+        <article class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900/60 shadow-sm overflow-hidden p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-rose-950">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-rose-600"></span>
-                    <h2 class="text-base font-serif font-bold text-rose-950">Poor Condition Tools (@m.PoorCondition.Count)</h2>
+                    <h2 class="text-base font-serif font-bold text-rose-950 dark:text-rose-200">Poor Condition Tools (@m.PoorCondition.Count)</h2>
                 </div>
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-rose-200">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-rose-50 text-[11px] uppercase font-bold tracking-wider text-rose-900 border-b border-rose-200">
+            <div class="overflow-x-auto rounded-xl border border-rose-200 dark:border-rose-900/50">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-rose-50 dark:bg-rose-950/40 text-[11px] uppercase font-bold tracking-wider text-rose-900 dark:text-rose-300 border-b border-rose-200 dark:border-rose-900/50">
                         <tr>
                             <th class="py-3 px-4">Asset Tag</th>
                             <th class="py-3 px-4">Equipment Name</th>
@@ -181,20 +181,20 @@
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-rose-100 bg-white">
+                    <tbody class="divide-y divide-rose-100 dark:divide-rose-950 bg-white dark:bg-slate-900">
                         @foreach (var p in m.PoorCondition)
                         {
-                            <tr class="hover:bg-rose-50/50 transition">
-                                <td class="py-3 px-4 font-mono font-bold text-xs text-rose-800">@p.AssetTag</td>
-                                <td class="py-3 px-4 font-bold text-slate-900">@p.Name</td>
+                            <tr class="hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition">
+                                <td class="py-3 px-4 font-mono font-bold text-xs text-rose-800 dark:text-rose-400">@p.AssetTag</td>
+                                <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">@p.Name</td>
                                 <td class="py-3 px-4 text-xs">@(p.CurrentBarberName ?? "Unassigned (Shop)")</td>
                                 <td class="py-3 px-4 text-center">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">Poor</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300">Poor</span>
                                 </td>
                                 <td class="py-3 px-4 text-center text-xs">@p.Status</td>
                                 <td class="py-3 px-4 text-right whitespace-nowrap">
                                     <button onclick="openQualityInspectModal(@p.Id, '@p.Name', '@p.AssetTag')"
-                                            class="py-1 px-3 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
+                                            class="py-1 px-3 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition active:scale-95 shadow-xs">
                                         Update Condition
                                     </button>
                                 </td>
@@ -203,21 +203,21 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </article>
     }
 
     <!-- Recent Inspection Checks History -->
-    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+    <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
-                <h2 class="text-base font-serif font-bold text-slate-900 tracking-tight">Recent Inspection Audit Trail</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Historical inspection checks logged by barbers and administrators</p>
+                <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white tracking-tight">Recent Inspection Audit Trail</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Historical inspection checks logged by barbers and administrators</p>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                     <tr>
                         <th class="py-3 px-4">Asset Tag</th>
                         <th class="py-3 px-4">Equipment Name</th>
@@ -228,53 +228,53 @@
                         <th class="py-3 px-4">Notes</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                     @if (Model.RecentChecks.Count == 0)
                     {
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-slate-400 text-xs italic">
+                            <td colspan="7" class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
                                 No inspections recorded yet.
                             </td>
                         </tr>
                     }
                     @foreach (var c in Model.RecentChecks)
                     {
-                        <tr class="hover:bg-slate-50/80 transition text-xs">
-                            <td class="py-3 px-4 font-mono font-bold text-amber-700">@c.AssetTag</td>
-                            <td class="py-3 px-4 font-bold text-slate-900">@c.EquipmentName</td>
-                            <td class="py-3 px-4 font-mono text-slate-500">@c.CheckedAt</td>
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition text-xs">
+                            <td class="py-3 px-4 font-mono font-bold text-amber-700 dark:text-amber-400">@c.AssetTag</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">@c.EquipmentName</td>
+                            <td class="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">@c.CheckedAt</td>
                             <td class="py-3 px-4 text-center">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase @(c.Condition == "poor" ? "bg-rose-100 text-rose-800" : (c.Condition == "fair" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"))">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase @(c.Condition == "poor" ? "bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300" : (c.Condition == "fair" ? "bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300" : "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300"))">
                                     @c.Condition
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-center font-mono text-slate-700">@c.NextCheckDue</td>
-                            <td class="py-3 px-4 text-slate-700">@(c.CheckedByName ?? "System")</td>
-                            <td class="py-3 px-4 text-slate-500 italic">@(c.Notes ?? "-")</td>
+                            <td class="py-3 px-4 text-center font-mono text-slate-700 dark:text-slate-300">@c.NextCheckDue</td>
+                            <td class="py-3 px-4 text-slate-700 dark:text-slate-300">@(c.CheckedByName ?? "System")</td>
+                            <td class="py-3 px-4 text-slate-500 dark:text-slate-400 italic">@(c.Notes ?? "-")</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </div>
+    </article>
 </div>
 
-<!-- Log Inspection Modal -->
-<div id="qualityInspectModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+<!-- Log Inspection Modal (HTML5 Native Dialog with light dismiss and scroll containment) -->
+<dialog id="qualityInspectModal" closedby="any" aria-labelledby="qualityInspectHeader" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-md w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
-                <h3 class="text-xl font-serif font-black text-slate-900">Log Equipment Inspection</h3>
-                <p id="qualityInspectTitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
+                <h3 id="qualityInspectHeader" class="text-xl font-serif font-black text-slate-900 dark:text-white">Log Equipment Inspection</h3>
+                <p id="qualityInspectTitle" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5"></p>
             </div>
-            <button onclick="document.getElementById('qualityInspectModal').classList.add('hidden')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg font-bold">&times;</button>
+            <button type="button" onclick="closeQualityInspectModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-lg font-bold active:scale-95">&times;</button>
         </div>
 
         <form id="qualityInspectForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
             @Html.AntiForgeryToken()
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Equipment Condition *</label>
-                <select name="condition" required class="modal-input font-medium">
+                <label for="qualityInspectCondition" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Equipment Condition *</label>
+                <select id="qualityInspectCondition" name="condition" required class="modal-input font-medium dark:bg-slate-800 dark:text-white dark:border-slate-700">
                     <option value="Good">Good - Fully operational and sanitized</option>
                     <option value="Excellent">Excellent - Mint condition</option>
                     <option value="Fair">Fair - Minor wear, acceptable for service</option>
@@ -282,27 +282,57 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Custom Next Check Due Date (optional)</label>
-                <input type="date" name="nextCheckDue" class="modal-input font-medium" />
-                <p class="text-[10px] text-slate-400 mt-1">If blank, calculates automatically based on inspection interval.</p>
+                <label for="qualityInspectNextDue" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Custom Next Check Due Date (optional)</label>
+                <input type="date" id="qualityInspectNextDue" name="nextCheckDue" class="modal-input font-medium dark:bg-slate-800 dark:text-white dark:border-slate-700" />
+                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">If blank, calculates automatically based on inspection interval.</p>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Inspection Notes / Sanitization Log</label>
-                <textarea name="notes" rows="2" placeholder="e.g. Cleaned, lubricated clipper heads, tension inspected..." class="modal-input font-medium"></textarea>
+                <label for="qualityInspectNotes" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Inspection Notes / Sanitization Log</label>
+                <textarea id="qualityInspectNotes" name="notes" rows="2" placeholder="e.g. Cleaned, lubricated clipper heads, tension inspected..." class="modal-input font-medium dark:bg-slate-800 dark:text-white dark:border-slate-700"></textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 shrink-0">
-                <button type="button" onclick="document.getElementById('qualityInspectModal').classList.add('hidden')" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Cancel</button>
-                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Record Inspection</button>
+            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <button type="button" onclick="closeQualityInspectModal()" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">Cancel</button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">Record Inspection</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
 <script>
     function openQualityInspectModal(id, name, tag) {
         document.getElementById('qualityInspectForm').action = '/admin/inventory/equipment/' + id + '/inspect';
         document.getElementById('qualityInspectTitle').innerText = name + ' (' + tag + ')';
-        document.getElementById('qualityInspectModal').classList.remove('hidden');
+        const modal = document.getElementById('qualityInspectModal');
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            modal.showModal();
+        }
     }
+
+    function closeQualityInspectModal() {
+        const modal = document.getElementById('qualityInspectModal');
+        if (typeof modal.close === 'function') {
+            modal.close();
+        }
+        modal.classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('qualityInspectModal');
+        if (!modal) return;
+        modal.addEventListener('cancel', function () {
+            modal.classList.add('hidden');
+        });
+        modal.addEventListener('click', function (e) {
+            const rect = modal.getBoundingClientRect();
+            const isInDialog = (
+                rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+                rect.left <= e.clientX && e.clientX <= rect.left + rect.width
+            );
+            if (!isInDialog) {
+                closeQualityInspectModal();
+            }
+        });
+    });
 </script>
 

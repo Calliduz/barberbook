@@ -22,19 +22,19 @@
             <div id="step-progress-bar" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-amber-500 transition-all duration-300 -z-0" style="width: 0%;"></div>
 
             <!-- Step 1 Indicator -->
-            <button type="button" onclick="goToStep(1)" id="step-indicator-1" aria-label="Step 1: Choose Service" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 transition-colors bg-amber-500 text-slate-950 border-amber-500 shadow-md focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button type="button" onclick="goToStep(1)" id="step-indicator-1" aria-label="Step 1: Choose Service" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all active:scale-90 bg-amber-500 text-slate-950 border-amber-500 shadow-md focus:outline-none focus:ring-2 focus:ring-amber-500">
                 1
             </button>
             <!-- Step 2 Indicator -->
-            <button type="button" onclick="goToStep(2)" id="step-indicator-2" aria-label="Step 2: Choose Barber" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button type="button" onclick="goToStep(2)" id="step-indicator-2" aria-label="Step 2: Choose Barber" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-all active:scale-90 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 2
             </button>
             <!-- Step 3 Indicator -->
-            <button type="button" onclick="goToStep(3)" id="step-indicator-3" aria-label="Step 3: Select Date and Time" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button type="button" onclick="goToStep(3)" id="step-indicator-3" aria-label="Step 3: Select Date and Time" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-all active:scale-90 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 3
             </button>
             <!-- Step 4 Indicator -->
-            <button type="button" onclick="goToStep(4)" id="step-indicator-4" aria-label="Step 4: Review and Confirm Booking" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button type="button" onclick="goToStep(4)" id="step-indicator-4" aria-label="Step 4: Review and Confirm Booking" class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-all active:scale-90 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 4
             </button>
         </div>
@@ -62,7 +62,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @foreach (var svc in Model.Services)
             {
-                <div class="service-card cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-amber-500/60 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                <div class="service-card cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-amber-500/60 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
                      tabindex="0"
                      role="button"
                      aria-pressed="false"
@@ -116,7 +116,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="barbers-list-container">
             @foreach (var barber in Model.Barbers)
             {
-                <div class="barber-card cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-amber-500/60 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                <div class="barber-card cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-amber-500/60 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
                      tabindex="0"
                      role="button"
                      aria-pressed="false"
@@ -262,7 +262,7 @@
 
         <!-- Submit Button -->
         <button type="button" id="submit-booking-btn" onclick="submitBooking()"
-                class="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                class="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-black text-base transition-all duration-150 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
             <span>Confirm & Book Appointment &rarr;</span>
         </button>
     </div>
@@ -362,11 +362,11 @@
             const ind = document.getElementById(`step-indicator-${i}`);
             if (ind) {
                 if (i < step) {
-                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-amber-100 text-amber-900 border-amber-500 shadow-xs';
+                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border-amber-500 shadow-xs';
                 } else if (i === step) {
                     ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 transition-colors bg-amber-500 text-slate-950 border-amber-500 shadow-md';
                 } else {
-                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors bg-white text-slate-400 border-slate-300';
+                    ind.className = 'relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-300 dark:border-slate-700';
                 }
             }
         }
@@ -390,8 +390,8 @@
         state.serviceDuration = duration;
 
         document.querySelectorAll('.service-card').forEach(c => {
-            c.classList.remove('border-amber-500', 'bg-amber-50/40', 'ring-2', 'ring-amber-500/20');
-            c.classList.add('border-slate-200/90', 'bg-white');
+            c.classList.remove('border-amber-500', 'bg-amber-50/40', 'dark:bg-amber-950/20', 'ring-2', 'ring-amber-500/20');
+            c.classList.add('border-slate-200/90', 'dark:border-slate-800', 'bg-white', 'dark:bg-slate-900');
         });
         const chosen = document.querySelector(`.service-card[data-id="${id}"]`);
         if (chosen) highlightCard(chosen, 'service');
@@ -404,8 +404,8 @@
         state.barberName = name;
 
         document.querySelectorAll('.barber-card').forEach(c => {
-            c.classList.remove('border-amber-500', 'bg-amber-50/40', 'ring-2', 'ring-amber-500/20');
-            c.classList.add('border-slate-200/90', 'bg-white');
+            c.classList.remove('border-amber-500', 'bg-amber-50/40', 'dark:bg-amber-950/20', 'ring-2', 'ring-amber-500/20');
+            c.classList.add('border-slate-200/90', 'dark:border-slate-800', 'bg-white', 'dark:bg-slate-900');
         });
         const chosen = document.querySelector(`.barber-card[data-id="${id}"]`);
         if (chosen) highlightCard(chosen, 'barber');
@@ -415,11 +415,11 @@
 
     function filterBarbersByBranch(branchId) {
         document.querySelectorAll('.branch-chip').forEach(btn => {
-            btn.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-200/80 hover:bg-slate-300 transition';
+            btn.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition active:scale-95';
         });
         const activeChip = branchId ? document.getElementById(`branch-chip-${branchId}`) : document.getElementById('branch-chip-all');
         if (activeChip) {
-            activeChip.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs';
+            activeChip.className = 'branch-chip px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-xs active:scale-95';
         }
 
         document.querySelectorAll('.barber-card').forEach(card => {
@@ -436,8 +436,10 @@
         document.querySelectorAll(`.${type}-card`).forEach(c => {
             c.setAttribute('aria-pressed', 'false');
         });
-        card.classList.remove('border-slate-200/90', 'bg-white');
-        card.classList.add('border-amber-500', 'bg-amber-50/40', 'ring-2', 'ring-amber-500/20');
+        card.classList.remove('border-slate-200/90', 'dark:border-slate-800', 'bg-white', 'dark:bg-slate-900');
+        card.classList.add('border-amber-500', 'bg-amber-50/40', 'dark:bg-amber-950/20', 'ring-2', 'ring-amber-500/20');
+        card.setAttribute('aria-pressed', 'true');
+    }
         card.setAttribute('aria-pressed', 'true');
     }
 
@@ -486,7 +488,7 @@
                 const slotIso = slot.startsAtIso || (typeof slot.startsAtUtc === 'string' ? slot.startsAtUtc : null);
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'slot-btn py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-500 hover:bg-amber-50/50 text-slate-800 font-bold text-sm transition-all text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs';
+                btn.className = 'slot-btn py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 text-slate-800 dark:text-slate-200 font-bold text-sm transition-all hover:-translate-y-0.5 active:scale-95 text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs';
                 btn.innerText = slot.formattedTime;
                 btn.setAttribute('aria-pressed', 'false');
                 btn.setAttribute('aria-label', `Select time slot ${slot.formattedTime}`);
@@ -504,11 +506,11 @@
         state.slotFormattedTime = formattedTime;
 
         document.querySelectorAll('.slot-btn').forEach(b => {
-            b.className = 'slot-btn py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-500 hover:bg-amber-50/50 text-slate-800 font-bold text-sm transition-all text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs';
+            b.className = 'slot-btn py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 text-slate-800 dark:text-slate-200 font-bold text-sm transition-all hover:-translate-y-0.5 active:scale-95 text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs';
             b.setAttribute('aria-pressed', 'false');
         });
 
-        btn.className = 'slot-btn py-3 px-2 rounded-xl border-2 border-amber-500 bg-amber-500 text-slate-950 font-black text-sm transition-all text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-md';
+        btn.className = 'slot-btn py-3 px-2 rounded-xl border-2 border-amber-500 bg-amber-500 text-slate-950 font-black text-sm transition-all scale-[1.02] text-center focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-md';
         btn.setAttribute('aria-pressed', 'true');
 
         setTimeout(() => goToStep(4), 250);

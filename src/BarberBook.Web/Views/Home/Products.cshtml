@@ -35,13 +35,13 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <!-- Category Filter Pills -->
         <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <a href="/products" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.IsNullOrEmpty(selectedCat) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
+            <a href="/products" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 @(string.IsNullOrEmpty(selectedCat) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
                 All Products
             </a>
             @foreach (var cat in categories)
             {
                 <a href="/products?category=@cat@(string.IsNullOrEmpty(searchTerm) ? "" : $"&search={searchTerm}")"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition @(string.Equals(selectedCat, cat, StringComparison.OrdinalIgnoreCase) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
+                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 @(string.Equals(selectedCat, cat, StringComparison.OrdinalIgnoreCase) ? "bg-slate-900 text-amber-300 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white")">
                     @cat
                 </a>
             }
@@ -58,7 +58,7 @@
                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" />
                 <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
-            <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-xs">
+            <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold active:scale-95 transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
                 Search
             </button>
             @if (!string.IsNullOrEmpty(searchTerm) || !string.IsNullOrEmpty(selectedCat))
@@ -88,9 +88,9 @@
             @foreach (var p in Model)
             {
                 var iconType = GetProductIcon(p.Category, p.Name);
-                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-amber-500/50 transition duration-300 group">
+                <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:border-amber-500/50 hover:-translate-y-0.5 transition-all duration-200 group">
                     <!-- Product Header Box with Vintage Motif -->
-                    <div class="p-6 bg-slate-900 text-white relative overflow-hidden flex items-center justify-between">
+                    <header class="p-6 bg-slate-900 text-white relative overflow-hidden flex items-center justify-between">
                         <div class="space-y-1 relative z-10">
                             <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                                 @p.Category
@@ -112,7 +112,7 @@
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                             }
                         </div>
-                    </div>
+                    </header>
 
                     <!-- Product Body Content -->
                     <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
@@ -158,14 +158,14 @@
                         </div>
 
                         <!-- Card Footer -->
-                        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                        <footer class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                             <span class="text-[11px] text-slate-500 dark:text-slate-400 italic">Available in-shop</span>
-                            <a href="/book" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 transition-transform">
+                            <a href="/book" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 active:scale-[0.98] transition-transform">
                                 Book &amp; Visit Shop &rarr;
                             </a>
-                        </div>
+                        </footer>
                     </div>
-                </div>
+                </article>
             }
         </div>
     }

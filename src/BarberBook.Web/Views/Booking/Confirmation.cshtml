@@ -20,7 +20,7 @@
                 </svg>
             </div>
 
-            <h1 class="text-2xl sm:text-3xl font-serif font-black text-amber-50 tracking-tight">Booking Submitted!</h1>
+            <h1 class="text-2xl sm:text-3xl font-serif font-black text-amber-50 tracking-tight">Booking Submitted</h1>
             <p class="mt-2 text-sm text-neutral-400">Your appointment request has been recorded successfully.</p>
 
             <!-- Reference Code Highlight Box with Mini Barber Pole -->
@@ -93,15 +93,15 @@
         <!-- Calendar Sync & Print Slip (Enterprise Booking Feature) -->
         <div class="mt-6 p-4 rounded-2xl bg-neutral-950/80 border border-neutral-800 flex flex-wrap items-center justify-center gap-3">
             <span class="text-xs text-neutral-400 font-semibold w-full sm:w-auto">Keep your schedule handy:</span>
-            <button type="button" onclick="addToGoogleCalendar()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 text-xs font-semibold border border-amber-500/20 transition">
+            <button type="button" onclick="addToGoogleCalendar()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-amber-300 text-xs font-semibold border border-amber-500/20 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
                 <span>Google Calendar</span>
             </button>
-            <button type="button" onclick="downloadIcsFile()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold border border-neutral-700 transition">
+            <button type="button" onclick="downloadIcsFile()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 text-xs font-semibold border border-neutral-700 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>iCal / Apple (.ics)</span>
             </button>
-            <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold border border-neutral-700 transition">
+            <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 text-xs font-semibold border border-neutral-700 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 <span>Print Voucher</span>
             </button>
@@ -110,11 +110,11 @@
         <!-- CTA Action Buttons -->
         <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="/my-appointments"
-               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-sm transition-colors text-center shadow-md">
+               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-neutral-950 font-bold text-sm transition-all duration-150 text-center shadow-md focus:outline-none focus:ring-2 focus:ring-amber-500">
                 My Appointments
             </a>
             <a href="/book"
-               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-bold text-sm transition-colors text-center border border-neutral-700">
+               class="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-[0.98] text-neutral-200 font-bold text-sm transition-all duration-150 text-center border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 Book Another
             </a>
         </div>

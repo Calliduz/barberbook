@@ -71,12 +71,17 @@ public class ToastAndConfirmModalTests : IClassFixture<WebApplicationFactory<Pro
 
         var content = File.ReadAllText(confirmPath);
 
-        // Accessible Modal semantics
+        // Accessible Modal semantics & Native HTML5 Dialog
+        content.Should().Contain("<dialog");
         content.Should().Contain("id=\"barberbook-confirm-dialog\"");
+        content.Should().Contain("closedby=\"any\"");
         content.Should().Contain("role=\"dialog\"");
         content.Should().Contain("aria-modal=\"true\"");
         content.Should().Contain("aria-labelledby=\"confirm-dialog-title\"");
         content.Should().Contain("aria-describedby=\"confirm-dialog-desc\"");
+
+        // Modern Web Guidance CSS & Scroll containment
+        content.Should().Contain("overscroll-behavior: contain;");
 
         // Dark mode & Vintage Modern Styling
         content.Should().Contain("backdrop-blur-sm");

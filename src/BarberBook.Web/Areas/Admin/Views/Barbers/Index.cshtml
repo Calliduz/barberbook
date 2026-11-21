@@ -7,11 +7,11 @@
     <!-- Header Section -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-serif">Barber Accounts</h1>
-            <p class="mt-1 text-sm text-slate-500">Manage barber shop staff profiles, credentials, specialties, and active statuses.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-serif">Barber Accounts</h1>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage barber shop staff profiles, credentials, specialties, and active statuses.</p>
         </div>
         <div class="mt-4 sm:mt-0">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center h-[38px] rounded-lg bg-amber-500 px-4 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 transition whitespace-nowrap">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center h-[38px] rounded-lg bg-amber-500 px-4 text-xs font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-[0.98] transition whitespace-nowrap">
                 <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
@@ -23,7 +23,7 @@
     <!-- Alert Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="rounded-md bg-emerald-50 p-4 border border-emerald-200">
+        <div class="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 p-4 border border-emerald-200 dark:border-emerald-800">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
@@ -31,14 +31,14 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-emerald-800">@TempData["SuccessMessage"]</p>
+                    <p class="text-sm font-medium text-emerald-800 dark:text-emerald-300">@TempData["SuccessMessage"]</p>
                 </div>
             </div>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="rounded-md bg-rose-50 p-4 border border-rose-200">
+        <div class="rounded-xl bg-rose-50 dark:bg-rose-950/40 p-4 border border-rose-200 dark:border-rose-800">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-rose-400" viewBox="0 0 20 20" fill="currentColor">
@@ -46,17 +46,17 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-rose-800">@TempData["ErrorMessage"]</p>
+                    <p class="text-sm font-medium text-rose-800 dark:text-rose-300">@TempData["ErrorMessage"]</p>
                 </div>
             </div>
         </div>
     }
 
     <!-- Search & Filters -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5">
+    <article class="card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3.5 transition">
         <form method="get" action="/admin/barbers" class="flex flex-col sm:flex-row gap-3 justify-between items-center">
             <div class="w-full sm:w-80 relative">
-                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by name, email, specialty..." class="filter-control w-full pl-9 pr-4 text-xs" />
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by name, email, specialty..." class="filter-control w-full pl-9 pr-4 text-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" />
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -64,28 +64,28 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
-                <label for="statusFilter" class="text-xs font-bold text-slate-600 whitespace-nowrap uppercase tracking-wider">Status:</label>
-                <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs">
+                <label for="statusFilter" class="text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap uppercase tracking-wider">Status:</label>
+                <select id="statusFilter" name="status" onchange="this.form.submit()" class="filter-control text-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                     <option value="all" selected="@(Model.StatusFilter == "all")">All Statuses</option>
                     <option value="active" selected="@(Model.StatusFilter == "active")">Active</option>
                     <option value="inactive" selected="@(Model.StatusFilter == "inactive")">Inactive</option>
                 </select>
                 @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.StatusFilter != "all")
                 {
-                    <a href="/admin/barbers" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 transition flex items-center whitespace-nowrap">
+                    <a href="/admin/barbers" class="h-[38px] px-3 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition flex items-center whitespace-nowrap">
                         Reset
                     </a>
                 }
             </div>
         </form>
-    </div>
+    </article>
 
     <!-- Barbers Table -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <article class="card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition">
         <!-- Desktop Table View -->
         <div class="hidden sm:block overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead class="bg-slate-50 text-slate-600 font-semibold">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
+                <thead class="bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
                     <tr>
                         <th class="py-3.5 pl-6 pr-3">Barber</th>
                         <th class="px-3 py-3.5">Email</th>
@@ -96,7 +96,7 @@
                         <th class="py-3.5 pl-3 pr-6 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200 text-slate-700">
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                     @if (!Model.Items.Any())
                     {
                         <tr>
@@ -287,16 +287,16 @@
     </div>
 </div>
 
-<!-- Add Barber Modal / Drawer -->
-<div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 modal-dialog">
+<!-- Add Barber Native Modal Dialog -->
+<dialog id="createModal" closedby="any" class="hidden m-auto rounded-2xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 modal-dialog overflow-hidden">
         <!-- Sticky Header -->
-        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70 shrink-0">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/70 dark:bg-slate-850 shrink-0">
             <div>
-                <h3 class="text-base font-bold text-slate-900">Add New Barber Account</h3>
-                <p class="text-[11px] text-slate-500">Create staff profile, login credentials, and branch allocation.</p>
+                <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Add New Barber Account</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Create staff profile, login credentials, and branch allocation.</p>
             </div>
-            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+            <button type="button" onclick="closeModal('createModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -304,55 +304,55 @@
         </div>
         <!-- Scrollable Form Body -->
         <form method="post" action="/admin/barbers" enctype="multipart/form-data" class="flex flex-col flex-grow overflow-hidden">
-            <div class="modal-body p-6 space-y-4">
-                <!-- 3-Column First, Middle, Last Name (strictly constrained to prevent container overflow) -->
+            <div class="modal-body p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <!-- 3-Column First, Middle, Last Name -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Staff Legal Name *</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Staff Legal Name *</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 box-border w-full">
                         <div class="min-w-0">
-                            <input type="text" name="FirstName" id="createFirstName" required class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="First (e.g. Ramon)" oninput="updateCreateNamePreview()" />
+                            <input type="text" name="FirstName" id="createFirstName" required class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="First (e.g. Ramon)" oninput="updateCreateNamePreview()" />
                         </div>
                         <div class="min-w-0">
-                            <input type="text" name="MiddleName" id="createMiddleName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="Middle (optional)" oninput="updateCreateNamePreview()" />
+                            <input type="text" name="MiddleName" id="createMiddleName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Middle (optional)" oninput="updateCreateNamePreview()" />
                         </div>
                         <div class="min-w-0">
-                            <input type="text" name="LastName" id="createLastName" required class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="Last (e.g. Bautista)" oninput="updateCreateNamePreview()" />
+                            <input type="text" name="LastName" id="createLastName" required class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Last (e.g. Bautista)" oninput="updateCreateNamePreview()" />
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Display Name / Nickname *</label>
-                    <input type="text" name="DisplayName" id="createDisplayName" required class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="e.g. Master Ramon" oninput="this.dataset.manuallyEdited='true'" />
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Display Name / Nickname *</label>
+                    <input type="text" name="DisplayName" id="createDisplayName" required class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="e.g. Master Ramon" oninput="this.dataset.manuallyEdited='true'" />
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Email Address *</label>
-                        <input type="email" name="Email" required class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="e.g. ramon@barberbook.local" />
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Email Address *</label>
+                        <input type="email" name="Email" required class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="e.g. ramon@barberbook.local" />
                     </div>
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Phone Number</label>
-                        <input type="tel" name="PhoneNumber" id="createPhoneNumber" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="0917-XXX-XXXX" />
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Phone Number</label>
+                        <input type="tel" name="PhoneNumber" id="createPhoneNumber" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="0917-XXX-XXXX" />
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Temporary Password *</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Temporary Password *</label>
                     <div class="relative mt-1">
-                        <input type="password" name="Password" id="createPassword" required minlength="6" class="modal-input block w-full rounded-lg py-2 pl-3 pr-10 text-xs shadow-xs" placeholder="Set temporary password (min 6 chars)" />
-                        <button type="button" onclick="togglePasswordVisibility('createPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Toggle password visibility">
+                        <input type="password" name="Password" id="createPassword" required minlength="6" class="modal-input block w-full rounded-lg py-2 pl-3 pr-10 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Set temporary password (min 6 chars)" />
+                        <button type="button" onclick="togglePasswordVisibility('createPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none" aria-label="Toggle password visibility">
                             <svg class="w-4 h-4 icon-eye" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <svg class="w-4 h-4 icon-eye-slash hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
                         </button>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-1">Admin provides this password to the barber. Barbers cannot self-register.</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Admin provides this password to the barber. Barbers cannot self-register.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Assigned Branch</label>
-                        <select name="BranchId" id="createBranchId" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Assigned Branch</label>
+                        <select name="BranchId" id="createBranchId" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                             <option value="">-- No Branch Assigned --</option>
                             @foreach (var br in Model.Branches)
                             {
@@ -361,51 +361,51 @@
                         </select>
                     </div>
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Barber Commission %</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Barber Commission %</label>
                         <div class="relative mt-1">
-                            <input type="number" name="CommissionRate" id="createCommissionRate" min="0" max="100" step="5" value="50" required placeholder="50" class="modal-input block w-full rounded-lg py-2 px-3 pr-8 text-xs shadow-xs" />
+                            <input type="number" name="CommissionRate" id="createCommissionRate" min="0" max="100" step="5" value="50" required placeholder="50" class="modal-input block w-full rounded-lg py-2 px-3 pr-8 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" />
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-xs font-bold text-slate-400">%</div>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">e.g. 50% = 50% Barber / 50% Shop Owner</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">e.g. 50% = 50% Barber / 50% Shop Owner</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Specialties</label>
-                    <input type="text" name="Specialties" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="e.g. Classic Taper, Pompadour, Beard Fade" />
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Specialties</label>
+                    <input type="text" name="Specialties" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="e.g. Classic Taper, Pompadour, Beard Fade" />
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Bio / Notes</label>
-                    <textarea name="Bio" rows="2" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="Short introduction for customers..."></textarea>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Bio / Notes</label>
+                    <textarea name="Bio" rows="2" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Short introduction for customers..."></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Barber Photo</label>
-                    <input type="file" name="photoFile" accept="image/*" class="modal-input mt-1 block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200 shadow-xs" />
-                    <p class="text-[11px] text-slate-400 mt-1">Upload portrait image (JPG, PNG, WebP). Stored locally in /uploads/barbers/.</p>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Barber Photo</label>
+                    <input type="file" name="photoFile" accept="image/*" class="modal-input mt-1 block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-amber-100 dark:file:bg-amber-950/60 file:text-amber-900 dark:file:text-amber-300 hover:file:bg-amber-200 dark:hover:file:bg-amber-900 shadow-xs" />
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Upload portrait image (JPG, PNG, WebP). Stored locally in /uploads/barbers/.</p>
                 </div>
             </div>
 
             <!-- Sticky Footer -->
-            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-3 shrink-0">
-                <button type="button" onclick="closeModal('createModal')" class="rounded-lg bg-white border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition">Cancel</button>
-                <button type="submit" class="rounded-lg bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-xs transition">Create Account</button>
+            <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 flex justify-end space-x-3 shrink-0">
+                <button type="button" onclick="closeModal('createModal')" class="rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 shadow-xs transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-amber-500 hover:bg-amber-400 active:scale-[0.98] px-4 py-2 text-xs font-bold text-slate-950 shadow-xs transition">Create Account</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
-<!-- Edit Barber Modal -->
-<div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 modal-dialog">
+<!-- Edit Barber Native Modal Dialog -->
+<dialog id="editModal" closedby="any" class="hidden m-auto rounded-2xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 modal-dialog overflow-hidden">
         <!-- Sticky Header -->
-        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70 shrink-0">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/70 dark:bg-slate-850 shrink-0">
             <div>
-                <h3 class="text-base font-bold text-slate-900">Edit Barber Profile</h3>
-                <p class="text-[11px] text-slate-500">Update staff contact details, branch station, and bio.</p>
+                <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Edit Barber Profile</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Update staff contact details, branch station, and bio.</p>
             </div>
-            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+            <button type="button" onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -413,37 +413,37 @@
         </div>
         <form id="editBarberForm" method="post" action="" enctype="multipart/form-data" class="flex flex-col flex-grow overflow-hidden">
             <input type="hidden" id="editPhotoUrl" name="PhotoUrl" />
-            <div class="modal-body p-6 space-y-4">
+            <div class="modal-body p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Staff Legal Name *</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Staff Legal Name *</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 box-border w-full">
                         <div class="min-w-0">
-                            <input type="text" id="editFirstName" name="FirstName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="First (e.g. Ramon)" />
+                            <input type="text" id="editFirstName" name="FirstName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="First (e.g. Ramon)" />
                         </div>
                         <div class="min-w-0">
-                            <input type="text" id="editMiddleName" name="MiddleName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="Middle (Optional)" />
+                            <input type="text" id="editMiddleName" name="MiddleName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Middle (Optional)" />
                         </div>
                         <div class="min-w-0">
-                            <input type="text" id="editLastName" name="LastName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="Last (e.g. Bautista)" />
+                            <input type="text" id="editLastName" name="LastName" class="modal-input block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="Last (e.g. Bautista)" />
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Display Name *</label>
-                        <input type="text" id="editDisplayName" name="DisplayName" required placeholder="e.g. Master Ramon" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" />
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Display Name *</label>
+                        <input type="text" id="editDisplayName" name="DisplayName" required placeholder="e.g. Master Ramon" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" />
                     </div>
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Phone Number</label>
-                        <input type="tel" id="editPhoneNumber" name="PhoneNumber" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" placeholder="0917-XXX-XXXX" />
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Phone Number</label>
+                        <input type="tel" id="editPhoneNumber" name="PhoneNumber" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" placeholder="0917-XXX-XXXX" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Assigned Branch</label>
-                        <select name="BranchId" id="editBranchId" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Assigned Branch</label>
+                        <select name="BranchId" id="editBranchId" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                             <option value="">-- No Branch Assigned --</option>
                             @foreach (var br in Model.Branches)
                             {
@@ -452,65 +452,71 @@
                         </select>
                     </div>
                     <div class="min-w-0">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Barber Commission %</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Barber Commission %</label>
                         <div class="relative mt-1">
-                            <input type="number" name="CommissionRate" id="editCommissionRate" min="0" max="100" step="5" required placeholder="50" class="modal-input block w-full rounded-lg py-2 px-3 pr-8 text-xs shadow-xs" />
+                            <input type="number" name="CommissionRate" id="editCommissionRate" min="0" max="100" step="5" required placeholder="50" class="modal-input block w-full rounded-lg py-2 px-3 pr-8 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" />
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-xs font-bold text-slate-400">%</div>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">e.g. 50% = 50% Barber / 50% Shop Owner</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">e.g. 50% = 50% Barber / 50% Shop Owner</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Specialties</label>
-                    <input type="text" id="editSpecialties" name="Specialties" placeholder="e.g. Skin Fade, Beard Sculpting" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs" />
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Specialties</label>
+                    <input type="text" id="editSpecialties" name="Specialties" placeholder="e.g. Skin Fade, Beard Sculpting" class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100" />
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Bio</label>
-                    <textarea id="editBio" name="Bio" rows="2" placeholder="Master barber bio and technique background..." class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs"></textarea>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Bio</label>
+                    <textarea id="editBio" name="Bio" rows="2" placeholder="Master barber bio and technique background..." class="modal-input mt-1 block w-full rounded-lg py-2 px-3 text-xs shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Change Barber Photo</label>
-                    <input type="file" name="photoFile" accept="image/*" class="modal-input mt-1 block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200 shadow-xs" />
-                    <p class="text-[11px] text-slate-400 mt-1">Leave empty to keep current photo. Stored locally in /uploads/barbers/.</p>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Change Barber Photo</label>
+                    <input type="file" name="photoFile" accept="image/*" class="modal-input mt-1 block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-amber-100 dark:file:bg-amber-950/60 file:text-amber-900 dark:file:text-amber-300 hover:file:bg-amber-200 dark:hover:file:bg-amber-900 shadow-xs" />
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Leave empty to keep current photo. Stored locally in /uploads/barbers/.</p>
                 </div>
             </div>
 
             <!-- Sticky Footer -->
-            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end space-x-3 shrink-0">
-                <button type="button" onclick="closeModal('editModal')" class="rounded-lg bg-white border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition">Cancel</button>
-                <button type="submit" class="rounded-lg bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-xs transition">Save Changes</button>
+            <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 flex justify-end space-x-3 shrink-0">
+                <button type="button" onclick="closeModal('editModal')" class="rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 shadow-xs transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-amber-500 hover:bg-amber-400 active:scale-[0.98] px-4 py-2 text-xs font-bold text-slate-950 shadow-xs transition">Save Changes</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
-<!-- Reset Password Modal -->
-<div id="resetPasswordModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+<!-- Reset Password Native Modal Dialog -->
+<dialog id="resetPasswordModal" closedby="any" class="hidden m-auto rounded-2xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-md w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full p-6 shadow-xl border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100">
         <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-bold text-slate-900">Reset Password</h3>
-            <button type="button" onclick="closeModal('resetPasswordModal')" class="text-slate-400 hover:text-slate-500">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-serif">Reset Password</h3>
+            <button type="button" onclick="closeModal('resetPasswordModal')" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <p class="text-sm text-slate-600 mb-4">Set a new password for <span id="resetBarberName" class="font-semibold text-slate-900"></span>. Direct password override managed by shop administrator.</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Set a new password for <span id="resetBarberName" class="font-semibold text-slate-900 dark:text-slate-100"></span>. Direct password override managed by shop administrator.</p>
         <form id="resetPasswordForm" method="post" action="" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-slate-700">New Password *</label>
-                <input type="password" name="NewPassword" required minlength="6" class="mt-1 block w-full rounded-lg border-slate-300 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Minimum 6 characters" />
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">New Password *</label>
+                <input type="password" name="NewPassword" required minlength="6" class="mt-1 block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 px-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-sm" placeholder="Minimum 6 characters" />
             </div>
-            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('resetPasswordModal')" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-                <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 transition">Update Password</button>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeModal('resetPasswordModal')" class="rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-750 active:scale-95 transition">Cancel</button>
+                <button type="submit" class="rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 text-sm font-bold active:scale-[0.98] transition">Update Password</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
+
+<style>
+    dialog:modal {
+        overscroll-behavior: contain;
+    }
+</style>
 
 
 <script>
@@ -522,7 +528,9 @@
         const dn = document.getElementById('createDisplayName');
         dn.value = '';
         delete dn.dataset.manuallyEdited;
-        document.getElementById('createModal').classList.remove('hidden');
+        const modal = document.getElementById('createModal');
+        modal.classList.remove('hidden');
+        modal.showModal();
     }
 
     function updateCreateNamePreview() {
@@ -556,13 +564,17 @@
         document.getElementById('editPhotoUrl').value = photoUrl;
         document.getElementById('editBranchId').value = branchId || '';
         document.getElementById('editCommissionRate').value = (commissionRate !== undefined && commissionRate !== null && commissionRate !== '') ? commissionRate : 50;
-        document.getElementById('editModal').classList.remove('hidden');
+        const modal = document.getElementById('editModal');
+        modal.classList.remove('hidden');
+        modal.showModal();
     }
 
     function openResetPasswordModal(id, displayName) {
         document.getElementById('resetPasswordForm').action = '/admin/barbers/' + id + '/reset-password';
         document.getElementById('resetBarberName').innerText = displayName;
-        document.getElementById('resetPasswordModal').classList.remove('hidden');
+        const modal = document.getElementById('resetPasswordModal');
+        modal.classList.remove('hidden');
+        modal.showModal();
     }
 
     async function confirmToggleStatus(id, displayName, isActive) {
@@ -596,7 +608,29 @@
     }
 
     function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
+        const modal = document.getElementById(id);
+        if (modal) {
+            if (typeof modal.close === 'function' && modal.open) {
+                modal.close();
+            }
+            modal.classList.add('hidden');
+        }
     }
+
+    // Wire up backdrop click & cancel events for native dialogs
+    ['createModal', 'editModal', 'resetPasswordModal'].forEach(id => {
+        const diag = document.getElementById(id);
+        if (diag) {
+            diag.addEventListener('cancel', (e) => {
+                e.preventDefault();
+                closeModal(id);
+            });
+            diag.addEventListener('click', (e) => {
+                if (e.target === diag) {
+                    closeModal(id);
+                }
+            });
+        }
+    });
 </script>
 

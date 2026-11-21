@@ -6,44 +6,44 @@
 
 <div class="space-y-6">
     <!-- Header -->
-    <div class="sm:flex sm:items-center sm:justify-between pb-4 border-b border-slate-200">
+    <div class="sm:flex sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Sales & Transaction Reports</h1>
-            <p class="mt-1 text-sm text-slate-600 font-sans">Automated financial journals generated strictly from completed customer appointments and counter sales.</p>
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white tracking-tight">Sales & Transaction Reports</h1>
+            <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 font-sans">Automated financial journals generated strictly from completed customer appointments and counter sales.</p>
         </div>
         <div class="mt-4 sm:mt-0 flex flex-wrap gap-2">
             <a href="/admin/reports/export?tab=@Model.ActiveTab&date=@Model.SelectedDateString&year=@Model.SelectedYear&month=@Model.SelectedMonth" 
-               class="h-[38px] px-4 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1.5 transition whitespace-nowrap">
+               class="h-[38px] px-4 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1.5 transition active:scale-95 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                 <span>Export to CSV / Excel</span>
             </a>
-            <button type="button" onclick="window.print()" class="h-[38px] px-4 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm flex items-center gap-1.5 transition whitespace-nowrap">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24-1.076-.673-2.684-.673-4.008 0-3.26 2.37-5.821 5.953-5.821 3.582 0 5.953 2.561 5.953 5.821 0 1.324-.433 2.932-.673 4.008m-10.56 0h11.12m-11.12 0A2.25 2.25 0 004.5 16.079v3.171A2.25 2.25 0 006.75 21.5h10.5a2.25 2.25 0 002.25-2.25v-3.171a2.25 2.25 0 00-1.68-2.25" /></svg>
+            <button type="button" onclick="window.print()" class="h-[38px] px-4 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shadow-sm flex items-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24-1.076-.673-2.684-.673-4.008 0-3.26 2.37-5.821 5.953-5.821 3.582 0 5.953 2.561 5.953 5.821 0 1.324-.433 2.932-.673 4.008m-10.56 0h11.12m-11.12 0A2.25 2.25 0 004.5 16.079v3.171A2.25 2.25 0 006.75 21.5h10.5a2.25 2.25 0 002.25-2.25v-3.171a2.25 2.25 0 00-1.68-2.25" /></svg>
                 <span>Print Report</span>
             </button>
         </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-200 gap-2 sm:gap-4 overflow-x-auto">
+    <div class="flex border-b border-slate-200 dark:border-slate-800 gap-2 sm:gap-4 overflow-x-auto">
         <a href="/admin/reports?tab=daily&date=@Model.SelectedDateString"
-           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "daily" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "daily" ? "border-amber-600 text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20" : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")">
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
             <span>Daily Sales</span>
         </a>
         <a href="/admin/reports?tab=monthly&year=@Model.SelectedYear&month=@Model.SelectedMonth"
-           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "monthly" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "monthly" ? "border-amber-600 text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20" : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")">
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
             <span>Monthly Sales</span>
         </a>
         <a href="/admin/reports?tab=customers&customerId=@Model.SelectedCustomerId"
-           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "customers" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "customers" ? "border-amber-600 text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20" : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")">
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
             <span>Customer Transactions</span>
         </a>
         <a href="/admin/reports?tab=barbers&barberId=@Model.SelectedBarberId"
-           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "barbers" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "barbers" ? "border-amber-600 text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20" : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")">
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
             <span>Barber Transactions</span>
         </a>
     </div>
@@ -53,41 +53,41 @@
         <!-- DAILY SALES VIEW -->
         <div class="space-y-6">
             <!-- Filter & Preset Bar -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-3.5 sm:p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-3.5 sm:p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <form id="dailyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <input type="hidden" name="tab" value="daily" />
-                    <label for="date" class="text-xs font-bold uppercase tracking-wider text-slate-600">Select Date:</label>
+                    <label for="date" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Select Date:</label>
                     <input type="date" id="date" name="date" value="@Model.SelectedDateString" onchange="this.form.submit()"
-                           class="filter-control h-[38px] text-xs font-bold text-slate-900" />
+                           class="filter-control h-[38px] text-xs font-bold text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-700" />
                 </form>
 
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Presets:</span>
-                    <button type="button" onclick="setDailyDate(getTodayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Today</button>
-                    <button type="button" onclick="setDailyDate(getYesterdayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Yesterday</button>
-                    <a href="/admin/reports?tab=monthly" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition inline-flex items-center">This Month</a>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1">Presets:</span>
+                    <button type="button" onclick="setDailyDate(getTodayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition active:scale-95">Today</button>
+                    <button type="button" onclick="setDailyDate(getYesterdayStr())" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition active:scale-95">Yesterday</button>
+                    <a href="/admin/reports?tab=monthly" class="h-[32px] px-3 rounded-lg text-xs font-bold bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60 transition inline-flex items-center active:scale-95">This Month</a>
                 </div>
             </div>
 
             <!-- Daily Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Service Sales (Completed)</span>
-                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 mt-1">@Model.DailyReport.FormattedTotalSales</h3>
-                    <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.CompletedCount Completed Appointments</p>
-                </div>
+                <article class="kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition hover:border-slate-300 dark:hover:border-slate-700">
+                    <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Service Sales (Completed)</span>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 dark:text-white mt-1">@Model.DailyReport.FormattedTotalSales</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">@Model.DailyReport.CompletedCount Completed Appointments</p>
+                </article>
 
-                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Product Sales (Retail)</span>
-                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700 mt-1">@Model.DailyReport.ProductSales.FormattedTotal</h3>
-                    <p class="text-xs text-slate-500 mt-1">@Model.DailyReport.ProductSales.Count counter sale(s) recorded</p>
-                </div>
+                <article class="kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition hover:border-slate-300 dark:hover:border-slate-700">
+                    <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Product Sales (Retail)</span>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700 dark:text-amber-400 mt-1">@Model.DailyReport.ProductSales.FormattedTotal</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">@Model.DailyReport.ProductSales.Count counter sale(s) recorded</p>
+                </article>
 
-                <div class="kpi-accent-card bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Grand Total Revenue</span>
-                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700 mt-1">@Model.DailyReport.FormattedGrandTotal</h3>
-                    <p class="text-xs text-slate-500 mt-1">In-shop settlement (Service + Products)</p>
-                </div>
+                <article class="kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 transition hover:border-slate-300 dark:hover:border-slate-700">
+                    <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block tracking-wider">Grand Total Revenue</span>
+                    <h3 class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700 dark:text-emerald-400 mt-1">@Model.DailyReport.FormattedGrandTotal</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">In-shop settlement (Service + Products)</p>
+                </article>
             </div>
 
             <!-- Daily Visual Analytics Row (Chart.js) -->
@@ -95,65 +95,65 @@
             {
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <!-- Revenue Split: Services vs Retail (5 cols) -->
-                    <div class="md:col-span-5 bg-white/95 rounded-2xl border border-slate-200/90 shadow-sm p-6 flex flex-col justify-between">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <article class="md:col-span-5 bg-white/95 dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-6 flex flex-col justify-between">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 class="font-serif font-bold text-slate-900 text-sm">Revenue Mix</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Services vs. Retail Product Sales</p>
+                                <h3 class="font-serif font-bold text-slate-900 dark:text-white text-sm">Revenue Mix</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Services vs. Retail Product Sales</p>
                             </div>
-                            <span class="text-xs font-bold text-emerald-700">@Model.DailyReport.FormattedGrandTotal</span>
+                            <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400">@Model.DailyReport.FormattedGrandTotal</span>
                         </div>
                         <div class="mt-3 relative h-48 w-full flex items-center justify-center">
                             <canvas id="dailyRevenueSplitChart"></canvas>
                         </div>
-                        <div class="mt-3 grid grid-cols-2 gap-2 text-xs border-t border-slate-100 pt-3">
-                            <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
-                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Services</span>
-                                <span class="font-bold text-slate-900">@Model.DailyReport.FormattedTotalSales</span>
+                        <div class="mt-3 grid grid-cols-2 gap-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Services</span>
+                                <span class="font-bold text-slate-900 dark:text-white">@Model.DailyReport.FormattedTotalSales</span>
                             </div>
-                            <div class="p-2 rounded-lg bg-amber-50 border border-amber-200">
-                                <span class="text-amber-700 block text-[10px] uppercase font-bold">Retail</span>
-                                <span class="font-bold text-amber-900">@Model.DailyReport.ProductSales.FormattedTotal</span>
+                            <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60">
+                                <span class="text-amber-700 dark:text-amber-400 block text-[10px] uppercase font-bold">Retail</span>
+                                <span class="font-bold text-amber-900 dark:text-amber-300">@Model.DailyReport.ProductSales.FormattedTotal</span>
                             </div>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Revenue by Barber Horizontal Bar (7 cols) -->
-                    <div class="md:col-span-7 bg-white/95 rounded-2xl border border-slate-200/90 shadow-sm p-6">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <article class="md:col-span-7 bg-white/95 dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-6">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 class="font-serif font-bold text-slate-900 text-sm">Barber Revenue Distribution</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Sales contribution per master barber</p>
+                                <h3 class="font-serif font-bold text-slate-900 dark:text-white text-sm">Barber Revenue Distribution</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sales contribution per master barber</p>
                             </div>
-                            <span class="text-xs font-bold text-slate-400">@Model.DailyReport.ByBarber.Count active</span>
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500">@Model.DailyReport.ByBarber.Count active</span>
                         </div>
                         <div class="mt-4 relative h-56 w-full">
                             <canvas id="dailyBarberBarChart"></canvas>
                         </div>
-                    </div>
+                    </article>
                 </div>
             }
 
             <!-- Daily Journal Table matching paper sample: No., Time, Customer, Barber, Service, Amount -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Daily Sales Journal · @Model.DailyReport.DateFormatted</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Line-item journal including completed cuts and retail product sales</p>
+                        <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white">Daily Sales Journal · @Model.DailyReport.DateFormatted</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Line-item journal including completed cuts and retail product sales</p>
                     </div>
 
                     <!-- Type Filter Tabs: All, Service, Product -->
-                    <div class="inline-flex p-1 bg-slate-100 rounded-2xl border border-slate-200/80 shadow-inner">
+                    <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-inner">
                         <button type="button" onclick="filterSalesJournal('all')" id="filterBtnAll"
-                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-white shadow-xs">
+                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 shadow-xs active:scale-95">
                             All Sales (@Model.DailyReport.CombinedJournal.Count)
                         </button>
                         <button type="button" onclick="filterSalesJournal('service')" id="filterBtnService"
-                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">
+                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95">
                             Service Cuts (@Model.DailyReport.Items.Count · @Model.DailyReport.FormattedTotalSales)
                         </button>
                         <button type="button" onclick="filterSalesJournal('product')" id="filterBtnProduct"
-                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">
+                                class="sales-type-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95">
                             Retail Products (@Model.DailyReport.ProductSales.Count · @Model.DailyReport.ProductSales.FormattedTotal)
                         </button>
                     </div>
@@ -161,19 +161,19 @@
 
                 @if (!Model.DailyReport.CombinedJournal.Any())
                 {
-                    <div class="p-12 text-center text-slate-400 text-sm">
-                        <div class="inline-flex p-3 rounded-full bg-slate-100 mb-2">
-                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <div class="p-12 text-center text-slate-400 dark:text-slate-500 text-sm">
+                        <div class="inline-flex p-3 rounded-full bg-slate-100 dark:bg-slate-800 mb-2">
+                            <svg class="w-6 h-6 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <p class="font-semibold text-slate-600">No completed sales recorded for @Model.DailyReport.DateFormatted.</p>
-                        <p class="text-xs text-slate-400 mt-1">Only completed appointments and settled retail counter sales generate financial records.</p>
+                        <p class="font-semibold text-slate-600 dark:text-slate-300">No completed sales recorded for @Model.DailyReport.DateFormatted.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Only completed appointments and settled retail counter sales generate financial records.</p>
                     </div>
                 }
                 else
                 {
                     <div class="overflow-x-auto">
-                        <table id="salesJournalTable" class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                        <table id="salesJournalTable" class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                            <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                 <tr>
                                     <th class="py-3 px-6 w-12 text-center">No.</th>
                                     <th class="py-3 px-6">Time</th>
@@ -184,135 +184,135 @@
                                     <th class="py-3 px-6 text-right">Amount (₱)</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                 @foreach (var row in Model.DailyReport.CombinedJournal)
                                 {
-                                    <tr class="hover:bg-slate-50/80 transition" data-sale-type="@row.ItemType" data-amount="@row.Amount">
-                                        <td class="py-3.5 px-6 text-center font-bold text-slate-400">
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition" data-sale-type="@row.ItemType" data-amount="@row.Amount">
+                                        <td class="py-3.5 px-6 text-center font-bold text-slate-400 dark:text-slate-500">
                                             @row.No
                                         </td>
-                                        <td class="py-3.5 px-6 font-semibold text-slate-900 whitespace-nowrap">
+                                        <td class="py-3.5 px-6 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
                                             @row.Time
                                         </td>
-                                        <td class="py-3.5 px-6 font-medium text-slate-900">
+                                        <td class="py-3.5 px-6 font-medium text-slate-900 dark:text-white">
                                             @row.Customer
-                                            <span class="block text-[11px] font-mono text-amber-800">@row.ReferenceCode</span>
+                                            <span class="block text-[11px] font-mono text-amber-800 dark:text-amber-400">@row.ReferenceCode</span>
                                         </td>
-                                        <td class="py-3.5 px-6 font-medium text-slate-700">
+                                        <td class="py-3.5 px-6 font-medium text-slate-700 dark:text-slate-300">
                                             @row.Barber
                                         </td>
-                                        <td class="py-3.5 px-6 text-slate-800 font-medium">
+                                        <td class="py-3.5 px-6 text-slate-800 dark:text-slate-200 font-medium">
                                             @row.Service
                                         </td>
                                         <td class="py-3.5 px-6 text-center whitespace-nowrap">
                                             @if (row.ItemType == "Retail Product")
                                             {
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Retail Product</span>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60">Retail Product</span>
                                             }
                                             else
                                             {
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">Service</span>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/60">Service</span>
                                             }
                                         </td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 whitespace-nowrap">
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 dark:text-white whitespace-nowrap">
                                             @row.FormattedAmount
                                         </td>
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot class="bg-slate-50/90 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tfoot class="bg-slate-50/90 dark:bg-slate-800/60 font-bold border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
                                 <tr>
                                     <td colspan="6" id="journalFooterLabel" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Grand Total Revenue</td>
-                                    <td id="journalFooterTotal" class="py-3.5 px-6 text-right font-serif text-base text-emerald-700">@Model.DailyReport.FormattedGrandTotal</td>
+                                    <td id="journalFooterTotal" class="py-3.5 px-6 text-right font-serif text-base text-emerald-700 dark:text-emerald-400">@Model.DailyReport.FormattedGrandTotal</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 }
-            </div>
+            </article>
 
             <!-- Breakdown By Barber, Service & Retail Product -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Per Barber -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Breakdown by Master Barber</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-bold text-slate-600">Services</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Breakdown by Master Barber</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-400">Services</span>
                     </div>
                     @if (!Model.DailyReport.ByBarber.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No barber activity on this date.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No barber activity on this date.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var b in Model.DailyReport.ByBarber)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
-                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-slate-900 dark:text-white">@b.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
 
                 <!-- Per Service -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Breakdown by Service Menu</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">Services</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Breakdown by Service Menu</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/60 font-bold">Services</span>
                     </div>
                     @if (!Model.DailyReport.ByService.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No services rendered on this date.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No services rendered on this date.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var s in Model.DailyReport.ByService)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
-                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-slate-900 dark:text-white">@s.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
 
                 <!-- Per Product -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Breakdown by Retail Product</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold">Products</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Breakdown by Retail Product</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60 font-bold">Products</span>
                     </div>
                     @if (!Model.DailyReport.ProductSales.PerProduct.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No retail counter sales on this date.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No retail counter sales on this date.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var prod in Model.DailyReport.ProductSales.PerProduct)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 border border-amber-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/50">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@prod.Name</span>
-                                        <span class="text-xs text-slate-500">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@prod.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-amber-800">@prod.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-amber-800 dark:text-amber-400">@prod.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
             </div>
         </div>
     }
@@ -320,17 +320,17 @@
     {
         <!-- MONTHLY SALES VIEW -->
         <div class="space-y-6">
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <form method="get" action="/admin/reports" class="flex items-center gap-3 w-full sm:w-auto">
                     <input type="hidden" name="tab" value="monthly" />
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Select Month & Year:</label>
-                    <select name="month" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Select Month & Year:</label>
+                    <select name="month" onchange="this.form.submit()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-bold text-slate-900 dark:text-white shadow-sm">
                         @for (int m = 1; m <= 12; m++)
                         {
                             <option value="@m" selected="@(m == Model.SelectedMonth)">@monthNames[m]</option>
                         }
                     </select>
-                    <select name="year" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                    <select name="year" onchange="this.form.submit()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-bold text-slate-900 dark:text-white shadow-sm">
                         @for (int y = 2025; y <= 2028; y++)
                         {
                             <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
@@ -340,28 +340,28 @@
 
                 <div class="flex items-center gap-4 sm:gap-6">
                     <div class="text-right">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Service Sales</span>
-                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-slate-800">@Model.MonthlyReport.FormattedTotalSales</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block">Service Sales</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-slate-800 dark:text-slate-200">@Model.MonthlyReport.FormattedTotalSales</span>
                     </div>
                     <div class="text-right">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Product Sales</span>
-                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-amber-700">@Model.MonthlyReport.FormattedProductSales</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block">Product Sales</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-amber-700 dark:text-amber-400">@Model.MonthlyReport.FormattedProductSales</span>
                     </div>
-                    <div class="text-right border-l border-slate-200 pl-4">
-                        <span class="text-xs uppercase font-bold text-slate-500 block">Grand Total</span>
-                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700">@Model.MonthlyReport.FormattedGrandTotal</span>
+                    <div class="text-right border-l border-slate-200 dark:border-slate-700 pl-4">
+                        <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block">Grand Total</span>
+                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-700 dark:text-emerald-400">@Model.MonthlyReport.FormattedGrandTotal</span>
                     </div>
                 </div>
-            </div>
+            </article>
 
             <!-- Monthly Visual Trend Chart (Chart.js Interactive) -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                     <div>
-                        <h3 class="text-base font-serif font-bold text-slate-900">Income Distribution · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Daily breakdown of Service revenue and Retail product counter sales</p>
+                        <h3 class="text-base font-serif font-bold text-slate-900 dark:text-white">Income Distribution · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daily breakdown of Service revenue and Retail product counter sales</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Full Month Trend
                     </span>
@@ -369,21 +369,21 @@
                 <div class="mt-4 relative h-64 sm:h-72 w-full">
                     <canvas id="monthlySalesTrendChart"></canvas>
                 </div>
-            </div>
+            </article>
 
             <!-- Day-by-Day Table -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Day-by-Day Sales Summary (@monthNames[Model.SelectedMonth] @Model.SelectedYear)</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Sum of daily totals equals monthly total: Services @Model.MonthlyReport.FormattedTotalSales &bull; Products @Model.MonthlyReport.FormattedProductSales &bull; Grand @Model.MonthlyReport.FormattedGrandTotal</p>
+                        <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white">Day-by-Day Sales Summary (@monthNames[Model.SelectedMonth] @Model.SelectedYear)</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sum of daily totals equals monthly total: Services @Model.MonthlyReport.FormattedTotalSales &bull; Products @Model.MonthlyReport.FormattedProductSales &bull; Grand @Model.MonthlyReport.FormattedGrandTotal</p>
                     </div>
-                    <span class="text-xs text-slate-500 font-medium">@Model.MonthlyReport.CompletedCount total appointments</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">@Model.MonthlyReport.CompletedCount total appointments</span>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                    <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                        <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                             <tr>
                                 <th class="py-3 px-6">Date</th>
                                 <th class="py-3 px-6 text-center">Day of Week</th>
@@ -394,139 +394,139 @@
                                 <th class="py-3 px-6 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             @foreach (var day in Model.MonthlyReport.DailyTotals)
                             {
-                                <tr class="hover:bg-slate-50/80 transition @(day.GrandTotal > 0 ? "bg-amber-50/20" : "")">
-                                    <td class="py-3 px-6 font-bold text-slate-900">
+                                <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition @(day.GrandTotal > 0 ? "bg-amber-50/20 dark:bg-amber-950/10" : "")">
+                                    <td class="py-3 px-6 font-bold text-slate-900 dark:text-white">
                                         @day.DateFormatted
                                     </td>
-                                    <td class="py-3 px-6 text-center text-xs font-semibold text-slate-500">
+                                    <td class="py-3 px-6 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
                                         @day.DayOfWeek
                                     </td>
-                                    <td class="py-3 px-6 text-center font-medium @(day.CompletedCount > 0 ? "text-slate-900 font-bold" : "text-slate-400")">
+                                    <td class="py-3 px-6 text-center font-medium @(day.CompletedCount > 0 ? "text-slate-900 dark:text-white font-bold" : "text-slate-400 dark:text-slate-500")">
                                         @day.CompletedCount
                                     </td>
-                                    <td class="py-3 px-6 text-right font-serif font-medium text-slate-800">
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-slate-800 dark:text-slate-200">
                                         @day.FormattedTotalSales
                                     </td>
-                                    <td class="py-3 px-6 text-right font-serif font-medium text-amber-800">
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-amber-800 dark:text-amber-400">
                                         @day.FormattedProductSales
                                     </td>
-                                    <td class="py-3 px-6 text-right font-serif font-bold text-slate-900">
+                                    <td class="py-3 px-6 text-right font-serif font-bold text-slate-900 dark:text-white">
                                         @day.FormattedGrandTotal
                                     </td>
                                     <td class="py-3 px-6 text-right">
                                         @if (day.GrandTotal > 0)
                                         {
-                                            <a href="/admin/reports?tab=daily&date=@day.Date.ToString("yyyy-MM-dd", null)" class="text-xs font-bold text-amber-700 hover:underline">
+                                            <a href="/admin/reports?tab=daily&date=@day.Date.ToString("yyyy-MM-dd", null)" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline active:scale-95 inline-block">
                                                 View Daily →
                                             </a>
                                         }
                                         else
                                         {
-                                            <span class="text-xs text-slate-400">No activity</span>
+                                            <span class="text-xs text-slate-400 dark:text-slate-500">No activity</span>
                                         }
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                        <tfoot class="bg-slate-50 dark:bg-slate-800/60 font-bold border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
                             <tr>
                                 <td colspan="2" class="py-3.5 px-6 uppercase text-xs tracking-wider">Total For @monthNames[Model.SelectedMonth] @Model.SelectedYear:</td>
                                 <td class="py-3.5 px-6 text-center font-serif text-base">@Model.MonthlyReport.CompletedCount</td>
-                                <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900">@Model.MonthlyReport.FormattedTotalSales</td>
-                                <td class="py-3.5 px-6 text-right font-serif text-base text-amber-800">@Model.MonthlyReport.FormattedProductSales</td>
-                                <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-800">@Model.MonthlyReport.FormattedGrandTotal</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900 dark:text-white">@Model.MonthlyReport.FormattedTotalSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-amber-800 dark:text-amber-400">@Model.MonthlyReport.FormattedProductSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-800 dark:text-emerald-400">@Model.MonthlyReport.FormattedGrandTotal</td>
                                 <td></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-            </div>
+            </article>
 
             <!-- Monthly Breakdowns: Barber, Service & Retail Product -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Per Barber -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Monthly Breakdown by Barber</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-bold text-slate-600">Services</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Monthly Breakdown by Barber</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-400">Services</span>
                     </div>
                     @if (!Model.MonthlyReport.ByBarber.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No barber sales recorded this month.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No barber sales recorded this month.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var b in Model.MonthlyReport.ByBarber)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
-                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-slate-900 dark:text-white">@b.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
 
                 <!-- Per Service -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Monthly Breakdown by Service</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">Services</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Monthly Breakdown by Service</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/60 font-bold">Services</span>
                     </div>
                     @if (!Model.MonthlyReport.ByService.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No services rendered this month.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No services rendered this month.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var s in Model.MonthlyReport.ByService)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
-                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-slate-900 dark:text-white">@s.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
 
                 <!-- Per Product -->
-                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Monthly Breakdown by Product</h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold">Products</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Monthly Breakdown by Product</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60 font-bold">Products</span>
                     </div>
                     @if (!Model.MonthlyReport.ProductSalesPerProduct.Any())
                     {
-                        <p class="text-xs text-slate-400 italic">No retail product sales recorded this month.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 italic">No retail product sales recorded this month.</p>
                     }
                     else
                     {
                         <div class="space-y-3">
                             @foreach (var prod in Model.MonthlyReport.ProductSalesPerProduct)
                             {
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 border border-amber-100">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/50">
                                     <div>
-                                        <span class="font-bold text-slate-900 block text-sm">@prod.Name</span>
-                                        <span class="text-xs text-slate-500">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
+                                        <span class="font-bold text-slate-900 dark:text-white block text-sm">@prod.Name</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
                                     </div>
-                                    <span class="font-serif font-bold text-base text-amber-800">@prod.FormattedTotalSales</span>
+                                    <span class="font-serif font-bold text-base text-amber-800 dark:text-amber-400">@prod.FormattedTotalSales</span>
                                 </div>
                             }
                         </div>
                     }
-                </div>
+                </article>
             </div>
         </div>
     }
@@ -534,12 +534,12 @@
     {
         <!-- CUSTOMER TRANSACTIONS VIEW -->
         <div class="space-y-6">
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
                 <form method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <input type="hidden" name="tab" value="customers" />
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">Select Client:</label>
-                        <select name="customerId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                        <label for="reportCustomerId" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">Select Client:</label>
+                        <select id="reportCustomerId" name="customerId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm font-bold text-slate-900 dark:text-white shadow-sm">
                             @foreach (var c in Model.Customers)
                             {
                                 <option value="@c.Id" selected="@(c.Id == Model.SelectedCustomerId)">@c.FullName (@c.Email)</option>
@@ -548,41 +548,41 @@
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">From:</label>
-                        <input type="date" name="startDate" value="@Model.StartDateString"
-                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                        <label for="custStartDate" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">From:</label>
+                        <input type="date" id="custStartDate" name="startDate" value="@Model.StartDateString"
+                               class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-white" />
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">To:</label>
-                        <input type="date" name="endDate" value="@Model.EndDateString"
-                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                        <label for="custEndDate" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">To:</label>
+                        <input type="date" id="custEndDate" name="endDate" value="@Model.EndDateString"
+                               class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-white" />
                     </div>
 
                     <div class="pt-5">
-                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">
                             Apply Filter
                         </button>
                     </div>
                 </form>
 
                 <div class="text-right">
-                    <span class="text-xs uppercase font-bold text-slate-500 block">Total Spent</span>
-                    <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.CustomerReport.FormattedTotalSpent</span>
-                    <span class="text-xs text-slate-500">@Model.CustomerReport.CompletedCount transactions</span>
+                    <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block">Total Spent</span>
+                    <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700 dark:text-amber-400">@Model.CustomerReport.FormattedTotalSpent</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">@Model.CustomerReport.CompletedCount transactions</span>
                 </div>
-            </div>
+            </article>
 
             <!-- Customer Transaction Record -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record · @Model.CustomerReport.CustomerName</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Completed appointments (newest first)</p>
+                        <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white">Transaction Record · @Model.CustomerReport.CustomerName</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Completed appointments (newest first)</p>
                     </div>
                     @if (Model.SelectedCustomerId > 0)
                     {
-                        <a href="/admin/customers/@Model.SelectedCustomerId" class="text-xs font-bold text-amber-700 hover:underline">
+                        <a href="/admin/customers/@Model.SelectedCustomerId" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline active:scale-95 inline-block">
                             View Customer Profile →
                         </a>
                     }
@@ -590,15 +590,15 @@
 
                 @if (!Model.CustomerReport.Transactions.Any())
                 {
-                    <div class="p-12 text-center text-slate-400 text-sm">
+                    <div class="p-12 text-center text-slate-400 dark:text-slate-500 text-sm">
                         No completed transactions recorded for @Model.CustomerReport.CustomerName.
                     </div>
                 }
                 else
                 {
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                        <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                            <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                 <tr>
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Service</th>
@@ -607,47 +607,47 @@
                                     <th class="py-3 px-6 text-right">Amount (₱)</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                 @foreach (var tx in Model.CustomerReport.Transactions)
                                 {
-                                    <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                                        <td class="py-3.5 px-6 font-medium text-slate-900 dark:text-white whitespace-nowrap">
                                             @tx.DateFormatted
-                                            <span class="block text-[11px] font-mono text-amber-800">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
+                                            <span class="block text-[11px] font-mono text-amber-800 dark:text-amber-400">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
                                         </td>
-                                        <td class="py-3.5 px-6 font-semibold text-slate-800">@tx.Service</td>
-                                        <td class="py-3.5 px-6 text-slate-700">@tx.Barber</td>
+                                        <td class="py-3.5 px-6 font-semibold text-slate-800 dark:text-slate-200">@tx.Service</td>
+                                        <td class="py-3.5 px-6 text-slate-700 dark:text-slate-300">@tx.Barber</td>
                                         <td class="py-3.5 px-6">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                                                 @tx.Status
                                             </span>
                                         </td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedAmount</td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 dark:text-white">@tx.FormattedAmount</td>
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tfoot class="bg-slate-50 dark:bg-slate-800/60 font-bold border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
                                 <tr>
                                     <td colspan="4" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Total Spent</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.CustomerReport.FormattedTotalSpent</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700 dark:text-amber-400">@Model.CustomerReport.FormattedTotalSpent</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 }
-            </div>
+            </article>
         </div>
     }
     else if (Model.ActiveTab == "barbers")
     {
         <!-- BARBER TRANSACTIONS VIEW -->
         <div class="space-y-6">
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
                 <form method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <input type="hidden" name="tab" value="barbers" />
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">Select Barber:</label>
-                        <select name="barberId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                        <label for="reportBarberId" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">Select Barber:</label>
+                        <select id="reportBarberId" name="barberId" onchange="this.form.submit()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm font-bold text-slate-900 dark:text-white shadow-sm">
                             @foreach (var b in Model.Barbers)
                             {
                                 <option value="@b.Id" selected="@(b.Id == Model.SelectedBarberId)">@b.DisplayName</option>
@@ -656,19 +656,19 @@
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">From:</label>
-                        <input type="date" name="startDate" value="@Model.StartDateString"
-                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                        <label for="barberStartDate" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">From:</label>
+                        <input type="date" id="barberStartDate" name="startDate" value="@Model.StartDateString"
+                               class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-white" />
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">To:</label>
-                        <input type="date" name="endDate" value="@Model.EndDateString"
-                               class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-800" />
+                        <label for="barberEndDate" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 block mb-1">To:</label>
+                        <input type="date" id="barberEndDate" name="endDate" value="@Model.EndDateString"
+                               class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-white" />
                     </div>
 
                     <div class="pt-5">
-                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
+                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">
                             Apply Filter
                         </button>
                     </div>
@@ -676,78 +676,78 @@
 
                 <div class="flex items-center gap-4 sm:gap-6">
                     <div class="text-right">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Gross Sales</span>
-                        <span class="text-base font-serif font-bold text-slate-800">@Model.BarberReport.FormattedTotalSales</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block">Gross Sales</span>
+                        <span class="text-base font-serif font-bold text-slate-800 dark:text-slate-200">@Model.BarberReport.FormattedTotalSales</span>
                     </div>
-                    <div class="text-right border-l border-slate-200 pl-4">
-                        <span class="text-[10px] uppercase font-bold text-emerald-600 block">Barber Commission (50%)</span>
-                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-emerald-700">@Model.BarberReport.FormattedTotalCommission</span>
+                    <div class="text-right border-l border-slate-200 dark:border-slate-700 pl-4">
+                        <span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 block">Barber Commission (50%)</span>
+                        <span class="text-base kpi-value font-sans font-bold tabular-nums text-emerald-700 dark:text-emerald-400">@Model.BarberReport.FormattedTotalCommission</span>
                     </div>
-                    <div class="text-right border-l border-slate-200 pl-4">
-                        <span class="text-xs uppercase font-bold text-slate-500 block">Shop Net Share</span>
-                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700">@Model.BarberReport.FormattedShopNetShare</span>
-                        <span class="text-[11px] text-slate-500 block">@Model.BarberReport.CompletedCount transactions</span>
+                    <div class="text-right border-l border-slate-200 dark:border-slate-700 pl-4">
+                        <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block">Shop Net Share</span>
+                        <span class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-700 dark:text-amber-400">@Model.BarberReport.FormattedShopNetShare</span>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 block">@Model.BarberReport.CompletedCount transactions</span>
                     </div>
                 </div>
-            </div>
+            </article>
 
             <!-- Barber Transaction Record -->
-            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-serif font-bold text-slate-900">Transaction Record · Master Barber @Model.BarberReport.BarberName</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Completed services (newest first) with 50% commission split</p>
+                        <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white">Transaction Record · Master Barber @Model.BarberReport.BarberName</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Completed services (newest first) with 50% commission split</p>
                     </div>
                 </div>
 
                 @if (!Model.BarberReport.Transactions.Any())
                 {
-                    <div class="p-12 text-center text-slate-400 text-sm">
+                    <div class="p-12 text-center text-slate-400 dark:text-slate-500 text-sm">
                         No completed transactions recorded for @Model.BarberReport.BarberName.
                     </div>
                 }
                 else
                 {
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                        <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                            <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                 <tr>
                                     <th class="py-3 px-6">Date</th>
                                     <th class="py-3 px-6">Customer</th>
                                     <th class="py-3 px-6">Service</th>
                                     <th class="py-3 px-6 text-right">Service Amount</th>
-                                    <th class="py-3 px-6 text-right text-emerald-800">Barber Cut (50%)</th>
+                                    <th class="py-3 px-6 text-right text-emerald-800 dark:text-emerald-400">Barber Cut (50%)</th>
                                     <th class="py-3 px-6 text-right">Shop Share (50%)</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                 @foreach (var tx in Model.BarberReport.Transactions)
                                 {
-                                    <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="py-3.5 px-6 font-medium text-slate-900 whitespace-nowrap">
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                                        <td class="py-3.5 px-6 font-medium text-slate-900 dark:text-white whitespace-nowrap">
                                             @tx.DateFormatted
-                                            <span class="block text-[11px] font-mono text-amber-800">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
+                                            <span class="block text-[11px] font-mono text-amber-800 dark:text-amber-400">@tx.ReferenceCode &bull; @tx.TimeFormatted</span>
                                         </td>
-                                        <td class="py-3.5 px-6 font-bold text-slate-900">@tx.Customer</td>
-                                        <td class="py-3.5 px-6 text-slate-700">@tx.Service</td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tx.FormattedAmount</td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-emerald-700">@tx.FormattedCommissionAmount</td>
-                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-700">@tx.FormattedShopShare</td>
+                                        <td class="py-3.5 px-6 font-bold text-slate-900 dark:text-white">@tx.Customer</td>
+                                        <td class="py-3.5 px-6 text-slate-700 dark:text-slate-300">@tx.Service</td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 dark:text-white">@tx.FormattedAmount</td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-emerald-700 dark:text-emerald-400">@tx.FormattedCommissionAmount</td>
+                                        <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-700 dark:text-slate-300">@tx.FormattedShopShare</td>
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tfoot class="bg-slate-50 dark:bg-slate-800/60 font-bold border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
                                 <tr>
                                     <td colspan="3" class="py-3.5 px-6 text-right uppercase text-xs tracking-wider">Totals:</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900">@Model.BarberReport.FormattedTotalSales</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-700">@Model.BarberReport.FormattedTotalCommission</td>
-                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700">@Model.BarberReport.FormattedShopNetShare</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900 dark:text-white">@Model.BarberReport.FormattedTotalSales</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-700 dark:text-emerald-400">@Model.BarberReport.FormattedTotalCommission</td>
+                                    <td class="py-3.5 px-6 text-right font-serif text-base text-amber-700 dark:text-amber-400">@Model.BarberReport.FormattedShopNetShare</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 }
-            </div>
+            </article>
         </div>
     }
 </div>
@@ -794,13 +794,13 @@
         });
 
         document.querySelectorAll('.sales-type-pill').forEach(btn => {
-            btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs');
-            btn.classList.add('text-slate-600');
+            btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs', 'dark:bg-amber-500', 'dark:text-slate-950');
+            btn.classList.add('text-slate-600', 'dark:text-slate-400');
         });
         const activeBtn = document.getElementById('filterBtn' + type.charAt(0).toUpperCase() + type.slice(1));
         if (activeBtn) {
-            activeBtn.classList.remove('text-slate-600');
-            activeBtn.classList.add('bg-slate-900', 'text-white', 'shadow-xs');
+            activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+            activeBtn.classList.add('bg-slate-900', 'text-white', 'shadow-xs', 'dark:bg-amber-500', 'dark:text-slate-950');
         }
 
         const labelEl = document.getElementById('journalFooterLabel');

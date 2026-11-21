@@ -5,72 +5,72 @@
 
 <div class="space-y-8 max-w-4xl mx-auto">
     <!-- Header -->
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition">
         <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-slate-800 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
                 <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
                 <span>SECURITY & PROFILE</span>
             </div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Barber Account</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Barber Account</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Manage your profile credentials and account security settings.
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold @(Model.IsActive ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-red-100 text-red-800 border border-red-300")">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold @(Model.IsActive ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800" : "bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800")">
                 @(Model.IsActive ? "Active Craftsman" : "Inactive Account")
             </span>
         </div>
-    </div>
+    </article>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Profile Summary Card -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-            <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
-                <div class="w-16 h-16 rounded-2xl bg-slate-900 text-amber-400 font-serif font-black text-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-md">
+        <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-6 transition">
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 dark:bg-slate-800 text-amber-400 font-serif font-black text-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-md">
                     @Model.DisplayName[0]
                 </div>
                 <div>
-                    <h2 class="text-xl font-serif font-bold text-slate-900">@Model.DisplayName</h2>
-                    <p class="text-xs text-amber-700 font-semibold">@(Model.Specialties ?? "Master Barber Craftsman")</p>
+                    <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">@Model.DisplayName</h2>
+                    <p class="text-xs text-amber-700 dark:text-amber-400 font-semibold">@(Model.Specialties ?? "Master Barber Craftsman")</p>
                 </div>
             </div>
 
             <div class="space-y-4 text-xs">
                 <div>
-                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Email Address</span>
-                    <span class="font-bold text-slate-900 text-sm">@Model.Email</span>
+                    <span class="text-slate-400 dark:text-slate-500 uppercase font-bold text-[10px] tracking-wider block">Email Address</span>
+                    <span class="font-bold text-slate-900 dark:text-slate-100 text-sm">@Model.Email</span>
                 </div>
                 <div>
-                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Contact Phone</span>
-                    <span class="font-semibold text-slate-800 text-sm">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not set" : Model.PhoneNumber)</span>
+                    <span class="text-slate-400 dark:text-slate-500 uppercase font-bold text-[10px] tracking-wider block">Contact Phone</span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not set" : Model.PhoneNumber)</span>
                 </div>
                 <div>
-                    <span class="text-slate-400 uppercase font-bold text-[10px] tracking-wider block">Shop Policy</span>
-                    <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">
+                    <span class="text-slate-400 dark:text-slate-500 uppercase font-bold text-[10px] tracking-wider block">Shop Policy</span>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1 text-[11px] leading-relaxed">
                         Barber accounts are provisioned and managed centrally by shop administrators. To update your name, photo, or contact phone, please contact the shop administrator.
                     </p>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Change Password Card -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-            <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-xl font-serif font-bold text-slate-900">Change Password</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Update your password to keep your barber account secure.</p>
+        <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-6 transition">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Change Password</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update your password to keep your barber account secure.</p>
             </div>
 
             <form method="post" action="/Account/ChangePassword" class="space-y-4">
                 @Html.AntiForgeryToken()
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Current Password</label>
+                    <label for="barber-current-password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Current Password</label>
                     <div class="relative">
                         <input type="password" id="barber-current-password" name="CurrentPassword" required placeholder="Enter current password"
-                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
+                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
                         <button type="button" onclick="togglePasswordVisibility('barber-current-password', this)"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                 aria-label="Show password">
                             <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-6 0 3.75 3.75 0 016 0z" /></svg>
                             <svg class="icon-eye-slash w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
@@ -79,27 +79,27 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Password</label>
+                    <label for="barber-new-password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">New Password</label>
                     <div class="relative">
                         <input type="password" id="barber-new-password" name="NewPassword" required minlength="8" placeholder="At least 8 characters"
-                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
+                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
                         <button type="button" onclick="togglePasswordVisibility('barber-new-password', this)"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                 aria-label="Show password">
-                            <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-6 0 3.75 3.75 0 017.5 0z" /></svg>
+                            <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-6 0 3.75 3.75 0 016 0z" /></svg>
                             <svg class="icon-eye-slash w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
                         </button>
                     </div>
-                    <span class="text-[10px] text-slate-400 mt-0.5 block">Minimum 8 characters with letters, numbers, and symbols.</span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 block">Minimum 8 characters with letters, numbers, and symbols.</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Confirm New Password</label>
+                    <label for="barber-confirm-password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Confirm New Password</label>
                     <div class="relative">
                         <input type="password" id="barber-confirm-password" name="ConfirmPassword" required minlength="8" placeholder="Re-enter new password"
-                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
+                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition" />
                         <button type="button" onclick="togglePasswordVisibility('barber-confirm-password', this)"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition"
                                 aria-label="Show password">
                             <svg class="icon-eye w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3.75 3.75 0 11-6 0 3.75 3.75 0 016 0z" /></svg>
                             <svg class="icon-eye-slash w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
@@ -113,7 +113,7 @@
                     </button>
                 </div>
             </form>
-        </div>
+        </article>
     </div>
 </div>
 

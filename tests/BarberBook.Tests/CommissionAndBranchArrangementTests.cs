@@ -47,13 +47,13 @@ public class CommissionAndBranchArrangementTests : IClassFixture<WebApplicationF
     {
         var client = _factory.CreateClient();
 
-        // Query availability for Ramon on upcoming Wednesday
-        var res = await client.GetAsync("/api/barbers/1/availability?serviceId=1&date=2026-11-18");
+        // Query availability for Ramon on upcoming Wednesday (2026-12-02)
+        var res = await client.GetAsync("/api/barbers/1/availability?serviceId=1&date=2026-12-02");
         res.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await res.Content.ReadAsStringAsync();
         content.Should().Contain("startsAtIso");
-        content.Should().Contain("2026-11-18T");
+        content.Should().Contain("2026-12-02T");
     }
 
     [Fact]
@@ -62,8 +62,8 @@ public class CommissionAndBranchArrangementTests : IClassFixture<WebApplicationF
         var juanClient = await CreateAuthenticatedClientAsync("juan@barberbook.local", "Demo@BarberBook2026!");
         var markClient = await CreateAuthenticatedClientAsync("mark@barberbook.local", "Demo@BarberBook2026!");
 
-        // Book slot for Juan: 2026-11-18 10:00 AM Manila (02:00:00Z)
-        var startsAt = "2026-11-18T02:00:00Z";
+        // Book slot for Juan: 2026-12-02 10:00 AM Manila (02:00:00Z)
+        var startsAt = "2026-12-02T02:00:00Z";
 
         var juanBooking = await juanClient.PostAsJsonAsync("/api/appointments", new
         {
@@ -95,7 +95,7 @@ public class CommissionAndBranchArrangementTests : IClassFixture<WebApplicationF
     {
         var juanClient = await CreateAuthenticatedClientAsync("juan@barberbook.local", "Demo@BarberBook2026!");
 
-        var startsAt = "2026-11-18T03:00:00Z"; // 11:00 AM Manila
+        var startsAt = "2026-12-02T03:00:00Z"; // 11:00 AM Manila on Wednesday
 
         // Juan books Ramon at 11:00 AM
         var first = await juanClient.PostAsJsonAsync("/api/appointments", new

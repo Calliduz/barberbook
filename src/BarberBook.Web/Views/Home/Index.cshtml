@@ -54,19 +54,19 @@
             </h1>
 
             <p class="mt-5 text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-light">
-                Where timeless craftsmanship meets modern convenience. Book your preferred master barber in seconds with guaranteed real-time availability and zero waiting.
+                Handcrafted cuts, hot towel straight-razor shaves, and traditional apothecary grooming in Manila. Book your master barber with locked 30-minute intervals and zero waiting.
             </p>
 
             <!-- CTA Actions -->
             <div class="mt-8 flex flex-wrap gap-4 items-center">
-                <a href="/book" class="inline-flex items-center justify-center rounded-xl bg-brand-500 px-7 py-4 text-base font-bold text-slate-950 shadow-xl hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 transition transform hover:-translate-y-0.5">
+                <a href="/book" class="inline-flex items-center justify-center rounded-xl bg-brand-500 px-7 py-4 text-base font-bold text-slate-950 shadow-xl hover:bg-brand-400 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 transition-all duration-150 ease-out">
                     <svg class="w-5 h-5 mr-2 -ml-1 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     Book an Appointment
                 </a>
-                <a href="/services" class="inline-flex items-center justify-center rounded-xl bg-slate-800/80 backdrop-blur-sm px-6 py-4 text-sm font-bold text-white border border-slate-700 hover:bg-slate-700 transition">
+                <a href="/services" class="inline-flex items-center justify-center rounded-xl bg-slate-800/80 backdrop-blur-sm px-6 py-4 text-sm font-bold text-white border border-slate-700 hover:bg-slate-700 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 transition-all duration-150 ease-out">
                     Grooming Menu
                 </a>
-                <a href="/barbers" class="inline-flex items-center justify-center rounded-xl px-4 py-4 text-sm font-semibold text-brand-300 hover:text-brand-200 transition">
+                <a href="/barbers" class="inline-flex items-center justify-center rounded-xl px-4 py-4 text-sm font-semibold text-brand-300 hover:text-brand-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-all duration-150 ease-out">
                     Meet Our Barbers &rarr;
                 </a>
             </div>
@@ -115,9 +115,9 @@
             @foreach (var svc in Model)
             {
                 var imgUrl = GetServiceImage(svc.Name);
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:border-brand-500/60 hover:shadow-md transition group">
-                    <div class="sm:w-44 h-48 sm:h-auto vintage-img-container shrink-0 bg-slate-900">
-                        <img src="@imgUrl" alt="@svc.Name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
+                <article class="card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:border-brand-500/60 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group">
+                    <div class="sm:w-44 h-48 sm:h-auto vintage-img-container shrink-0 bg-slate-900 overflow-hidden">
+                        <img src="@imgUrl" alt="@svc.Name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-transform duration-300 ease-out" />
                     </div>
                     <div class="p-6 flex-1 flex flex-col justify-between">
                         <div>
@@ -136,14 +136,14 @@
                                 @svc.Description
                             </p>
                         </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <footer class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                             <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium italic">Snapshot price guaranteed</span>
-                            <a href="/book?serviceId=@svc.Id" class="inline-flex items-center text-xs font-bold text-brand-700 dark:text-brand-400 hover:text-brand-900 dark:hover:text-brand-300">
+                            <a href="/book?serviceId=@svc.Id" class="inline-flex items-center text-xs font-bold text-brand-700 dark:text-brand-400 hover:text-brand-900 dark:hover:text-brand-300 active:scale-[0.98] transition-transform">
                                 Book This Service &rarr;
                             </a>
-                        </div>
+                        </footer>
                     </div>
-                </div>
+                </article>
             }
         </div>
     </div>
@@ -172,8 +172,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach (var p in products.Take(6))
                 {
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
-                        <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
+                    <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group">
+                        <header class="p-6 bg-slate-900 text-white flex items-center justify-between">
                             <div>
                                 <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                                     @p.Category
@@ -183,7 +183,7 @@
                             <div class="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                             </div>
-                        </div>
+                        </header>
 
                         <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
                             <div>
@@ -222,14 +222,14 @@
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                            <footer class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400 italic">Available in-shop</span>
-                                <a href="/products" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 transition-transform">
+                                <a href="/products" class="inline-flex items-center font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 group-hover:translate-x-0.5 active:scale-[0.98] transition-transform">
                                     Explore Product Details &rarr;
                                 </a>
-                            </div>
+                            </footer>
                         </div>
-                    </div>
+                    </article>
                 }
             </div>
         </div>
@@ -260,9 +260,9 @@
                 @foreach (var b in barbers)
                 {
                     var barberPhoto = GetBarberImage(b.DisplayName, b.PhotoUrl);
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col hover:border-brand-500/60 hover:shadow-lg transition group">
-                        <div class="h-64 vintage-img-container bg-slate-900 relative">
-                            <img src="@barberPhoto" alt="@b.DisplayName" class="w-full h-full object-cover object-top opacity-95 group-hover:opacity-100" />
+                    <article class="card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col hover:border-brand-500/60 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group">
+                        <div class="h-64 vintage-img-container bg-slate-900 relative overflow-hidden">
+                            <img src="@barberPhoto" alt="@b.DisplayName" class="w-full h-full object-cover object-top opacity-95 group-hover:opacity-100 group-hover:scale-[1.02] transition-transform duration-300 ease-out" />
                             <div class="absolute bottom-3 left-3 bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-slate-700">
                                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                                 <span>Active Staff</span>
@@ -282,16 +282,16 @@
                                 </p>
                             </div>
 
-                            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <footer class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <a href="/barbers/@b.Id" class="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                                     View Schedule
                                 </a>
-                                <a href="/book?barberId=@b.Id" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-sm transition">
+                                <a href="/book?barberId=@b.Id" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-sm active:scale-[0.98] transition-all duration-150">
                                     Book with @b.DisplayName &rarr;
                                 </a>
-                            </div>
+                            </footer>
                         </div>
-                    </div>
+                    </article>
                 }
             </div>
         </div>
@@ -322,7 +322,7 @@
                 @foreach (var br in branches)
                 {
                     var branchBarbers = barbers.Where(b => b.BranchId == br.Id).ToList();
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg transition group">
+                    <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-500/60 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group">
                         <div class="p-6 sm:p-7 space-y-4">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
@@ -371,12 +371,12 @@
                             }
                         </div>
 
-                        <div class="p-6 pt-0">
-                            <a href="/book?branchId=@br.Id" class="w-full inline-flex items-center justify-center px-4 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs sm:text-sm shadow-md transition group-hover:bg-amber-500 group-hover:text-slate-950">
+                        <footer class="p-6 pt-0">
+                            <a href="/book?branchId=@br.Id" class="w-full inline-flex items-center justify-center px-4 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs sm:text-sm shadow-md transition-all duration-150 active:scale-[0.98] group-hover:bg-amber-500 group-hover:text-slate-950">
                                 <span>Book at @br.Name &rarr;</span>
                             </a>
-                        </div>
-                    </div>
+                        </footer>
+                    </article>
                 }
             </div>
         </div>
@@ -392,7 +392,7 @@
 
         <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Bento 1: Large Card (2 columns) with Interactive Time Slot Matrix Preview -->
-            <div class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+            <article class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between hover:border-amber-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -422,10 +422,10 @@
                         <span class="py-1.5 px-2 rounded-lg bg-slate-800/60 text-slate-500 border border-slate-700/50 line-through">01:30 PM</span>
                     </div>
                 </div>
-            </div>
+            </article>
 
             <!-- Bento 2: Tall Vertical Accent Card (1 column) -->
-            <div class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-800/90 to-slate-900 border border-slate-700/80 flex flex-col justify-between interactive-card">
+            <article class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-800/90 to-slate-900 border border-slate-700/80 flex flex-col justify-between hover:border-amber-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
                 <div>
                     <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold mb-4">
                         <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>
@@ -435,14 +435,14 @@
                         No online payment gateway fees or convenience surcharges. Pay the exact service price upon completion via Cash, QR, or Card.
                     </p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-amber-400 font-semibold">
+                <footer class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-amber-400 font-semibold">
                     <span>Zero Surcharges</span>
                     <span>100% Transparent</span>
-                </div>
-            </div>
+                </footer>
+            </article>
 
             <!-- Bento 3: Equipment & Quality Hygiene Card (1 column) -->
-            <div class="p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+            <article class="p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
                 <div>
                     <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center font-bold mb-4">
                         <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
@@ -452,14 +452,14 @@
                         Every clipper, shear, and razor undergoes strict routine sanitation and maintenance logs before and after each client cut.
                     </p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-blue-300 font-semibold">
+                <footer class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-blue-300 font-semibold">
                     <span>Oiled &amp; Zero-Gapped</span>
                     <span>Hospital Grade</span>
-                </div>
-            </div>
+                </footer>
+            </article>
 
             <!-- Bento 4: Reschedule Flexibility & Customer Portal Card (2 columns) -->
-            <div class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between interactive-card">
+            <article class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex flex-col justify-between hover:border-amber-500/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
@@ -472,16 +472,16 @@
                         Plans changed? Move your appointment to any open slot or cancel directly from your customer portal. Released slots instantly return to live inventory for other clients.
                     </p>
                 </div>
-                <div class="mt-6 flex flex-wrap gap-3 items-center">
-                    <a href="/book" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs shadow-md hover:bg-amber-400 transition">
+                <footer class="mt-6 flex flex-wrap gap-3 items-center">
+                    <a href="/book" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs shadow-md hover:bg-amber-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150">
                         <span>Book Your Preferred Slot</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                     </a>
-                    <a href="/services" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-700/80 text-white font-semibold text-xs hover:bg-slate-700 transition">
+                    <a href="/services" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-700/80 text-white font-semibold text-xs hover:bg-slate-700 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150">
                         View Service Menu
                     </a>
-                </div>
-            </div>
+                </footer>
+            </article>
         </div>
     </div>
 </div>

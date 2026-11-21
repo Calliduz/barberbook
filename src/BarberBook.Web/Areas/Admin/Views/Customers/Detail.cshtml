@@ -6,7 +6,7 @@
 <div class="space-y-6">
     <!-- Top Nav Stepper / Back Link -->
     <div class="flex items-center justify-between">
-        <a href="/admin/customers" class="text-xs font-bold text-slate-500 hover:text-slate-900 transition flex items-center gap-1.5">
+        <a href="/admin/customers" class="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition flex items-center gap-1.5 active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
             <span>Back to Customer Directory</span>
         </a>
@@ -16,13 +16,13 @@
                 @Html.AntiForgeryToken()
                 @if (Model.IsActive)
                 {
-                    <button type="button" onclick="confirmCustomerDeactivate()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition">
+                    <button type="button" onclick="confirmCustomerDeactivate()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/60 transition active:scale-95">
                         Deactivate Account
                     </button>
                 }
                 else
                 {
-                    <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
+                    <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60 transition active:scale-95">
                         Reactivate Account
                     </button>
                 }
@@ -31,107 +31,107 @@
     </div>
 
     <!-- Customer Overview Banner -->
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="flex items-start sm:items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-slate-900 text-amber-300 font-serif font-black text-2xl flex items-center justify-center shrink-0 border border-slate-800 shadow-md">
+            <div class="w-16 h-16 rounded-2xl bg-slate-900 dark:bg-slate-950 text-amber-300 font-serif font-black text-2xl flex items-center justify-center shrink-0 border border-slate-800 shadow-md">
                 @(string.IsNullOrWhiteSpace(Model.FullName) ? "C" : Model.FullName.Substring(0, 1).ToUpper())
             </div>
             <div>
                 <div class="flex items-center gap-2 flex-wrap">
-                    <h1 class="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">@Model.FullName</h1>
+                    <h1 class="text-2xl sm:text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">@Model.FullName</h1>
                     @if (Model.IsActive)
                     {
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60">
                             Active Account
                         </span>
                     }
                     else
                     {
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800/60">
                             Deactivated
                         </span>
                     }
                     @if (Model.NoShowVisits > 0)
                     {
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
-                            <svg class="w-3.5 h-3.5 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 shadow-xs">
+                            <svg class="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                             <span>@Model.NoShowVisits Prior No-Show@(Model.NoShowVisits == 1 ? "" : "s")</span>
                         </span>
                     }
                 </div>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1">
-                        <span>Email: <strong class="text-slate-800">@Model.Email</strong></span>
-                        <button type="button" class="copy-btn" onclick="copyToClipboard('@Model.Email', this)" title="Copy email address" aria-label="Copy email address">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                        <span>Email: <strong class="text-slate-800 dark:text-slate-200">@Model.Email</strong></span>
+                        <button type="button" class="copy-btn active:scale-95" onclick="copyToClipboard('@Model.Email', this)" title="Copy email address" aria-label="Copy email address">
+                            <svg class="w-3.5 h-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
                         </button>
                     </span>
-                    <span class="text-slate-400">&bull;</span>
+                    <span class="text-slate-400 dark:text-slate-600">&bull;</span>
                     <span class="inline-flex items-center gap-1">
-                        <span>Phone: <strong class="text-slate-800">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</strong></span>
+                        <span>Phone: <strong class="text-slate-800 dark:text-slate-200">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</strong></span>
                         @if (!string.IsNullOrWhiteSpace(Model.Phone))
                         {
-                            <button type="button" class="copy-btn" onclick="copyToClipboard('@Model.Phone', this)" title="Copy phone number" aria-label="Copy phone number">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                            <button type="button" class="copy-btn active:scale-95" onclick="copyToClipboard('@Model.Phone', this)" title="Copy phone number" aria-label="Copy phone number">
+                                <svg class="w-3.5 h-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
                             </button>
                         }
                     </span>
-                    <span class="text-slate-400">&bull;</span>
+                    <span class="text-slate-400 dark:text-slate-600">&bull;</span>
                     <span>Member since @Model.MemberSince</span>
                 </p>
             </div>
         </div>
 
-        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-right shrink-0">
-            <span class="text-[11px] uppercase tracking-wider font-extrabold text-amber-800">LIFETIME SPENT</span>
-            <div class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-800 mt-0.5">@Model.FormattedTotalSpent</div>
-            <div class="text-[11px] text-amber-800/80 mt-0.5">@Model.CompletedVisits completed cuts</div>
+        <div class="bg-amber-500/10 dark:bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4 text-right shrink-0">
+            <span class="text-[11px] uppercase tracking-wider font-extrabold text-amber-800 dark:text-amber-400">LIFETIME SPENT</span>
+            <div class="text-2xl kpi-value font-sans font-black tabular-nums text-amber-800 dark:text-amber-300 mt-0.5">@Model.FormattedTotalSpent</div>
+            <div class="text-[11px] text-amber-800/80 dark:text-amber-400/80 mt-0.5">@Model.CompletedVisits completed cuts</div>
         </div>
-    </div>
+    </article>
 
     <!-- Summary Metrics Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Total Bookings</p>
-            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 mt-1">@Model.TotalAppointments</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">All time requests</p>
-        </div>
+        <article class="card bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Total Bookings</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-900 dark:text-slate-100 mt-1">@Model.TotalAppointments</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">All time requests</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Completed Visits</p>
-            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-600 mt-1">@Model.CompletedVisits</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Finished appointments</p>
-        </div>
+        <article class="card bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Completed Visits</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-emerald-600 dark:text-emerald-400 mt-1">@Model.CompletedVisits</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Finished appointments</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Cancelled / Rejected</p>
-            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-700 mt-1">@Model.CancelledVisits</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Unfulfilled bookings</p>
-        </div>
+        <article class="card bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Cancelled / Rejected</p>
+            <p class="text-2xl kpi-value font-sans font-black tabular-nums text-slate-700 dark:text-slate-300 mt-1">@Model.CancelledVisits</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Unfulfilled bookings</p>
+        </article>
 
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Last Visit</p>
-            <p class="text-base font-bold text-slate-900 mt-1 truncate" title="@Model.LastVisit">@Model.LastVisit</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Most recent completed service</p>
-        </div>
+        <article class="card bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Last Visit</p>
+            <p class="text-base font-bold text-slate-900 dark:text-slate-100 mt-1 truncate" title="@Model.LastVisit">@Model.LastVisit</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Most recent completed service</p>
+        </article>
     </div>
 
     <!-- Tab Bar -->
-    <div class="border-b border-slate-200">
+    <div class="border-b border-slate-200 dark:border-slate-800">
         <nav class="flex space-x-6 text-xs font-bold">
-            <button type="button" onclick="switchTab('profile')" id="tabBtn-profile" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 @(Model.ActiveTab == "profile" ? "border-amber-500 text-amber-800" : "border-transparent text-slate-500 hover:text-slate-800")">
+            <button type="button" onclick="switchTab('profile')" id="tabBtn-profile" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 active:scale-95 @(Model.ActiveTab == "profile" ? "border-amber-500 text-amber-800 dark:text-amber-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200")">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
                 <span>Edit Profile</span>
             </button>
-            <button type="button" onclick="switchTab('history')" id="tabBtn-history" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 @(Model.ActiveTab == "history" ? "border-amber-500 text-amber-800" : "border-transparent text-slate-500 hover:text-slate-800")">
+            <button type="button" onclick="switchTab('history')" id="tabBtn-history" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 active:scale-95 @(Model.ActiveTab == "history" ? "border-amber-500 text-amber-800 dark:text-amber-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200")">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 <span>Appointment History (@Model.Appointments.Count)</span>
             </button>
-            <button type="button" onclick="switchTab('transactions')" id="tabBtn-transactions" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 @(Model.ActiveTab == "transactions" ? "border-amber-500 text-amber-800" : "border-transparent text-slate-500 hover:text-slate-800")">
+            <button type="button" onclick="switchTab('transactions')" id="tabBtn-transactions" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 active:scale-95 @(Model.ActiveTab == "transactions" ? "border-amber-500 text-amber-800 dark:text-amber-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200")">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 <span>Transactions</span>
             </button>
-            <button type="button" onclick="switchTab('security')" id="tabBtn-security" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 @(Model.ActiveTab == "security" ? "border-amber-500 text-amber-800" : "border-transparent text-slate-500 hover:text-slate-800")">
+            <button type="button" onclick="switchTab('security')" id="tabBtn-security" class="tab-button pb-3 border-b-2 transition flex items-center gap-2 active:scale-95 @(Model.ActiveTab == "security" ? "border-amber-500 text-amber-800 dark:text-amber-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200")">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
                 <span>Security & Credentials</span>
             </button>
@@ -140,10 +140,10 @@
 
     <!-- Tab 1: Profile Editor -->
     <div id="tabContent-profile" class="tab-pane @(Model.ActiveTab == "profile" ? "" : "hidden")">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm max-w-2xl space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-xl font-serif font-bold text-slate-900">Edit Customer Information</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Update personal identity records, contact email, and mobile phone number.</p>
+        <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm max-w-2xl space-y-6">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-4">
+                <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Edit Customer Information</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update personal identity records, contact email, and mobile phone number.</p>
             </div>
 
             <form method="post" action="/admin/customers/@Model.Id/edit" class="space-y-4">
@@ -151,57 +151,57 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">First Name</label>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">First Name</label>
                         <input type="text" name="FirstName" value="@Model.EditForm.FirstName" required placeholder="e.g. Juan"
-                               class="modal-input font-medium" />
+                               class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Last Name</label>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Last Name</label>
                         <input type="text" name="LastName" value="@Model.EditForm.LastName" required placeholder="e.g. Dela Cruz"
-                               class="modal-input font-medium" />
+                               class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email Address</label>
                     <input type="email" name="Email" value="@Model.EditForm.Email" required
-                           class="modal-input font-medium" />
-                    <p class="text-[11px] text-slate-400 mt-1">Used for authentication. Must be globally unique.</p>
+                           class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Used for authentication. Must be globally unique.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Phone Number (optional)</label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Phone Number (optional)</label>
                     <input type="tel" name="Phone" value="@Model.EditForm.Phone" placeholder="09xxxxxxxxx"
-                           class="modal-input font-medium" />
+                           class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                 </div>
 
-                <div class="pt-4 border-t border-slate-100 flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md">
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md active:scale-95">
                         Save Profile Changes
                     </button>
                 </div>
             </form>
-        </div>
+        </article>
     </div>
 
     <!-- Tab 2: Appointment History (Reuses P09 Component Design) -->
     <div id="tabContent-history" class="tab-pane @(Model.ActiveTab == "history" ? "" : "hidden")">
-        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+        <article class="card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-serif font-bold text-slate-900">Client Appointment History</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Historical log of all bookings across every status with audit timelines.</p>
+                    <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Client Appointment History</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Historical log of all bookings across every status with audit timelines.</p>
                 </div>
-                <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                     @Model.Appointments.Count total records
                 </span>
             </div>
 
             @if (!Model.Appointments.Any())
             {
-                <div class="py-16 text-center text-slate-400">
-                    <p class="text-base font-semibold text-slate-700">No appointment history for this client.</p>
-                    <p class="text-xs text-slate-400 mt-1">New online bookings will appear here automatically.</p>
+                <div class="py-16 text-center text-slate-400 dark:text-slate-500">
+                    <p class="text-base font-semibold text-slate-700 dark:text-slate-300">No appointment history for this client.</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">New online bookings will appear here automatically.</p>
                 </div>
             }
             else
@@ -209,7 +209,7 @@
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
+                        <thead class="bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                             <tr>
                                 <th class="py-3.5 px-6">Reference</th>
                                 <th class="py-3.5 px-6">Date & Time</th>
@@ -220,38 +220,38 @@
                                 <th class="py-3.5 px-6 text-right">Audit Timeline</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-700 dark:text-slate-300">
                             @foreach (var app in Model.Appointments)
                             {
                                 var badgeClass = app.Status switch
                                 {
-                                    BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
-                                    BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
-                                    BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
-                                    BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
-                                    BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
-                                    _ => "bg-slate-100 text-slate-700"
+                                    BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800/60",
+                                    BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800/60",
+                                    BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60",
+                                    BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700",
+                                    BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800/60",
+                                    _ => "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                                 };
 
-                                <tr class="hover:bg-slate-50/70 transition">
-                                    <td class="py-4 px-6 font-mono font-bold text-amber-800 text-xs">
+                                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+                                    <td class="py-4 px-6 font-mono font-bold text-amber-800 dark:text-amber-400 text-xs">
                                         @app.ReferenceCode
                                     </td>
                                     <td class="py-4 px-6">
-                                        <div class="font-bold text-slate-900">@app.ScheduledDateFormatted</div>
-                                        <div class="text-[11px] text-slate-500">@app.ScheduledTime12h</div>
+                                        <div class="font-bold text-slate-900 dark:text-slate-100">@app.ScheduledDateFormatted</div>
+                                        <div class="text-[11px] text-slate-500 dark:text-slate-400">@app.ScheduledTime12h</div>
                                     </td>
-                                    <td class="py-4 px-6 font-bold text-slate-800">
+                                    <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-200">
                                         @app.BarberName
                                     </td>
                                     <td class="py-4 px-6">
-                                        <div class="font-semibold text-slate-800">@app.ServiceName</div>
+                                        <div class="font-semibold text-slate-800 dark:text-slate-200">@app.ServiceName</div>
                                         @if (!string.IsNullOrWhiteSpace(app.Notes))
                                         {
-                                            <div class="text-[11px] text-slate-400 italic">"@app.Notes"</div>
+                                            <div class="text-[11px] text-slate-400 dark:text-slate-500 italic">"@app.Notes"</div>
                                         }
                                     </td>
-                                    <td class="py-4 px-6 font-bold text-slate-900">
+                                    <td class="py-4 px-6 font-bold text-slate-900 dark:text-slate-100">
                                         @app.FormattedPrice
                                     </td>
                                     <td class="py-4 px-6">
@@ -261,7 +261,7 @@
                                     </td>
                                     <td class="py-4 px-6 text-right">
                                         <button type="button" onclick="openTimelineModal(@app.Id)"
-                                                class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-800 hover:text-amber-900 hover:bg-amber-50 border border-amber-200 transition">
+                                                class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-800 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 transition active:scale-95">
                                             View Timeline
                                         </button>
                                     </td>
@@ -272,29 +272,29 @@
                 </div>
 
                 <!-- Mobile Stacked Card View -->
-                <div class="md:hidden divide-y divide-slate-100">
+                <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach (var app in Model.Appointments)
                     {
                         var badgeClass = app.Status switch
                         {
-                            BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
-                            BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
-                            BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
-                            BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
-                            BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-red-100 text-red-800 border-red-300",
-                            _ => "bg-slate-100 text-slate-700"
+                            BarberBook.Data.Enums.AppointmentStatus.Pending => "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800/60",
+                            BarberBook.Data.Enums.AppointmentStatus.Confirmed => "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800/60",
+                            BarberBook.Data.Enums.AppointmentStatus.Completed => "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60",
+                            BarberBook.Data.Enums.AppointmentStatus.Cancelled => "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700",
+                            BarberBook.Data.Enums.AppointmentStatus.Rejected => "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800/60",
+                            _ => "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                         };
 
-                        <div class="p-4 space-y-3 hover:bg-amber-50/20 transition">
+                        <div class="p-4 space-y-3 hover:bg-amber-50/20 dark:hover:bg-amber-950/10 transition">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
                                         #@app.ReferenceCode
                                     </span>
-                                    <h3 class="font-bold text-slate-900 text-sm mt-1">@app.ServiceName</h3>
+                                    <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm mt-1">@app.ServiceName</h3>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-serif font-black text-base text-slate-900">@app.FormattedPrice</span>
+                                    <span class="font-serif font-black text-base text-slate-900 dark:text-slate-100">@app.FormattedPrice</span>
                                     <div class="mt-0.5">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border @badgeClass capitalize">
                                             @app.StatusString
@@ -303,28 +303,28 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
                                 <div>
-                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Scheduled For</span>
-                                    <span class="font-semibold text-slate-900">@app.ScheduledDateFormatted</span>
-                                    <span class="block text-amber-800 font-bold">@app.ScheduledTime12h</span>
+                                    <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Scheduled For</span>
+                                    <span class="font-semibold text-slate-900 dark:text-slate-100">@app.ScheduledDateFormatted</span>
+                                    <span class="block text-amber-800 dark:text-amber-400 font-bold">@app.ScheduledTime12h</span>
                                 </div>
                                 <div>
-                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Barber</span>
-                                    <span class="font-semibold text-slate-800">@app.BarberName</span>
+                                    <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Barber</span>
+                                    <span class="font-semibold text-slate-800 dark:text-slate-200">@app.BarberName</span>
                                 </div>
                             </div>
 
                             @if (!string.IsNullOrWhiteSpace(app.Notes))
                             {
-                                <p class="text-xs text-slate-500 italic bg-amber-50/40 p-2 rounded-lg border border-amber-900/5">
+                                <p class="text-xs text-slate-500 dark:text-slate-400 italic bg-amber-50/40 dark:bg-amber-950/20 p-2 rounded-lg border border-amber-900/5 dark:border-amber-800/20">
                                     "@app.Notes"
                                 </p>
                             }
 
                             <div class="pt-1">
                                 <button type="button" onclick="openTimelineModal(@app.Id)"
-                                        class="w-full py-2 px-3 rounded-xl text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition text-center shadow-2xs">
+                                        class="w-full py-2 px-3 rounded-xl text-xs font-bold text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/60 transition text-center shadow-2xs active:scale-95">
                                     View Audit Timeline &rarr;
                                 </button>
                             </div>
@@ -332,20 +332,20 @@
                     }
                 </div>
             }
-        </div>
+        </article>
     </div>
 
     <!-- Tab 3: Transactions -->
     <div id="tabContent-transactions" class="tab-pane @(Model.ActiveTab == "transactions" ? "" : "hidden")">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-            <div class="border-b border-slate-100 pb-4 flex items-center justify-between">
+        <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-4 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-serif font-bold text-slate-900">Customer Transactions Ledger</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Financial record of settled services rendered to @Model.FullName.</p>
+                    <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Customer Transactions Ledger</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Financial record of settled services rendered to @Model.FullName.</p>
                 </div>
                 <div class="text-right">
-                    <span class="text-xs uppercase font-extrabold text-amber-800">Total Spent</span>
-                    <div class="text-xl font-serif font-black text-slate-900">@Model.FormattedTotalSpent</div>
+                    <span class="text-xs uppercase font-extrabold text-amber-800 dark:text-amber-400">Total Spent</span>
+                    <div class="text-xl font-serif font-black text-slate-900 dark:text-slate-100">@Model.FormattedTotalSpent</div>
                 </div>
             </div>
 
@@ -355,9 +355,9 @@
 
             @if (!completedApps.Any())
             {
-                <div class="py-12 text-center text-slate-400">
-                    <p class="text-base font-semibold text-slate-700">No settled transactions found.</p>
-                    <p class="text-xs text-slate-400 mt-1">Only appointments marked "completed" appear in financial transaction records.</p>
+                <div class="py-12 text-center text-slate-400 dark:text-slate-500">
+                    <p class="text-base font-semibold text-slate-700 dark:text-slate-300">No settled transactions found.</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Only appointments marked "completed" appear in financial transaction records.</p>
                 </div>
             }
             else
@@ -365,7 +365,7 @@
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
+                        <thead class="bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                             <tr>
                                 <th class="py-3 px-6">Date</th>
                                 <th class="py-3 px-6">Service</th>
@@ -374,31 +374,31 @@
                                 <th class="py-3 px-6 text-right">Amount (₱)</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-700 dark:text-slate-300">
                             @foreach (var tr in completedApps)
                             {
-                                <tr class="hover:bg-slate-50/70 transition">
-                                    <td class="py-3.5 px-6 font-bold text-slate-900 whitespace-nowrap">
+                                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+                                    <td class="py-3.5 px-6 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                                         @tr.ScheduledDateFormatted
-                                        <span class="block text-[11px] font-mono text-amber-800">@tr.ReferenceCode &bull; @tr.ScheduledTime12h</span>
+                                        <span class="block text-[11px] font-mono text-amber-800 dark:text-amber-400">@tr.ReferenceCode &bull; @tr.ScheduledTime12h</span>
                                     </td>
-                                    <td class="py-3.5 px-6 font-semibold text-slate-800">@tr.ServiceName</td>
-                                    <td class="py-3.5 px-6 text-slate-800">@tr.BarberName</td>
+                                    <td class="py-3.5 px-6 font-semibold text-slate-800 dark:text-slate-200">@tr.ServiceName</td>
+                                    <td class="py-3.5 px-6 text-slate-800 dark:text-slate-200">@tr.BarberName</td>
                                     <td class="py-3.5 px-6">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60">
                                             Completed
                                         </span>
                                     </td>
-                                    <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900">@tr.FormattedPrice</td>
+                                    <td class="py-3.5 px-6 text-right font-serif font-bold text-slate-900 dark:text-slate-100">@tr.FormattedPrice</td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="bg-slate-50 border-t border-slate-200 font-bold text-slate-900">
+                        <tfoot class="bg-slate-50/90 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 font-bold text-slate-900 dark:text-slate-100">
                             <tr>
-                                <td colspan="4" class="py-3.5 px-6 text-right uppercase tracking-wider text-xs text-slate-500">
+                                <td colspan="4" class="py-3.5 px-6 text-right uppercase tracking-wider text-xs text-slate-500 dark:text-slate-400">
                                     Total Spent
                                 </td>
-                                <td class="py-3.5 px-6 text-right text-base text-amber-800 font-serif font-black">
+                                <td class="py-3.5 px-6 text-right text-base text-amber-800 dark:text-amber-400 font-serif font-black">
                                     @Model.FormattedTotalSpent
                                 </td>
                             </tr>
@@ -407,76 +407,76 @@
                 </div>
 
                 <!-- Mobile Stacked Card View -->
-                <div class="md:hidden divide-y divide-slate-100">
+                <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach (var tr in completedApps)
                     {
-                        <div class="p-4 space-y-2 hover:bg-amber-50/20 transition">
+                        <div class="p-4 space-y-2 hover:bg-amber-50/20 dark:hover:bg-amber-950/10 transition">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <span class="font-mono text-xs font-bold text-amber-800">#@tr.ReferenceCode</span>
-                                    <h3 class="font-bold text-slate-900 text-sm mt-0.5">@tr.ServiceName</h3>
+                                    <span class="font-mono text-xs font-bold text-amber-800 dark:text-amber-400">#@tr.ReferenceCode</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">@tr.ServiceName</h3>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-serif font-black text-base text-slate-900">@tr.FormattedPrice</span>
-                                    <span class="block text-[10px] font-bold text-emerald-700">Completed</span>
+                                    <span class="font-serif font-black text-base text-slate-900 dark:text-slate-100">@tr.FormattedPrice</span>
+                                    <span class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400">Completed</span>
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+                            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
                                 <span>@tr.ScheduledDateFormatted &bull; @tr.ScheduledTime12h</span>
-                                <span class="font-medium text-slate-700">Barber: @tr.BarberName</span>
+                                <span class="font-medium text-slate-700 dark:text-slate-300">Barber: @tr.BarberName</span>
                             </div>
                         </div>
                     }
-                    <div class="p-4 bg-slate-50 flex items-center justify-between text-xs font-bold rounded-b-2xl">
-                        <span class="uppercase tracking-wider text-slate-500">Total Settled</span>
-                        <span class="text-base text-amber-800 font-serif font-black">@Model.FormattedTotalSpent</span>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between text-xs font-bold rounded-b-2xl">
+                        <span class="uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Settled</span>
+                        <span class="text-base text-amber-800 dark:text-amber-400 font-serif font-black">@Model.FormattedTotalSpent</span>
                     </div>
                 </div>
             }
-        </div>
+        </article>
     </div>
 
     <!-- Tab 4: Security & Password Reset -->
     <div id="tabContent-security" class="tab-pane @(Model.ActiveTab == "security" ? "" : "hidden")">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Reset Password Box -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h3 class="text-xl font-serif font-bold text-slate-900">Admin Password Reset</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Reset customer password directly without email tokens.</p>
+            <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4">
+                <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Admin Password Reset</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Reset customer password directly without email tokens.</p>
                 </div>
 
                 <form method="post" action="/admin/customers/@Model.Id/reset-password" class="space-y-4">
                     @Html.AntiForgeryToken()
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Password</label>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">New Password</label>
                         <input type="password" name="NewPassword" required minlength="6" placeholder="At least 6 characters"
-                               class="modal-input font-medium" />
+                               class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Confirm New Password</label>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Confirm New Password</label>
                         <input type="password" name="ConfirmPassword" required minlength="6" placeholder="Repeat new password"
-                               class="modal-input font-medium" />
+                               class="modal-input font-medium w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
                     </div>
 
-                    <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md">
+                    <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-md active:scale-95">
                         Reset Password Now
                     </button>
                 </form>
-            </div>
+            </article>
 
             <!-- Account Status & Access Management -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-4 flex flex-col justify-between">
+            <article class="card bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
-                    <div class="border-b border-slate-100 pb-3">
-                        <h3 class="text-xl font-serif font-bold text-slate-900">Account Status Control</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Deactivate customer accounts when necessary.</p>
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <h3 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">Account Status Control</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Deactivate customer accounts when necessary.</p>
                     </div>
 
-                    <div class="mt-4 p-4 rounded-2xl @(Model.IsActive ? "bg-emerald-50 border border-emerald-200 text-emerald-900" : "bg-red-50 border border-red-200 text-red-900") text-xs space-y-1.5">
+                    <div class="mt-4 p-4 rounded-2xl @(Model.IsActive ? "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-300" : "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-300") text-xs space-y-1.5">
                         <p class="font-bold">Current State: @(Model.IsActive ? "ACTIVE" : "DEACTIVATED")</p>
                         <p class="text-[11px] leading-relaxed">
                             @if (Model.IsActive)
@@ -495,31 +495,31 @@
                     @Html.AntiForgeryToken()
                     @if (Model.IsActive)
                     {
-                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-500 transition shadow-sm">
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm active:scale-95">
                             Deactivate Customer Account
                         </button>
                     }
                     else
                     {
-                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-sm">
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-sm active:scale-95">
                             Reactivate Customer Account
                         </button>
                     }
                 </form>
-            </div>
+            </article>
         </div>
     </div>
 </div>
 
-<!-- Modal for Audit Timeline -->
-<div id="timelineModal" class="modal-backdrop hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col max-h-[88vh]">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+<!-- Native Dialog for Audit Timeline -->
+<dialog id="timelineModal" closedby="any" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 relative flex flex-col max-h-[88vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
-                <h3 class="text-xl font-serif font-black text-slate-900">Appointment Status Timeline</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Audit log of all transitions on this appointment</p>
+                <h3 class="text-xl font-serif font-black text-slate-900 dark:text-slate-100">Appointment Status Timeline</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Audit log of all transitions on this appointment</p>
             </div>
-            <button type="button" onclick="closeTimelineModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+            <button type="button" onclick="closeTimelineModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95" aria-label="Close dialog">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
@@ -528,13 +528,13 @@
             <!-- Dynamically populated via JS -->
         </div>
 
-        <div class="pt-4 border-t border-slate-100 text-right shrink-0">
-            <button type="button" onclick="closeTimelineModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 text-right shrink-0">
+            <button type="button" onclick="closeTimelineModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700 transition active:scale-95">
                 Close
             </button>
         </div>
     </div>
-</div>
+</dialog>
 
 <script>
     const historyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Appointments.Select(a => new {
@@ -546,16 +546,16 @@
     function switchTab(tabName) {
         document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-button').forEach(el => {
-            el.classList.remove('border-amber-500', 'text-amber-800');
-            el.classList.add('border-transparent', 'text-slate-500');
+            el.classList.remove('border-amber-500', 'text-amber-800', 'dark:text-amber-400');
+            el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
         });
 
         const activeContent = document.getElementById(`tabContent-${tabName}`);
         const activeBtn = document.getElementById(`tabBtn-${tabName}`);
         if (activeContent) activeContent.classList.remove('hidden');
         if (activeBtn) {
-            activeBtn.classList.remove('border-transparent', 'text-slate-500');
-            activeBtn.classList.add('border-amber-500', 'text-amber-800');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+            activeBtn.classList.add('border-amber-500', 'text-amber-800', 'dark:text-amber-400');
         }
 
         const url = new URL(window.location);
@@ -569,20 +569,20 @@
         container.innerHTML = '';
 
         if (!item || !item.timeline || item.timeline.length === 0) {
-            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No audit timeline records found.</p>';
+            container.innerHTML = '<p class="text-xs text-slate-400 dark:text-slate-500 text-center py-4">No audit timeline records found.</p>';
         } else {
-            let html = '<div class="space-y-4 relative border-l-2 border-slate-200 ml-4 pl-4">';
+            let html = '<div class="space-y-4 relative border-l-2 border-slate-200 dark:border-slate-700 ml-4 pl-4">';
             item.timeline.forEach(t => {
                 html += `
                     <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-amber-500 border-2 border-white shadow-xs"></div>
-                        <div class="text-xs font-bold text-slate-900">
-                            Transition: <span class="capitalize text-slate-600">${t.FromStatus}</span> &rarr; <span class="capitalize text-amber-800 font-extrabold">${t.ToStatus}</span>
+                        <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-amber-500 border-2 border-white dark:border-slate-900 shadow-xs"></div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-slate-100">
+                            Transition: <span class="capitalize text-slate-600 dark:text-slate-400">${t.FromStatus}</span> &rarr; <span class="capitalize text-amber-800 dark:text-amber-400 font-extrabold">${t.ToStatus}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                             By ${t.ChangedByRole} &bull; ${t.TimestampFormatted}
                         </div>
-                        ${t.Note ? `<div class="mt-1 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 italic">"${t.Note}"</div>` : ''}
+                        ${t.Note ? `<div class="mt-1 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-2 italic">"${t.Note}"</div>` : ''}
                     </div>
                 `;
             });
@@ -590,11 +590,35 @@
             container.innerHTML = html;
         }
 
-        document.getElementById('timelineModal').classList.remove('hidden');
+        const modal = document.getElementById('timelineModal');
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            modal.showModal();
+        }
     }
 
     function closeTimelineModal() {
-        document.getElementById('timelineModal').classList.add('hidden');
+        const modal = document.getElementById('timelineModal');
+        if (modal) {
+            if (typeof modal.close === 'function' && modal.open) {
+                modal.close();
+            }
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Modern light-dismiss & cancel handlers
+    const timelineDialog = document.getElementById('timelineModal');
+    if (timelineDialog) {
+        timelineDialog.addEventListener('click', (e) => {
+            if (e.target === timelineDialog) {
+                closeTimelineModal();
+            }
+        });
+        timelineDialog.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            closeTimelineModal();
+        });
     }
 
     async function confirmCustomerDeactivate() {

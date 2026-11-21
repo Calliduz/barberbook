@@ -3,17 +3,24 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>@ViewData["Title"] - BarberBook Barber Portal</title>
     
-    <!-- Dark Mode Init to prevent FOUC -->
+    <!-- Dark Mode Init to prevent FOUC & synchronize color-scheme meta -->
     <script>
-        if (localStorage.getItem('barberbook_theme') === 'dark' || (!localStorage.getItem('barberbook_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
+        (function() {
+            var stored = localStorage.getItem('barberbook_theme');
+            var isDark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            var meta = document.querySelector('meta[name="color-scheme"]');
+            if (meta) meta.content = stored ? (isDark ? 'dark' : 'light') : 'light dark';
+        })();
     </script>
 
     <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->

@@ -5,15 +5,15 @@
 
 <div class="space-y-6">
     <!-- Header Section -->
-    <div class="sm:flex sm:items-center sm:justify-between">
+    <div class="sm:flex sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-serif">Barber Schedules & Availability</h1>
-            <p class="mt-1 text-sm text-slate-500">Configure weekly recurring working hours, shift windows, and days off per barber.</p>
+            <h1 class="text-2xl font-serif font-black tracking-tight text-slate-900 dark:text-white">Barber Schedules & Availability</h1>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Configure weekly recurring working hours, shift windows, and days off per barber.</p>
         </div>
         <!-- Barber Picker -->
         <div class="mt-4 sm:mt-0 flex items-center space-x-2">
-            <label for="barberPicker" class="text-xs font-bold uppercase tracking-wider text-slate-600 whitespace-nowrap">Barber:</label>
-            <select id="barberPicker" onchange="window.location.href='/admin/schedules?barberId=' + this.value" class="filter-control h-[38px] text-xs font-bold text-slate-900">
+            <label for="barberPicker" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 whitespace-nowrap">Barber:</label>
+            <select id="barberPicker" onchange="window.location.href='/admin/schedules?barberId=' + this.value" class="filter-control h-[38px] text-xs font-bold text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-700">
                 @foreach (var b in Model.Barbers)
                 {
                     <option value="@b.Id" selected="@(b.Id == Model.SelectedBarberId)">@b.DisplayName (@b.FullName)</option>
@@ -24,7 +24,7 @@
 
     @if (Model.SelectedBarber == null)
     {
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center text-slate-400">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-400 dark:text-slate-500">
             No active barbers found. Please add a barber account first.
         </div>
     }
@@ -34,18 +34,18 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left 2 Cols: Weekly Working Hours Editor -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <article class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">Weekly Working Hours</h2>
-                            <p class="text-xs text-slate-500">Slots start on 30-minute intervals and must sit fully within a single working window.</p>
+                            <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Weekly Working Hours</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Slots start on 30-minute intervals and must sit fully within a single working window.</p>
                         </div>
-                        <button type="button" onclick="openAddWorkingHourModal()" class="rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 text-xs font-bold transition shadow-sm">
+                        <button type="button" onclick="openAddWorkingHourModal()" class="rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 text-xs font-bold transition shadow-sm active:scale-95">
                             + Add Shift Window
                         </button>
                     </div>
 
-                    <div class="divide-y divide-slate-100 mt-4">
+                    <div class="divide-y divide-slate-100 dark:divide-slate-800 mt-4">
                         @{
                             string[] dayNames = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
                         }
@@ -53,19 +53,19 @@
                         {
                             var ranges = Model.WeeklyHours.ContainsKey(dow) ? Model.WeeklyHours[dow] : new List<BarberBook.Web.Models.Schedule.WorkingHoursItemDto>();
                             <div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <div class="w-32 font-semibold text-slate-800 text-sm">
+                                <div class="w-32 font-semibold text-slate-800 dark:text-slate-200 text-sm">
                                     @dayNames[dow]
                                 </div>
                                 <div class="flex-1 flex flex-wrap gap-2 items-center">
                                     @if (!ranges.Any())
                                     {
-                                        <span class="text-xs text-slate-400 italic">Day Off (No working hours)</span>
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Day Off (No working hours)</span>
                                     }
                                     @foreach (var range in ranges)
                                     {
-                                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1 text-xs font-medium text-slate-800 border border-slate-200">
+                                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
                                             <span>@range.StartTime – @range.EndTime</span>
-                                            <button type="button" onclick="deleteWorkingHour(@range.Id)" class="text-slate-400 hover:text-rose-600 transition" title="Remove shift">
+                                            <button type="button" onclick="deleteWorkingHour(@range.Id)" class="text-slate-400 hover:text-rose-600 transition active:scale-95" title="Remove shift">
                                                 <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                                                 </svg>
@@ -76,18 +76,18 @@
                             </div>
                         }
                     </div>
-                </div>
+                </article>
             </div>
 
             <!-- Right 1 Col: Days Off Management -->
             <div class="space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <article class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">Days Off</h2>
-                            <p class="text-xs text-slate-500">Dates when @Model.SelectedBarber.DisplayName is unavailable.</p>
+                            <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Days Off</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Dates when @Model.SelectedBarber.DisplayName is unavailable.</p>
                         </div>
-                        <button type="button" onclick="openAddDayOffModal()" class="rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 text-xs font-bold shadow-sm transition">
+                        <button type="button" onclick="openAddDayOffModal()" class="rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 text-xs font-bold shadow-sm transition active:scale-95">
                             + Add Day Off
                         </button>
                     </div>
@@ -95,38 +95,38 @@
                     <div class="mt-4 space-y-3">
                         @if (!Model.DaysOff.Any())
                         {
-                            <div class="text-center py-8 text-xs text-slate-400">
+                            <div class="text-center py-8 text-xs text-slate-400 dark:text-slate-500">
                                 No upcoming days off scheduled for this barber.
                             </div>
                         }
                         @foreach (var dayOff in Model.DaysOff)
                         {
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm">
                                 <div>
-                                    <div class="font-semibold text-slate-900">@dayOff.FormattedDate</div>
-                                    <div class="text-xs text-slate-500">@(string.IsNullOrWhiteSpace(dayOff.Reason) ? "Scheduled day off" : dayOff.Reason)</div>
+                                    <div class="font-semibold text-slate-900 dark:text-white">@dayOff.FormattedDate</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">@(string.IsNullOrWhiteSpace(dayOff.Reason) ? "Scheduled day off" : dayOff.Reason)</div>
                                 </div>
-                                <button type="button" onclick="deleteDayOff(@dayOff.Id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium transition" title="Delete day off">
+                                <button type="button" onclick="deleteDayOff(@dayOff.Id)" class="text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 text-xs font-medium transition active:scale-95" title="Delete day off">
                                     Remove
                                 </button>
                             </div>
                         }
                     </div>
-                </div>
+                </article>
             </div>
         </div>
     }
 </div>
 
-<!-- Modal: Add Working Hours Shift -->
-<div id="workingHourModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+<!-- Modal: Add Working Hours Shift (HTML5 Native Dialog) -->
+<dialog id="workingHourModal" closedby="any" aria-labelledby="workingHourHeader" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
-                <h3 class="text-lg font-serif font-bold text-slate-900">Add Shift Window</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Define recurring 30-minute booking capacity</p>
+                <h3 id="workingHourHeader" class="text-lg font-serif font-bold text-slate-900 dark:text-white">Add Shift Window</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Define recurring 30-minute booking capacity</p>
             </div>
-            <button type="button" onclick="closeModal('workingHourModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+            <button type="button" onclick="closeModal('workingHourModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -134,8 +134,8 @@
         </div>
         <form id="addWorkingHourForm" onsubmit="submitAddWorkingHour(event)" class="modal-body space-y-4">
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Day of Week</label>
-                <select id="whDayOfWeek" class="modal-input mt-1">
+                <label for="whDayOfWeek" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Day of Week</label>
+                <select id="whDayOfWeek" class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700">
                     <option value="1">Monday</option>
                     <option value="2">Tuesday</option>
                     <option value="3">Wednesday</option>
@@ -147,31 +147,31 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Start Time</label>
-                    <input type="time" id="whStartTime" value="09:00" required class="modal-input mt-1" />
+                    <label for="whStartTime" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Start Time</label>
+                    <input type="time" id="whStartTime" value="09:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
                 </div>
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">End Time</label>
-                    <input type="time" id="whEndTime" value="18:00" required class="modal-input mt-1" />
+                    <label for="whEndTime" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">End Time</label>
+                    <input type="time" id="whEndTime" value="18:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
                 </div>
             </div>
-            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('workingHourModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Add Shift</button>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeModal('workingHourModal')" class="rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">Add Shift</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
-<!-- Modal: Add Day Off -->
-<div id="dayOffModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+<!-- Modal: Add Day Off (HTML5 Native Dialog) -->
+<dialog id="dayOffModal" closedby="any" aria-labelledby="dayOffHeader" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
-                <h3 class="text-lg font-serif font-bold text-slate-900">Add Day(s) Off</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Schedule leave or rest days with appointment conflict protection</p>
+                <h3 id="dayOffHeader" class="text-lg font-serif font-bold text-slate-900 dark:text-white">Add Day(s) Off</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Schedule leave or rest days with appointment conflict protection</p>
             </div>
-            <button type="button" onclick="closeModal('dayOffModal')" class="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg hover:bg-slate-100">
+            <button type="button" onclick="closeModal('dayOffModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -180,64 +180,96 @@
         <form id="addDayOffForm" onsubmit="submitAddDayOff(event)" class="modal-body space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Start Date *</label>
-                    <input type="date" id="doStartDate" required class="modal-input mt-1" />
+                    <label for="doStartDate" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Start Date *</label>
+                    <input type="date" id="doStartDate" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
                 </div>
                 <div class="min-w-0">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">End Date (Optional)</label>
-                    <input type="date" id="doEndDate" class="modal-input mt-1" placeholder="Leave empty for single day" />
+                    <label for="doEndDate" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">End Date (Optional)</label>
+                    <input type="date" id="doEndDate" class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" placeholder="Leave empty for single day" />
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Reason</label>
-                <input type="text" id="doReason" placeholder="e.g. Vacation, Personal, Sick Leave" class="modal-input mt-1" />
+                <label for="doReason" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Reason</label>
+                <input type="text" id="doReason" placeholder="e.g. Vacation, Personal, Sick Leave" class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
             </div>
-            <p class="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200">
+            <p class="text-xs text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900/60">
                 <strong>Appointment Safeguard:</strong> If this day off coincides with existing pending or confirmed bookings, a conflict warning will be displayed. Existing bookings are <strong>never automatically cancelled</strong>.
             </p>
-            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeModal('dayOffModal')" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">Cancel</button>
-                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm">Save Day Off</button>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeModal('dayOffModal')" class="rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">Cancel</button>
+                <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">Save Day Off</button>
             </div>
         </form>
     </div>
-</div>
+</dialog>
 
-<!-- Modal: Conflict Warning Display -->
-<div id="conflictWarningModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="modal-dialog bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-amber-200">
-        <div class="flex items-center space-x-3 mb-3 text-amber-600">
+<!-- Modal: Conflict Warning Display (HTML5 Native Dialog) -->
+<dialog id="conflictWarningModal" closedby="any" aria-labelledby="conflictWarningHeader" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-xl w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
+    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-amber-200 dark:border-amber-800">
+        <div class="flex items-center space-x-3 mb-3 text-amber-600 dark:text-amber-400">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h3 class="text-lg font-serif font-bold text-slate-900">Appointment Conflict Warning</h3>
+            <h3 id="conflictWarningHeader" class="text-lg font-serif font-bold text-slate-900 dark:text-white">Appointment Conflict Warning</h3>
         </div>
-        <p class="text-xs text-slate-600 mb-4">
+        <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
             The day(s) off have been saved. However, the following existing appointments are scheduled on these dates. <strong>Per shop policy, they have NOT been auto-cancelled</strong>. Please contact the customers to reschedule.
         </p>
-        <div id="conflictListContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-100 bg-slate-50 rounded-xl p-3 border border-slate-200 mb-5 text-xs">
+        <div id="conflictListContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700 mb-5 text-xs">
             <!-- Dynamically populated -->
         </div>
         <div class="flex justify-end">
-            <button type="button" onclick="window.location.reload()" class="rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition">Understood, Refresh Schedule</button>
+            <button type="button" onclick="window.location.reload()" class="rounded-xl bg-slate-900 dark:bg-amber-500 px-4 py-2 text-xs font-bold text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-amber-400 transition active:scale-95">Understood, Refresh Schedule</button>
         </div>
     </div>
-</div>
+</dialog>
 
 <script>
     const currentBarberId = @Model.SelectedBarberId;
 
-    function openAddWorkingHourModal() {
-        document.getElementById('workingHourModal').classList.remove('hidden');
-    }
-
-    function openAddDayOffModal() {
-        document.getElementById('dayOffModal').classList.remove('hidden');
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            modal.showModal();
+        }
     }
 
     function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        if (typeof modal.close === 'function') {
+            modal.close();
+        }
+        modal.classList.add('hidden');
     }
+
+    function openAddWorkingHourModal() {
+        openModal('workingHourModal');
+    }
+
+    function openAddDayOffModal() {
+        openModal('dayOffModal');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        ['workingHourModal', 'dayOffModal', 'conflictWarningModal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.addEventListener('cancel', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (e) => {
+                const rect = modal.getBoundingClientRect();
+                const isInDialog = (
+                    rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+                    rect.left <= e.clientX && e.clientX <= rect.left + rect.width
+                );
+                if (!isInDialog) {
+                    closeModal(id);
+                }
+            });
+        });
+    });
 
     async function submitAddWorkingHour(e) {
         e.preventDefault();
@@ -333,7 +365,7 @@
                             </div>
                         </div>
                     `).join('');
-                    document.getElementById('conflictWarningModal').classList.remove('hidden');
+                    openModal('conflictWarningModal');
                 } else {
                     if (window.showToast) window.showToast('Day off saved successfully.', 'success');
                     setTimeout(() => window.location.reload(), 600);

@@ -14,7 +14,7 @@
             <h1 class="text-3xl sm:text-4xl font-serif font-black text-slate-900 dark:text-white tracking-tight">My Appointments</h1>
             <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 font-light">Manage your upcoming bookings, view real-time status updates, or review your past grooming history.</p>
         </div>
-        <a href="/book" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition shadow-md hover:shadow-lg shrink-0">
+        <a href="/book" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-extrabold text-sm transition-all duration-150 shadow-md hover:shadow-lg shrink-0 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
@@ -60,15 +60,25 @@
         <h3 id="empty-title" class="text-lg font-serif font-bold text-slate-900 dark:text-white">No appointments found</h3>
         <p id="empty-subtitle" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">Ready for a fresh cut or master hot towel shave? Book your preferred barber in seconds.</p>
         <div class="mt-6">
-            <a href="/book" class="inline-flex items-center px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm">
+            <a href="/book" class="inline-flex items-center px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-xs transition-all duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 Book an Appointment &rarr;
             </a>
         </div>
     </div>
 </div>
 
+<style>
+    dialog:modal {
+        overscroll-behavior: contain;
+    }
+    dialog::backdrop {
+        overflow: hidden;
+        overscroll-behavior: contain;
+    }
+</style>
+
 <!-- Cancel Modal -->
-<div id="cancel-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+<dialog id="cancel-modal" closedby="any" class="hidden m-auto rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-md w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-4">
         <div>
             <h3 class="text-xl font-serif font-black text-slate-900 dark:text-white">Cancel Appointment</h3>
@@ -86,25 +96,25 @@
         </div>
 
         <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onclick="closeCancelModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
+            <button type="button" onclick="closeCancelModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-400">
                 Keep Appointment
             </button>
-            <button type="button" id="confirm-cancel-btn" onclick="executeCancel()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-sm">
+            <button type="button" id="confirm-cancel-btn" onclick="executeCancel()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500">
                 Confirm Cancellation
             </button>
         </div>
     </div>
-</div>
+</dialog>
 
 <!-- Reschedule Modal -->
-<div id="reschedule-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+<dialog id="reschedule-modal" closedby="any" class="hidden m-auto rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-lg w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl my-8 space-y-5">
         <div class="flex justify-between items-start">
             <div>
                 <h3 class="text-xl font-serif font-black text-slate-900 dark:text-white">Reschedule Appointment</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Choose a new date and open time slot with your barber.</p>
             </div>
-            <button type="button" onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1">
+            <button type="button" onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:scale-90 p-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -137,16 +147,16 @@
         </div>
 
         <div class="flex justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
+            <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-400">
                 Cancel
             </button>
             <button type="button" id="confirm-reschedule-btn" disabled onclick="executeReschedule()"
-                    class="px-5 py-2.5 rounded-xl bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-sm">
+                    class="px-5 py-2.5 rounded-xl bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-400 active:scale-95 text-slate-950 text-xs font-bold transition shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 Confirm New Slot
             </button>
         </div>
     </div>
-</div>
+</dialog>
 
 <script>
     let currentScope = 'upcoming';
@@ -156,6 +166,17 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         loadAppointments('upcoming');
+
+        ['cancel-modal', 'reschedule-modal'].forEach(id => {
+            const dlg = document.getElementById(id);
+            if (!dlg) return;
+            dlg.addEventListener('click', (e) => {
+                if (e.target === dlg) {
+                    if (id === 'cancel-modal') closeCancelModal();
+                    else closeRescheduleModal();
+                }
+            });
+        });
     });
 
     function switchTab(scope) {
@@ -164,11 +185,11 @@
         const historyBtn = document.getElementById('tab-history-btn');
 
         if (scope === 'upcoming') {
-            upcomingBtn.className = 'px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 flex items-center gap-2 transition-colors';
-            historyBtn.className = 'px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors';
+            upcomingBtn.className = 'px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 dark:text-amber-400 flex items-center gap-2 transition-colors active:scale-95';
+            historyBtn.className = 'px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 transition-colors active:scale-95';
         } else {
-            historyBtn.className = 'px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 flex items-center gap-2 transition-colors';
-            upcomingBtn.className = 'px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors';
+            historyBtn.className = 'px-6 py-3.5 text-sm font-bold border-b-2 border-amber-500 text-amber-800 dark:text-amber-400 flex items-center gap-2 transition-colors active:scale-95';
+            upcomingBtn.className = 'px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 transition-colors active:scale-95';
         }
 
         loadAppointments(scope);
@@ -221,17 +242,17 @@
 
     function renderAppointments(list, container) {
         list.forEach(app => {
-            const card = document.createElement('div');
-            card.className = 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-amber-500/50 transition duration-200';
+            const card = document.createElement('article');
+            card.className = 'card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500/50 transition-all duration-200';
             
             const statusBadgeHtml = getStatusBadge(app.status, app.statusDisplay);
 
             const actionsHtml = app.canCancelOrReschedule ? `
                 <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-2.5">
-                    <button type="button" onclick="openRescheduleModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition">
+                    <button type="button" onclick="openRescheduleModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition focus:outline-none focus:ring-2 focus:ring-amber-500">
                         Reschedule
                     </button>
-                    <button type="button" onclick="openCancelModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-800 transition">
+                    <button type="button" onclick="openCancelModal(${app.id})" class="px-3.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 active:scale-95 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-800 transition focus:outline-none focus:ring-2 focus:ring-rose-500">
                         Cancel
                     </button>
                 </div>
@@ -291,20 +312,20 @@
 
         const items = timeline.map(item => `
             <li class="mb-3 ml-4">
-                <div class="absolute -left-1.5 mt-1.5 w-3 h-3 rounded-full border-2 border-white bg-amber-500"></div>
+                <div class="absolute -left-1.5 mt-1.5 w-3 h-3 rounded-full border-2 border-white dark:border-slate-900 bg-amber-500"></div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-900 uppercase tracking-wider">${item.toStatus}</span>
-                    <span class="text-[11px] text-slate-500">by ${item.changedByRole}</span>
+                    <span class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">${item.toStatus}</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">by ${item.changedByRole}</span>
                 </div>
-                <p class="text-[11px] text-slate-600 mt-0.5">${item.note || 'Status updated'}</p>
-                <time class="text-[10px] text-slate-400 block mt-0.5">${item.formattedChangedAt}</time>
+                <p class="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">${item.note || 'Status updated'}</p>
+                <time class="text-[10px] text-slate-400 dark:text-slate-500 block mt-0.5">${item.formattedChangedAt}</time>
             </li>
         `).join('');
 
         return `
             <div class="pl-2">
-                <span class="text-[11px] font-bold text-slate-500 block mb-2 uppercase tracking-wider">Status History Audit</span>
-                <ol class="relative border-l border-slate-200 text-xs">
+                <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wider">Status History Audit</span>
+                <ol class="relative border-l border-slate-200 dark:border-slate-800 text-xs">
                     ${items}
                 </ol>
             </div>
@@ -320,12 +341,12 @@
     }
 
     function getStatusBadge(status, display) {
-        let cls = 'bg-slate-100 text-slate-700 border-slate-200';
-        if (status === 'pending') cls = 'bg-amber-50 text-amber-800 border-amber-200';
-        else if (status === 'confirmed') cls = 'bg-blue-50 text-blue-700 border-blue-200';
-        else if (status === 'completed') cls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-        else if (status === 'cancelled') cls = 'bg-slate-100 text-slate-600 border-slate-200';
-        else if (status === 'rejected') cls = 'bg-rose-50 text-rose-700 border-rose-200';
+        let cls = 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+        if (status === 'pending') cls = 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800';
+        else if (status === 'confirmed') cls = 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800';
+        else if (status === 'completed') cls = 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800';
+        else if (status === 'cancelled') cls = 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+        else if (status === 'rejected') cls = 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800';
 
         return `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${cls}">${display}</span>`;
     }
@@ -357,11 +378,19 @@
             Scheduled for ${activeModalAppointment.formattedDate} at ${activeModalAppointment.formattedTime}
         `;
         document.getElementById('cancel-reason').value = '';
-        document.getElementById('cancel-modal').classList.remove('hidden');
+        const modal = document.getElementById('cancel-modal');
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            try { modal.showModal(); } catch (_) {}
+        }
     }
 
     function closeCancelModal() {
-        document.getElementById('cancel-modal').classList.add('hidden');
+        const modal = document.getElementById('cancel-modal');
+        if (typeof modal.close === 'function') {
+            try { modal.close(); } catch (_) {}
+        }
+        modal.classList.add('hidden');
         activeModalAppointment = null;
     }
 
@@ -411,7 +440,7 @@
 
         document.getElementById('reschedule-modal-summary').innerHTML = `
             <strong>${activeModalAppointment.serviceName}</strong> with <strong>${activeModalAppointment.barberName}</strong><br/>
-            Current slot: <span class="text-amber-800 font-bold">${activeModalAppointment.formattedDate} at ${activeModalAppointment.formattedTime}</span>
+            Current slot: <span class="text-amber-800 dark:text-amber-300 font-bold">${activeModalAppointment.formattedDate} at ${activeModalAppointment.formattedTime}</span>
         `;
 
         // Default date picker to current appointment date or today
@@ -420,12 +449,20 @@
         picker.min = today;
         picker.value = today;
 
-        document.getElementById('reschedule-modal').classList.remove('hidden');
+        const modal = document.getElementById('reschedule-modal');
+        modal.classList.remove('hidden');
+        if (typeof modal.showModal === 'function') {
+            try { modal.showModal(); } catch (_) {}
+        }
         loadRescheduleSlots();
     }
 
     function closeRescheduleModal() {
-        document.getElementById('reschedule-modal').classList.add('hidden');
+        const modal = document.getElementById('reschedule-modal');
+        if (typeof modal.close === 'function') {
+            try { modal.close(); } catch (_) {}
+        }
+        modal.classList.add('hidden');
         activeModalAppointment = null;
         selectedRescheduleSlotUtc = null;
     }
@@ -467,13 +504,13 @@
             slots.forEach(s => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 transition-all';
+                btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 hover:-translate-y-0.5 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500';
                 btn.innerText = s.formattedTime;
                 btn.onclick = () => {
                     document.querySelectorAll('.reschedule-slot-btn').forEach(b => {
-                        b.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 transition-all';
+                        b.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-500/20 hover:-translate-y-0.5 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500';
                     });
-                    btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-amber-500 text-slate-950 border border-amber-500 text-xs font-extrabold shadow-sm transition-all';
+                    btn.className = 'reschedule-slot-btn py-2.5 px-2 text-center rounded-xl bg-amber-500 text-slate-950 border border-amber-500 text-xs font-extrabold shadow-sm scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-amber-500';
                     selectedRescheduleSlotUtc = s.startsAtUtc;
                     document.getElementById('confirm-reschedule-btn').disabled = false;
                 };

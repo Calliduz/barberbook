@@ -267,6 +267,15 @@ public class AppointmentBookingTests : IClassFixture<WebApplicationFactory<Progr
 
         // Ramon works 9:00 AM - 6:00 PM. 8:00 PM (20:00) is outside working hours
         var testDate = new LocalDate(2026, 12, 11);
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == 1 && d.Date == testDate).ToListAsync();
+            db.DaysOff.RemoveRange(existingDaysOff);
+            await db.SaveChangesAsync();
+        }
+
         var outsideInstant = testDate.At(new LocalTime(20, 0)).InZoneStrictly(_zone).ToInstant();
 
         var payload = new CreateAppointmentRequest
