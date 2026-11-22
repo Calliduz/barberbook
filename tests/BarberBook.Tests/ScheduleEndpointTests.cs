@@ -286,6 +286,34 @@ public class ScheduleEndpointTests : IClassFixture<WebApplicationFactory<Program
         error.Error.Message.Should().Contain("Validation failed");
     }
 
+    [Theory]
+    [InlineData(0, "09:00", "18:00", "Sundays")] // Sunday shift
+    [InlineData(1, "08:00", "17:00", "opening time")] // Earlier than 09:00
+    [InlineData(1, "10:00", "19:00", "closing time")] // Later than 18:00
+    [InlineData(2, "22:00", "00:00", "closing time")] // Late night / midnight shift (Ramon regression test)
+    public async Task HW2_BR03_SetWorkingHours_SundayOrOutsideShopHours_RejectedByValidation(int day, string start, string end, string expectedMessageFragment)
+    {
+        // Requirement HW-2, BR-03: Shifts must be Monday-Saturday within shop hours 09:00 - 18:00
+        await EnsureSeededAsync();
+        var adminClient = await CreateAuthenticatedClientAsync("admin@barberbook.local", "Admin@BarberBook2026!");
+
+        var invalidRequest = new SetWorkingHoursRequest
+        {
+            Ranges = new List<WorkingHoursRangeDto>
+            {
+                new() { DayOfWeek = day, StartTime = start, EndTime = end }
+            }
+        };
+
+        var response = await adminClient.PutAsJsonAsync("/api/admin/barbers/1/working-hours", invalidRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+        error!.Error.Code.Should().Be("VALIDATION_ERROR");
+        error.Error.Details.Should().NotBeNull();
+        error.Error.Details!.ToString().Should().Contain(expectedMessageFragment);
+    }
+
     [Fact]
     public async Task CF3_PublicScheduleEndpoint_ReturnsWeeklyHoursAndDaysOff_WithoutCustomerData()
     {

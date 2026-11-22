@@ -174,11 +174,11 @@ public static class DatabaseSeeder
         // 2.5 Seed Branches (Multi-Branch Support)
         var branchesData = new[]
         {
-            (Name: "Manila Main Branch", Address: "123 Escolta St., Binondo, Manila", Phone: "0917-111-2222"),
-            (Name: "Makati Poblacion Branch", Address: "456 General Luna St., Poblacion, Makati", Phone: "0917-333-4444"),
-            (Name: "BGC High Street Branch", Address: "Unit 204, Bonifacio High Street, Taguig", Phone: "0917-555-6666"),
-            (Name: "QC Tomas Morato Branch", Address: "78 Tomas Morato Ave., Quezon City", Phone: "0917-777-8888"),
-            (Name: "Ortigas Center Branch", Address: "Emerald Ave. cor. Doña Julia Vargas, Pasig", Phone: "0917-999-0000")
+            (Name: "Manila Main Branch", Address: "G/F Heritage Bldg., Escolta St., Binondo, Manila", Phone: "(02) 8555-0101"),
+            (Name: "Makati Poblacion Branch", Address: "5032 P. Burgos cor. Kalayaan Ave., Poblacion, Makati", Phone: "(02) 8555-0102"),
+            (Name: "BGC High Street Branch", Address: "Level 2, High Street Central, 7th Ave., BGC, Taguig", Phone: "(02) 8555-0103"),
+            (Name: "QC Tomas Morato Branch", Address: "Scout Castor cor. Tomas Morato Ave., Quezon City", Phone: "(02) 8555-0104"),
+            (Name: "Ortigas Center Branch", Address: "G/F Prestige Tower, F. Ortigas Jr. Rd., Pasig", Phone: "(02) 8555-0105")
         };
 
         // Clean up any obsolete duplicate Alabang branches
@@ -209,6 +209,15 @@ public static class DatabaseSeeder
                 };
                 context.Branches.Add(branch);
                 await context.SaveChangesAsync();
+            }
+            else
+            {
+                if (branch.Address != bAddress || branch.PhoneNumber != bPhone)
+                {
+                    branch.Address = bAddress;
+                    branch.PhoneNumber = bPhone;
+                    await context.SaveChangesAsync();
+                }
             }
             branchMap[bName] = branch;
         }
@@ -286,7 +295,14 @@ public static class DatabaseSeeder
                 }
             }
 
-            // Seed Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM
+            // Seed or sanitize Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM
+            var invalidHours = barber.WorkingHours.Where(w => w.DayOfWeek < 1 || w.DayOfWeek > 6 || w.StartTime < new LocalTime(9, 0) || w.EndTime > new LocalTime(18, 0)).ToList();
+            if (invalidHours.Any())
+            {
+                context.WorkingHours.RemoveRange(invalidHours);
+                await context.SaveChangesAsync();
+            }
+
             if (!barber.WorkingHours.Any())
             {
                 for (int day = 1; day <= 6; day++)
@@ -308,7 +324,7 @@ public static class DatabaseSeeder
         // 4. Seed Services
         var servicesData = new[]
         {
-            (Name: "Haircut", Price: 150.00m, Duration: 30, Description: "Standard professional haircut and styling"),
+            (Name: "Haircut", Price: 150.00m, Duration: 30, Description: "Traditional gentleman's cut, clipper & scissor taper, hot lather neck trim, and signature styling."),
             (Name: "Haircut + Shave", Price: 220.00m, Duration: 60, Description: "Haircut paired with hot towel straight razor shave"),
             (Name: "Beard Trim", Price: 100.00m, Duration: 30, Description: "Precision beard shaping, edging, and conditioning"),
             (Name: "Hair Color", Price: 500.00m, Duration: 90, Description: "Full professional hair coloring and treatment")
@@ -330,6 +346,11 @@ public static class DatabaseSeeder
                     IsActive = true
                 };
                 context.Services.Add(service);
+                await context.SaveChangesAsync();
+            }
+            else if (service.Description == "Updated description" || service.Description == "Standard professional haircut and styling")
+            {
+                service.Description = desc;
                 await context.SaveChangesAsync();
             }
             serviceMap[name] = service;

@@ -4,6 +4,7 @@ using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -17,17 +18,20 @@ public class AccountController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ILogger<AccountController> _logger;
     private readonly IClock _clock;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILogger<AccountController> logger,
-        IClock clock)
+        IClock clock,
+        IWebHostEnvironment hostEnvironment)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
         _clock = clock;
+        _hostEnvironment = hostEnvironment;
     }
 
     [HttpGet]
@@ -495,5 +499,105 @@ public class AccountController : Controller
             IsActive = user.IsActive
         };
     }
+
+    // DEV / ACADEMIC DEMO TOOLKIT (SBIT-3D Oral Defense)
+    [HttpPost("api/dev/quick-login")]
+    [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> QuickLogin([FromBody] QuickLoginRequest? request)
+    {
+        if (!_hostEnvironment.IsDevelopment())
+        {
+            return Forbid();
+        }
+
+        var roleStr = (request?.Role ?? "customer").ToLowerInvariant();
+        string targetEmail = roleStr switch
+        {
+            "barber" => "ramon@barberbook.local",
+            "admin" => "admin@barberbook.local",
+            _ => "juan@barberbook.local"
+        };
+
+        var user = await _userManager.FindByEmailAsync(targetEmail);
+        if (user == null)
+        {
+            return NotFound(new ApiErrorResponse("USER_NOT_FOUND", $"Demo user {targetEmail} not found. Please reset demo data."));
+        }
+
+        await _signInManager.SignOutAsync();
+        await _signInManager.SignInAsync(user, isPersistent: true);
+
+        var redirectUrl = GetRedirectUrlByRole(user.Role, request?.ReturnUrl);
+        return Ok(new
+        {
+            success = true,
+            role = user.Role.ToString().ToLowerInvariant(),
+            email = user.Email,
+            redirect_url = redirectUrl
+        });
+    }
+
+    [HttpGet("dev/quick-login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> QuickLoginGet(string role = "customer", string? returnUrl = null)
+    {
+        if (!_hostEnvironment.IsDevelopment())
+        {
+            return Forbid();
+        }
+
+        var roleStr = (role ?? "customer").ToLowerInvariant();
+        string targetEmail = roleStr switch
+        {
+            "barber" => "ramon@barberbook.local",
+            "admin" => "admin@barberbook.local",
+            _ => "juan@barberbook.local"
+        };
+
+        var user = await _userManager.FindByEmailAsync(targetEmail);
+        if (user == null)
+        {
+            return NotFound($"Demo user {targetEmail} not found. Please reset demo data.");
+        }
+
+        await _signInManager.SignOutAsync();
+        await _signInManager.SignInAsync(user, isPersistent: true);
+
+        var redirectUrl = GetRedirectUrlByRole(user.Role, returnUrl);
+        return LocalRedirect(redirectUrl);
+    }
+
+    [HttpPost("api/dev/reset-demo-data")]
+    [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ResetDemoData([FromServices] IServiceProvider serviceProvider)
+    {
+        if (!_hostEnvironment.IsDevelopment())
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            await BarberBook.Data.Seeding.DatabaseSeeder.SeedAsync(serviceProvider);
+            return Ok(new
+            {
+                success = true,
+                message = "Database successfully re-seeded to pristine paper oracle state (₱1,340.00 daily sales)."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reset demo data");
+            return StatusCode(500, new ApiErrorResponse("SEED_ERROR", ex.Message));
+        }
+    }
+}
+
+public class QuickLoginRequest
+{
+    public string? Role { get; set; }
+    public string? ReturnUrl { get; set; }
 }
 

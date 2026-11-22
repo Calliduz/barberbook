@@ -26,10 +26,7 @@ public class SecurityHeadersMiddleware
                 headers.Append("X-Content-Type-Options", "nosniff");
             }
 
-            if (!headers.ContainsKey("X-Frame-Options"))
-            {
-                headers.Append("X-Frame-Options", "DENY");
-            }
+            headers["X-Frame-Options"] = "DENY";
 
             if (!headers.ContainsKey("Referrer-Policy"))
             {

@@ -18,6 +18,7 @@ public class HomeController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IValidator<UpdateProfileRequest> _profileValidator;
     private readonly IInventoryService _inventoryService;
+    private readonly IAvailabilityService _availabilityService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
@@ -26,6 +27,7 @@ public class HomeController : Controller
         UserManager<ApplicationUser> userManager,
         IValidator<UpdateProfileRequest> profileValidator,
         IInventoryService inventoryService,
+        IAvailabilityService availabilityService,
         IClock clock,
         DateTimeZone? zone = null)
     {
@@ -33,6 +35,7 @@ public class HomeController : Controller
         _userManager = userManager;
         _profileValidator = profileValidator;
         _inventoryService = inventoryService;
+        _availabilityService = availabilityService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -59,9 +62,17 @@ public class HomeController : Controller
 
         var products = await _inventoryService.GetProductsAsync(includeInactive: false);
 
+        var nextSlots = new Dictionary<int, string>();
+        foreach (var b in barbers)
+        {
+            var nextSlot = await _availabilityService.GetNextAvailableSlotAsync(b.Id);
+            nextSlots[b.Id] = nextSlot != null ? nextSlot.DisplayText : "Schedule Full";
+        }
+
         ViewBag.Barbers = barbers;
         ViewBag.Branches = branches;
         ViewBag.Products = products;
+        ViewBag.NextAvailableSlots = nextSlots;
         return View(highlights);
     }
 
@@ -103,6 +114,14 @@ public class HomeController : Controller
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
 
+        var nextSlots = new Dictionary<int, string>();
+        foreach (var b in barbers)
+        {
+            var nextSlot = await _availabilityService.GetNextAvailableSlotAsync(b.Id);
+            nextSlots[b.Id] = nextSlot != null ? nextSlot.DisplayText : "Schedule Full";
+        }
+
+        ViewBag.NextAvailableSlots = nextSlots;
         return View(barbers);
     }
 

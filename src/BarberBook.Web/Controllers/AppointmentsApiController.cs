@@ -297,6 +297,33 @@ public class AppointmentsApiController : ControllerBase
                 seq++;
             } while (await _dbContext.Appointments.AnyAsync(a => a.ReferenceCode == refCode, cancellationToken));
 
+            // 9.5. Process optional reserved products add-ons (HW-2, LM-1)
+            string? combinedNotes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim();
+            if (request.ReservedProducts != null && request.ReservedProducts.Any(p => p.Quantity > 0))
+            {
+                var reservedItemDetails = new List<string>();
+                decimal totalReservedProductAmount = 0m;
+
+                foreach (var item in request.ReservedProducts.Where(p => p.Quantity > 0))
+                {
+                    var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId, cancellationToken);
+                    if (product != null && product.IsActive)
+                    {
+                        var lineTotal = product.SellPrice * item.Quantity;
+                        totalReservedProductAmount += lineTotal;
+                        reservedItemDetails.Add($"{item.Quantity}x {product.Name} ({FormattingHelpers.FormatPeso(lineTotal)})");
+                    }
+                }
+
+                if (reservedItemDetails.Any())
+                {
+                    var reservationNote = $"Reserved Chair Add-ons: {string.Join(", ", reservedItemDetails)} [Subtotal: {FormattingHelpers.FormatPeso(totalReservedProductAmount)} - In-Shop Settlement]";
+                    combinedNotes = string.IsNullOrEmpty(combinedNotes)
+                        ? reservationNote
+                        : $"{combinedNotes} | {reservationNote}";
+                }
+            }
+
             // 10. Create appointment with price and service_name snapshots (BR-08)
             var appointment = new Appointment
             {
@@ -310,7 +337,7 @@ public class AppointmentsApiController : ControllerBase
                 Status = AppointmentStatus.Pending,
                 Price = service.Price, // Snapshot
                 ServiceName = service.Name, // Snapshot
-                Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
+                Notes = combinedNotes,
                 CreatedAt = now,
                 UpdatedAt = now
             };

@@ -502,5 +502,51 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
         var validUtc = date.At(new LocalTime(10, 0)).InZoneStrictly(_zone).ToInstant();
         (await availabilityService.IsSlotAvailableAsync(barber.Id, s30.Id, validUtc)).Should().BeTrue();
     }
+
+    [Fact]
+    public async Task CF3_BR04_GetNextAvailableSlot_ReturnsFirstAvailableFutureSlot()
+    {
+        await EnsureSeededAsync();
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+        var (barber, s30, _, _) = await SetupAvailabilityFixturesAsync(db);
+
+        // Choose a Monday (2026-11-23 is Monday)
+        var date = new LocalDate(2026, 11, 23);
+        int dow = 1;
+
+        var existingHours = await db.WorkingHours.Where(w => w.BarberId == barber.Id && w.DayOfWeek == dow).ToListAsync();
+        db.WorkingHours.RemoveRange(existingHours);
+        db.WorkingHours.Add(new WorkingHours
+        {
+            BarberId = barber.Id,
+            DayOfWeek = dow,
+            StartTime = new LocalTime(9, 0),
+            EndTime = new LocalTime(18, 0)
+        });
+
+        var dayStartUtc = date.AtStartOfDayInZone(_zone).ToInstant();
+        var dayEndUtc = date.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+        var existingApps = await db.Appointments.Where(a => a.BarberId == barber.Id && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc).ToListAsync();
+        db.Appointments.RemoveRange(existingApps);
+
+        var existingDaysOff = await db.DaysOff.Where(d => d.BarberId == barber.Id && d.Date == date).ToListAsync();
+        db.DaysOff.RemoveRange(existingDaysOff);
+
+        await db.SaveChangesAsync();
+
+        // Fix clock to Monday at 10:15 AM Manila time (UTC+8 => 02:15 UTC)
+        var fixedClock = new FixedTestClock(Instant.FromUtc(2026, 11, 23, 2, 15));
+        var availabilityService = new AvailabilityService(db, fixedClock, _zone);
+
+        // Act
+        var nextSlot = await availabilityService.GetNextAvailableSlotAsync(barber.Id, s30.Id);
+
+        // Assert
+        nextSlot.Should().NotBeNull();
+        nextSlot!.Date.Should().Be(date);
+        nextSlot.Time.Should().Be(new LocalTime(10, 30)); // Next 30-min slot after 10:15 AM
+        nextSlot.DisplayText.Should().Be("Today 10:30 AM");
+    }
 }
 

@@ -14,15 +14,19 @@ public class SetWorkingHoursRequestValidator : AbstractValidator<SetWorkingHours
         RuleForEach(x => x.Ranges).ChildRules(range =>
         {
             range.RuleFor(r => r.DayOfWeek)
-                .InclusiveBetween(0, 6).WithMessage("Day of week must be between 0 (Sunday) and 6 (Saturday).");
+                .InclusiveBetween(1, 6).WithMessage("Working hours can only be scheduled Monday (1) through Saturday (6). The shop is closed on Sundays.");
 
             range.RuleFor(r => r.StartTime)
                 .NotEmpty().WithMessage("Start time is required.")
-                .Must(BeValidTime).WithMessage("Start time must be in HH:mm format (e.g., 09:00).");
+                .Must(BeValidTime).WithMessage("Start time must be in HH:mm format (e.g., 09:00).")
+                .Must(t => TryParseMinutes(t, out var m) && m >= 9 * 60)
+                .WithMessage("Start time cannot be earlier than shop opening time (09:00).");
 
             range.RuleFor(r => r.EndTime)
                 .NotEmpty().WithMessage("End time is required.")
-                .Must(BeValidTime).WithMessage("End time must be in HH:mm format (e.g., 18:00).");
+                .Must(BeValidTime).WithMessage("End time must be in HH:mm format (e.g., 18:00).")
+                .Must(t => TryParseMinutes(t, out var m) && m <= 18 * 60 && m > 0)
+                .WithMessage("End time cannot be later than shop closing time (18:00).");
 
             range.RuleFor(r => r)
                 .Must(r =>
@@ -30,8 +34,6 @@ public class SetWorkingHoursRequestValidator : AbstractValidator<SetWorkingHours
                     if (!TryParseMinutes(r.StartTime, out var start) || !TryParseMinutes(r.EndTime, out var end))
                         return true;
 
-                    // Support 00:00 as midnight closing
-                    if (end == 0 && start > 0) end = 24 * 60;
                     return end > start;
                 })
                 .WithMessage("End time must be after start time.");

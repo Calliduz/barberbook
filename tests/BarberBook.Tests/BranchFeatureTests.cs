@@ -148,6 +148,52 @@ public class BranchFeatureTests : IClassFixture<WebApplicationFactory<Program>>
         custApiResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
+    [Fact]
+    public void BRN_05_BranchHelpers_ReturnsTransitLandmarks_And_Districts()
+    {
+        var (manilaDistrict, manilaTransit, manilaLandmark) = BarberBook.Web.Common.BranchHelpers.GetBranchDetails("Manila Main Branch");
+        manilaDistrict.Should().Be("Historic District");
+        manilaTransit.Should().Contain("LRT-1");
+        manilaLandmark.Should().Contain("Santa Cruz Church");
+
+        var (bgcDistrict, bgcTransit, bgcLandmark) = BarberBook.Web.Common.BranchHelpers.GetBranchDetails("BGC High Street Branch");
+        bgcDistrict.Should().Be("Corporate & Shopping");
+        bgcTransit.Should().Contain("High Street");
+        bgcLandmark.Should().Contain("Cinema");
+
+        var (ortigasDistrict, ortigasTransit, ortigasLandmark) = BarberBook.Web.Common.BranchHelpers.GetBranchDetails("Ortigas Center Branch");
+        ortigasDistrict.Should().Be("Business & Tech Hub");
+        ortigasTransit.Should().Contain("MRT-3");
+    }
+
+    [Fact]
+    public async Task DEV_01_QuickLogin_And_ResetDemoData_Endpoints_WorkInDevelopment()
+    {
+        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            HandleCookies = true,
+            AllowAutoRedirect = false
+        });
+
+        // 1. Quick login as barber
+        var barberLoginRes = await client.PostAsJsonAsync("/api/dev/quick-login", new { role = "barber" });
+        barberLoginRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var barberData = await barberLoginRes.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        barberData.GetProperty("role").GetString().Should().Be("barber");
+
+        // 2. Quick login as admin
+        var adminLoginRes = await client.PostAsJsonAsync("/api/dev/quick-login", new { role = "admin" });
+        adminLoginRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var adminData = await adminLoginRes.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        adminData.GetProperty("role").GetString().Should().Be("admin");
+
+        // 3. Reset demo data
+        var resetRes = await client.PostAsync("/api/dev/reset-demo-data", null);
+        resetRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var resetData = await resetRes.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        resetData.GetProperty("success").GetBoolean().Should().BeTrue();
+    }
+
     private class BranchListApiResponse
     {
         public List<AdminBranchItemDto> Items { get; set; } = new();

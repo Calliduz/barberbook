@@ -226,5 +226,68 @@ public class AvailabilityService : IAvailabilityService
 
         return !hasOverlap;
     }
+
+    public async Task<NextAvailableSlotDto?> GetNextAvailableSlotAsync(int barberId, int? serviceId = null, CancellationToken cancellationToken = default)
+    {
+        int svcId;
+        if (serviceId.HasValue)
+        {
+            svcId = serviceId.Value;
+        }
+        else
+        {
+            var defaultService = await _dbContext.Services
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.Price)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (defaultService == null)
+            {
+                return null;
+            }
+            svcId = defaultService.Id;
+        }
+
+        var today = _clock.GetCurrentInstant().InZone(_zone).Date;
+
+        for (int offset = 0; offset < 7; offset++)
+        {
+            var candidateDate = today.PlusDays(offset);
+            if (candidateDate.DayOfWeek == IsoDayOfWeek.Sunday)
+            {
+                continue;
+            }
+
+            var slots = await GetAvailableSlotDetailsAsync(barberId, svcId, candidateDate, cancellationToken);
+            if (slots.Any())
+            {
+                var firstSlot = slots.First();
+                string displayText;
+                if (candidateDate == today)
+                {
+                    displayText = $"Today {firstSlot.FormattedTime}";
+                }
+                else if (candidateDate == today.PlusDays(1))
+                {
+                    displayText = $"Tomorrow {firstSlot.FormattedTime}";
+                }
+                else
+                {
+                    displayText = candidateDate.ToString("ddd, MMM d", System.Globalization.CultureInfo.InvariantCulture) + $" at {firstSlot.FormattedTime}";
+                }
+
+                return new NextAvailableSlotDto
+                {
+                    Date = candidateDate,
+                    Time = firstSlot.Time,
+                    FormattedTime = firstSlot.FormattedTime,
+                    DisplayText = displayText,
+                    StartsAtUtc = firstSlot.StartsAtUtc
+                };
+            }
+        }
+
+        return null;
+    }
 }
 

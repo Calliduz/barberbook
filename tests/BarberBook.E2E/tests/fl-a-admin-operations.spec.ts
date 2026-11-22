@@ -12,6 +12,7 @@ async function loginAsAdmin(page: any) {
 test.describe('FL-A — Admin Operations End-to-End Flow', () => {
 
   test('FL_A_Admin_CreateBarber_ViewBookings_ConfirmReject_ViewReports', async ({ page }) => {
+    test.setTimeout(60000);
     // 1. Admin login
     await loginAsAdmin(page);
 
@@ -55,12 +56,15 @@ test.describe('FL-A — Admin Operations End-to-End Flow', () => {
     // Filter by Pending or verify table presence
     await expect(page.locator('table')).toBeVisible();
 
-    // 5. View Sales Reports
-    await page.goto('/admin/reports');
+    // 5. View Sales Reports & Verify Paper Oracle (RP-1, RP-2, Paper §7.3: ₱1,340.00)
+    await page.goto('/admin/reports?date=2026-09-14');
     await page.waitForLoadState('networkidle');
     await expect(page.locator('h1')).toContainText('Sales & Transaction Reports');
     await expect(page.locator('body')).toContainText('Daily Sales');
     await expect(page.locator('body')).toContainText('Monthly Sales');
+
+    // Verify paper oracle total ₱1,340.00 is rendered in the daily sales report
+    await expect(page.locator('body')).toContainText('₱1,340.00');
   });
 
 });

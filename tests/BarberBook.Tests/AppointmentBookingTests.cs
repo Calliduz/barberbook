@@ -463,4 +463,59 @@ public class AppointmentBookingTests : IClassFixture<WebApplicationFactory<Progr
         var adminResp = await clientAdmin.GetAsync($"/api/appointments/{created.Id}");
         adminResp.StatusCode.Should().Be(HttpStatusCode.OK);
     }
+
+    [Fact]
+    public async Task CF4_HW2_CreateAppointment_WithReservedProducts_PersistsReservationInNotes()
+    {
+        await EnsureSeededAsync();
+
+        var client = await CreateAuthenticatedClientAsync("juan@barberbook.local", "Demo@BarberBook2026!");
+
+        // Target next Wednesday at 2:00 PM Manila time
+        var testDate = new LocalDate(2026, 11, 25);
+        var slotLocalTime = new LocalTime(14, 0);
+        var slotInstant = testDate.At(slotLocalTime).InZoneStrictly(_zone).ToInstant();
+
+        await EnsureWorkingHoursAsync(1, 3); // Wednesday
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
+            var dayStartUtc = testDate.AtStartOfDayInZone(_zone).ToInstant();
+            var dayEndUtc = testDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+            var existingApps = await db.Appointments
+                .Where(a => a.BarberId == 1 && a.StartsAt < dayEndUtc && a.EndsAt > dayStartUtc)
+                .ToListAsync();
+            db.Appointments.RemoveRange(existingApps);
+
+            var existingDaysOff = await db.DaysOff
+                .Where(d => d.BarberId == 1 && d.Date == testDate)
+                .ToListAsync();
+            db.DaysOff.RemoveRange(existingDaysOff);
+
+            await db.SaveChangesAsync();
+        }
+
+        var payload = new CreateAppointmentRequest
+        {
+            ServiceId = 1, // Haircut (150)
+            BarberId = 1, // Ramon
+            StartsAt = slotInstant.ToString(),
+            Notes = "Fade on the sides",
+            ReservedProducts = new List<ReservedProductItemDto>
+            {
+                new() { ProductId = 1, Quantity = 1 } // Pomade
+            }
+        };
+
+        var postResp = await client.PostAsJsonAsync("/api/appointments", payload);
+        var errText = await postResp.Content.ReadAsStringAsync();
+        postResp.StatusCode.Should().Be(HttpStatusCode.Created, errText);
+
+        var created = await postResp.Content.ReadFromJsonAsync<AppointmentDetailDto>();
+        created.Should().NotBeNull();
+        created!.Notes.Should().Contain("Fade on the sides");
+        created.Notes.Should().Contain("Reserved Chair Add-ons");
+        created.Notes.Should().Contain("Classic High-Shine Pomade");
+    }
 }

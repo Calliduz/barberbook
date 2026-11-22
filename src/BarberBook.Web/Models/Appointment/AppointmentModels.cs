@@ -1,7 +1,14 @@
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Customer;
+using BarberBook.Web.Models.Inventory;
 
 namespace BarberBook.Web.Models.Appointment;
+
+public class ReservedProductItemDto
+{
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
+}
 
 public class CreateAppointmentRequest
 {
@@ -9,6 +16,7 @@ public class CreateAppointmentRequest
     public int BarberId { get; set; }
     public string StartsAt { get; set; } = string.Empty;
     public string? Notes { get; set; }
+    public List<ReservedProductItemDto> ReservedProducts { get; set; } = new();
 }
 
 public class CancelAppointmentRequest
@@ -99,4 +107,5 @@ public class BookingWizardViewModel
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
     public string CustomerPhone { get; set; } = string.Empty;
+    public List<ProductDto> AvailableProducts { get; set; } = new();
 }

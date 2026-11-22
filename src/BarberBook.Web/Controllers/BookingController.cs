@@ -4,6 +4,7 @@ using BarberBook.Data.Enums;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Appointment;
 using BarberBook.Web.Models.Customer;
+using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,18 @@ namespace BarberBook.Web.Controllers;
 public class BookingController : Controller
 {
     private readonly BarberBookDbContext _dbContext;
+    private readonly IInventoryService _inventoryService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
     public BookingController(
         BarberBookDbContext dbContext,
+        IInventoryService inventoryService,
         IClock clock,
         DateTimeZone? zone = null)
     {
         _dbContext = dbContext;
+        _inventoryService = inventoryService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -104,6 +108,8 @@ public class BookingController : Controller
             }
         }
 
+        var products = await _inventoryService.GetProductsAsync(includeInactive: false);
+
         var model = new BookingWizardViewModel
         {
             Branches = branches,
@@ -115,7 +121,8 @@ public class BookingController : Controller
             TodayDateString = today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
             CustomerName = custName,
             CustomerEmail = custEmail,
-            CustomerPhone = custPhone
+            CustomerPhone = custPhone,
+            AvailableProducts = products.ToList()
         };
 
         return View(model);

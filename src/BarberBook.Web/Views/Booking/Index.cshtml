@@ -246,6 +246,64 @@
             </div>
         </div>
 
+        <!-- Artisan Grooming Chair Add-ons (In-Shop Counter Settlement) -->
+        @if (Model.AvailableProducts != null && Model.AvailableProducts.Any(p => p.CurrentStock > 0))
+        {
+            <div class="mb-6 p-5 sm:p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-base font-serif font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="barber-pole-icon" style="height: 14px; width: 8px;"></span>
+                            <span>Artisan Grooming Add-ons</span>
+                            <span class="text-xs font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Reserve premium styling essentials to be ready at your chair. Pay at counter upon cut completion.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    @foreach (var prod in Model.AvailableProducts.Where(p => p.CurrentStock > 0))
+                    {
+                        var prodImg = BarberBook.Web.Common.ImageHelpers.GetProductImage(prod.Name);
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-amber-500/40 transition-colors">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <img src="@prodImg" alt="@prod.Name" class="w-12 h-12 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shrink-0" />
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-serif font-bold text-slate-900 dark:text-white truncate">@prod.Name</h4>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-xs font-mono font-bold text-amber-800 dark:text-amber-400">@prod.FormattedSellPrice</span>
+                                        <span class="text-[10px] text-slate-400">(@prod.CurrentStock in stock)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" onclick="decrementProduct(@prod.Id)" aria-label="Decrease quantity for @prod.Name" class="w-8 h-8 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 font-bold text-base transition-transform">-</button>
+                                <span id="qty-@prod.Id" class="w-6 text-center text-xs font-mono font-bold text-slate-900 dark:text-white">0</span>
+                                <button type="button" onclick="incrementProduct(@prod.Id, @prod.CurrentStock, '@prod.Name', @prod.SellPrice)" aria-label="Increase quantity for @prod.Name" class="w-8 h-8 rounded-xl bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 active:scale-95 font-bold text-base shadow-xs transition-all">+</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Live Settlement Breakdown Preview -->
+                <div class="mt-4 pt-3.5 border-t border-slate-200 dark:border-slate-700/80 flex flex-col gap-1 text-xs">
+                    <div class="flex justify-between text-slate-600 dark:text-slate-400">
+                        <span>Service:</span>
+                        <span id="settlement-service-price" class="font-mono font-semibold"></span>
+                    </div>
+                    <div id="settlement-products-row" class="hidden flex justify-between text-amber-800 dark:text-amber-400">
+                        <span id="settlement-products-label">Reserved Products (0 items):</span>
+                        <span id="settlement-products-price" class="font-mono font-semibold">₱0.00</span>
+                    </div>
+                    <div class="flex justify-between items-baseline pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-900 dark:text-white font-bold">
+                        <span>Estimated In-Shop Settlement:</span>
+                        <span id="settlement-grand-total" class="text-xl font-mono font-black text-amber-800 dark:text-amber-400"></span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Cash or in-shop payment settled at reception upon service completion (LM-1). No online charge.</p>
+                </div>
+            </div>
+        }
+
         <!-- Optional Notes -->
         <div class="mb-6">
             <label for="booking-notes" class="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1.5">Special Requests or Notes <span class="text-slate-400 text-xs font-normal">(optional)</span></label>
@@ -276,6 +334,61 @@
         slotFormattedTime: '',
         currentStep: 1
     };
+
+    const selectedProducts = {};
+
+    function incrementProduct(id, maxStock, name, price) {
+        if (!selectedProducts[id]) {
+            selectedProducts[id] = { quantity: 0, name: name, price: price };
+        }
+        if (selectedProducts[id].quantity < maxStock) {
+            selectedProducts[id].quantity++;
+            const el = document.getElementById('qty-' + id);
+            if (el) el.textContent = selectedProducts[id].quantity;
+            updateSettlementSummary();
+        } else {
+            if (window.showToast) window.showToast('Maximum available in-shop stock reached for this item.', 'info');
+        }
+    }
+
+    function decrementProduct(id) {
+        if (selectedProducts[id] && selectedProducts[id].quantity > 0) {
+            selectedProducts[id].quantity--;
+            const el = document.getElementById('qty-' + id);
+            if (el) el.textContent = selectedProducts[id].quantity;
+            updateSettlementSummary();
+        }
+    }
+
+    function updateSettlementSummary() {
+        const servicePriceNum = parseFloat((state.servicePrice || '₱0').replace(/[^0-9.]/g, '')) || 0;
+        let productsTotal = 0;
+        let totalQty = 0;
+        for (const item of Object.values(selectedProducts)) {
+            productsTotal += item.quantity * item.price;
+            totalQty += item.quantity;
+        }
+
+        const grandTotal = servicePriceNum + productsTotal;
+        const sSvc = document.getElementById('settlement-service-price');
+        if (sSvc) sSvc.textContent = '₱' + servicePriceNum.toFixed(2);
+
+        const prodRow = document.getElementById('settlement-products-row');
+        const prodLabel = document.getElementById('settlement-products-label');
+        const prodPrice = document.getElementById('settlement-products-price');
+        if (prodRow && prodLabel && prodPrice) {
+            if (totalQty > 0) {
+                prodRow.classList.remove('hidden');
+                prodLabel.textContent = `Reserved Products (${totalQty} item${totalQty > 1 ? 's' : ''}):`;
+                prodPrice.textContent = '₱' + productsTotal.toFixed(2);
+            } else {
+                prodRow.classList.add('hidden');
+            }
+        }
+
+        const grandEl = document.getElementById('settlement-grand-total');
+        if (grandEl) grandEl.textContent = '₱' + grandTotal.toFixed(2);
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         // Check for deep-linked query parameters or pre-selections
@@ -434,8 +547,6 @@
         card.classList.add('border-amber-500', 'bg-amber-50/40', 'dark:bg-amber-950/20', 'ring-2', 'ring-amber-500/20');
         card.setAttribute('aria-pressed', 'true');
     }
-        card.setAttribute('aria-pressed', 'true');
-    }
 
     function onDateChanged() {
         const picker = document.getElementById('booking-date-picker');
@@ -517,12 +628,20 @@
         document.getElementById('review-barber-name').innerText = state.barberName;
         document.getElementById('review-date-str').innerText = state.date;
         document.getElementById('review-time-str').innerText = state.slotFormattedTime;
+        updateSettlementSummary();
     }
 
     async function submitBooking() {
         clearError();
         const btn = document.getElementById('submit-booking-btn');
         const notes = document.getElementById('booking-notes').value;
+
+        const reservedList = [];
+        for (const [idStr, item] of Object.entries(selectedProducts)) {
+            if (item.quantity > 0) {
+                reservedList.push({ productId: parseInt(idStr, 10), quantity: item.quantity });
+            }
+        }
 
         btn.disabled = true;
         btn.innerHTML = `
@@ -541,7 +660,8 @@
                     serviceId: state.serviceId,
                     barberId: state.barberId,
                     startsAt: state.slotUtc,
-                    notes: notes
+                    notes: notes,
+                    reservedProducts: reservedList
                 })
             });
 

@@ -142,17 +142,16 @@
                     <option value="4">Thursday</option>
                     <option value="5">Friday</option>
                     <option value="6">Saturday</option>
-                    <option value="0">Sunday</option>
                 </select>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="min-w-0">
                     <label for="whStartTime" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Start Time</label>
-                    <input type="time" id="whStartTime" value="09:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
+                    <input type="time" id="whStartTime" value="09:00" min="09:00" max="18:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
                 </div>
                 <div class="min-w-0">
                     <label for="whEndTime" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">End Time</label>
-                    <input type="time" id="whEndTime" value="18:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
+                    <input type="time" id="whEndTime" value="18:00" min="09:00" max="18:00" required class="modal-input mt-1 dark:bg-slate-800 dark:text-white dark:border-slate-700" />
                 </div>
             </div>
             <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -276,6 +275,22 @@
         const dow = parseInt(document.getElementById('whDayOfWeek').value);
         const startTime = document.getElementById('whStartTime').value;
         const endTime = document.getElementById('whEndTime').value;
+
+        if (dow === 0) {
+            const msg = 'BarberBook is closed on Sundays. Please select Monday to Saturday.';
+            if (window.showToast) window.showToast(msg, 'error'); else alert(msg);
+            return;
+        }
+        if (startTime < "09:00" || endTime > "18:00") {
+            const msg = 'Shifts must be within shop operating hours (09:00 AM – 06:00 PM).';
+            if (window.showToast) window.showToast(msg, 'error'); else alert(msg);
+            return;
+        }
+        if (endTime <= startTime) {
+            const msg = 'Shift end time must be after start time.';
+            if (window.showToast) window.showToast(msg, 'error'); else alert(msg);
+            return;
+        }
 
         try {
             const getRes = await fetch('/api/admin/barbers/' + currentBarberId + '/working-hours');
