@@ -218,16 +218,17 @@ public class AdminAppointmentsApiController : ControllerBase
         [FromBody] UpdateAppointmentStatusRequest request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.To))
+        var rawTarget = !string.IsNullOrWhiteSpace(request.To) ? request.To : request.Status;
+        if (string.IsNullOrWhiteSpace(rawTarget))
         {
             return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "The 'to' target status is required."));
         }
 
-        var normalizedTo = request.To.Replace("-", "").Replace("_", "").Trim();
+        var normalizedTo = rawTarget.Replace("-", "").Replace("_", "").Trim();
         if (!Enum.TryParse<AppointmentStatus>(normalizedTo, true, out var targetStatus))
         {
             return BadRequest(new ApiErrorResponse("VALIDATION_ERROR",
-                $"Invalid status '{request.To}'. Allowed values: confirmed, rejected, completed, cancelled, noshow."));
+                $"Invalid status '{rawTarget}'. Allowed values: confirmed, rejected, completed, cancelled, noshow."));
         }
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -393,21 +394,29 @@ public class AdminAppointmentsApiController : ControllerBase
         Instant startsAtInstant;
         if (!string.IsNullOrWhiteSpace(request.StartsAt))
         {
-            var parseResult = InstantPattern.ExtendedIso.Parse(request.StartsAt);
-            if (parseResult.Success)
+            var genResult = InstantPattern.General.Parse(request.StartsAt);
+            if (genResult.Success)
             {
-                startsAtInstant = parseResult.Value;
-            }
-            else if (DateTimeOffset.TryParse(request.StartsAt, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
-            {
-                startsAtInstant = Instant.FromDateTimeOffset(dto);
+                startsAtInstant = genResult.Value;
             }
             else
             {
-                var nowManila = now.InZone(_zone);
-                int minute = (nowManila.Minute / 30) * 30;
-                var alignedLocal = new LocalDateTime(nowManila.Year, nowManila.Month, nowManila.Day, nowManila.Hour, minute, 0);
-                startsAtInstant = alignedLocal.InZoneLeniently(_zone).ToInstant();
+                var parseResult = InstantPattern.ExtendedIso.Parse(request.StartsAt);
+                if (parseResult.Success)
+                {
+                    startsAtInstant = parseResult.Value;
+                }
+                else if (DateTimeOffset.TryParse(request.StartsAt, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dto))
+                {
+                    startsAtInstant = Instant.FromDateTimeOffset(dto);
+                }
+                else
+                {
+                    var nowManila = now.InZone(_zone);
+                    int minute = (nowManila.Minute / 30) * 30;
+                    var alignedLocal = new LocalDateTime(nowManila.Year, nowManila.Month, nowManila.Day, nowManila.Hour, minute, 0);
+                    startsAtInstant = alignedLocal.InZoneLeniently(_zone).ToInstant();
+                }
             }
         }
         else

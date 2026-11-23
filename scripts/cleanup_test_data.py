@@ -64,13 +64,29 @@ for bid, uid, dname, bio, specs, branch_id in canonical_barbers:
             'bio': bio,
             'specialties': specs,
             'branch_id': branch_id,
+            'commission_rate': 0.50,
             'is_active': True
         }},
         upsert=True
     )
 
-# Ensure users 1..19 are active
-db.users.update_many({'_id': {'$lte': 19}}, {'$set': {'is_active': True}})
+# Ensure users 1..19 are active and have canonical passwords & no lockout
+CANONICAL_ADMIN_HASH = "AQAAAAIAAYagAAAAEPGdxvxlXzese3q1rtpswVoXKC9TyZxymJSW+9QsIeJfe7Ry2Ufzu+tnjS9nQ3wvEQ==" # Admin@BarberBook2026!
+CANONICAL_DEMO_HASH = "AQAAAAIAAYagAAAAEGR/YuAanNa9pB3bbJHVzgLCfWDwqxCsGT2/G/JfeqW4Ys5SVZgJDReZrTxS/lgzFA=="  # Demo@BarberBook2026!
+
+db.users.update_one({'_id': 1}, {'$set': {
+    'is_active': True,
+    'PasswordHash': CANONICAL_ADMIN_HASH,
+    'LockoutEnd': None,
+    'AccessFailedCount': 0
+}})
+
+db.users.update_many({'_id': {'$gte': 2, '$lte': 19}}, {'$set': {
+    'is_active': True,
+    'PasswordHash': CANONICAL_DEMO_HASH,
+    'LockoutEnd': None,
+    'AccessFailedCount': 0
+}})
 db.users.update_one({'_id': 2}, {'$set': {'full_name': 'Ramon'}})
 db.users.update_one({'_id': 6}, {'$set': {'full_name': 'Rafael'}})
 
@@ -81,10 +97,10 @@ if services_to_delete:
     print(f"Deleted {r.deleted_count} test services: {services_to_delete}")
 
 canonical_services = [
-    (1, "Signature Cut", "Complete precision haircut, hot towel finish, style", 350.0, 30),
-    (2, "Beard Sculpt & Trim", "Precision edging, hot lather, beard oil conditioning", 250.0, 25),
-    (3, "Hair & Beard Deluxe", "Signature cut combined with full beard sculpture", 550.0, 50),
-    (4, "Royal Shave Treatment", "Multi-step traditional hot towel razor shave with facial massage", 400.0, 40)
+    (1, "Haircut", "Standard professional haircut and styling", 150.0, 30),
+    (2, "Haircut + Shave", "Haircut paired with hot towel straight razor shave", 220.0, 60),
+    (3, "Beard Trim", "Precision beard shaping, edging, and conditioning", 100.0, 30),
+    (4, "Hair Color", "Full professional hair coloring and treatment", 500.0, 90)
 ]
 for sid, sname, sdesc, sprice, sdur in canonical_services:
     db.services.update_one(
@@ -105,7 +121,8 @@ if products_to_delete:
     r = db.products.delete_many({'_id': {'$in': products_to_delete}})
     print(f"Deleted {r.deleted_count} test products: {products_to_delete}")
     r_sm = db.stock_movements.delete_many({'product_id': {'$in': products_to_delete}})
-    print(f"Deleted {r_sm.deleted_count} test stock movements")
+    r_psi = db.product_sale_items.delete_many({'product_id': {'$in': products_to_delete}})
+    print(f"Deleted {r_sm.deleted_count} test stock movements and {r_psi.deleted_count} sale items")
 
 # 5. Clean test equipment (keep _id <= 5)
 equipment_to_delete = [e['_id'] for e in db.equipment.find() if e['_id'] > 5]
@@ -122,6 +139,13 @@ if users_to_delete:
     r = db.users.delete_many({'_id': {'$in': users_to_delete}})
     print(f"Deleted {r.deleted_count} test users: {users_to_delete}")
     db.user_roles.delete_many({'user_id': {'$in': users_to_delete}})
+
+# 6.5 Clean test appointments (keep canonical seed appointments <= 1680)
+test_appts = [a['_id'] for a in db.appointments.find() if a['_id'] > 1680]
+if test_appts:
+    r_a = db.appointments.delete_many({'_id': {'$in': test_appts}})
+    db.status_histories.delete_many({'appointment_id': {'$in': test_appts}})
+    print(f"Deleted {r_a.deleted_count} test appointments: {test_appts}")
 
 # 7. Reset sequential counters
 def reset_counter(coll_name, id_field='_id'):

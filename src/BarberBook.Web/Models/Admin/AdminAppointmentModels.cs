@@ -6,6 +6,7 @@ namespace BarberBook.Web.Models.Admin;
 public class UpdateAppointmentStatusRequest
 {
     public string To { get; set; } = string.Empty;
+    public string? Status { get; set; }
     public string? Note { get; set; }
     public string? PaymentMethod { get; set; } // Cash, GCash, Maya, Card
     public List<AddOnProductItemDto>? AddOns { get; set; }
