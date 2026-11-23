@@ -5,57 +5,61 @@
 
 <div class="space-y-6">
     <!-- Header -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white tracking-tight">Equipment per Barber</h1>
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+                <div class="barber-pole-icon" style="height: 14px; width: 8px;"></div>
+                <span>BARBER STATION ALLOCATIONS</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Equipment per Barber</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
                 View active tools assigned to each barber, inspect assignment timelines, and allocate shop equipment.
             </p>
         </div>
 
         <div class="flex items-center gap-2">
-            <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">
+            <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
                 &larr; Back to Equipment
             </a>
-            <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">
+            <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">
                 Quality Monitoring &rarr;
             </a>
         </div>
     </div>
 
     <!-- Sub-Navigation Links for Inventory & Purchasing Modules -->
-    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold">
-        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
+    <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200 text-xs font-bold">
+        <a href="/admin/inventory?tab=products" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
             Retail Products
         </a>
-        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
+        <a href="/admin/purchases" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
             Buy (Purchases)
         </a>
-        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
+        <a href="/admin/product-sales" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
             Sell (Product Sales)
         </a>
-        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
+        <a href="/admin/inventory?tab=equipment" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
             Equipment Assets
         </a>
-        <span class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 shadow-xs font-bold">
+        <span class="px-4 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
             Equipment per Barber
         </span>
-        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">
+        <a href="/admin/equipment/quality" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
             Quality Monitoring
         </a>
     </div>
 
     <!-- Barber Selection Bar -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-3">
-        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Select Barber:</span>
+    <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm flex flex-wrap items-center gap-3">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Barber:</span>
         <div class="flex flex-wrap gap-2">
             @foreach (var b in Model.Barbers)
             {
                 var isSelected = b.Id == Model.SelectedBarberId;
                 <a href="/admin/equipment/per-barber?barberId=@b.Id"
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 active:scale-95 @(isSelected ? "bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700")">
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 @(isSelected ? "bg-slate-900 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
                     <span>@b.DisplayName</span>
-                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black @(isSelected ? "bg-amber-500 text-slate-950 dark:bg-slate-950 dark:text-amber-400" : "bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200")">
+                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black @(isSelected ? "bg-amber-500 text-slate-950" : "bg-slate-300 text-slate-800")">
                         @b.ActiveToolCount
                     </span>
                 </a>
@@ -64,19 +68,19 @@
     </div>
 
     <!-- Active Equipment Assigned to Selected Barber -->
-    <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-                <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white tracking-tight">
+                <h2 class="text-lg font-serif font-bold text-slate-900 tracking-tight">
                     Currently Assigned Tools (@Model.ActiveAssignments.Count items)
                 </h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Active equipment assigned to this barber workstation</p>
+                <p class="text-xs text-slate-500 mt-0.5">Active equipment assigned to this barber workstation</p>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-                <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
                     <tr>
                         <th class="py-3 px-4">Asset Tag</th>
                         <th class="py-3 px-4">Equipment Name</th>
@@ -85,29 +89,33 @@
                         <th class="py-3 px-4 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @if (Model.ActiveAssignments.Count == 0)
                     {
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
+                            <td colspan="5" class="py-8 text-center text-slate-400 text-xs italic">
                                 No active equipment currently assigned to this barber.
                             </td>
                         </tr>
                     }
                     @foreach (var a in Model.ActiveAssignments)
                     {
-                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
-                            <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700 dark:text-amber-400">@a.AssetTag</td>
-                            <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">@a.EquipmentName</td>
-                            <td class="py-3.5 px-4 font-mono text-xs text-slate-600 dark:text-slate-400">@a.AssignedAt</td>
-                            <td class="py-3.5 px-4 text-xs text-slate-500 dark:text-slate-400">@(a.Notes ?? "-")</td>
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-3.5 px-4 font-mono font-bold text-xs text-amber-700">@a.AssetTag</td>
+                            <td class="py-3.5 px-4 font-bold text-slate-900">@a.EquipmentName</td>
+                            <td class="py-3.5 px-4 font-mono text-xs text-slate-600">@a.AssignedAt</td>
+                            <td class="py-3.5 px-4 text-xs text-slate-500">@(a.Notes ?? "-")</td>
                             <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
-                                <button type="button" onclick="openReassignModal(@a.EquipmentId, '@a.EquipmentName', '@a.AssetTag')" class="py-1 px-3 rounded-lg text-xs font-bold text-amber-900 dark:text-amber-300 bg-amber-500/15 dark:bg-amber-500/20 hover:bg-amber-500/25 border border-amber-500/30 transition active:scale-95">
+                                <button type="button" onclick="openReassignModal(@a.EquipmentId, '@a.EquipmentName', '@a.AssetTag')" class="py-1 px-3 rounded-lg text-xs font-bold text-amber-900 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition">
                                     Reassign
                                 </button>
                                 <form method="post" action="/admin/inventory/equipment/@a.EquipmentId/return" class="inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="py-1 px-3 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95">
+                                    <button type="submit"
+                                            data-confirm="Are you sure you want to return '@a.EquipmentName' to storage? It will be marked available in the central inventory pool."
+                                            data-confirm-title="Return Equipment to Storage"
+                                            data-confirm-button="Return to Storage"
+                                            class="py-1 px-3 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
                                         Return to Storage
                                     </button>
                                 </form>
@@ -117,20 +125,20 @@
                 </tbody>
             </table>
         </div>
-    </article>
+    </div>
 
     <!-- Assignment History for Selected Barber -->
-    <article class="bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-                <h2 class="text-base font-serif font-bold text-slate-900 dark:text-white tracking-tight">Past Equipment History</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Audited history of tools previously assigned and returned</p>
+                <h2 class="text-base font-serif font-bold text-slate-900 tracking-tight">Past Equipment History</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Audited history of tools previously assigned and returned</p>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-                <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
                     <tr>
                         <th class="py-3 px-4">Asset Tag</th>
                         <th class="py-3 px-4">Equipment Name</th>
@@ -139,47 +147,47 @@
                         <th class="py-3 px-4">Notes</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @if (Model.PastAssignments.Count == 0)
                     {
                         <tr>
-                            <td colspan="5" class="py-6 text-center text-slate-400 dark:text-slate-500 text-xs italic">
+                            <td colspan="5" class="py-6 text-center text-slate-400 text-xs italic">
                                 No past assignment history found for this barber.
                             </td>
                         </tr>
                     }
                     @foreach (var p in Model.PastAssignments)
                     {
-                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition text-xs opacity-75">
-                            <td class="py-3 px-4 font-mono font-bold text-slate-600 dark:text-slate-400">@p.AssetTag</td>
-                            <td class="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">@p.EquipmentName</td>
-                            <td class="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">@p.AssignedAt</td>
-                            <td class="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">@p.ReturnedAt</td>
-                            <td class="py-3 px-4 text-slate-500 dark:text-slate-400 italic">@(p.Notes ?? "-")</td>
+                        <tr class="hover:bg-slate-50/80 transition text-xs opacity-75">
+                            <td class="py-3 px-4 font-mono font-bold text-slate-600">@p.AssetTag</td>
+                            <td class="py-3 px-4 font-medium text-slate-800">@p.EquipmentName</td>
+                            <td class="py-3 px-4 font-mono text-slate-500">@p.AssignedAt</td>
+                            <td class="py-3 px-4 font-mono text-slate-500">@p.ReturnedAt</td>
+                            <td class="py-3 px-4 text-slate-500 italic">@(p.Notes ?? "-")</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </article>
+    </div>
 </div>
 
-<!-- Reassign Equipment Modal (HTML5 Native Dialog with light dismiss and scroll containment) -->
-<dialog id="reassignModal" closedby="any" aria-labelledby="reassignHeader" class="hidden m-auto rounded-2xl sm:rounded-3xl p-0 bg-transparent backdrop:bg-slate-950/70 backdrop:backdrop-blur-xs max-w-md w-[calc(100%-2rem)] shadow-2xl focus:outline-none">
-    <div class="modal-dialog bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 relative flex flex-col max-h-[88vh]">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+<!-- Reassign Equipment Modal -->
+<div id="reassignModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
             <div>
-                <h3 id="reassignHeader" class="text-xl font-serif font-black text-slate-900 dark:text-white">Reassign Equipment</h3>
-                <p id="reassignModalTitle" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5"></p>
+                <h3 class="text-lg font-serif font-black text-slate-900">Reassign Equipment</h3>
+                <p id="reassignModalTitle" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
-            <button type="button" onclick="closeReassignModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-lg font-bold active:scale-95">&times;</button>
+            <button onclick="closeReassignModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
         </div>
 
-        <form id="reassignForm" method="post" action="" class="modal-body overflow-y-auto flex-1 space-y-4 py-2">
+        <form id="reassignForm" method="post" action="" class="space-y-4">
             @Html.AntiForgeryToken()
             <div>
-                <label for="reassignBarberId" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Transfer to Barber *</label>
-                <select id="reassignBarberId" name="barberId" required class="modal-input font-medium dark:bg-slate-800 dark:text-white dark:border-slate-700">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Transfer to Barber *</label>
+                <select name="barberId" required class="w-full text-xs p-2.5 rounded-lg border border-slate-200 bg-white">
                     @foreach (var b in Model.Barbers)
                     {
                         <option value="@b.Id" selected="@(b.Id != Model.SelectedBarberId ? "selected" : null)">@b.DisplayName (@(b.Specialties ?? "Master Barber"))</option>
@@ -187,52 +195,26 @@
                 </select>
             </div>
             <div>
-                <label for="reassignNotes" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Transfer Notes (optional)</label>
-                <textarea id="reassignNotes" name="notes" rows="2" placeholder="e.g. Workstation reassignment, tool swap..." class="modal-input font-medium dark:bg-slate-800 dark:text-white dark:border-slate-700"></textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Transfer Notes (optional)</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Workstation reassignment, tool swap..." class="w-full text-xs p-2.5 rounded-lg border border-slate-200"></textarea>
             </div>
-            <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
-                <button type="button" onclick="closeReassignModal()" class="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95">Cancel</button>
-                <button type="submit" class="py-2.5 px-5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm active:scale-95">Confirm Reassignment</button>
+            <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                <button type="button" onclick="closeReassignModal()" class="py-2 px-4 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button type="submit" class="py-2 px-5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm">Confirm Reassignment</button>
             </div>
         </form>
     </div>
-</dialog>
+</div>
 
 <script>
     function openReassignModal(equipmentId, name, tag) {
         document.getElementById('reassignForm').action = '/admin/inventory/equipment/' + equipmentId + '/assign';
         document.getElementById('reassignModalTitle').innerText = name + ' (' + tag + ')';
-        const modal = document.getElementById('reassignModal');
-        modal.classList.remove('hidden');
-        if (typeof modal.showModal === 'function') {
-            modal.showModal();
-        }
+        document.getElementById('reassignModal').classList.remove('hidden');
     }
 
     function closeReassignModal() {
-        const modal = document.getElementById('reassignModal');
-        if (typeof modal.close === 'function') {
-            modal.close();
-        }
-        modal.classList.add('hidden');
+        document.getElementById('reassignModal').classList.add('hidden');
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('reassignModal');
-        if (!modal) return;
-        modal.addEventListener('cancel', function () {
-            modal.classList.add('hidden');
-        });
-        modal.addEventListener('click', function (e) {
-            const rect = modal.getBoundingClientRect();
-            const isInDialog = (
-                rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
-                rect.left <= e.clientX && e.clientX <= rect.left + rect.width
-            );
-            if (!isInDialog) {
-                closeReassignModal();
-            }
-        });
-    });
 </script>
 

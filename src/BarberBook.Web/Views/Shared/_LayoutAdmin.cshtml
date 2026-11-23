@@ -245,6 +245,21 @@
                     <a href="/admin/inventory" class="block px-3 py-1.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800">Inventory & Equipment</a>
                 </div>
             </div>
+
+            <div class="pt-3 border-t border-slate-800">
+                <form action="/logout" method="post" class="m-0" data-no-double-submit="true">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            data-confirm="Are you sure you want to sign out of BarberBook Admin?"
+                            data-confirm-title="Sign Out"
+                            data-confirm-button="Sign Out"
+                            data-confirm-destructive="true"
+                            class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-rose-400 hover:bg-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -259,6 +274,9 @@
             <p>&copy; @DateTime.UtcNow.Year BarberBook Management System &bull; Modern Professional Grooming</p>
         </div>
     </footer>
+
+    <!-- Global CSRF Token for Dynamic Forms & Modals -->
+    @Html.AntiForgeryToken()
 
     <!-- Shared Accessible Toast, Confirm Modal & Command Palette Components -->
     <partial name="_Toast" />

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Models.Appointment;
@@ -47,12 +48,7 @@ public class AdminAppointmentsApiController : ControllerBase
         CancellationToken cancellationToken)
     {
         var dbQuery = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber).ThenInclude(b => b.User)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .Include(a => a.Branch)
+            .AsNoTracking()
             .AsQueryable();
 
         // 1. Date Range Filter
@@ -106,18 +102,30 @@ public class AdminAppointmentsApiController : ControllerBase
         // 5b. Branch Filter
         if (query.BranchId.HasValue && query.BranchId.Value > 0)
         {
-            dbQuery = dbQuery.Where(a => a.BranchId == query.BranchId.Value || a.Barber.BranchId == query.BranchId.Value);
+            var branchBarberIds = await _dbContext.Barbers
+                .AsNoTracking()
+                .Where(b => b.BranchId == query.BranchId.Value)
+                .Select(b => b.Id)
+                .ToListAsync(cancellationToken);
+
+            dbQuery = dbQuery.Where(a => a.BranchId == query.BranchId.Value || branchBarberIds.Contains(a.BarberId));
         }
 
         // 6. Text Search (Reference Code or Customer Name/Email/Phone)
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
             var term = query.Search.Trim().ToLower();
+            var matchingUserIds = await _dbContext.Users
+                .AsNoTracking()
+                .Where(u => u.FullName.ToLower().Contains(term) ||
+                            (u.Email != null && u.Email.ToLower().Contains(term)) ||
+                            (u.PhoneNumber != null && u.PhoneNumber.Contains(term)))
+                .Select(u => u.Id)
+                .ToListAsync(cancellationToken);
+
             dbQuery = dbQuery.Where(a =>
                 a.ReferenceCode.ToLower().Contains(term) ||
-                a.Customer.FullName.ToLower().Contains(term) ||
-                (a.Customer.Email != null && a.Customer.Email.ToLower().Contains(term)) ||
-                (a.Customer.PhoneNumber != null && a.Customer.PhoneNumber.Contains(term)));
+                matchingUserIds.Contains(a.CustomerId));
         }
 
         var totalCount = await dbQuery.CountAsync(cancellationToken);
@@ -128,7 +136,6 @@ public class AdminAppointmentsApiController : ControllerBase
         {
             "price" => isAsc ? dbQuery.OrderBy(a => a.Price) : dbQuery.OrderByDescending(a => a.Price),
             "status" => isAsc ? dbQuery.OrderBy(a => a.Status) : dbQuery.OrderByDescending(a => a.Status),
-            "customer" => isAsc ? dbQuery.OrderBy(a => a.Customer.FullName) : dbQuery.OrderByDescending(a => a.Customer.FullName),
             "date" => isAsc ? dbQuery.OrderBy(a => a.StartsAt) : dbQuery.OrderByDescending(a => a.StartsAt),
             "created" => isAsc ? dbQuery.OrderBy(a => a.Id) : dbQuery.OrderByDescending(a => a.Id),
             _ => isAsc ? dbQuery.OrderBy(a => a.Id) : dbQuery.OrderByDescending(a => a.Id)
@@ -142,6 +149,8 @@ public class AdminAppointmentsApiController : ControllerBase
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+
+        await _dbContext.HydrateAppointmentsAsync(items, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true, ct: cancellationToken);
 
         var itemDtos = items.Select(app =>
         {
@@ -166,13 +175,13 @@ public class AdminAppointmentsApiController : ControllerBase
                 Id = app.Id,
                 ReferenceCode = app.ReferenceCode,
                 CustomerId = app.CustomerId,
-                CustomerName = app.Customer.FullName,
-                CustomerEmail = app.Customer.Email ?? string.Empty,
-                CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
+                CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+                CustomerEmail = app.Customer?.Email ?? string.Empty,
+                CustomerPhone = app.Customer?.PhoneNumber ?? string.Empty,
                 BarberId = app.BarberId,
-                BarberName = app.Barber.DisplayName,
-                BranchId = app.BranchId ?? app.Barber.BranchId,
-                BranchName = app.Branch?.Name ?? app.Barber?.Branch?.Name,
+                BarberName = app.Barber?.DisplayName ?? "Staff",
+                BranchId = app.BranchId ?? app.Barber?.BranchId,
+                BranchName = app.Branch?.Name ?? app.Barber?.Branch?.Name ?? "Main Branch",
                 ServiceId = app.ServiceId,
                 ServiceName = app.ServiceName,
                 Price = app.Price,
@@ -279,16 +288,19 @@ public class AdminAppointmentsApiController : ControllerBase
         var startsAtManila = app.StartsAt.InZone(_zone);
         var endsAtManila = app.EndsAt.InZone(_zone);
 
+        var customer = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == app.CustomerId, cancellationToken);
+        var barber = await _dbContext.Barbers.AsNoTracking().FirstOrDefaultAsync(b => b.Id == app.BarberId, cancellationToken);
+
         var dto = new AppointmentDetailDto
         {
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
             CustomerId = app.CustomerId,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
-            CustomerEmail = app.Customer.Email ?? string.Empty,
+            CustomerName = customer?.FullName ?? string.Empty,
+            CustomerPhone = customer?.PhoneNumber ?? string.Empty,
+            CustomerEmail = customer?.Email ?? string.Empty,
             BarberId = app.BarberId,
-            BarberName = app.Barber.DisplayName,
+            BarberName = barber?.DisplayName ?? string.Empty,
             ServiceId = app.ServiceId,
             ServiceName = app.ServiceName,
             Price = app.Price,
@@ -366,8 +378,12 @@ public class AdminAppointmentsApiController : ControllerBase
         }
 
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == request.BarberId, cancellationToken);
+        if (barber != null)
+        {
+            await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, ct: cancellationToken);
+        }
         if (barber == null || !barber.IsActive || !barber.User.IsActive)
         {
             return BadRequest(new ApiErrorResponse("INVALID_BARBER", "Selected barber is invalid or inactive."));

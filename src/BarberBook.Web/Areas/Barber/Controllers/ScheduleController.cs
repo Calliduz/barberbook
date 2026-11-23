@@ -2,6 +2,7 @@ using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Schedule;
 using FluentValidation;
@@ -52,10 +53,13 @@ public class ScheduleController : Controller
             return Forbid();
         }
 
-        var hours = await _dbContext.WorkingHours
+        var rawHours = await _dbContext.WorkingHours
             .Where(w => w.BarberId == barber.Id)
             .OrderBy(w => w.DayOfWeek)
             .ThenBy(w => w.StartTime)
+            .ToListAsync();
+
+        var hours = rawHours
             .Select(w => new WorkingHoursItemDto
             {
                 Id = w.Id,
@@ -64,7 +68,7 @@ public class ScheduleController : Controller
                 StartTime = w.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
                 EndTime = w.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)
             })
-            .ToListAsync();
+            .ToList();
 
         return Ok(hours);
     }
@@ -144,9 +148,12 @@ public class ScheduleController : Controller
             return Forbid();
         }
 
-        var daysOff = await _dbContext.DaysOff
+        var rawDaysOff = await _dbContext.DaysOff
             .Where(d => d.BarberId == barber.Id)
             .OrderBy(d => d.Date)
+            .ToListAsync();
+
+        var daysOff = rawDaysOff
             .Select(d => new DayOffItemDto
             {
                 Id = d.Id,
@@ -154,7 +161,7 @@ public class ScheduleController : Controller
                 FormattedDate = d.Date.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture),
                 Reason = d.Reason
             })
-            .ToListAsync();
+            .ToList();
 
         return Ok(daysOff);
     }
@@ -191,14 +198,14 @@ public class ScheduleController : Controller
         var rangeEndUtc = endDate.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
 
         var conflictingAppointments = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
+            .AsNoTracking()
             .Where(a => a.BarberId == barber.Id &&
                         (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed) &&
                         a.StartsAt < rangeEndUtc &&
                         a.EndsAt > rangeStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(conflictingAppointments, includeCustomer: true, includeBarber: false, includeService: true);
 
         var conflicts = conflictingAppointments.Select(a =>
         {

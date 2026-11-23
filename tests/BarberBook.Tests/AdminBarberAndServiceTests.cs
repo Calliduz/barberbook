@@ -83,11 +83,13 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
-            var barberInDb = await db.Barbers.Include(b => b.User).FirstOrDefaultAsync(b => b.User.Email == uniqueEmail);
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == uniqueEmail);
+            user.Should().NotBeNull();
+            user!.Role.Should().Be(UserRole.Barber);
+            user.IsActive.Should().BeTrue();
+            var barberInDb = await db.Barbers.FirstOrDefaultAsync(b => b.UserId == user.Id);
             barberInDb.Should().NotBeNull();
-            barberInDb!.User.Role.Should().Be(UserRole.Barber);
-            barberInDb.User.IsActive.Should().BeTrue();
-            barberInDb.Specialties.Should().Be("Scissor Cut, Beard Shaping");
+            barberInDb!.Specialties.Should().Be("Scissor Cut, Beard Shaping");
         }
 
         // 2. The new barber logs in with temporary credentials
@@ -358,11 +360,12 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
             {
                 var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
                 var appointment = await db.Appointments
-                    .Include(a => a.Service)
                     .FirstOrDefaultAsync(a => a.ServiceId == 1 && a.Status == AppointmentStatus.Completed);
 
                 appointment.Should().NotBeNull();
-                appointment!.Service.Should().NotBeNull();
+                var service = await db.Services.FirstOrDefaultAsync(s => s.Id == appointment!.ServiceId);
+                appointment!.Service = service!;
+                appointment.Service.Should().NotBeNull();
                 appointment.Service.Id.Should().Be(1);
                 appointment.Price.Should().Be(150.00m);
                 appointment.ServiceName.Should().Be("Haircut");
@@ -612,22 +615,27 @@ public class AdminBarberAndServiceTests : IClassFixture<WebApplicationFactory<Pr
         var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
 
         // Clean up transient test barbers created during tests
-        var testBarbers = await db.Barbers
-            .Include(b => b.User)
-            .Where(b => b.User != null && (
-                b.User.Email!.Contains("barber_antonio_") ||
-                b.User.Email.Contains("deactivate_test_") ||
-                b.User.Email.Contains("pwd_reset_") ||
-                b.User.Email.Contains("barber_separate_names_")))
+        var testUsers = await db.Users
+            .Where(u => u.Email != null && (
+                u.Email.Contains("barber_antonio_") ||
+                u.Email.Contains("deactivate_test_") ||
+                u.Email.Contains("pwd_reset_") ||
+                u.Email.Contains("barber_separate_names_")))
             .ToListAsync();
 
-        if (testBarbers.Count > 0)
+        if (testUsers.Count > 0)
         {
-            var userIds = testBarbers.Select(b => b.UserId).ToList();
-            db.Barbers.RemoveRange(testBarbers);
-            await db.SaveChangesAsync();
+            var userIds = testUsers.Select(u => u.Id).ToList();
+            var testBarbers = await db.Barbers
+                .Where(b => userIds.Contains(b.UserId))
+                .ToListAsync();
 
-            var testUsers = await db.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+            if (testBarbers.Count > 0)
+            {
+                db.Barbers.RemoveRange(testBarbers);
+                await db.SaveChangesAsync();
+            }
+
             db.Users.RemoveRange(testUsers);
             await db.SaveChangesAsync();
         }

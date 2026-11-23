@@ -1,12 +1,11 @@
-@* Accessible Native Confirmation Dialog Component (P18, EO-4, BR-13, Modern Web Guidance) *@
-<dialog id="barberbook-confirm-dialog"
-        closedby="any"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-desc"
-        class="m-auto rounded-3xl bg-transparent p-0 shadow-2xl max-w-md w-full border-0 text-slate-800 dark:text-slate-100 backdrop:bg-slate-950/75 backdrop:backdrop-blur-sm">
-    <div id="confirm-dialog-card" class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 relative shadow-2xl">
+@* Accessible Confirmation Dialog Component (P18, EO-4, BR-13) *@
+<div id="barberbook-confirm-dialog" 
+     class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[10001] hidden flex items-center justify-center p-4 transition-opacity duration-200 opacity-0"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="confirm-dialog-title"
+     aria-describedby="confirm-dialog-desc">
+    <div id="confirm-dialog-card" class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative transform transition-all duration-200 scale-95">
         <div class="flex items-center gap-3.5 mb-4">
             <div id="confirm-dialog-icon-container" class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 transition-colors">
                 <svg id="confirm-dialog-icon-standard" class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -28,27 +27,16 @@
 
         <div class="mt-6 flex items-center justify-end gap-2.5">
             <button type="button" id="confirm-dialog-cancel-btn"
-                    class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+                    class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-amber-500">
                 Cancel
             </button>
             <button type="button" id="confirm-dialog-proceed-btn"
-                    class="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 ease-out shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+                    class="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 Proceed
             </button>
         </div>
     </div>
-</dialog>
-
-<style>
-    /* Modern Web Guidance: Prevent page scroll under modal dialog */
-    dialog#barberbook-confirm-dialog:modal {
-        overscroll-behavior: contain;
-    }
-    dialog#barberbook-confirm-dialog::backdrop {
-        overflow: hidden;
-        overscroll-behavior: contain;
-    }
-</style>
+</div>
 
 <script>
     (function () {
@@ -67,6 +55,7 @@
                 _confirmResolve = resolve;
 
                 const dialog = document.getElementById('barberbook-confirm-dialog');
+                const card = document.getElementById('confirm-dialog-card');
                 const iconContainer = document.getElementById('confirm-dialog-icon-container');
                 const iconStandard = document.getElementById('confirm-dialog-icon-standard');
                 const iconDestructive = document.getElementById('confirm-dialog-icon-destructive');
@@ -75,8 +64,8 @@
                 const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
                 const cancelBtn = document.getElementById('confirm-dialog-cancel-btn');
 
-                if (!dialog || typeof dialog.showModal !== 'function') {
-                    // Fallback to window.confirm if native dialog is not supported
+                if (!dialog || !card) {
+                    // Fallback to native confirm if DOM is missing
                     resolve(window.confirm(message));
                     return;
                 }
@@ -90,23 +79,23 @@
                     iconContainer.className = 'w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0';
                     iconStandard.classList.add('hidden');
                     iconDestructive.classList.remove('hidden');
-                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 ease-out shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2';
+                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500';
                 } else {
                     iconContainer.className = 'w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0';
                     iconStandard.classList.remove('hidden');
                     iconDestructive.classList.add('hidden');
-                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 ease-out shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2';
+                    proceedBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500';
                 }
 
-                if (!dialog.open) {
-                    dialog.showModal();
-                }
+                dialog.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    dialog.classList.remove('opacity-0');
+                    dialog.classList.add('opacity-100');
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                });
 
-                if (isDestructive) {
-                    cancelBtn.focus();
-                } else {
-                    proceedBtn.focus();
-                }
+                proceedBtn.focus();
             });
         };
 
@@ -114,17 +103,21 @@
 
         function closeDialog(confirmed) {
             const dialog = document.getElementById('barberbook-confirm-dialog');
-            if (!dialog) return;
+            const card = document.getElementById('confirm-dialog-card');
+            if (!dialog || !card) return;
 
-            dialog.returnValue = confirmed ? 'proceed' : 'cancel';
-            if (dialog.open) {
-                dialog.close();
-            }
+            dialog.classList.remove('opacity-100');
+            dialog.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
 
-            if (_confirmResolve) {
-                _confirmResolve(confirmed);
-                _confirmResolve = null;
-            }
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                if (_confirmResolve) {
+                    _confirmResolve(confirmed);
+                    _confirmResolve = null;
+                }
+            }, 200);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -137,47 +130,30 @@
             cancelBtn.addEventListener('click', () => closeDialog(false));
             proceedBtn.addEventListener('click', () => closeDialog(true));
 
-            // Native dialog cancel and close listeners (Escape key, etc.)
-            dialog.addEventListener('cancel', (e) => {
-                if (_confirmResolve) {
-                    _confirmResolve(false);
-                    _confirmResolve = null;
+            // Click backdrop to cancel
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    closeDialog(false);
                 }
             });
 
-            dialog.addEventListener('close', () => {
-                const confirmed = dialog.returnValue === 'proceed';
-                if (_confirmResolve) {
-                    _confirmResolve(confirmed);
-                    _confirmResolve = null;
+            // Escape key to dismiss
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !dialog.classList.contains('hidden')) {
+                    closeDialog(false);
                 }
-                dialog.returnValue = '';
             });
 
-            // Modern Web Guidance: Light-dismiss fallback for browsers without native closedBy support
-            if (!('closedBy' in HTMLDialogElement.prototype)) {
-                dialog.addEventListener('click', (event) => {
-                    if (event.target !== dialog) return;
-
-                    const rect = dialog.getBoundingClientRect();
-                    const isDialogContent = (
-                        rect.top <= event.clientY &&
-                        event.clientY <= rect.top + rect.height &&
-                        rect.left <= event.clientX &&
-                        event.clientX <= rect.left + rect.width
-                    );
-
-                    if (!isDialogContent) {
-                        closeDialog(false);
-                    }
-                });
-            }
-
-            // Declarative data-confirm handler for buttons, links, and forms
+            // Declarative data-confirm handler for buttons and links
             document.addEventListener('click', async (e) => {
                 const trigger = e.target.closest('[data-confirm]');
                 if (!trigger) return;
 
+                // Forms with data-confirm should be handled by the 'submit' event listener,
+                // not on click (otherwise clicking on an input or label inside the form would trigger the modal)
+                if (trigger.tagName === 'FORM') return;
+
+                // If already confirmed by this handler, permit natural execution
                 if (trigger.dataset.confirmedByModal === 'true') {
                     delete trigger.dataset.confirmedByModal;
                     return;
@@ -204,10 +180,11 @@
                     trigger.dataset.confirmedByModal = 'true';
                     if (trigger.tagName === 'A' && trigger.href) {
                         window.location.href = trigger.href;
-                    } else if (trigger.type === 'submit' || trigger.tagName === 'BUTTON') {
+                    } else if (trigger.type === 'submit' || (trigger.tagName === 'BUTTON' && trigger.type !== 'button')) {
                         const form = trigger.closest('form');
                         if (form) {
-                            form.requestSubmit ? form.requestSubmit(trigger) : form.submit();
+                            form.dataset.confirmedByModal = 'true';
+                            form.requestSubmit ? form.requestSubmit(trigger) : HTMLFormElement.prototype.submit.call(form);
                         } else {
                             trigger.click();
                         }

@@ -45,8 +45,7 @@ public class BranchesController : Controller
         if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
         var query = _dbContext.Branches
-            .Include(b => b.Barbers)
-            .Include(b => b.Appointments)
+            .AsNoTracking()
             .AsQueryable();
 
         if (status.Equals("active", StringComparison.OrdinalIgnoreCase))
@@ -69,35 +68,46 @@ public class BranchesController : Controller
 
         var totalCount = await query.CountAsync();
 
-        var branches = await query
+        var rawBranches = await query
             .OrderBy(b => b.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(b => new AdminBranchItemDto
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Address = b.Address,
-                PhoneNumber = b.PhoneNumber,
-                OpeningTime = b.OpeningTime.ToString("HH:mm", null),
-                ClosingTime = b.ClosingTime.ToString("HH:mm", null),
-                IsActive = b.IsActive,
-                BarbersCount = b.Barbers.Count(bar => bar.IsActive),
-                CompletedAppointmentsCount = b.Appointments.Count(a => a.Status == AppointmentStatus.Completed)
-            })
             .ToListAsync();
 
-        var totalActive = await _dbContext.Branches.CountAsync(br => br.IsActive);
-        var totalAssignedBarbers = await _dbContext.Barbers.CountAsync(b => b.BranchId != null && b.IsActive && b.User.IsActive);
-        var totalCompletedCuts = await _dbContext.Appointments.CountAsync(a => a.Status == AppointmentStatus.Completed);
+        var branchIds = rawBranches.Select(b => b.Id).ToList();
+        var barberCounts = (await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(bar => bar.BranchId.HasValue && branchIds.Contains(bar.BranchId.Value) && bar.IsActive)
+            .Select(bar => bar.BranchId!.Value)
+            .ToListAsync())
+            .GroupBy(bid => bid)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var apptCounts = (await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.BranchId.HasValue && branchIds.Contains(a.BranchId.Value) && a.Status == AppointmentStatus.Completed)
+            .Select(a => a.BranchId!.Value)
+            .ToListAsync())
+            .GroupBy(bid => bid)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var branches = rawBranches.Select(b => new AdminBranchItemDto
+        {
+            Id = b.Id,
+            Name = b.Name,
+            Address = b.Address,
+            PhoneNumber = b.PhoneNumber,
+            OpeningTime = b.OpeningTime.ToString("HH:mm", null),
+            ClosingTime = b.ClosingTime.ToString("HH:mm", null),
+            IsActive = b.IsActive,
+            BarbersCount = barberCounts.TryGetValue(b.Id, out var bc) ? bc : 0,
+            CompletedAppointmentsCount = apptCounts.TryGetValue(b.Id, out var ac) ? ac : 0
+        }).ToList();
 
         var viewModel = new BranchListViewModel
         {
             Items = branches,
             TotalCount = totalCount,
-            TotalActiveCount = totalActive,
-            TotalAssignedBarbersCount = totalAssignedBarbers,
-            TotalCompletedAppointmentsCount = totalCompletedCuts,
             Page = page,
             PageSize = pageSize,
             SearchQuery = q,
@@ -143,7 +153,7 @@ public class BranchesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -185,7 +195,7 @@ public class BranchesController : Controller
             return Created($"/api/admin/branches/{branch.Id}", resultDto);
         }
 
-        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' created successfully.";
+        TempData["SuccessMessage"] = $"Branch '{branch.Name}' created successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -213,7 +223,7 @@ public class BranchesController : Controller
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
-            TempData["Error"] = TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
             return RedirectToAction(nameof(Index));
         }
 
@@ -255,7 +265,7 @@ public class BranchesController : Controller
             return Ok(resultDto);
         }
 
-        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' updated successfully.";
+        TempData["SuccessMessage"] = $"Branch '{branch.Name}' updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -281,7 +291,7 @@ public class BranchesController : Controller
             return Ok(new { branchId = branch.Id, isActive = branch.IsActive, message = $"Branch '{branch.Name}' has been {statusText}." });
         }
 
-        TempData["Success"] = TempData["SuccessMessage"] = $"Branch '{branch.Name}' has been {statusText}.";
+        TempData["SuccessMessage"] = $"Branch '{branch.Name}' has been {statusText}.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -295,19 +305,23 @@ public class BranchesController : Controller
             return NotFound(new ApiErrorResponse("NOT_FOUND", $"Branch with ID {id} not found."));
         }
 
-        var barbers = await _dbContext.Barbers
-            .Include(b => b.Branch)
+        var rawBarbers = await _dbContext.Barbers
+            .AsNoTracking()
             .Where(b => b.IsActive)
             .OrderBy(b => b.DisplayName)
-            .Select(b => new BranchBarberItemDto
-            {
-                BarberId = b.Id,
-                DisplayName = b.DisplayName,
-                Specialties = b.Specialties,
-                IsAssignedToThisBranch = b.BranchId == id,
-                CurrentBranchName = b.Branch != null ? b.Branch.Name : "Unassigned"
-            })
             .ToListAsync();
+
+        var bBranchIds = rawBarbers.Where(b => b.BranchId.HasValue).Select(b => b.BranchId!.Value).Distinct().ToList();
+        var allBranches = await _dbContext.Branches.AsNoTracking().Where(br => bBranchIds.Contains(br.Id)).ToDictionaryAsync(br => br.Id);
+
+        var barbers = rawBarbers.Select(b => new BranchBarberItemDto
+        {
+            BarberId = b.Id,
+            DisplayName = b.DisplayName,
+            Specialties = b.Specialties,
+            IsAssignedToThisBranch = b.BranchId == id,
+            CurrentBranchName = b.BranchId.HasValue && allBranches.TryGetValue(b.BranchId.Value, out var br) ? br.Name : "Unassigned"
+        }).ToList();
 
         return Ok(new
         {

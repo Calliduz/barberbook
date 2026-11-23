@@ -4,12 +4,14 @@ using System.Security.Claims;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Appointment;
 using BarberBook.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NodaTime;
 using NodaTime.Text;
 
@@ -19,6 +21,7 @@ namespace BarberBook.Web.Controllers;
 [Route("api/appointments")]
 public class AppointmentsApiController : ControllerBase
 {
+    private static readonly SemaphoreSlim _bookingLock = new(1, 1);
     private readonly BarberBookDbContext _dbContext;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
@@ -37,6 +40,7 @@ public class AppointmentsApiController : ControllerBase
     }
 
     [Authorize(Roles = "Customer")]
+    [HttpGet("mine")]
     [HttpGet("~/api/me/appointments")]
     public async Task<IActionResult> GetMyAppointments(
         [FromQuery] string? scope,
@@ -51,10 +55,7 @@ public class AppointmentsApiController : ControllerBase
 
         var now = _clock.GetCurrentInstant();
         var query = _dbContext.Appointments
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
-            .Include(a => a.Branch)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
+            .AsNoTracking()
             .Where(a => a.CustomerId == customerId);
 
         // Optional status filter
@@ -86,6 +87,7 @@ public class AppointmentsApiController : ControllerBase
         }
 
         var appointments = await query.ToListAsync(cancellationToken);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true, ct: cancellationToken);
 
         var dtoList = appointments.Select(app =>
         {
@@ -197,22 +199,30 @@ public class AppointmentsApiController : ControllerBase
             return BadRequest(new ApiErrorResponse("INACTIVE_SERVICE", "The selected service is not active or does not exist."));
         }
 
-        // 5. Begin transaction with row-level lock on the barber
-        await using var tx = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        // 5. Acquire booking lock and begin relational transaction if supported
+        await _bookingLock.WaitAsync(cancellationToken);
+        IDbContextTransaction? tx = null;
+        if (_dbContext.Database.IsRelational())
+        {
+            tx = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT id FROM barbers WHERE id = {request.BarberId} FOR UPDATE", cancellationToken);
+        }
 
         try
         {
-            // Acquire row-level exclusive lock on the barber row
-            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
-                $"SELECT id FROM barbers WHERE id = {request.BarberId} FOR UPDATE", cancellationToken);
-
             var barber = await _dbContext.Barbers
-                .Include(b => b.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == request.BarberId, cancellationToken);
+
+            if (barber != null)
+            {
+                await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, ct: cancellationToken);
+            }
 
             if (barber == null || !barber.IsActive || !barber.User.IsActive)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("INACTIVE_BARBER", "The selected barber is not active or does not exist."));
             }
 
@@ -223,7 +233,7 @@ public class AppointmentsApiController : ControllerBase
                 d => d.BarberId == request.BarberId && d.Date == appointmentDate, cancellationToken);
             if (isDayOff)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("DAY_OFF", "The selected barber is not available on this date (day off)."));
             }
 
@@ -248,7 +258,7 @@ public class AppointmentsApiController : ControllerBase
 
             if (!fitsInsideRange)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("OUTSIDE_WORKING_HOURS", "The requested appointment duration falls outside the barber's working hours."));
             }
 
@@ -265,7 +275,7 @@ public class AppointmentsApiController : ControllerBase
 
             if (slotTaken)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked for this barber. Please choose another time."));
             }
 
@@ -279,7 +289,7 @@ public class AppointmentsApiController : ControllerBase
 
             if (customerBusy)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return Conflict(new ApiErrorResponse("CUSTOMER_BUSY", "You already have an appointment scheduled during this time slot."));
             }
 
@@ -360,7 +370,7 @@ public class AppointmentsApiController : ControllerBase
             _dbContext.StatusHistories.Add(statusHistory);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            await tx.CommitAsync(cancellationToken);
+            if (tx != null) await tx.CommitAsync(cancellationToken);
 
             var endsAtManila = endsAt.InZone(_zone);
             var responseDto = new AppointmentDetailDto
@@ -405,8 +415,13 @@ public class AppointmentsApiController : ControllerBase
         }
         catch (DbUpdateException ex) when (IsExclusionViolation(ex))
         {
-            await tx.RollbackAsync(cancellationToken);
+            if (tx != null) await tx.RollbackAsync(cancellationToken);
             return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked. Please choose another time."));
+        }
+        finally
+        {
+            if (tx != null) await tx.DisposeAsync();
+            _bookingLock.Release();
         }
     }
 
@@ -463,15 +478,15 @@ public class AppointmentsApiController : ControllerBase
         }
 
         var appointment = await _dbContext.Appointments
-            .Include(a => a.Barber)
-            .Include(a => a.Service)
-            .Include(a => a.Customer)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
         if (appointment == null)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found."));
         }
+
+        await _dbContext.HydrateAppointmentsAsync(new[] { appointment }, includeCustomer: true, includeBarber: true, includeService: true, ct: cancellationToken);
 
         if (appointment.CustomerId != customerId)
         {
@@ -522,20 +537,29 @@ public class AppointmentsApiController : ControllerBase
         }
 
         // Begin transaction with row-level lock on the barber
-        await using var tx = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        await _bookingLock.WaitAsync(cancellationToken);
+        IDbContextTransaction? tx = null;
+        if (_dbContext.Database.IsRelational())
+        {
+            tx = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT id FROM barbers WHERE id = {appointment.BarberId} FOR UPDATE", cancellationToken);
+        }
 
         try
         {
-            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
-                $"SELECT id FROM barbers WHERE id = {appointment.BarberId} FOR UPDATE", cancellationToken);
-
             var barber = await _dbContext.Barbers
-                .Include(b => b.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == appointment.BarberId, cancellationToken);
+
+            if (barber != null)
+            {
+                await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: false, ct: cancellationToken);
+            }
 
             if (barber == null || !barber.IsActive || !barber.User.IsActive)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("INACTIVE_BARBER", "The barber is not active or does not exist."));
             }
 
@@ -546,7 +570,7 @@ public class AppointmentsApiController : ControllerBase
                 d => d.BarberId == appointment.BarberId && d.Date == appointmentDate, cancellationToken);
             if (isDayOff)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("DAY_OFF", "The selected barber is not available on this date (day off)."));
             }
 
@@ -556,8 +580,9 @@ public class AppointmentsApiController : ControllerBase
                 .Where(w => w.BarberId == appointment.BarberId && w.DayOfWeek == dow)
                 .ToListAsync(cancellationToken);
 
+            int durationMinutes = appointment.Service?.DurationMinutes ?? (int)(appointment.EndsAt - appointment.StartsAt).TotalMinutes;
             int startMin = timeOfDay.Hour * 60 + timeOfDay.Minute;
-            int endMin = startMin + appointment.Service.DurationMinutes;
+            int endMin = startMin + durationMinutes;
 
             bool fitsInsideRange = workingRanges.Any(range =>
             {
@@ -571,12 +596,12 @@ public class AppointmentsApiController : ControllerBase
 
             if (!fitsInsideRange)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return BadRequest(new ApiErrorResponse("OUTSIDE_WORKING_HOURS", "The requested appointment duration falls outside the barber's working hours."));
             }
 
             // 5. Check slot collision (ignoring this appointment itself via ignoreAppointmentId)
-            var newEndsAt = newStartsAtInstant.Plus(Duration.FromMinutes(appointment.Service.DurationMinutes));
+            var newEndsAt = newStartsAtInstant.Plus(Duration.FromMinutes(durationMinutes));
 
             var slotTaken = await _dbContext.Appointments.AnyAsync(
                 a => a.BarberId == appointment.BarberId &&
@@ -589,7 +614,7 @@ public class AppointmentsApiController : ControllerBase
 
             if (slotTaken)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked. Please choose another time."));
             }
 
@@ -609,13 +634,17 @@ public class AppointmentsApiController : ControllerBase
                 },
                 cancellationToken: cancellationToken);
 
+            appointment.StartsAt = newStartsAtInstant;
+            appointment.EndsAt = newEndsAt;
+            appointment.Status = AppointmentStatus.Pending;
+
             if (!transitionResult.Success)
             {
-                await tx.RollbackAsync(cancellationToken);
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 return StatusCode(transitionResult.StatusCode, new ApiErrorResponse(transitionResult.ErrorCode!, transitionResult.ErrorMessage!));
             }
 
-            await tx.CommitAsync(cancellationToken);
+            if (tx != null) await tx.CommitAsync(cancellationToken);
 
             var endsAtManila = newEndsAt.InZone(_zone);
             var responseDto = new AppointmentDetailDto
@@ -623,9 +652,9 @@ public class AppointmentsApiController : ControllerBase
                 Id = appointment.Id,
                 ReferenceCode = appointment.ReferenceCode,
                 CustomerId = customerId,
-                CustomerName = appointment.Customer.FullName,
-                CustomerPhone = appointment.Customer.PhoneNumber ?? string.Empty,
-                CustomerEmail = appointment.Customer.Email ?? string.Empty,
+                CustomerName = appointment.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = appointment.Customer?.PhoneNumber ?? string.Empty,
+                CustomerEmail = appointment.Customer?.Email ?? string.Empty,
                 BarberId = barber.Id,
                 BarberName = barber.DisplayName,
                 ServiceId = appointment.ServiceId,
@@ -634,7 +663,7 @@ public class AppointmentsApiController : ControllerBase
                 FormattedPrice = FormattingHelpers.FormatPeso(appointment.Price),
                 StartsAt = appointment.StartsAt.ToString(),
                 EndsAt = appointment.EndsAt.ToString(),
-                DurationMinutes = appointment.Service.DurationMinutes,
+                DurationMinutes = durationMinutes,
                 FormattedDate = FormattingHelpers.FormatDate(appointment.StartsAt),
                 FormattedTime = $"{FormattingHelpers.FormatTime12h(startsAtManila.TimeOfDay)} – {FormattingHelpers.FormatTime12h(endsAtManila.TimeOfDay)}",
                 Status = appointment.Status.ToString().ToLowerInvariant(),
@@ -647,8 +676,13 @@ public class AppointmentsApiController : ControllerBase
         }
         catch (DbUpdateException ex) when (IsExclusionViolation(ex))
         {
-            await tx.RollbackAsync(cancellationToken);
+            if (tx != null) await tx.RollbackAsync(cancellationToken);
             return Conflict(new ApiErrorResponse("SLOT_TAKEN", "The selected time slot is already booked. Please choose another time."));
+        }
+        finally
+        {
+            if (tx != null) await tx.DisposeAsync();
+            _bookingLock.Release();
         }
     }
 
@@ -657,16 +691,15 @@ public class AppointmentsApiController : ControllerBase
     public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
     {
         var app = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber).ThenInclude(b => b.User)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
         if (app == null)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found."));
         }
+
+        await _dbContext.HydrateAppointmentsAsync(new[] { app }, includeCustomer: true, includeBarber: true, includeService: true, includeHistories: true, ct: cancellationToken);
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var currentUserId))
@@ -675,7 +708,7 @@ public class AppointmentsApiController : ControllerBase
         }
 
         bool isAdmin = User.IsInRole("Admin");
-        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber.UserId == currentUserId;
+        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber?.UserId == currentUserId;
         bool isOwnerCustomer = User.IsInRole("Customer") && app.CustomerId == currentUserId;
 
         if (!isAdmin && !isAssignedBarber && !isOwnerCustomer)
@@ -704,11 +737,11 @@ public class AppointmentsApiController : ControllerBase
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
             CustomerId = app.CustomerId,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
-            CustomerEmail = app.Customer.Email ?? string.Empty,
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? string.Empty,
+            CustomerEmail = app.Customer?.Email ?? string.Empty,
             BarberId = app.BarberId,
-            BarberName = app.Barber.DisplayName,
+            BarberName = app.Barber?.DisplayName ?? "Staff",
             ServiceId = app.ServiceId,
             ServiceName = app.ServiceName,
             Price = app.Price,
@@ -733,16 +766,15 @@ public class AppointmentsApiController : ControllerBase
     public async Task<IActionResult> GetByReferenceCode(string referenceCode, CancellationToken cancellationToken)
     {
         var app = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber).ThenInclude(b => b.User)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.ReferenceCode == referenceCode, cancellationToken);
 
         if (app == null)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found."));
         }
+
+        await _dbContext.HydrateAppointmentsAsync(new[] { app }, includeCustomer: true, includeBarber: true, includeService: true, includeHistories: true, ct: cancellationToken);
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var currentUserId))
@@ -751,7 +783,7 @@ public class AppointmentsApiController : ControllerBase
         }
 
         bool isAdmin = User.IsInRole("Admin");
-        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber.UserId == currentUserId;
+        bool isAssignedBarber = User.IsInRole("Barber") && app.Barber?.UserId == currentUserId;
         bool isOwnerCustomer = User.IsInRole("Customer") && app.CustomerId == currentUserId;
 
         if (!isAdmin && !isAssignedBarber && !isOwnerCustomer)
@@ -780,11 +812,11 @@ public class AppointmentsApiController : ControllerBase
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
             CustomerId = app.CustomerId,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? string.Empty,
-            CustomerEmail = app.Customer.Email ?? string.Empty,
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? string.Empty,
+            CustomerEmail = app.Customer?.Email ?? string.Empty,
             BarberId = app.BarberId,
-            BarberName = app.Barber.DisplayName,
+            BarberName = app.Barber?.DisplayName ?? "Staff",
             ServiceId = app.ServiceId,
             ServiceName = app.ServiceName,
             Price = app.Price,
@@ -806,11 +838,18 @@ public class AppointmentsApiController : ControllerBase
 
     private static bool IsExclusionViolation(DbUpdateException ex)
     {
-        if (ex.InnerException is Npgsql.PostgresException pEx)
+        var inner = ex.InnerException;
+        if (inner != null)
         {
-            return pEx.SqlState == "23P01" ||
-                   pEx.ConstraintName == "exclude_overlapping_appointments" ||
-                   pEx.Message.Contains("exclude_overlapping_appointments");
+            var typeName = inner.GetType().Name;
+            if (typeName == "PostgresException" || typeName.Contains("Mongo"))
+            {
+                var msg = inner.Message;
+                return msg.Contains("23P01") ||
+                       msg.Contains("exclude_overlapping_appointments") ||
+                       msg.Contains("duplicate") ||
+                       msg.Contains("E11000");
+            }
         }
         return false;
     }

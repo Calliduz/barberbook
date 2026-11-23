@@ -21,36 +21,16 @@ public class SecurityHeadersMiddleware
 
             headers.Remove("Server");
 
-            if (!headers.ContainsKey("X-Content-Type-Options"))
-            {
-                headers.Append("X-Content-Type-Options", "nosniff");
-            }
-
+            headers["X-Content-Type-Options"] = "nosniff";
             headers["X-Frame-Options"] = "DENY";
-
-            if (!headers.ContainsKey("Referrer-Policy"))
-            {
-                headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-            }
-
-            if (!headers.ContainsKey("Permissions-Policy"))
-            {
-                headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-            }
-
-            if (!headers.ContainsKey("X-Permitted-Cross-Domain-Policies"))
-            {
-                headers.Append("X-Permitted-Cross-Domain-Policies", "none");
-            }
-
-            if (!headers.ContainsKey("X-XSS-Protection"))
-            {
-                headers.Append("X-XSS-Protection", "0");
-            }
+            headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+            headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+            headers["X-Permitted-Cross-Domain-Policies"] = "none";
+            headers["X-XSS-Protection"] = "0";
 
             if (!headers.ContainsKey("Content-Security-Policy"))
             {
-                // Permits local inline Razor scripts, Google Fonts, CDN assets, and self origin assets
+                // Permits local inline Razor scripts, Google Fonts, and self origin assets
                 headers.Append("Content-Security-Policy",
                     "default-src 'self'; " +
                     "script-src 'self' 'unsafe-inline'; " +

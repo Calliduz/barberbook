@@ -1,5 +1,6 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Customer;
 using BarberBook.Web.Services;
@@ -18,7 +19,6 @@ public class HomeController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IValidator<UpdateProfileRequest> _profileValidator;
     private readonly IInventoryService _inventoryService;
-    private readonly IAvailabilityService _availabilityService;
     private readonly IClock _clock;
     private readonly DateTimeZone _zone;
 
@@ -27,7 +27,6 @@ public class HomeController : Controller
         UserManager<ApplicationUser> userManager,
         IValidator<UpdateProfileRequest> profileValidator,
         IInventoryService inventoryService,
-        IAvailabilityService availabilityService,
         IClock clock,
         DateTimeZone? zone = null)
     {
@@ -35,7 +34,6 @@ public class HomeController : Controller
         _userManager = userManager;
         _profileValidator = profileValidator;
         _inventoryService = inventoryService;
-        _availabilityService = availabilityService;
         _clock = clock;
         _zone = zone ?? DateTimeZoneProviders.Tzdb["Asia/Manila"];
     }
@@ -48,12 +46,26 @@ public class HomeController : Controller
             .Take(6)
             .ToListAsync();
 
-        var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Branch)
-            .Where(b => b.IsActive && b.User.IsActive)
+        var activeBarbers = await _dbContext.Barbers
+            .Where(b => b.IsActive)
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
+
+        var userIds = activeBarbers.Select(b => b.UserId).Distinct().ToList();
+        var users = await _dbContext.Users.Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
+
+        var branchIds = activeBarbers.Where(b => b.BranchId.HasValue).Select(b => b.BranchId!.Value).Distinct().ToList();
+        var branchesDict = await _dbContext.Branches.Where(b => branchIds.Contains(b.Id)).ToDictionaryAsync(b => b.Id);
+
+        var barbers = activeBarbers
+            .Where(b => users.TryGetValue(b.UserId, out var u) && u.IsActive)
+            .Select(b =>
+            {
+                if (users.TryGetValue(b.UserId, out var u)) b.User = u;
+                if (b.BranchId.HasValue && branchesDict.TryGetValue(b.BranchId.Value, out var br)) b.Branch = br;
+                return b;
+            })
+            .ToList();
 
         var branches = await _dbContext.Branches
             .Where(b => b.IsActive)
@@ -61,18 +73,11 @@ public class HomeController : Controller
             .ToListAsync();
 
         var products = await _inventoryService.GetProductsAsync(includeInactive: false);
-
-        var nextSlots = new Dictionary<int, string>();
-        foreach (var b in barbers)
-        {
-            var nextSlot = await _availabilityService.GetNextAvailableSlotAsync(b.Id);
-            nextSlots[b.Id] = nextSlot != null ? nextSlot.DisplayText : "Schedule Full";
-        }
+        products = products.OrderBy(p => p.Id).ToList();
 
         ViewBag.Barbers = barbers;
         ViewBag.Branches = branches;
         ViewBag.Products = products;
-        ViewBag.NextAvailableSlots = nextSlots;
         return View(highlights);
     }
 
@@ -106,22 +111,15 @@ public class HomeController : Controller
     [HttpGet("barbers")]
     public async Task<IActionResult> Barbers()
     {
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Branch)
-            .Include(b => b.WorkingHours)
-            .Where(b => b.IsActive && b.User.IsActive)
+            .AsNoTracking()
+            .Where(b => b.IsActive && activeUserIds.Contains(b.UserId))
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
 
-        var nextSlots = new Dictionary<int, string>();
-        foreach (var b in barbers)
-        {
-            var nextSlot = await _availabilityService.GetNextAvailableSlotAsync(b.Id);
-            nextSlots[b.Id] = nextSlot != null ? nextSlot.DisplayText : "Schedule Full";
-        }
+        await _dbContext.HydrateBarbersAsync(barbers, includeUser: true, includeBranch: true, includeWorkingHours: true);
 
-        ViewBag.NextAvailableSlots = nextSlots;
         return View(barbers);
     }
 
@@ -129,12 +127,17 @@ public class HomeController : Controller
     public async Task<IActionResult> BarberProfile(int id)
     {
         var barber = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Branch)
-            .Include(b => b.WorkingHours)
-            .FirstOrDefaultAsync(b => b.Id == id && b.IsActive && b.User.IsActive);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.IsActive);
 
         if (barber == null)
+        {
+            return NotFound();
+        }
+
+        await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: true, includeWorkingHours: true);
+
+        if (barber.User == null || !barber.User.IsActive)
         {
             return NotFound();
         }
@@ -150,6 +153,52 @@ public class HomeController : Controller
         return View(barber);
     }
 
+    [HttpGet("branches")]
+    [HttpGet("api/branches")]
+    public async Task<IActionResult> Branches()
+    {
+        var branches = await _dbContext.Branches
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.Name)
+            .ToListAsync();
+
+        var activeBarbers = await _dbContext.Barbers
+            .AsNoTracking()
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+        await _dbContext.HydrateBarbersAsync(activeBarbers, includeUser: true, includeBranch: false, includeWorkingHours: true);
+
+        foreach (var br in branches)
+        {
+            br.Barbers = activeBarbers.Where(b => b.BranchId == br.Id).ToList();
+        }
+
+        if (IsJsonRequest())
+        {
+            return Ok(branches.Select(b => new
+            {
+                b.Id,
+                b.Name,
+                b.Address,
+                b.PhoneNumber,
+                OpeningTime = b.OpeningTime.ToString("h:mm tt", null),
+                ClosingTime = b.ClosingTime.ToString("h:mm tt", null),
+                b.IsActive,
+                Barbers = b.Barbers.Select(barber => new
+                {
+                    barber.Id,
+                    barber.DisplayName,
+                    barber.Specialties,
+                    barber.PhotoUrl
+                })
+            }));
+        }
+
+        return View(branches);
+    }
+
     [HttpGet("products")]
     [HttpGet("api/products")]
     public async Task<IActionResult> Products([FromQuery] string? category = null, [FromQuery] string? search = null)
@@ -161,12 +210,13 @@ public class HomeController : Controller
             return Ok(products);
         }
 
-        var categories = await _dbContext.Products
+        var categories = (await _dbContext.Products
             .Where(p => p.IsActive)
             .Select(p => p.Category)
+            .ToListAsync())
             .Distinct()
             .OrderBy(c => c)
-            .ToListAsync();
+            .ToList();
 
         ViewBag.Categories = categories;
         ViewBag.SelectedCategory = category;

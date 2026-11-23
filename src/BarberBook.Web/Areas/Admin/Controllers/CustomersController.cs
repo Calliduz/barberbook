@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
@@ -182,12 +183,11 @@ public class CustomersController : Controller
         }
 
         var appointments = await _dbContext.Appointments
-            .Include(a => a.Barber)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
+            .AsNoTracking()
             .Where(a => a.CustomerId == id)
             .OrderByDescending(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: true, includeHistories: true);
 
         var completed = appointments.Where(a => a.Status == AppointmentStatus.Completed).ToList();
         var cancelled = appointments.Where(a => a.Status == AppointmentStatus.Cancelled).ToList();

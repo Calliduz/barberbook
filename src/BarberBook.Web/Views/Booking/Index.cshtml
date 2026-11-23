@@ -410,9 +410,9 @@
             }
         }
 
-        // Check for branch filter from URL query param
+        // Check for branch filter from URL query param or model preselection
         const urlParams = new URLSearchParams(window.location.search);
-        const branchParam = urlParams.get('branchId');
+        const branchParam = urlParams.get('branch') || urlParams.get('branchId') || @(Model.PreSelectedBranchId.HasValue ? Model.PreSelectedBranchId.Value.ToString() : "null");
         if (branchParam) {
             filterBarbersByBranch(parseInt(branchParam, 10));
         }

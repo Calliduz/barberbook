@@ -38,7 +38,9 @@ public class AvailabilityServiceTests : IClassFixture<WebApplicationFactory<Prog
     private async Task<(Barber barber, Service s30, Service s60, Service s90)> SetupAvailabilityFixturesAsync(BarberBookDbContext db)
     {
         // Find Ramon (Barber ID 1 or first active barber)
-        var barber = await db.Barbers.Include(b => b.User).FirstAsync(b => b.IsActive && b.User.IsActive);
+        var activeUserIds = await db.Users.Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
+        var barber = await db.Barbers.FirstAsync(b => b.IsActive && activeUserIds.Contains(b.UserId));
+        barber.User = (await db.Users.FirstOrDefaultAsync(u => u.Id == barber.UserId))!;
 
         // Find or create standard services (30m, 60m, 90m)
         var s30 = await db.Services.FirstAsync(s => s.DurationMinutes == 30);

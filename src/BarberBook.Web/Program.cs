@@ -1,13 +1,44 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
+using BarberBook.Data.Identity;
 using BarberBook.Web.Middleware;
 using BarberBook.Web.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using MongoDB.Driver;
+using MongoDB.EntityFrameworkCore.Extensions;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+
+// Auto-load .env if present
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (!File.Exists(envPath))
+{
+    var parentEnv = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", ".env");
+    if (File.Exists(parentEnv)) envPath = parentEnv;
+}
+if (File.Exists(envPath))
+{
+    foreach (var line in File.ReadAllLines(envPath))
+    {
+        var trimmed = line.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("#")) continue;
+        var parts = trimmed.Split('=', 2);
+        if (parts.Length == 2)
+        {
+            var key = parts[0].Trim();
+            var val = parts[1].Trim().Trim('"').Trim('\'');
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(key)))
+            {
+                Environment.SetEnvironmentVariable(key, val);
+            }
+        }
+    }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,26 +48,25 @@ builder.WebHost.ConfigureKestrel(options =>
     options.AddServerHeader = false;
 });
 
-// 1. Database & EF Core
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    if (builder.Environment.IsProduction())
-    {
-        throw new InvalidOperationException("ConnectionStrings:DefaultConnection must be configured in Production environment.");
-    }
-    connectionString = "Host=localhost;Port=5432;Database=barberbook_dev;Username=barberbook;Password=barberbook_dev_password";
-}
+// 1. Database & EF Core (MongoDB Atlas)
+var mongoUri = builder.Configuration.GetConnectionString("MongoConnection")
+    ?? Environment.GetEnvironmentVariable("MONGODB_URI")
+    ?? Environment.GetEnvironmentVariable("ConnectionStrings__MongoConnection")
+    ?? "mongodb+srv://cabunocjoshlisteristuris_db_user:QtjA8IW2dDSZkdVF@cluster0.ivvillv.mongodb.net/?appName=Cluster0";
+var databaseName = builder.Configuration["DatabaseName"]
+    ?? Environment.GetEnvironmentVariable("MONGODB_DB_NAME")
+    ?? "barberbook";
+
+var mongoClient = new MongoClient(mongoUri);
+builder.Services.AddSingleton<IMongoClient>(mongoClient);
 
 builder.Services.AddDbContext<BarberBookDbContext>(options =>
 {
-    options.UseNpgsql(connectionString, npgsqlOptions =>
-    {
-        npgsqlOptions.UseNodaTime();
-    });
+    options.UseMongoDB(mongoClient, databaseName);
+    options.ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
 });
 
-// 2. ASP.NET Core Identity
+// 2. ASP.NET Core Identity with document-adapted BarberBookUserStore & BarberBookRoleStore
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -51,7 +81,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 })
-.AddEntityFrameworkStores<BarberBookDbContext>()
+.AddUserStore<BarberBookUserStore>()
+.AddRoleStore<BarberBookRoleStore>()
 .AddDefaultTokenProviders();
 
 // Configure Application Cookie

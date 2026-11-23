@@ -184,8 +184,8 @@ public class AppointmentTransitionTests : IClassFixture<WebApplicationFactory<Pr
         // Ramon (Barber 1, UserId 2) and Dennis (Barber 2, UserId 3)
         // Juan (Customer 1, UserId 5) and Mark (Customer 2, UserId 6)
         // Admin (UserId 1)
-        var ramon = await db.Barbers.Include(b => b.User).FirstAsync(b => b.DisplayName == "Ramon");
-        var dennis = await db.Barbers.Include(b => b.User).FirstAsync(b => b.DisplayName == "Dennis");
+        var ramon = await db.Barbers.FirstAsync(b => b.DisplayName == "Ramon");
+        var dennis = await db.Barbers.FirstAsync(b => b.DisplayName == "Dennis");
         var juan = await db.Users.FirstAsync(u => u.Email == "juan@barberbook.local");
         var mark = await db.Users.FirstAsync(u => u.Email == "mark@barberbook.local");
         var admin = await db.Users.FirstAsync(u => u.Email == "admin@barberbook.local");
@@ -201,8 +201,8 @@ public class AppointmentTransitionTests : IClassFixture<WebApplicationFactory<Pr
         }
         else if (role == "Barber")
         {
-            var barberUser = isOwn ? ramon.User : dennis.User;
-            actor = new TransitionActor(barberUser.Id, "Barber", BarberId: isOwn ? ramon.Id : dennis.Id);
+            var barberUserId = isOwn ? ramon.UserId : dennis.UserId;
+            actor = new TransitionActor(barberUserId, "Barber", BarberId: isOwn ? ramon.Id : dennis.Id);
         }
         else // Customer
         {

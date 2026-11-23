@@ -81,29 +81,44 @@ public class InventoryController : Controller
             }
         }
 
-        var productCategories = await _dbContext.Products
+        var productCategories = (await _dbContext.Products
             .Select(p => p.Category)
+            .ToListAsync())
             .Distinct()
             .OrderBy(c => c)
-            .ToListAsync();
+            .ToList();
 
-        var equipmentCategories = await _dbContext.Equipment
+        var equipmentCategories = (await _dbContext.Equipment
             .Select(e => e.Category)
+            .ToListAsync())
             .Distinct()
             .OrderBy(c => c)
-            .ToListAsync();
+            .ToList();
 
-        var activeBarbers = await _dbContext.Barbers
+        var rawActiveBarbers = await _dbContext.Barbers
+            .AsNoTracking()
             .Where(b => b.IsActive)
             .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        var barberIds = rawActiveBarbers.Select(b => b.Id).ToList();
+        var activeAssignmentsList = await _dbContext.EquipmentAssignments
+            .AsNoTracking()
+            .Where(a => barberIds.Contains(a.BarberId) && a.ReturnedAt == null)
+            .ToListAsync();
+        var assignmentCounts = activeAssignmentsList
+            .GroupBy(a => a.BarberId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var activeBarbers = rawActiveBarbers
             .Select(b => new BarberEquipmentSelectionItem
             {
                 Id = b.Id,
                 DisplayName = b.DisplayName,
                 Specialties = b.Specialties,
-                ActiveToolCount = b.EquipmentAssignments.Count(a => a.ReturnedAt == null)
+                ActiveToolCount = assignmentCounts.GetValueOrDefault(b.Id, 0)
             })
-            .ToListAsync();
+            .ToList();
 
         var model = new AdminInventoryViewModel
         {
@@ -125,17 +140,30 @@ public class InventoryController : Controller
     [HttpGet("admin/equipment/per-barber")]
     public async Task<IActionResult> EquipmentPerBarber([FromQuery] int? barberId = null)
     {
-        var activeBarbers = await _dbContext.Barbers
+        var rawActiveBarbers = await _dbContext.Barbers
+            .AsNoTracking()
             .Where(b => b.IsActive)
             .OrderBy(b => b.DisplayName)
+            .ToListAsync();
+
+        var barberIds = rawActiveBarbers.Select(b => b.Id).ToList();
+        var activeAssignmentsList = await _dbContext.EquipmentAssignments
+            .AsNoTracking()
+            .Where(a => barberIds.Contains(a.BarberId) && a.ReturnedAt == null)
+            .ToListAsync();
+        var assignmentCounts = activeAssignmentsList
+            .GroupBy(a => a.BarberId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var activeBarbers = rawActiveBarbers
             .Select(b => new BarberEquipmentSelectionItem
             {
                 Id = b.Id,
                 DisplayName = b.DisplayName,
                 Specialties = b.Specialties,
-                ActiveToolCount = b.EquipmentAssignments.Count(a => a.ReturnedAt == null)
+                ActiveToolCount = assignmentCounts.GetValueOrDefault(b.Id, 0)
             })
-            .ToListAsync();
+            .ToList();
 
         int selectedId = barberId ?? activeBarbers.FirstOrDefault()?.Id ?? 0;
 

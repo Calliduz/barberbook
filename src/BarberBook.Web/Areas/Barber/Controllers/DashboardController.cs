@@ -1,6 +1,7 @@
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Barber;
 using BarberBook.Web.Services;
@@ -49,11 +50,16 @@ public class DashboardController : Controller
         var userId = User.GetUserId();
         if (!userId.HasValue) return null;
 
-        return await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.WorkingHours)
-            .Include(b => b.Branch)
+        var barber = await _dbContext.Barbers
+            .AsNoTracking()
             .FirstOrDefaultAsync(b => b.UserId == userId.Value);
+
+        if (barber != null)
+        {
+            await _dbContext.HydrateBarbersAsync(new[] { barber }, includeUser: true, includeBranch: true, includeWorkingHours: true);
+        }
+
+        return barber;
     }
 
     [HttpGet("")]
@@ -67,17 +73,15 @@ public class DashboardController : Controller
         var endOfToday = today.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
 
         var appointmentsQuery = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .Include(a => a.Branch)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
+            .AsNoTracking()
             .Where(a => a.BarberId == barber.Id);
 
         var todayAppointments = await appointmentsQuery
             .Where(a => a.StartsAt >= startOfToday && a.StartsAt < endOfToday)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+
+        await _dbContext.HydrateAppointmentsAsync(todayAppointments, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true);
 
         var pendingCount = await appointmentsQuery
             .CountAsync(a => a.Status == AppointmentStatus.Pending);
@@ -140,12 +144,12 @@ public class DashboardController : Controller
         var endOfWeek = weekEnd.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
 
         var appointments = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
+            .AsNoTracking()
             .Where(a => a.BarberId == barber.Id && a.StartsAt >= startOfWeek && a.StartsAt < endOfWeek)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true);
 
         var dayApps = appointments
             .Where(a => a.StartsAt >= startOfSelectedDay && a.StartsAt < endOfSelectedDay)
@@ -210,11 +214,7 @@ public class DashboardController : Controller
         if (barber == null) return Forbid();
 
         var query = _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .Include(a => a.Branch)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
+            .AsNoTracking()
             .Where(a => a.BarberId == barber.Id)
             .AsQueryable();
 
@@ -226,8 +226,13 @@ public class DashboardController : Controller
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim().ToLower();
+            var matchingUserIds = await _dbContext.Users.AsNoTracking()
+                .Where(u => u.FullName.ToLower().Contains(term) || (u.PhoneNumber != null && u.PhoneNumber.Contains(term)))
+                .Select(u => u.Id)
+                .ToListAsync();
+
             query = query.Where(a => a.ReferenceCode.ToLower().Contains(term) ||
-                                     a.Customer.FullName.ToLower().Contains(term) ||
+                                     matchingUserIds.Contains(a.CustomerId) ||
                                      a.ServiceName.ToLower().Contains(term));
         }
 
@@ -252,12 +257,15 @@ public class DashboardController : Controller
         }
 
         var allBarberApps = await _dbContext.Appointments
+            .AsNoTracking()
             .Where(a => a.BarberId == barber.Id)
             .ToListAsync();
 
         var filteredApps = await query
             .OrderByDescending(a => a.StartsAt)
             .ToListAsync();
+
+        await _dbContext.HydrateAppointmentsAsync(filteredApps, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true);
 
         var model = new BarberAppointmentsViewModel
         {
@@ -286,11 +294,6 @@ public class DashboardController : Controller
         if (barber == null) return Forbid();
 
         var app = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .Include(a => a.Branch)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (app == null || app.BarberId != barber.Id)
@@ -303,6 +306,8 @@ public class DashboardController : Controller
             return RedirectToAction(nameof(Appointments));
         }
 
+        await _dbContext.HydrateAppointmentsAsync(new[] { app }, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true);
+
         var model = MapToItem(app);
         return View("AppointmentDetail", model);
     }
@@ -314,17 +319,14 @@ public class DashboardController : Controller
         if (barber == null) return Forbid();
 
         var app = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Service)
-            .Include(a => a.StatusHistories)
-            .Include(a => a.Branch)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (app == null || app.BarberId != barber.Id)
         {
             return NotFound(new ApiErrorResponse("NOT_FOUND", "Appointment not found or not assigned to you."));
         }
+
+        await _dbContext.HydrateAppointmentsAsync(new[] { app }, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true, includeHistories: true);
 
         var model = MapToItem(app);
         return Ok(model);
@@ -397,9 +399,12 @@ public class DashboardController : Controller
         }).ToList();
 
         var today = _clock.GetCurrentInstant().InZone(_zone).Date;
-        var daysOff = await _dbContext.DaysOff
+        var rawDaysOff = await _dbContext.DaysOff
             .Where(d => d.BarberId == barber.Id && d.Date >= today)
             .OrderBy(d => d.Date)
+            .ToListAsync();
+
+        var daysOff = rawDaysOff
             .Select(d => new BarberDayOffItemViewModel
             {
                 Id = d.Id,
@@ -407,7 +412,7 @@ public class DashboardController : Controller
                 FormattedDate = d.Date.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture),
                 Reason = d.Reason
             })
-            .ToListAsync();
+            .ToList();
 
         var model = new BarberAvailabilityViewModel
         {
@@ -743,9 +748,9 @@ public class DashboardController : Controller
         {
             Id = app.Id,
             ReferenceCode = app.ReferenceCode,
-            CustomerName = app.Customer.FullName,
-            CustomerPhone = app.Customer.PhoneNumber ?? "No phone provided",
-            CustomerEmail = app.Customer.Email ?? "No email provided",
+            CustomerName = app.Customer?.FullName ?? "Walk-in Guest",
+            CustomerPhone = app.Customer?.PhoneNumber ?? "No phone provided",
+            CustomerEmail = app.Customer?.Email ?? "No email provided",
             ServiceName = app.ServiceName,
             Price = app.Price,
             FormattedPrice = FormattingHelpers.FormatPeso(app.Price),

@@ -5,155 +5,346 @@
 }
 
 <div class="space-y-8">
-    <!-- Clean Executive Title Block -->
-    <div class="sm:flex sm:items-center sm:justify-between pb-6 border-b border-slate-200 dark:border-slate-800">
+    <!-- Header with Vintage Badge -->
+    <div class="sm:flex sm:items-center sm:justify-between pb-6 border-b border-slate-200">
         <div>
-            <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Shop Operations & Analytics</h1>
-            <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 font-sans">Live performance metrics, pending booking reviews, revenue journals, and master barber schedules.</p>
+            <div class="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-inner">
+                <div class="barber-pole-icon" style="height: 16px; width: 9px;"></div>
+                <span>BARBERBOOK MANILA · EXECUTIVE DASHBOARD</span>
+            </div>
+            <h1 class="text-3xl font-serif font-black text-slate-900 tracking-tight">Shop Operations & Analytics</h1>
+            <p class="mt-1 text-sm text-slate-600 font-sans">Live performance metrics, pending booking reviews, revenue journals, and master barber schedules.</p>
         </div>
         <div class="mt-4 sm:mt-0 flex flex-wrap gap-2.5">
-            <a href="/admin/appointments" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-neutral-950 transition shadow-md shadow-amber-500/20">
+            <a href="/admin/appointments" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition shadow-md shadow-amber-500/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 <span>Manage Bookings</span>
             </a>
-            <a href="/admin/reports" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 dark:bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-100 transition border border-slate-700">
+            <a href="/admin/reports" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-100 transition border border-slate-700">
                 <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
                 <span>Sales Reports</span>
             </a>
         </div>
     </div>
 
+    <!-- Quick Links Bar (P13 Requirement: quick links to Reports, Appointments, Barbers, Services, Customers) -->
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-3.5 flex flex-wrap items-center gap-2 sm:gap-3">
+        <span class="text-xs uppercase font-extrabold text-slate-400 px-2 tracking-wider">Quick Links:</span>
+        <a href="/admin/reports" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+            <span>Sales Reports</span>
+        </a>
+        <a href="/admin/appointments" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
+            <span>Appointments</span>
+        </a>
+        <a href="/admin/barbers" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
+            <span>Master Barbers</span>
+        </a>
+        <a href="/admin/services" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <div class="barber-pole-icon" style="height: 12px; width: 7px;"></div>
+            <span>Services Menu</span>
+        </a>
+        <a href="/admin/customers" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+            <span>Customer Records</span>
+        </a>
+        <a href="/admin/branches" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+            <span>Branches & Locations</span>
+        </a>
+        <a href="/admin/schedules" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Shop Hours</span>
+        </a>
+    </div>
+
     <!-- Stat Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <!-- Today's Completed Sales -->
-        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 sm:p-6 hover:shadow-md transition">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
-                <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Today's Sales</span>
-                <span class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Today's Sales</span>
+                <span class="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-emerald-700 dark:text-emerald-400">@Model.FormattedTodayGrandTotal</span>
+                <span class="text-3xl font-serif font-black text-emerald-700">@Model.FormattedTodayGrandTotal</span>
             </div>
-            <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
-                <p class="font-medium text-slate-700 dark:text-slate-300">@Model.FormattedTodayCompletedSales Services &bull; @Model.TodayCounts.Completed cuts</p>
+            <div class="mt-2 text-xs text-slate-500 space-y-0.5">
+                <p class="font-medium text-slate-700">@Model.FormattedTodayCompletedSales Services &bull; @Model.TodayCounts.Completed cuts</p>
                 @if (Model.TodayProductSales > 0)
                 {
-                    <p class="text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+                    <p class="text-[11px] font-semibold text-amber-700">
                         + @Model.FormattedTodayProductSales retail counter sales
                     </p>
                 }
             </div>
-        </article>
+        </div>
 
         <!-- Month-to-Date Revenue -->
-        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 sm:p-6 hover:shadow-md transition">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
-                <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Month-to-Date</span>
-                <span class="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Month-to-Date</span>
+                <span class="p-2 rounded-xl bg-slate-900 text-amber-300 border border-amber-500/30">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900 dark:text-slate-100">@Model.FormattedMonthToDateGrandTotal</span>
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.FormattedMonthToDateGrandTotal</span>
             </div>
-            <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
-                <p class="font-medium text-slate-700 dark:text-slate-300">@Model.FormattedMonthToDateCompletedSales Services</p>
+            <div class="mt-2 text-xs text-slate-500 space-y-0.5">
+                <p class="font-medium text-slate-700">@Model.FormattedMonthToDateCompletedSales Services</p>
                 @if (Model.MonthToDateProductSales > 0)
                 {
-                    <p class="text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+                    <p class="text-[11px] font-semibold text-amber-700">
                         + @Model.FormattedMonthToDateProductSales retail products
                     </p>
                 }
             </div>
-        </article>
+        </div>
 
         <!-- Pending Bookings (Actionable) -->
-        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 sm:p-6 hover:shadow-md transition">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
-                <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Pending Bookings</span>
-                <span class="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Pending Bookings</span>
+                <span class="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-amber-600 dark:text-amber-400">@Model.TotalPendingBookingsCount</span>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">needs action</span>
+                <span class="text-3xl font-serif font-black text-amber-600">@Model.TotalPendingBookingsCount</span>
+                <span class="text-xs text-slate-500 font-medium">needs action</span>
             </div>
-            <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Requires inline confirm or reject</p>
-        </article>
+            <p class="mt-2 text-xs text-slate-500">Requires inline confirm or reject</p>
+        </div>
 
         <!-- Today's Total Appointments -->
-        <article class="card kpi-accent-card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-5 sm:p-6 hover:shadow-md transition">
+        <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 hover:shadow-md transition">
             <div class="flex items-center justify-between">
-                <span class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Today's Total</span>
-                <span class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Today's Total</span>
+                <span class="p-2 rounded-xl bg-slate-100 text-slate-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
                 </span>
             </div>
             <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl kpi-value font-sans font-black tabular-nums text-slate-900 dark:text-slate-100">@Model.TodayCounts.Total</span>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">appointments</span>
+                <span class="text-3xl font-serif font-black text-slate-900">@Model.TodayCounts.Total</span>
+                <span class="text-xs text-slate-500 font-medium">appointments</span>
             </div>
-            <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">@Model.TodayCounts.Confirmed confirmed &bull; @Model.TodayCounts.Pending pending</p>
-        </article>
+            <p class="mt-2 text-xs text-slate-500">@Model.TodayCounts.Confirmed confirmed &bull; @Model.TodayCounts.Pending pending</p>
+        </div>
     </div>
 
-    <!-- 2-Column Visual Analytics Row (Fresha / Squire / Stripe Enterprise Benchmark) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- 7-Day Revenue Trend (65% width = 8 cols) -->
-        <article class="card lg:col-span-8 bg-white/95 dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-6 transition">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
-                    <h2 class="text-base font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">7-Day Revenue Trend</h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daily service sales and retail product revenue breakdown</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        Past 7 Days
-                    </span>
-                </div>
-            </div>
-            <div class="mt-4" style="position: relative; height: 240px; width: 100%;">
-                <canvas id="revenueTrendChart"></canvas>
-            </div>
-        </article>
-
-        <!-- 30-Day Bookings Breakdown (35% width = 4 cols) -->
-        <article class="card lg:col-span-4 bg-white/95 dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-6 flex flex-col justify-between transition">
+    <!-- REVENUE ANALYTICS & TRENDS: CUTS (SERVICES) VS. PRODUCTS (RETAIL) -->
+    <div class="bg-white/95 rounded-3xl border border-amber-900/10 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
             <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                    <div>
-                        <h2 class="text-base font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Bookings Status</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">30-day volume breakdown</p>
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                    <span>VISUAL REVENUE ANALYTICS & TRENDS</span>
+                </div>
+                <h2 class="text-2xl font-serif font-black text-slate-900 tracking-tight">Cuts (Service Sales) vs. Product Sales</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Comparative 7-day revenue stream and month-to-date category distribution.</p>
+            </div>
+            <!-- Legend & Reports Link -->
+            <div class="flex flex-wrap items-center gap-4 text-xs font-bold">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3.5 h-3.5 rounded bg-amber-500 inline-block shadow-2xs"></span>
+                    <span class="text-slate-800">✂ Cuts & Services</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shadow-2xs"></span>
+                    <span class="text-slate-800">🧴 Grooming Products</span>
+                </div>
+                <a href="/admin/reports?tab=monthly" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 transition flex items-center gap-1">
+                    <span>Full Journal</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+            <!-- 7-Day Grouped Bar Chart (8 Columns) -->
+            <div class="lg:col-span-8 space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+                    <span>Past 7 Days (Asia/Manila)</span>
+                    <span>Daily In-Shop Settlement</span>
+                </div>
+
+                @{
+                    var maxGraphSales = Model.RecentDailySales.Any() ? Model.RecentDailySales.Max(d => Math.Max(d.ServiceSales, d.ProductSales)) : 0m;
+                    if (maxGraphSales <= 0) maxGraphSales = 1000m;
+                }
+
+                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200">
+                    <div class="flex items-end justify-between gap-2 sm:gap-4 h-48 pt-6 border-b border-slate-200 pb-2">
+                        @foreach (var pt in Model.RecentDailySales)
+                        {
+                            var cutsHeightPct = Math.Min(100, (int)Math.Round((pt.ServiceSales / maxGraphSales) * 100));
+                            var prodHeightPct = Math.Min(100, (int)Math.Round((pt.ProductSales / maxGraphSales) * 100));
+
+                            <div class="flex-1 flex flex-col items-center group relative cursor-pointer" onclick="location.href='/admin/reports?tab=daily&date=@(DateTime.UtcNow.ToString("yyyy-MM-dd"))'">
+                                <!-- Value Pill for Day Total -->
+                                <div class="mb-1 text-[10px] font-bold font-mono text-slate-700 opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all">
+                                    @(pt.GrandTotal > 0 ? pt.FormattedGrandTotal : "₱0")
+                                </div>
+
+                                <!-- Paired Bars Container -->
+                                <div class="w-full flex items-end justify-center gap-1 h-36">
+                                    <!-- Cuts Bar (Amber) -->
+                                    <div class="w-1/2 max-w-[20px] bg-amber-500 hover:bg-amber-600 rounded-t transition-all relative" style="height: @(Math.Max(cutsHeightPct, 4))%;"></div>
+                                    <!-- Products Bar (Emerald) -->
+                                    <div class="w-1/2 max-w-[20px] bg-emerald-500 hover:bg-emerald-600 rounded-t transition-all relative" style="height: @(Math.Max(prodHeightPct, 4))%;"></div>
+                                </div>
+
+                                <!-- Day Label -->
+                                <div class="mt-2 text-center">
+                                    <span class="block text-[11px] font-bold text-slate-800">@pt.DayName</span>
+                                    <span class="block text-[9px] text-slate-400 font-medium">@pt.DateLabel</span>
+                                </div>
+
+                                <!-- Interactive Hover Tooltip -->
+                                <div class="absolute bottom-full mb-3 hidden group-hover:flex flex-col items-center z-20 whitespace-nowrap pointer-events-none">
+                                    <div class="bg-slate-900 text-white text-[11px] rounded-xl px-3 py-2 shadow-xl border border-slate-700 space-y-1">
+                                        <div class="font-bold border-b border-slate-700 pb-1 text-slate-300">@pt.DateLabel (@pt.DayName)</div>
+                                        <div class="flex items-center justify-between gap-3 text-amber-300">
+                                            <span>✂ Cuts Sales:</span>
+                                            <span class="font-bold font-mono">@pt.FormattedServiceSales</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 pl-4">@pt.CompletedCutsCount completed cuts</div>
+                                        <div class="flex items-center justify-between gap-3 text-emerald-300">
+                                            <span>🧴 Products:</span>
+                                            <span class="font-bold font-mono">@pt.FormattedProductSales</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 pl-4">@pt.ProductItemsSold unit(s) sold</div>
+                                        <div class="border-t border-slate-700 pt-1 font-bold text-white flex items-center justify-between gap-3">
+                                            <span>Day Total:</span>
+                                            <span class="font-mono text-amber-400">@pt.FormattedGrandTotal</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-2 h-2 bg-slate-900 rotate-45 -mt-1"></div>
+                                </div>
+                            </div>
+                        }
                     </div>
-                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500">30 Days</span>
-                </div>
-                <div class="mt-4 flex items-center justify-center" style="position: relative; height: 240px; width: 100%;">
-                    <canvas id="bookingsDoughnutChart"></canvas>
                 </div>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
-                <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-300 font-semibold">
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Confirmed</span>
-                    <span class="font-bold">@Model.ChartConfirmedCount</span>
+
+            <!-- Revenue Split & Performance Gauge (4 Columns) -->
+            <div class="lg:col-span-4 bg-slate-50/80 rounded-2xl p-5 border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Month-to-Date Mix</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">REVENUE SHARE</span>
                 </div>
-                <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-900 dark:text-blue-300 font-semibold">
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Completed</span>
-                    <span class="font-bold">@Model.ChartCompletedCount</span>
+
+                @{
+                    var mtdGrand = Model.MonthToDateGrandTotal > 0 ? Model.MonthToDateGrandTotal : 1m;
+                    var cutsSharePct = (int)Math.Round((Model.MonthToDateCompletedSales / mtdGrand) * 100);
+                    var prodSharePct = 100 - cutsSharePct;
+                }
+
+                <!-- Segmented Revenue Bar -->
+                <div class="space-y-1.5">
+                    <div class="h-4 w-full bg-slate-200 rounded-full overflow-hidden flex shadow-inner">
+                        <div class="bg-amber-500 h-full transition-all" style="width: @cutsSharePct%;" title="Cuts: @cutsSharePct%"></div>
+                        <div class="bg-emerald-500 h-full transition-all" style="width: @prodSharePct%;" title="Products: @prodSharePct%"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                        <span class="text-amber-800">✂ Cuts @cutsSharePct%</span>
+                        <span class="text-emerald-800">🧴 Products @prodSharePct%</span>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 font-semibold">
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Pending</span>
-                    <span class="font-bold">@Model.ChartPendingCount</span>
-                </div>
-                <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-900 dark:text-rose-300 font-semibold">
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Cancelled</span>
-                    <span class="font-bold">@Model.ChartCancelledCount</span>
+
+                <!-- Detailed Breakdown Rows -->
+                <div class="space-y-2 pt-2 border-t border-slate-200 text-xs">
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="font-bold text-slate-800">Cuts & Services</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-900">@Model.FormattedMonthToDateCompletedSales</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-slate-800">Retail Grooming</span>
+                        </div>
+                        <span class="font-mono font-bold text-slate-900">@Model.FormattedMonthToDateProductSales</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 text-white font-bold">
+                        <span>Total Month Revenue</span>
+                        <span class="font-mono text-amber-400 text-sm">@Model.FormattedMonthToDateGrandTotal</span>
+                    </div>
                 </div>
             </div>
-        </article>
+        </div>
+    </div>
+
+    <!-- BRANCH NETWORK & WORKSTATIONS OVERVIEW -->
+    <div class="bg-white/95 rounded-3xl border border-amber-900/10 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div>
+                <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    <span>METRO MANILA SHOP LOCATIONS</span>
+                </div>
+                <h2 class="text-2xl font-serif font-black text-slate-900 tracking-tight">Active Branches & Workstations</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Physical barbershop locations, assigned staff capacity, and completed visits.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/branches" target="_blank" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                    <span>Public View</span>
+                </a>
+                <a href="/admin/branches" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-2xs flex items-center gap-1.5">
+                    <span>Manage All Branches</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach (var br in Model.BranchesOverview)
+            {
+                <div class="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 hover:border-amber-400/80 hover:shadow-md transition space-y-3.5">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <h3 class="font-serif font-bold text-slate-900 text-base">@br.Name</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                                <span>@br.Address</span>
+                            </p>
+                        </div>
+                        @if (br.IsActive)
+                        {
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Inactive</span>
+                        }
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/80 text-xs">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Master Barbers</span>
+                            <span class="font-serif font-bold text-slate-900 text-sm">@br.ActiveBarbersCount On Duty</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Completed Cuts</span>
+                            <span class="font-serif font-bold text-amber-700 text-sm">@br.CompletedCutsCount visits</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                        <span class="font-medium">⏰ @br.OpeningHours</span>
+                        <a href="/admin/branches?q=@Uri.EscapeDataString(br.Name)" class="font-bold text-amber-800 hover:text-amber-900 hover:underline">Edit Branch &rarr;</a>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 
     <!-- 2-Column Command Hub (Fresha / Squire / Stripe Enterprise Pattern) -->
@@ -162,20 +353,20 @@
         <!-- Primary Operations Hub (8 Columns) -->
         <div class="lg:col-span-8 space-y-8">
             <!-- P13 Requirement: "Needs Action" list with inline Confirm and Reject buttons -->
-            <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm overflow-hidden transition">
-        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100 tracking-tight">Needs Action - Pending Bookings</h2>
+                    <h2 class="text-xl font-serif font-bold text-slate-900 tracking-tight">Needs Action - Pending Bookings</h2>
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Review incoming booking requests and confirm, reject, or bulk process in one click.</p>
+                <p class="text-xs text-slate-500 mt-1">Review incoming booking requests and confirm, reject, or bulk process in one click.</p>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                     @Model.TotalPendingBookingsCount pending
                 </span>
-                <a href="/admin/appointments?status=pending" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 hidden sm:inline">
+                <a href="/admin/appointments?status=pending" class="text-xs font-bold text-amber-700 hover:text-amber-800 hidden sm:inline">
                     View All Bookings &rarr;
                 </a>
             </div>
@@ -214,10 +405,10 @@
         }
         else
         {
-            <!-- Desktop Table View -->
-            <div class="hidden md:block overflow-x-auto divide-y divide-slate-100 dark:divide-slate-800">
-                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-                    <thead class="bg-slate-50 dark:bg-slate-850 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 shadow-2xs">
+            <!-- Desktop Table View wrapped in fixed-height sleek container to prevent scroll fatigue -->
+            <div class="hidden md:block overflow-x-auto max-h-[440px] overflow-y-auto divide-y divide-slate-100">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200 sticky top-0 z-10 shadow-2xs">
                         <tr>
                             <th class="py-3 px-4 w-10 text-center">
                                 <input type="checkbox" id="selectAllPending" onchange="toggleSelectAllPending(this)" class="w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500 cursor-pointer" />
@@ -229,36 +420,36 @@
                             <th class="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    <tbody class="divide-y divide-slate-100">
                         @foreach (var pending in Model.PendingBookings)
                         {
-                            <tr class="hover:bg-amber-50/20 dark:hover:bg-slate-800/40 transition">
+                            <tr class="hover:bg-amber-50/20 transition">
                                 <td class="py-3.5 px-4 text-center">
                                     <input type="checkbox" value="@pending.Id" onchange="updateBulkBar()" class="pending-bulk-chk w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500 cursor-pointer" />
                                 </td>
                                 <td class="py-3.5 px-4">
-                                    <div class="font-bold text-slate-900 dark:text-slate-100 text-xs">@pending.CustomerName</div>
+                                    <div class="font-bold text-slate-900 text-xs">@pending.CustomerName</div>
                                     @if (!string.IsNullOrWhiteSpace(pending.CustomerPhone))
                                     {
-                                        <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                        <div class="text-[11px] text-slate-500 flex items-center gap-1">
                                             <span>@pending.CustomerPhone</span>
-                                            <button type="button" class="copy-btn text-slate-400 hover:text-amber-700 dark:hover:text-amber-400" onclick="copyToClipboard('@pending.CustomerPhone', this)" title="Copy phone number" aria-label="Copy phone number">
+                                            <button type="button" class="copy-btn text-slate-400 hover:text-amber-700" onclick="copyToClipboard('@pending.CustomerPhone', this)" title="Copy phone number" aria-label="Copy phone number">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
                                             </button>
                                         </div>
                                     }
-                                    <span class="text-[10px] font-mono text-amber-800 dark:text-amber-400">#@pending.ReferenceCode</span>
+                                    <span class="text-[10px] font-mono text-amber-800">#@pending.ReferenceCode</span>
                                 </td>
                                 <td class="py-3.5 px-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-900 dark:text-slate-100 text-xs">@pending.ScheduledDateFormatted</div>
-                                    <div class="text-[11px] font-semibold text-amber-800 dark:text-amber-400">@pending.ScheduledTime</div>
+                                    <div class="font-bold text-slate-900 text-xs">@pending.ScheduledDateFormatted</div>
+                                    <div class="text-[11px] font-semibold text-amber-800">@pending.ScheduledTime</div>
                                 </td>
-                                <td class="py-3.5 px-4 font-medium text-slate-700 dark:text-slate-300 text-xs">
+                                <td class="py-3.5 px-4 font-medium text-slate-700 text-xs">
                                     @pending.BarberName
                                 </td>
-                                <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400 text-xs">
-                                    <div class="font-medium text-slate-800 dark:text-slate-200">@pending.ServiceName</div>
-                                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">@pending.FormattedPrice</div>
+                                <td class="py-3.5 px-4 text-slate-600 text-xs">
+                                    <div class="font-medium text-slate-800">@pending.ServiceName</div>
+                                    <div class="text-[11px] text-slate-500 font-mono">@pending.FormattedPrice</div>
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                     <div class="inline-flex items-center gap-1.5">
@@ -267,18 +458,23 @@
                                             <input type="hidden" name="to" value="confirmed" />
                                             <input type="hidden" name="note" value="Confirmed via dashboard action" />
                                             <button type="submit"
-                                                    class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 border border-emerald-300 dark:border-emerald-800 active:scale-95 transition flex items-center gap-1 shadow-2xs">
+                                                    class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-300 transition flex items-center gap-1 shadow-2xs">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                                                 <span>Confirm</span>
                                             </button>
                                         </form>
 
                                         <!-- Inline Reject Button (Softer tinted/outline style that fills on hover) -->
-                                        <form method="post" action="/admin/appointments/@pending.Id/status" class="inline" onsubmit="return confirm('Reject booking #@pending.ReferenceCode?');">
+                                        <form method="post" action="/admin/appointments/@pending.Id/status" class="inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="to" value="rejected" />
                                             <input type="hidden" name="note" value="Rejected via dashboard action" />
                                             <button type="submit"
-                                                    class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 border border-rose-300 dark:border-rose-800 active:scale-95 transition flex items-center gap-1 shadow-2xs">
+                                                    data-confirm="Are you sure you want to reject booking #@pending.ReferenceCode? The customer will be informed and the time slot will be reopened."
+                                                    data-confirm-title="Reject Booking"
+                                                    data-confirm-button="Reject"
+                                                    data-confirm-destructive="true"
+                                                    class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-300 transition flex items-center gap-1 shadow-2xs">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                                 <span>Reject</span>
                                             </button>
@@ -292,43 +488,43 @@
             </div>
 
             <!-- Mobile Stacked Cards View -->
-            <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+            <div class="md:hidden divide-y divide-slate-100">
                 @foreach (var pending in Model.PendingBookings)
                 {
-                    <div class="p-4 space-y-3 hover:bg-amber-50/20 dark:hover:bg-slate-800/40 transition">
+                    <div class="p-4 space-y-3 hover:bg-amber-50/20 transition">
                         <div class="flex items-start justify-between gap-2">
                             <div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-200">
                                     #@pending.ReferenceCode
                                 </span>
-                                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-base mt-1">@pending.CustomerName</h3>
+                                <h3 class="font-bold text-slate-900 text-base mt-1">@pending.CustomerName</h3>
                                 @if (!string.IsNullOrWhiteSpace(pending.CustomerPhone))
                                 {
-                                    <p class="text-xs text-slate-500 dark:text-slate-400 font-sans">@pending.CustomerPhone</p>
+                                    <p class="text-xs text-slate-500 font-sans">@pending.CustomerPhone</p>
                                 }
                             </div>
                             <div class="text-right">
-                                <span class="font-serif font-bold text-base text-slate-900 dark:text-slate-100">@pending.FormattedPrice</span>
-                                <span class="block text-[10px] text-slate-400 dark:text-slate-500">Booked @pending.CreatedAtFormatted</span>
+                                <span class="font-serif font-bold text-base text-slate-900">@pending.FormattedPrice</span>
+                                <span class="block text-[10px] text-slate-400">Booked @pending.CreatedAtFormatted</span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-850 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                             <div>
-                                <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Date & Time</span>
-                                <span class="font-semibold text-slate-900 dark:text-slate-100">@pending.ScheduledDateFormatted</span>
-                                <span class="block text-amber-800 dark:text-amber-400 font-bold">@pending.ScheduledTime</span>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Date & Time</span>
+                                <span class="font-semibold text-slate-900">@pending.ScheduledDateFormatted</span>
+                                <span class="block text-amber-800 font-bold">@pending.ScheduledTime</span>
                             </div>
                             <div>
-                                <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Barber & Service</span>
-                                <span class="font-semibold text-slate-800 dark:text-slate-200">@pending.BarberName</span>
-                                <span class="block text-slate-600 dark:text-slate-400 truncate">@pending.ServiceName</span>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Barber & Service</span>
+                                <span class="font-semibold text-slate-800">@pending.BarberName</span>
+                                <span class="block text-slate-600 truncate">@pending.ServiceName</span>
                             </div>
                         </div>
 
                         @if (!string.IsNullOrWhiteSpace(pending.Notes))
                         {
-                            <p class="text-xs text-slate-500 dark:text-slate-400 italic bg-amber-50/40 dark:bg-amber-950/20 p-2 rounded-lg border border-amber-900/5 dark:border-amber-800/30">
+                            <p class="text-xs text-slate-500 italic bg-amber-50/40 p-2 rounded-lg border border-amber-900/5">
                                 "@pending.Notes"
                             </p>
                         }
@@ -346,10 +542,15 @@
                             </form>
 
                             <!-- Inline Reject Button -->
-                            <form method="post" action="/admin/appointments/@pending.Id/status" class="flex-1" onsubmit="return confirm('Reject booking #@pending.ReferenceCode?');">
+                            <form method="post" action="/admin/appointments/@pending.Id/status" class="flex-1">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" name="to" value="rejected" />
                                 <input type="hidden" name="note" value="Rejected via admin dashboard one-click action" />
                                 <button type="submit"
+                                        data-confirm="Are you sure you want to reject booking #@pending.ReferenceCode? The customer will be informed and the time slot will be reopened."
+                                        data-confirm-title="Reject Booking"
+                                        data-confirm-button="Reject"
+                                        data-confirm-destructive="true"
                                         class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-sm transition flex items-center justify-center gap-1.5 active:scale-[0.98]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                     <span>Reject</span>
@@ -360,160 +561,131 @@
                 }
             </div>
         }
-    </article>
+    </div>
 
     <!-- Today's schedule by barber -->
-    <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-900/10 dark:border-slate-800 shadow-sm p-6 space-y-4 transition">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+    <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
-                <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-slate-100 tracking-tight">Today's Schedule by Barber</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Real-time workstation appointments scheduled for today across all master barbers.</p>
+                <h2 class="text-xl font-serif font-bold text-slate-900 tracking-tight">Today's Schedule by Barber</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Real-time workstation appointments scheduled for today across all master barbers.</p>
             </div>
-            <a href="/admin/appointments" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Full Schedule →</a>
+            <a href="/admin/appointments" class="text-xs font-bold text-amber-700 hover:text-amber-800">Full Schedule →</a>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach (var barberCol in Model.TodayAppointmentsByBarber)
             {
-                int bookedSlots = barberCol.Appointments.Count(a => a.Status != AppointmentStatus.Cancelled && a.Status != AppointmentStatus.Rejected);
-                int totalSlots = 12;
-                int percent = Math.Min(100, (int)((bookedSlots / (double)totalSlots) * 100));
-
-                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 space-y-3 flex flex-col justify-between">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-slate-900 dark:bg-slate-800 text-amber-400 font-serif font-bold flex items-center justify-center text-xs">
-                                    @barberCol.BarberName[0]
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">@barberCol.BarberName</h3>
-                                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block">@barberCol.Specialty</span>
-                                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-slate-900 text-amber-400 font-serif font-bold flex items-center justify-center text-xs">
+                                @barberCol.BarberName[0]
                             </div>
-                            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                                @barberCol.Appointments.Count
-                            </span>
-                        </div>
-
-                        <!-- Capacity Bar -->
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between text-[11px]">
-                                <span class="text-slate-500 dark:text-slate-400 font-medium">Daily Capacity</span>
-                                <span class="font-bold text-slate-800 dark:text-slate-200">@bookedSlots / @totalSlots slots</span>
-                            </div>
-                            <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                                <div class="h-full rounded-full @(percent > 80 ? "bg-rose-500" : percent > 40 ? "bg-amber-500" : "bg-emerald-500") transition-all duration-300" style="width: @percent%;"></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm">@barberCol.BarberName</h3>
+                                <span class="text-[10px] text-slate-500 block">@barberCol.Specialty</span>
                             </div>
                         </div>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700">
+                            @barberCol.Appointments.Count
+                        </span>
+                    </div>
 
-                        @if (!barberCol.Appointments.Any())
-                        {
-                            <div class="py-5 px-3 text-center rounded-xl bg-white/80 dark:bg-slate-900/60 border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
-                                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Available Now
-                                </div>
-                                <p class="text-slate-400 dark:text-slate-500 text-xs">No bookings queued for today</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                                @foreach (var app in barberCol.Appointments)
+                    @if (!barberCol.Appointments.Any())
+                    {
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            No appointments booked for today.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+                            @foreach (var app in barberCol.Appointments)
+                            {
+                                var badge = app.Status switch
                                 {
-                                    var badge = app.Status switch
-                                    {
-                                        AppointmentStatus.Pending => "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-                                        AppointmentStatus.Confirmed => "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800",
-                                        AppointmentStatus.Completed => "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-                                        AppointmentStatus.Cancelled => "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700",
-                                        AppointmentStatus.Rejected => "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-                                        AppointmentStatus.NoShow => "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-                                        _ => "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                                    };
+                                    AppointmentStatus.Pending => "bg-amber-100 text-amber-800 border-amber-300",
+                                    AppointmentStatus.Confirmed => "bg-blue-100 text-blue-800 border-blue-300",
+                                    AppointmentStatus.Completed => "bg-emerald-100 text-emerald-800 border-emerald-300",
+                                    AppointmentStatus.Cancelled => "bg-slate-100 text-slate-600 border-slate-300",
+                                    AppointmentStatus.Rejected => "bg-rose-100 text-rose-800 border-rose-300",
+                                    AppointmentStatus.NoShow => "bg-rose-100 text-rose-800 border-rose-300",
+                                    _ => "bg-slate-100 text-slate-700"
+                                };
 
-                                    <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-amber-400 dark:hover:border-amber-500/50 transition">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs font-bold text-amber-800 dark:text-amber-400">@app.TimeFormatted</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border @badge capitalize">
-                                                @app.StatusString
-                                            </span>
-                                        </div>
-                                        <div class="mt-1 font-bold text-xs text-slate-900 dark:text-slate-100">@app.CustomerName</div>
-                                        <div class="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between mt-0.5">
-                                            <span>@app.ServiceName</span>
-                                            <span class="font-bold text-slate-800 dark:text-slate-200">@app.FormattedPrice</span>
-                                        </div>
+                                <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-amber-400 transition">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-amber-800">@app.TimeFormatted</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border @badge capitalize">
+                                            @app.StatusString
+                                        </span>
                                     </div>
-                                }
-                            </div>
-                        }
-                    </div>
-
-                    <div class="pt-2 border-t border-slate-200/60 dark:border-slate-800">
-                        <a href="/admin/appointments?barberId=@barberCol.BarberId" 
-                           class="w-full py-1.5 px-3 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-800 active:scale-95 transition flex items-center justify-center gap-1.5 shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                            <span>+ Book Walk-In</span>
-                        </a>
-                    </div>
+                                    <div class="mt-1 font-bold text-xs text-slate-900">@app.CustomerName</div>
+                                    <div class="text-[11px] text-slate-500 flex justify-between mt-0.5">
+                                        <span>@app.ServiceName</span>
+                                        <span class="font-bold text-slate-800">@app.FormattedPrice</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
             }
         </div>
-    </article>
+    </div>
         </div>
 
         <!-- Operations Intelligence & Alerts Rail (4 Columns) -->
         <div class="lg:col-span-4 space-y-6">
 
             <!-- Rail Header -->
-            <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-                <h3 class="font-serif font-bold text-slate-900 dark:text-slate-100 text-base">System Alerts & Notices</h3>
-                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">INTELLIGENCE</span>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                <h3 class="font-serif font-bold text-slate-900 text-base">System Alerts & Notices</h3>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">INTELLIGENCE</span>
             </div>
 
             <!-- Quick Action Command Station -->
-            <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3 transition">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">Quick Actions</h3>
-                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">COMMAND</span>
+            <div class="bg-white/95 rounded-2xl border border-slate-200 shadow-sm p-5 space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-900 text-sm">Quick Actions</h3>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">COMMAND</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-                    <a href="/admin/purchases" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
-                        <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <a href="/admin/purchases" class="p-3 rounded-xl bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-700 border border-slate-200 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                         <span>Record Restock</span>
                     </a>
-                    <a href="/admin/inventory?tab=sales" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+                    <a href="/admin/inventory?tab=sales" class="p-3 rounded-xl bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-700 border border-slate-200 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
                         <span>Product Sale</span>
                     </a>
-                    <a href="/admin/appointments" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
-                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
+                    <a href="/admin/appointments" class="p-3 rounded-xl bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-700 border border-slate-200 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
                         <span>Full Schedule</span>
                     </a>
-                    <a href="/admin/reports" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 active:scale-95 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
-                        <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                    <a href="/admin/reports" class="p-3 rounded-xl bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-700 border border-slate-200 transition text-center flex flex-col items-center gap-1.5 shadow-2xs">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
                         <span>Sales Report</span>
                     </a>
                 </div>
-            </article>
+            </div>
 
             <!-- Low Stock Inventory Alerts Widget -->
             @if (Model.LowStockProductsCount > 0)
             {
-                <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-amber-300 dark:border-amber-700/60 p-5 shadow-sm space-y-3.5 bg-gradient-to-b from-amber-50/40 to-white dark:from-amber-950/20 dark:to-slate-900 transition">
-                    <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
+                <div class="bg-white/95 rounded-2xl border border-amber-300 p-5 shadow-sm space-y-3.5 bg-gradient-to-b from-amber-50/40 to-white">
+                    <div class="flex items-center justify-between pb-2 border-b border-amber-200">
                         <div class="flex items-center gap-2">
                             <span class="p-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                             </span>
                             <div>
-                                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">Low Stock Inventory</h3>
-                                <p class="text-[10px] text-amber-800 dark:text-amber-300 font-semibold uppercase tracking-wider">Restock Alert</p>
+                                <h3 class="font-bold text-slate-900 text-sm">Low Stock Inventory</h3>
+                                <p class="text-[10px] text-amber-800 font-semibold uppercase tracking-wider">Restock Alert</p>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
                             @Model.LowStockProductsCount @(Model.LowStockProductsCount == 1 ? "Item" : "Items")
                         </span>
                     </div>
@@ -522,12 +694,12 @@
                     <div class="space-y-2">
                         @foreach (var prod in Model.LowStockProducts.Take(3))
                         {
-                            <div class="p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs hover:border-amber-400 dark:hover:border-amber-500/50 transition">
+                            <div class="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 flex items-center justify-between text-xs hover:border-amber-400 transition">
                                 <div>
-                                    <div class="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[170px]">@prod.Name</div>
-                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">@prod.Sku &bull; Reorder: @prod.ReorderLevel</div>
+                                    <div class="font-bold text-slate-900 truncate max-w-[170px]">@prod.Name</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">@prod.Sku &bull; Reorder: @prod.ReorderLevel</div>
                                 </div>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
                                     @prod.CurrentStock @prod.Unit
                                 </span>
                             </div>
@@ -536,34 +708,34 @@
 
                     @if (Model.LowStockProductsCount > 3)
                     {
-                        <p class="text-[11px] text-amber-800 dark:text-amber-400 font-semibold text-center pt-1">
+                        <p class="text-[11px] text-amber-800 font-semibold text-center pt-1">
                             + @(Model.LowStockProductsCount - 3) more items need restock
                         </p>
                     }
 
                     <div class="pt-1">
-                        <a href="/admin/purchases" class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 active:scale-[0.98] transition shadow-2xs text-center block">
+                        <a href="/admin/purchases" class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shadow-2xs text-center block">
                             Record Restock (Buy) &rarr;
                         </a>
                     </div>
-                </article>
+                </div>
             }
 
             <!-- Equipment Maintenance Alert Widget -->
             @if (Model.FlaggedEquipmentCount > 0)
             {
-                <article class="card bg-white/95 dark:bg-slate-900 rounded-2xl border border-rose-300 dark:border-rose-700/60 p-5 shadow-sm space-y-3.5 bg-gradient-to-b from-rose-50/40 to-white dark:from-rose-950/20 dark:to-slate-900 transition">
-                    <div class="flex items-center justify-between pb-2 border-b border-rose-200 dark:border-rose-800">
+                <div class="bg-white/95 rounded-2xl border border-rose-300 p-5 shadow-sm space-y-3.5 bg-gradient-to-b from-rose-50/40 to-white">
+                    <div class="flex items-center justify-between pb-2 border-b border-rose-200">
                         <div class="flex items-center gap-2">
                             <span class="p-1.5 rounded-lg bg-rose-600 text-white font-bold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                             </span>
                             <div>
-                                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">Equipment Quality & Maintenance Alert</h3>
-                                <p class="text-[10px] text-rose-800 dark:text-rose-300 font-semibold uppercase tracking-wider">Maintenance Health Alert</p>
+                                <h3 class="font-bold text-slate-900 text-sm">Equipment Quality & Maintenance Alert</h3>
+                                <p class="text-[10px] text-rose-800 font-semibold uppercase tracking-wider">Maintenance Health Alert</p>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
                             @Model.FlaggedEquipmentCount @(Model.FlaggedEquipmentCount == 1 ? "Item" : "Items")
                         </span>
                     </div>
@@ -572,14 +744,14 @@
                     <div class="space-y-2">
                         @foreach (var alert in Model.FlaggedEquipmentAlerts.Take(3))
                         {
-                            <div class="p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1 hover:border-rose-400 dark:hover:border-rose-500/50 transition">
+                            <div class="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs space-y-1 hover:border-rose-400 transition">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[170px]">@alert.Name</span>
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 uppercase">
+                                    <span class="font-bold text-slate-900 truncate max-w-[170px]">@alert.Name</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 uppercase">
                                         @alert.Condition
                                     </span>
                                 </div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center justify-between">
+                                <div class="text-[10px] text-slate-500 font-mono flex items-center justify-between">
                                     <span>@alert.AssetTag</span>
                                     <span>@(alert.CurrentBarberName ?? "Unassigned")</span>
                                 </div>
@@ -589,162 +761,37 @@
 
                     @if (Model.FlaggedEquipmentCount > 3)
                     {
-                        <p class="text-[11px] text-rose-800 dark:text-rose-400 font-semibold text-center pt-1">
+                        <p class="text-[11px] text-rose-800 font-semibold text-center pt-1">
                             + @(Model.FlaggedEquipmentCount - 3) more tools flagged
                         </p>
                     }
 
                     <div class="pt-1">
-                        <a href="/admin/inventory?tab=equipment" class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 active:scale-[0.98] transition shadow-2xs text-center block">
+                        <a href="/admin/inventory?tab=equipment" class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-500 transition shadow-2xs text-center block">
                             Manage Equipment Registry &rarr;
                         </a>
                     </div>
-                </article>
+                </div>
             }
 
             @if (Model.FlaggedEquipmentCount == 0 && Model.LowStockProductsCount == 0)
             {
-                <article class="card rounded-2xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/60 dark:bg-emerald-950/20 p-5 text-center space-y-2 transition">
-                    <div class="inline-flex p-2.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 text-center space-y-2">
+                    <div class="inline-flex p-2.5 rounded-full bg-emerald-100 text-emerald-700">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                     </div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-200">All Operations Healthy</h4>
-                    <p class="text-xs text-emerald-700 dark:text-emerald-400">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-900">All Operations Healthy</h4>
+                    <p class="text-xs text-emerald-700">
                         Zero low-stock items. All tools and equipment pass quality checks.
                     </p>
-                </article>
+                </div>
             }
 
         </div>
     </div>
 </div>
 
-@section Scripts {
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof Chart === 'undefined') {
-            console.warn('Chart.js is not loaded.');
-            return;
-        }
-
-        // 1. 7-Day Revenue Trend Chart (Stacked Bar)
-        const revCtx = document.getElementById('revenueTrendChart');
-        if (revCtx) {
-            const revDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueChartDates));
-            const revServices = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueChartServices));
-            const revProducts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueChartProducts));
-
-            new Chart(revCtx, {
-                type: 'bar',
-                data: {
-                    labels: revDates,
-                    datasets: [
-                        {
-                            label: 'Service Revenue',
-                            data: revServices,
-                            backgroundColor: '#1e293b',
-                            borderRadius: 6,
-                            maxBarThickness: 32
-                        },
-                        {
-                            label: 'Retail Products',
-                            data: revProducts,
-                            backgroundColor: '#d97706',
-                            borderRadius: 6,
-                            maxBarThickness: 32
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            stacked: true,
-                            grid: { display: false },
-                            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748b' }
-                        },
-                        y: {
-                            stacked: true,
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                font: { family: 'Plus Jakarta Sans', size: 11 },
-                                color: '#64748b',
-                                callback: function (value) { return '₱' + Number(value).toLocaleString(); }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            align: 'end',
-                            labels: {
-                                boxWidth: 12,
-                                boxHeight: 12,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-                                color: '#475569'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    return ` ${context.dataset.label}: ₱${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 2. 30-Day Bookings Breakdown Doughnut Chart
-        const doughnutCtx = document.getElementById('bookingsDoughnutChart');
-        if (doughnutCtx) {
-            const counts = [
-                @Model.ChartConfirmedCount,
-                @Model.ChartCompletedCount,
-                @Model.ChartPendingCount,
-                @Model.ChartCancelledCount,
-                @Model.ChartNoShowCount
-            ];
-            const hasData = counts.some(c => c > 0);
-
-            new Chart(doughnutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Confirmed', 'Completed', 'Pending', 'Cancelled', 'No-Show / Rejected'],
-                    datasets: [{
-                        data: hasData ? counts : [1],
-                        backgroundColor: hasData 
-                            ? ['#10b981', '#3b82f6', '#f59e0b', '#f43f5e', '#94a3b8']
-                            : ['#e2e8f0'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '72%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            enabled: hasData,
-                            callbacks: {
-                                label: function (context) {
-                                    return ` ${context.label}: ${context.raw} bookings`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    });
-
     function toggleSelectAllPending(master) {
         document.querySelectorAll('.pending-bulk-chk').forEach(chk => {
             chk.checked = master.checked;
@@ -806,4 +853,3 @@
         }
     }
 </script>
-}

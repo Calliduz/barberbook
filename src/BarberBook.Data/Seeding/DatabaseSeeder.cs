@@ -24,8 +24,18 @@ public static class DatabaseSeeder
 
         logger.LogInformation("Starting idempotent database seeding...");
 
-        // Ensure database and extensions
-        await context.Database.MigrateAsync();
+        // Ensure database schema if relational provider is used
+        try
+        {
+            if (context.Database.IsRelational())
+            {
+                await context.Database.MigrateAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Database schema migration skipped (provider does not use relational migrations).");
+        }
 
         // 0. Clean up transient automated test artifacts from development database
         var testUsers = await context.Users
@@ -82,9 +92,6 @@ public static class DatabaseSeeder
                         e.Name.Contains("Ramon Private Trimmer") ||
                         e.Name.Contains("Alpha Clipper Station") ||
                         e.Name.Contains("Retirable Trimmer") ||
-                        e.Name.StartsWith("Master Clipper") ||
-                        e.AssetTag.StartsWith("ASSET-") ||
-                        e.AssetTag.Contains("1793") ||
                         e.AssetTag.StartsWith("EQ-TEST") ||
                         e.AssetTag.StartsWith("TEST-"))
             .ToListAsync();
@@ -113,7 +120,6 @@ public static class DatabaseSeeder
                         p.Name.Contains("Limited Beard Balm") ||
                         p.Name.Contains("Matte Clay Styling Wax") ||
                         p.Name.Contains("Precision Shave Gel") ||
-                        p.Sku.StartsWith("POM-") ||
                         p.Sku.StartsWith("SKU-") ||
                         p.Sku.StartsWith("TEST-"))
             .ToListAsync();
@@ -174,21 +180,28 @@ public static class DatabaseSeeder
         // 2.5 Seed Branches (Multi-Branch Support)
         var branchesData = new[]
         {
-            (Name: "Manila Main Branch", Address: "G/F Heritage Bldg., Escolta St., Binondo, Manila", Phone: "(02) 8555-0101"),
-            (Name: "Makati Poblacion Branch", Address: "5032 P. Burgos cor. Kalayaan Ave., Poblacion, Makati", Phone: "(02) 8555-0102"),
-            (Name: "BGC High Street Branch", Address: "Level 2, High Street Central, 7th Ave., BGC, Taguig", Phone: "(02) 8555-0103"),
-            (Name: "QC Tomas Morato Branch", Address: "Scout Castor cor. Tomas Morato Ave., Quezon City", Phone: "(02) 8555-0104"),
-            (Name: "Ortigas Center Branch", Address: "G/F Prestige Tower, F. Ortigas Jr. Rd., Pasig", Phone: "(02) 8555-0105")
+            (Name: "Manila Main Branch", Address: "123 Escolta St., Binondo, Manila", Phone: "0917-111-2222"),
+            (Name: "Makati Poblacion Branch", Address: "456 General Luna St., Poblacion, Makati", Phone: "0917-333-4444"),
+            (Name: "BGC High Street Branch", Address: "Unit 204, Bonifacio High Street, Taguig", Phone: "0917-555-6666"),
+            (Name: "QC Tomas Morato Branch", Address: "78 Tomas Morato Ave., Quezon City", Phone: "0917-777-8888"),
+            (Name: "Ortigas Center Branch", Address: "Emerald Ave. cor. Doña Julia Vargas, Pasig", Phone: "0917-999-0000")
         };
 
         // Clean up any obsolete duplicate Alabang branches
         var obsoleteBranches = await context.Branches
-            .Where(b => b.Name == "Alabang Town Center Branch" && !context.Appointments.Any(a => a.BranchId == b.Id) && !context.Barbers.Any(bar => bar.BranchId == b.Id))
+            .Where(b => b.Name == "Alabang Town Center Branch")
             .ToListAsync();
         if (obsoleteBranches.Any())
         {
-            context.Branches.RemoveRange(obsoleteBranches);
-            await context.SaveChangesAsync();
+            var branchIds = obsoleteBranches.Select(b => b.Id).ToList();
+            var usedInAppts = await context.Appointments.Where(a => a.BranchId.HasValue && branchIds.Contains(a.BranchId.Value)).Select(a => a.BranchId!.Value).ToListAsync();
+            var usedInBarbers = await context.Barbers.Where(b => b.BranchId.HasValue && branchIds.Contains(b.BranchId.Value)).Select(b => b.BranchId!.Value).ToListAsync();
+            var unused = obsoleteBranches.Where(b => !usedInAppts.Contains(b.Id) && !usedInBarbers.Contains(b.Id)).ToList();
+            if (unused.Any())
+            {
+                context.Branches.RemoveRange(unused);
+                await context.SaveChangesAsync();
+            }
         }
 
         var branchMap = new Dictionary<string, Branch>();
@@ -209,15 +222,6 @@ public static class DatabaseSeeder
                 };
                 context.Branches.Add(branch);
                 await context.SaveChangesAsync();
-            }
-            else
-            {
-                if (branch.Address != bAddress || branch.PhoneNumber != bPhone)
-                {
-                    branch.Address = bAddress;
-                    branch.PhoneNumber = bPhone;
-                    await context.SaveChangesAsync();
-                }
             }
             branchMap[bName] = branch;
         }
@@ -259,8 +263,7 @@ public static class DatabaseSeeder
             }
 
             var branchId = branchMap[branchName].Id;
-            var barber = await context.Barbers.Include(b => b.WorkingHours).FirstOrDefaultAsync(b => b.UserId == user.Id);
-            var expectedPhoto = $"/images/barbers/{name.ToLowerInvariant()}.jpg";
+            var barber = await context.Barbers.FirstOrDefaultAsync(b => b.UserId == user.Id);
             if (barber == null)
             {
                 barber = new Barber
@@ -270,40 +273,20 @@ public static class DatabaseSeeder
                     Bio = bio,
                     Specialties = specialties,
                     BranchId = branchId,
-                    PhotoUrl = expectedPhoto,
                     IsActive = true
                 };
                 context.Barbers.Add(barber);
                 await context.SaveChangesAsync();
             }
-            else
+            else if (barber.BranchId != branchId)
             {
-                bool changed = false;
-                if (barber.BranchId != branchId)
-                {
-                    barber.BranchId = branchId;
-                    changed = true;
-                }
-                if (string.IsNullOrWhiteSpace(barber.PhotoUrl) || barber.PhotoUrl.EndsWith(".svg"))
-                {
-                    barber.PhotoUrl = expectedPhoto;
-                    changed = true;
-                }
-                if (changed)
-                {
-                    await context.SaveChangesAsync();
-                }
-            }
-
-            // Seed or sanitize Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM
-            var invalidHours = barber.WorkingHours.Where(w => w.DayOfWeek < 1 || w.DayOfWeek > 6 || w.StartTime < new LocalTime(9, 0) || w.EndTime > new LocalTime(18, 0)).ToList();
-            if (invalidHours.Any())
-            {
-                context.WorkingHours.RemoveRange(invalidHours);
+                barber.BranchId = branchId;
                 await context.SaveChangesAsync();
             }
 
-            if (!barber.WorkingHours.Any())
+            // Seed Working Hours: Mon-Sat (1..6) 9:00 AM - 6:00 PM
+            var hasHours = await context.WorkingHours.AnyAsync(w => w.BarberId == barber.Id);
+            if (!hasHours)
             {
                 for (int day = 1; day <= 6; day++)
                 {
@@ -324,7 +307,7 @@ public static class DatabaseSeeder
         // 4. Seed Services
         var servicesData = new[]
         {
-            (Name: "Haircut", Price: 150.00m, Duration: 30, Description: "Traditional gentleman's cut, clipper & scissor taper, hot lather neck trim, and signature styling."),
+            (Name: "Haircut", Price: 150.00m, Duration: 30, Description: "Standard professional haircut and styling"),
             (Name: "Haircut + Shave", Price: 220.00m, Duration: 60, Description: "Haircut paired with hot towel straight razor shave"),
             (Name: "Beard Trim", Price: 100.00m, Duration: 30, Description: "Precision beard shaping, edging, and conditioning"),
             (Name: "Hair Color", Price: 500.00m, Duration: 90, Description: "Full professional hair coloring and treatment")
@@ -346,11 +329,6 @@ public static class DatabaseSeeder
                     IsActive = true
                 };
                 context.Services.Add(service);
-                await context.SaveChangesAsync();
-            }
-            else if (service.Description == "Updated description" || service.Description == "Standard professional haircut and styling")
-            {
-                service.Description = desc;
                 await context.SaveChangesAsync();
             }
             serviceMap[name] = service;
@@ -663,10 +641,7 @@ public static class DatabaseSeeder
             new { Tag = "EQ-002", Name = "Skeleton FX Trimmer", Category = "Trimmers", Brand = "BaBylissPRO", Serial = "BBL-FX-4402", Cost = 5200.00m, Condition = EquipmentCondition.Excellent, Status = EquipmentStatus.InService, Interval = 30, Notes = "Zero-gapped blade" },
             new { Tag = "EQ-003", Name = "Master Pro Clipper", Category = "Clippers", Brand = "Andis Master", Serial = "AND-MP-1048", Cost = 7200.00m, Condition = EquipmentCondition.Fair, Status = EquipmentStatus.UnderMaintenance, Interval = 30, Notes = "Motor alignment check required" },
             new { Tag = "EQ-004", Name = "Handcrafted Japanese Shears 6.0\"", Category = "Shears", Brand = "Kashiwa Steel", Serial = "KSH-SH-0881", Cost = 8900.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 60, Notes = "Convex edge precision shears" },
-            new { Tag = "EQ-005", Name = "Vintage Heavy-Duty Barber Chair", Category = "Furniture", Brand = "Takara Belmont Classic", Serial = "TKB-CH-0012", Cost = 45000.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 90, Notes = "Hydraulic pump serviced recently" },
-            new { Tag = "EQ-MNL-01", Name = "Wahl Cordless Magic Clip #1", Category = "Clippers", Brand = "Wahl 5-Star", Serial = "WHL-MC-8148", Cost = 6800.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 30, Notes = "Stagger-tooth blade clipper" },
-            new { Tag = "EQ-BGC-02", Name = "BabylissPRO GoldFX Trimmer", Category = "Trimmers", Brand = "BaBylissPRO", Serial = "BBL-FX-787G", Cost = 5800.00m, Condition = EquipmentCondition.Excellent, Status = EquipmentStatus.InService, Interval = 30, Notes = "Skeleton gold detail trimmer" },
-            new { Tag = "EQ-MNL-03", Name = "Andis ProFoil Lithium Shaver", Category = "Shavers", Brand = "Andis ProFoil", Serial = "AND-TS-17150", Cost = 4200.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 30, Notes = "Hypoallergenic titanium foil" }
+            new { Tag = "EQ-005", Name = "Vintage Heavy-Duty Barber Chair", Category = "Furniture", Brand = "Takara Belmont Classic", Serial = "TKB-CH-0012", Cost = 45000.00m, Condition = EquipmentCondition.Good, Status = EquipmentStatus.InService, Interval = 90, Notes = "Hydraulic pump serviced recently" }
         };
 
         foreach (var eqSeed in equipmentSeed)

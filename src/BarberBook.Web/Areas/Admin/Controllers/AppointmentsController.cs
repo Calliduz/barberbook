@@ -33,9 +33,12 @@ public class AppointmentsController : Controller
         [FromQuery] string? status,
         CancellationToken cancellationToken)
     {
-        var services = await _dbContext.Services
+        var rawServices = await _dbContext.Services
             .Where(s => s.IsActive)
             .OrderBy(s => s.Name)
+            .ToListAsync(cancellationToken);
+
+        var services = rawServices
             .Select(s => new PublicServiceDto
             {
                 Id = s.Id,
@@ -45,11 +48,12 @@ public class AppointmentsController : Controller
                 FormattedPrice = FormattingHelpers.FormatPeso(s.Price),
                 DurationMinutes = s.DurationMinutes
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync(cancellationToken);
         var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Where(b => b.IsActive && b.User.IsActive)
+            .AsNoTracking()
+            .Where(b => b.IsActive && activeUserIds.Contains(b.UserId))
             .OrderBy(b => b.DisplayName)
             .Select(b => new PublicBarberDto
             {
@@ -74,9 +78,12 @@ public class AppointmentsController : Controller
             })
             .ToListAsync(cancellationToken);
 
-        var products = await _dbContext.Products
+        var rawProducts = await _dbContext.Products
             .Where(p => p.IsActive)
             .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+
+        var products = rawProducts
             .Select(p => new AdminRetailProductDto
             {
                 Id = p.Id,
@@ -84,7 +91,7 @@ public class AppointmentsController : Controller
                 Price = p.SellPrice,
                 FormattedPrice = FormattingHelpers.FormatPeso(p.SellPrice)
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var todayInManila = _clock.GetCurrentInstant().InZone(_zone).Date;
         var todayStr = todayInManila.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
@@ -108,8 +115,11 @@ public class AppointmentsController : Controller
     [HttpGet("admin/appointments/history")]
     public async Task<IActionResult> History(CancellationToken cancellationToken)
     {
-        var services = await _dbContext.Services
+        var rawServices = await _dbContext.Services
             .OrderBy(s => s.Name)
+            .ToListAsync(cancellationToken);
+
+        var services = rawServices
             .Select(s => new PublicServiceDto
             {
                 Id = s.Id,
@@ -119,7 +129,7 @@ public class AppointmentsController : Controller
                 FormattedPrice = FormattingHelpers.FormatPeso(s.Price),
                 DurationMinutes = s.DurationMinutes
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var barbers = await _dbContext.Barbers
             .OrderBy(b => b.DisplayName)

@@ -130,6 +130,18 @@
             <a href="/barber/transactions" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/transactions") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Transactions</a>
             <a href="/barber/account" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/account") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Account</a>
             <a href="/barber/equipment" class="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap @(currentPath.StartsWith("/barber/equipment") ? "bg-amber-500/20 text-amber-300 font-bold" : "text-slate-300 hover:text-white")">Equipment</a>
+            <form action="/logout" method="post" class="inline m-0" data-no-double-submit="true">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        data-confirm="Are you sure you want to sign out of Barber Portal?"
+                        data-confirm-title="Sign Out"
+                        data-confirm-button="Sign Out"
+                        data-confirm-destructive="true"
+                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-rose-400 hover:text-rose-300 hover:bg-slate-900 transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                    <span>Sign Out</span>
+                </button>
+            </form>
         </div>
     </header>
 
@@ -186,6 +198,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Global CSRF Token for Dynamic Forms & Modals -->
+    @Html.AntiForgeryToken()
 
     <!-- Shared Accessible Toast, Confirm Modal & Command Palette Components -->
     <partial name="_Toast" />

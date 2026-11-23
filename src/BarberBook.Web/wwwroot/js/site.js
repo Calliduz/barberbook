@@ -135,43 +135,74 @@
     };
 
     // 4. DOUBLE-CLICK SUBMISSION PREVENTION & LOADING SPINNER
+    window.resetSubmitButton = function (formOrBtn) {
+        if (!formOrBtn) return;
+        const form = formOrBtn.tagName === 'FORM' ? formOrBtn : formOrBtn.closest('form');
+        if (form) {
+            form.dataset.submitting = 'false';
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                const spinner = submitBtn.querySelector('[role="status"]');
+                if (spinner) spinner.remove();
+            }
+        }
+    };
+
     window.initDoubleSubmitPrevention = function () {
         document.querySelectorAll('form').forEach(form => {
             if (form.dataset.preventDoubleSubmitBound) return;
             form.dataset.preventDoubleSubmitBound = 'true';
 
+            // Never attach double submit lockout to AJAX modals or explicitly opted-out forms
+            if (form.hasAttribute('onsubmit') || form.dataset.ajax === 'true' || form.dataset.noDoubleSubmit === 'true') {
+                return;
+            }
+
             form.addEventListener('submit', function (e) {
+                if (e.defaultPrevented) return;
+
                 if (form.dataset.submitting === 'true') {
                     e.preventDefault();
                     return false;
                 }
 
                 // If form uses HTML5 validation and is invalid, don't lock
-                if (!form.checkValidity()) {
+                if (form.checkValidity && !form.checkValidity()) {
                     return;
                 }
 
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn && !submitBtn.dataset.noSpinner) {
-                    form.dataset.submitting = 'true';
-                    submitBtn.disabled = true;
-                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                // Defer button disabling by 0ms so other submit listeners have a chance to validate and preventDefault
+                setTimeout(() => {
+                    if (e.defaultPrevented) return;
 
-                    // Prepend or show spinner
-                    const spinner = document.createElement('span');
-                    spinner.className = 'inline-block w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin align-middle';
-                    spinner.setAttribute('role', 'status');
-                    submitBtn.prepend(spinner);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.dataset.noSpinner) {
+                        form.dataset.submitting = 'true';
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-                    // Safety timeout: unlock after 12s in case of validation/network error
-                    setTimeout(() => {
-                        form.dataset.submitting = 'false';
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-                        spinner.remove();
-                    }, 12000);
-                }
+                        // Prepend or show spinner
+                        if (!submitBtn.querySelector('[role="status"]')) {
+                            const spinner = document.createElement('span');
+                            spinner.className = 'inline-block w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin align-middle';
+                            spinner.setAttribute('role', 'status');
+                            submitBtn.prepend(spinner);
+                        }
+
+                        // Safety timeout: unlock after 6s in case of validation/network delay
+                        setTimeout(() => {
+                            window.resetSubmitButton(form);
+                        }, 6000);
+                    }
+                }, 0);
             });
+        });
+
+        // Always unlock on back/forward cache navigation
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('form').forEach(form => window.resetSubmitButton(form));
         });
     };
 

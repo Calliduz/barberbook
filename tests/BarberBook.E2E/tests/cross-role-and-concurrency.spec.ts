@@ -93,10 +93,18 @@ test.describe('Cross-Role Story & Concurrent Race Condition', () => {
       data: { email: 'mark@barberbook.local', password: 'Demo@BarberBook2026!' }
     });
 
-    // Valid Wednesday within Ramon's Mon-Sat 9AM-6PM (01:00-10:00 UTC) schedule
-    const wednesdays = ['2027-04-07', '2027-04-14', '2027-04-21', '2027-04-28', '2027-05-05', '2027-05-12', '2027-05-19'];
-    const chosenDate = wednesdays[Math.floor(Math.random() * wednesdays.length)];
-    const chosenHour = 1 + Math.floor(Math.random() * 8); // 01 to 08 UTC
+    // Calculate a dynamic future Wednesday far enough in the future to never collide with previous test runs
+    const now = new Date();
+    const randomWeeks = 60 + Math.floor(Math.random() * 200);
+    const targetDate = new Date(now.getTime() + randomWeeks * 7 * 24 * 60 * 60 * 1000);
+    const day = targetDate.getUTCDay();
+    const diff = (3 - day + 7) % 7; // Align to Wednesday (day 3)
+    targetDate.setUTCDate(targetDate.getUTCDate() + diff);
+    const yyyy = targetDate.getUTCFullYear();
+    const mm = String(targetDate.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(targetDate.getUTCDate()).padStart(2, '0');
+    const chosenDate = `${yyyy}-${mm}-${dd}`;
+    const chosenHour = 1 + Math.floor(Math.random() * 8); // 01 to 08 UTC (9 AM to 4 PM Manila)
     const chosenMin = Math.random() < 0.5 ? '00' : '30';
     const uniqueSlot = `${chosenDate}T${String(chosenHour).padStart(2, '0')}:${chosenMin}:00Z`;
 

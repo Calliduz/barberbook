@@ -2,6 +2,7 @@ using System.Globalization;
 using BarberBook.Data;
 using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Models.Inventory;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
@@ -140,11 +141,18 @@ public class EquipmentService : IEquipmentService
     {
         var assignments = await _dbContext.EquipmentAssignments
             .AsNoTracking()
-            .Include(a => a.Equipment)
-            .Include(a => a.Barber)
             .Where(a => a.EquipmentId == equipmentId)
             .OrderByDescending(a => a.AssignedAt)
             .ToListAsync(ct);
+
+        var equip = await _dbContext.Equipment.AsNoTracking().FirstOrDefaultAsync(e => e.Id == equipmentId, ct);
+        var barberIds = assignments.Select(a => a.BarberId).Distinct().ToList();
+        var barbers = await _dbContext.Barbers.AsNoTracking().Where(b => barberIds.Contains(b.Id)).ToDictionaryAsync(b => b.Id, ct);
+        foreach (var a in assignments)
+        {
+            if (equip != null) a.Equipment = equip;
+            if (barbers.TryGetValue(a.BarberId, out var b)) a.Barber = b;
+        }
 
         return assignments.Select(a => new EquipmentAssignmentDto
         {
@@ -165,8 +173,6 @@ public class EquipmentService : IEquipmentService
     {
         var query = _dbContext.EquipmentAssignments
             .AsNoTracking()
-            .Include(a => a.Equipment)
-            .Include(a => a.Barber)
             .Where(a => a.BarberId == barberId);
 
         if (activeOnly)
@@ -177,6 +183,15 @@ public class EquipmentService : IEquipmentService
         var list = await query
             .OrderByDescending(a => a.AssignedAt)
             .ToListAsync(ct);
+
+        var equipIds = list.Select(a => a.EquipmentId).Distinct().ToList();
+        var equips = await _dbContext.Equipment.AsNoTracking().Where(e => equipIds.Contains(e.Id)).ToDictionaryAsync(e => e.Id, ct);
+        var barber = await _dbContext.Barbers.AsNoTracking().FirstOrDefaultAsync(b => b.Id == barberId, ct);
+        foreach (var a in list)
+        {
+            if (equips.TryGetValue(a.EquipmentId, out var eq)) a.Equipment = eq;
+            if (barber != null) a.Barber = barber;
+        }
 
         return list.Select(a => new EquipmentAssignmentDto
         {
@@ -296,18 +311,27 @@ public class EquipmentService : IEquipmentService
 
         var checks = await _dbContext.EquipmentChecks
             .AsNoTracking()
-            .Include(c => c.Equipment)
-            .Include(c => c.CheckedBy)
             .Where(c => c.EquipmentId == equipmentId)
             .OrderByDescending(c => c.CheckedAt)
             .ToListAsync(ct);
+
+        var equip = await _dbContext.Equipment.AsNoTracking().FirstOrDefaultAsync(e => e.Id == equipmentId, ct);
+        var userIds = checks.Where(c => c.CheckedById.HasValue).Select(c => c.CheckedById!.Value).Distinct().ToList();
+        var users = userIds.Count > 0
+            ? await _dbContext.Users.AsNoTracking().Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id, ct)
+            : new Dictionary<int, ApplicationUser>();
+        foreach (var c in checks)
+        {
+            if (equip != null) c.Equipment = equip;
+            if (c.CheckedById.HasValue && users.TryGetValue(c.CheckedById.Value, out var u)) c.CheckedBy = u;
+        }
 
         return checks.Select(c => new EquipmentCheckDto
         {
             Id = c.Id,
             EquipmentId = c.EquipmentId,
-            EquipmentName = c.Equipment.Name,
-            AssetTag = c.Equipment.AssetTag,
+            EquipmentName = c.Equipment?.Name ?? "Equipment",
+            AssetTag = c.Equipment?.AssetTag ?? string.Empty,
             CheckedById = c.CheckedById,
             CheckedByName = c.CheckedBy?.FullName ?? "Staff",
             CheckedAt = c.CheckedAt.InZone(_zone).ToString("yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture),
@@ -324,18 +348,28 @@ public class EquipmentService : IEquipmentService
 
         var checks = await _dbContext.EquipmentChecks
             .AsNoTracking()
-            .Include(c => c.Equipment)
-            .Include(c => c.CheckedBy)
             .OrderByDescending(c => c.CheckedAt)
             .Take(limit)
             .ToListAsync(ct);
+
+        var equipIds = checks.Select(c => c.EquipmentId).Distinct().ToList();
+        var equips = await _dbContext.Equipment.AsNoTracking().Where(e => equipIds.Contains(e.Id)).ToDictionaryAsync(e => e.Id, ct);
+        var userIds = checks.Where(c => c.CheckedById.HasValue).Select(c => c.CheckedById!.Value).Distinct().ToList();
+        var users = userIds.Count > 0
+            ? await _dbContext.Users.AsNoTracking().Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id, ct)
+            : new Dictionary<int, ApplicationUser>();
+        foreach (var c in checks)
+        {
+            if (equips.TryGetValue(c.EquipmentId, out var eq)) c.Equipment = eq;
+            if (c.CheckedById.HasValue && users.TryGetValue(c.CheckedById.Value, out var u)) c.CheckedBy = u;
+        }
 
         return checks.Select(c => new EquipmentCheckDto
         {
             Id = c.Id,
             EquipmentId = c.EquipmentId,
-            EquipmentName = c.Equipment.Name,
-            AssetTag = c.Equipment.AssetTag,
+            EquipmentName = c.Equipment?.Name ?? "Equipment",
+            AssetTag = c.Equipment?.AssetTag ?? string.Empty,
             CheckedById = c.CheckedById,
             CheckedByName = c.CheckedBy?.FullName ?? "Staff",
             CheckedAt = c.CheckedAt.InZone(_zone).ToString("yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture),
@@ -352,11 +386,10 @@ public class EquipmentService : IEquipmentService
 
         var equipmentList = await _dbContext.Equipment
             .AsNoTracking()
-            .Include(e => e.Assignments.Where(a => a.ReturnedAt == null))
-                .ThenInclude(a => a.Barber)
-            .Include(e => e.Checks)
             .Where(e => e.Status != EquipmentStatus.Retired)
             .ToListAsync(ct);
+
+        await _dbContext.HydrateEquipmentListAsync(equipmentList, ct);
 
         var monitoringItems = new List<EquipmentMonitoringItemDto>();
 
@@ -431,11 +464,30 @@ public class EquipmentService : IEquipmentService
 
         var assignments = await _dbContext.EquipmentAssignments
             .AsNoTracking()
-            .Include(a => a.Equipment)
-                .ThenInclude(e => e.Checks)
-            .Include(a => a.Barber)
-            .Where(a => a.BarberId == barberId && a.ReturnedAt == null && a.Equipment.Status != EquipmentStatus.Retired)
+            .Where(a => a.BarberId == barberId && a.ReturnedAt == null)
             .ToListAsync(ct);
+
+        var equipIds = assignments.Select(a => a.EquipmentId).Distinct().ToList();
+        var equipmentList = await _dbContext.Equipment
+            .AsNoTracking()
+            .Where(e => equipIds.Contains(e.Id) && e.Status != EquipmentStatus.Retired)
+            .ToListAsync(ct);
+        await _dbContext.HydrateEquipmentListAsync(equipmentList, ct);
+        var equipDict = equipmentList.ToDictionary(e => e.Id);
+
+        var barber = await _dbContext.Barbers.AsNoTracking().FirstOrDefaultAsync(b => b.Id == barberId, ct);
+
+        var validAssignments = new List<EquipmentAssignment>();
+        foreach (var a in assignments)
+        {
+            if (equipDict.TryGetValue(a.EquipmentId, out var eq))
+            {
+                a.Equipment = eq;
+                a.Barber = barber!;
+                validAssignments.Add(a);
+            }
+        }
+        assignments = validAssignments;
 
         var list = new List<EquipmentMonitoringItemDto>();
 
@@ -514,10 +566,9 @@ public class EquipmentService : IEquipmentService
 
         var items = _dbContext.Equipment
             .AsNoTracking()
-            .Include(e => e.Assignments.Where(a => a.ReturnedAt == null))
-                .ThenInclude(a => a.Barber)
-            .Include(e => e.Checks)
             .ToList();
+
+        _dbContext.HydrateEquipmentListAsync(items).GetAwaiter().GetResult();
 
         return items.Select(e =>
         {

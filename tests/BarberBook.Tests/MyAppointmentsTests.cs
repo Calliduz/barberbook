@@ -129,10 +129,13 @@ public class MyAppointmentsTests : IClassFixture<WebApplicationFactory<Program>>
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
             var appInDb = await db.Appointments
-                .Include(a => a.StatusHistories)
                 .FirstOrDefaultAsync(a => a.Id == created.Id);
+            var histories = await db.StatusHistories
+                .Where(h => h.AppointmentId == created.Id)
+                .ToListAsync();
+            appInDb!.StatusHistories = histories;
 
-            appInDb!.Status.Should().Be(AppointmentStatus.Cancelled);
+            appInDb.Status.Should().Be(AppointmentStatus.Cancelled);
             appInDb.StatusHistories.Should().Contain(h => h.ToStatus == AppointmentStatus.Cancelled && h.Note == "Unexpected meeting at work");
         }
 
@@ -347,8 +350,9 @@ public class MyAppointmentsTests : IClassFixture<WebApplicationFactory<Program>>
         {
             var db = scope.ServiceProvider.GetRequiredService<BarberBookDbContext>();
             // Juan's seed appointment is completed
+            var juan = await db.Users.FirstAsync(u => u.Email == "juan@barberbook.local");
             var completedApp = await db.Appointments
-                .FirstAsync(a => a.Customer.Email == "juan@barberbook.local" && a.Status == AppointmentStatus.Completed);
+                .FirstAsync(a => a.CustomerId == juan.Id && a.Status == AppointmentStatus.Completed);
             completedAppId = completedApp.Id;
         }
 

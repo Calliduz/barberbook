@@ -43,57 +43,61 @@ public class InventoryService : IInventoryService
             query = query.Where(p => p.Category.ToLower() == cat);
         }
 
-        var list = await query
+        var products = await query
             .OrderBy(p => p.Category)
             .ThenBy(p => p.Name)
-            .Select(p => new
-            {
-                Product = p,
-                Stock = p.StockMovements.Sum(sm => (int?)sm.Quantity) ?? 0
-            })
             .ToListAsync(ct);
 
-        return list.Select(x => new ProductDto
+        var pIds = products.Select(p => p.Id).ToList();
+        var movements = await _dbContext.StockMovements
+            .AsNoTracking()
+            .Where(sm => pIds.Contains(sm.ProductId))
+            .ToListAsync(ct);
+        var stockMap = movements
+            .GroupBy(sm => sm.ProductId)
+            .ToDictionary(g => g.Key, g => g.Sum(sm => sm.Quantity));
+
+        return products.Select(p => new ProductDto
         {
-            Id = x.Product.Id,
-            Sku = x.Product.Sku,
-            Name = x.Product.Name,
-            Category = x.Product.Category,
-            Unit = x.Product.Unit,
-            SellPrice = x.Product.SellPrice,
-            CostPrice = x.Product.CostPrice,
-            ReorderLevel = x.Product.ReorderLevel,
-            CurrentStock = x.Stock,
-            IsActive = x.Product.IsActive
+            Id = p.Id,
+            Sku = p.Sku,
+            Name = p.Name,
+            Category = p.Category,
+            Unit = p.Unit,
+            SellPrice = p.SellPrice,
+            CostPrice = p.CostPrice,
+            ReorderLevel = p.ReorderLevel,
+            CurrentStock = stockMap.GetValueOrDefault(p.Id, 0),
+            IsActive = p.IsActive
         }).ToList();
     }
 
     public async Task<ProductDto?> GetProductByIdAsync(int id, CancellationToken ct = default)
     {
-        var item = await _dbContext.Products
+        var product = await _dbContext.Products
             .AsNoTracking()
-            .Where(p => p.Id == id)
-            .Select(p => new
-            {
-                Product = p,
-                Stock = p.StockMovements.Sum(sm => (int?)sm.Quantity) ?? 0
-            })
-            .FirstOrDefaultAsync(ct);
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
 
-        if (item == null) return null;
+        if (product == null) return null;
+
+        var movements = await _dbContext.StockMovements
+            .AsNoTracking()
+            .Where(sm => sm.ProductId == id)
+            .ToListAsync(ct);
+        var stock = movements.Sum(sm => sm.Quantity);
 
         return new ProductDto
         {
-            Id = item.Product.Id,
-            Sku = item.Product.Sku,
-            Name = item.Product.Name,
-            Category = item.Product.Category,
-            Unit = item.Product.Unit,
-            SellPrice = item.Product.SellPrice,
-            CostPrice = item.Product.CostPrice,
-            ReorderLevel = item.Product.ReorderLevel,
-            CurrentStock = item.Stock,
-            IsActive = item.Product.IsActive
+            Id = product.Id,
+            Sku = product.Sku,
+            Name = product.Name,
+            Category = product.Category,
+            Unit = product.Unit,
+            SellPrice = product.SellPrice,
+            CostPrice = product.CostPrice,
+            ReorderLevel = product.ReorderLevel,
+            CurrentStock = stock,
+            IsActive = product.IsActive
         };
     }
 
@@ -169,9 +173,10 @@ public class InventoryService : IInventoryService
 
         await _dbContext.SaveChangesAsync(ct);
 
-        var currentStock = await _dbContext.StockMovements
+        var currentStock = (await _dbContext.StockMovements
             .Where(sm => sm.ProductId == id)
-            .SumAsync(sm => (int?)sm.Quantity, ct) ?? 0;
+            .ToListAsync(ct))
+            .Sum(sm => sm.Quantity);
 
         return new ProductDto
         {
@@ -218,9 +223,10 @@ public class InventoryService : IInventoryService
         }
 
         // Calculate derived current stock
-        var currentStock = await _dbContext.StockMovements
+        var currentStock = (await _dbContext.StockMovements
             .Where(sm => sm.ProductId == productId)
-            .SumAsync(sm => (int?)sm.Quantity, ct) ?? 0;
+            .ToListAsync(ct))
+            .Sum(sm => sm.Quantity);
 
         // INV-03: Stock cannot go negative
         if (currentStock + quantity < 0)
@@ -273,11 +279,19 @@ public class InventoryService : IInventoryService
     {
         var movements = await _dbContext.StockMovements
             .AsNoTracking()
-            .Include(sm => sm.CreatedBy)
-            .Include(sm => sm.Product)
             .Where(sm => sm.ProductId == productId)
             .OrderByDescending(sm => sm.CreatedAt)
             .ToListAsync(ct);
+
+        var product = await _dbContext.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == productId, ct);
+        var creatorIds = movements.Where(sm => sm.CreatedById.HasValue).Select(sm => sm.CreatedById!.Value).Distinct().ToList();
+        var creators = await _dbContext.Users.AsNoTracking().Where(u => creatorIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id, ct);
+
+        foreach (var sm in movements)
+        {
+            if (product != null) sm.Product = product;
+            if (sm.CreatedById.HasValue && creators.TryGetValue(sm.CreatedById.Value, out var c)) sm.CreatedBy = c;
+        }
 
         return movements.Select(sm =>
         {

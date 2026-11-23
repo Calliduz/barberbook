@@ -1,6 +1,8 @@
 using System.Globalization;
 using BarberBook.Data;
+using BarberBook.Data.Entities;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Admin;
 using BarberBook.Web.Services;
@@ -59,11 +61,10 @@ public class DashboardController : Controller
         // 1. Today's appointments query
         var todayAppointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(todayAppointments, includeCustomer: true, includeBarber: true, includeService: false);
 
         var todayCounts = new TodayCountsDto
         {
@@ -81,12 +82,11 @@ public class DashboardController : Controller
 
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
             .OrderByDescending(a => a.CreatedAt)
             .Take(15)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(pendingRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var pendingBookings = pendingRaw.Select(a =>
         {
@@ -96,9 +96,9 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                CustomerPhone = a.Customer.PhoneNumber,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = a.Customer?.PhoneNumber,
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -114,8 +114,9 @@ public class DashboardController : Controller
         var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
 
         // 4. Entity counts
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var activeBarbersCount = await _dbContext.Barbers
-            .CountAsync(b => b.IsActive && b.User.IsActive);
+            .CountAsync(b => b.IsActive && activeUserIds.Contains(b.UserId));
 
         var totalCustomersCount = await _dbContext.Users
             .CountAsync(u => u.Role == UserRole.Customer);
@@ -139,7 +140,7 @@ public class DashboardController : Controller
                         Id = a.Id,
                         ReferenceCode = a.ReferenceCode,
                         TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                        CustomerName = a.Customer.FullName,
+                        CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
                         ServiceName = a.ServiceName,
                         Status = a.Status,
                         StatusString = a.Status.ToString(),
@@ -160,11 +161,10 @@ public class DashboardController : Controller
         // 6. Recent appointments live feed
         var recentApptsRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .OrderByDescending(a => a.StartsAt)
             .Take(8)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(recentApptsRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var recentAppts = recentApptsRaw.Select(a =>
         {
@@ -173,8 +173,8 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -196,31 +196,54 @@ public class DashboardController : Controller
         var products = await _inventoryService.GetProductsAsync(includeInactive: false);
         var lowStock = products.Where(p => p.IsLowStock).ToList();
 
-        // 9. Chart.js Analytics: 7-day revenue trend & 30-day booking breakdown
-        var revDates = new List<string>();
-        var revServices = new List<decimal>();
-        var revProducts = new List<decimal>();
+        // 9. Visual Analytics & Trends: Past 7 Days Cuts vs Products Sales
+        var recentDailySales = new List<AdminDashboardDailySalesPointDto>();
         for (int i = 6; i >= 0; i--)
         {
-            var day = today.PlusDays(-i);
-            revDates.Add(day.ToString("MMM d", CultureInfo.InvariantCulture));
-            var dayReport = await _reportingService.GetDailySalesAsync(day);
-            revServices.Add(dayReport.ServiceSales);
-            revProducts.Add(dayReport.ProductSales.Total);
+            var dayDate = today.PlusDays(-i);
+            var dayReport = await _reportingService.GetDailySalesAsync(dayDate);
+            recentDailySales.Add(new AdminDashboardDailySalesPointDto
+            {
+                DateLabel = dayDate.ToString("MMM d", CultureInfo.InvariantCulture),
+                DayName = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
+                ServiceSales = dayReport.TotalSales,
+                ProductSales = dayReport.ProductSales.Total,
+                GrandTotal = dayReport.GrandTotal,
+                FormattedServiceSales = dayReport.FormattedTotalSales,
+                FormattedProductSales = dayReport.ProductSales.FormattedTotal,
+                FormattedGrandTotal = dayReport.FormattedGrandTotal,
+                CompletedCutsCount = dayReport.CompletedCount,
+                ProductItemsSold = dayReport.ProductSales.PerProduct.Sum(x => x.Count)
+            });
         }
 
-        var thirtyDaysAgoUtc = today.PlusDays(-30).AtStartOfDayInZone(_zone).ToInstant();
-        var recent30Appts = await _dbContext.Appointments
-            .AsNoTracking()
-            .Where(a => a.StartsAt >= thirtyDaysAgoUtc)
-            .Select(a => a.Status)
+        // 10. Multi-Branch Operations Overview
+        var branchesRaw = await _dbContext.Branches.AsNoTracking().ToListAsync();
+        var allBarbers = await _dbContext.Barbers.AsNoTracking().ToListAsync();
+        var allCompletedAppts = await _dbContext.Appointments.AsNoTracking()
+            .Where(a => a.Status == AppointmentStatus.Completed)
+            .Select(a => new { a.Id, a.BarberId, a.BranchId })
             .ToListAsync();
 
-        var chartConfirmed = recent30Appts.Count(s => s == AppointmentStatus.Confirmed);
-        var chartCompleted = recent30Appts.Count(s => s == AppointmentStatus.Completed);
-        var chartPending = recent30Appts.Count(s => s == AppointmentStatus.Pending);
-        var chartCancelled = recent30Appts.Count(s => s == AppointmentStatus.Cancelled);
-        var chartNoShow = recent30Appts.Count(s => s == AppointmentStatus.NoShow || s == AppointmentStatus.Rejected);
+        var branchesOverview = branchesRaw.Select(br =>
+        {
+            var bBarberIds = allBarbers.Where(b => b.BranchId == br.Id).Select(b => b.Id).ToList();
+            var cutsCount = allCompletedAppts.Count(a => a.BranchId == br.Id || (a.BranchId == null && bBarberIds.Contains(a.BarberId)));
+            var openTimeStr = br.OpeningTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+            var closeTimeStr = br.ClosingTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+
+            return new AdminDashboardBranchSummaryDto
+            {
+                Id = br.Id,
+                Name = br.Name,
+                Address = br.Address,
+                PhoneNumber = br.PhoneNumber ?? "0917-000-0000",
+                OpeningHours = $"{openTimeStr} – {closeTimeStr}",
+                ActiveBarbersCount = allBarbers.Count(b => b.BranchId == br.Id && b.IsActive),
+                CompletedCutsCount = cutsCount,
+                IsActive = br.IsActive
+            };
+        }).OrderByDescending(b => b.IsActive).ThenBy(b => b.Name).ToList();
 
         var model = new AdminDashboardViewModel
         {
@@ -247,14 +270,8 @@ public class DashboardController : Controller
             PendingBookings = pendingBookings,
             TodayAppointmentsByBarber = todayByBarber,
             RecentAppointments = recentAppts,
-            RevenueChartDates = revDates,
-            RevenueChartServices = revServices,
-            RevenueChartProducts = revProducts,
-            ChartConfirmedCount = chartConfirmed,
-            ChartCompletedCount = chartCompleted,
-            ChartPendingCount = chartPending,
-            ChartCancelledCount = chartCancelled,
-            ChartNoShowCount = chartNoShow
+            RecentDailySales = recentDailySales,
+            BranchesOverview = branchesOverview
         };
 
         return View(model);
@@ -277,11 +294,10 @@ public class DashboardController : Controller
         // 1. Today's appointments query
         var todayAppointments = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.StartsAt >= todayStartUtc && a.StartsAt < tomorrowStartUtc)
             .OrderBy(a => a.StartsAt)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(todayAppointments, includeCustomer: true, includeBarber: true, includeService: false);
 
         var todayCounts = new TodayCountsDto
         {
@@ -299,12 +315,11 @@ public class DashboardController : Controller
 
         var pendingRaw = await _dbContext.Appointments
             .AsNoTracking()
-            .Include(a => a.Customer)
-            .Include(a => a.Barber)
             .Where(a => a.Status == AppointmentStatus.Pending)
             .OrderByDescending(a => a.CreatedAt)
             .Take(10)
             .ToListAsync();
+        await _dbContext.HydrateAppointmentsAsync(pendingRaw, includeCustomer: true, includeBarber: true, includeService: false);
 
         var pendingBookings = pendingRaw.Select(a =>
         {
@@ -314,9 +329,9 @@ public class DashboardController : Controller
             {
                 Id = a.Id,
                 ReferenceCode = a.ReferenceCode,
-                CustomerName = a.Customer.FullName,
-                CustomerPhone = a.Customer.PhoneNumber,
-                BarberName = a.Barber.DisplayName,
+                CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
+                CustomerPhone = a.Customer?.PhoneNumber,
+                BarberName = a.Barber?.DisplayName ?? "Staff",
                 ServiceName = a.ServiceName,
                 Price = a.Price,
                 FormattedPrice = FormattingHelpers.FormatPeso(a.Price),
@@ -332,8 +347,9 @@ public class DashboardController : Controller
         var monthlyReport = await _reportingService.GetMonthlySalesAsync(today.Year, today.Month);
 
         // 4. Entity counts
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var activeBarbersCount = await _dbContext.Barbers
-            .CountAsync(b => b.IsActive && b.User.IsActive);
+            .CountAsync(b => b.IsActive && activeUserIds.Contains(b.UserId));
 
         var totalCustomersCount = await _dbContext.Users
             .CountAsync(u => u.Role == UserRole.Customer);
@@ -357,7 +373,7 @@ public class DashboardController : Controller
                         Id = a.Id,
                         ReferenceCode = a.ReferenceCode,
                         TimeFormatted = startsAtLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),
-                        CustomerName = a.Customer.FullName,
+                        CustomerName = a.Customer?.FullName ?? "Walk-in Guest",
                         ServiceName = a.ServiceName,
                         Status = a.Status,
                         StatusString = a.Status.ToString(),
@@ -428,7 +444,7 @@ public class DashboardController : Controller
     {
         if (!Enum.TryParse<AppointmentStatus>(to, true, out var targetStatus))
         {
-            TempData["Error"] = TempData["ErrorMessage"] = $"Invalid status '{to}'.";
+            TempData["ErrorMessage"] = $"Invalid status '{to}'.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -439,11 +455,11 @@ public class DashboardController : Controller
 
         if (!result.Success)
         {
-            TempData["Error"] = TempData["ErrorMessage"] = result.ErrorMessage ?? "Status update failed.";
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Status update failed.";
         }
         else
         {
-            TempData["Success"] = TempData["SuccessMessage"] = $"Appointment #{id} marked as {targetStatus.ToString().ToLowerInvariant()} successfully.";
+            TempData["SuccessMessage"] = $"Appointment #{id} marked as {targetStatus.ToString().ToLowerInvariant()} successfully.";
         }
 
         if (Request.Headers.Accept.ToString().Contains("application/json"))

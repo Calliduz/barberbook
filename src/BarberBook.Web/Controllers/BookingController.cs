@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BarberBook.Data;
 using BarberBook.Data.Enums;
+using BarberBook.Data.Extensions;
 using BarberBook.Web.Common;
 using BarberBook.Web.Models.Appointment;
 using BarberBook.Web.Models.Customer;
@@ -56,9 +57,12 @@ public class BookingController : Controller
             })
             .ToListAsync();
 
-        var services = await _dbContext.Services
+        var rawServices = await _dbContext.Services
             .Where(s => s.IsActive)
             .OrderBy(s => s.Name)
+            .ToListAsync();
+
+        var services = rawServices
             .Select(s => new PublicServiceDto
             {
                 Id = s.Id,
@@ -68,15 +72,15 @@ public class BookingController : Controller
                 FormattedPrice = FormattingHelpers.FormatPeso(s.Price),
                 DurationMinutes = s.DurationMinutes
             })
-            .ToListAsync();
+            .ToList();
 
+        var activeUserIds = await _dbContext.Users.AsNoTracking().Where(u => u.IsActive).Select(u => u.Id).ToListAsync();
         var barbers = await _dbContext.Barbers
-            .Include(b => b.User)
-            .Include(b => b.Branch)
-            .Include(b => b.WorkingHours)
-            .Where(b => b.IsActive && b.User.IsActive)
+            .AsNoTracking()
+            .Where(b => b.IsActive && activeUserIds.Contains(b.UserId))
             .OrderBy(b => b.DisplayName)
             .ToListAsync();
+        await _dbContext.HydrateBarbersAsync(barbers, includeUser: true, includeBranch: true, includeWorkingHours: true);
 
         var barberDtos = barbers.Select(b => new PublicBarberDto
         {
@@ -140,17 +144,15 @@ public class BookingController : Controller
         }
 
         var appointment = await _dbContext.Appointments
-            .Include(a => a.Customer)
-            .Include(a => a.Barber).ThenInclude(b => b.User)
-            .Include(a => a.Barber).ThenInclude(b => b.Branch)
-            .Include(a => a.Branch)
-            .Include(a => a.Service)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.ReferenceCode == code);
 
         if (appointment == null)
         {
             return NotFound();
         }
+
+        await _dbContext.HydrateAppointmentsAsync(new[] { appointment }, includeCustomer: true, includeBarber: true, includeService: true, includeBranch: true);
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var currentUserId))
