@@ -32,12 +32,18 @@ public class CustomersController : Controller
 
     private bool IsJsonRequest()
     {
-        var path = Request.Path.Value ?? string.Empty;
         var accept = Request.Headers.Accept.ToString();
+        if (accept.Contains("text/html"))
+        {
+            return false;
+        }
+
+        var path = Request.Path.Value ?? string.Empty;
         var contentType = Request.ContentType ?? string.Empty;
 
         return path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase) ||
-               (accept.Contains("application/json") && !accept.Contains("text/html")) ||
+               path.Equals("/api", StringComparison.OrdinalIgnoreCase) ||
+               accept.Contains("application/json") ||
                contentType.Contains("application/json");
     }
 
@@ -282,13 +288,20 @@ public class CustomersController : Controller
     }
 
     [HttpPost("admin/customers/{id:int}/edit")]
-    [HttpPut("api/admin/customers/{id:int}")]
-    public async Task<IActionResult> Edit(
-        int id,
-        [FromBody] AdminCustomerEditProfileModel? jsonModel,
-        [FromForm] AdminCustomerEditProfileModel? formModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [FromForm] AdminCustomerEditProfileModel model)
     {
-        var model = jsonModel ?? formModel;
+        return await ProcessEditAsync(id, model, isApi: false);
+    }
+
+    [HttpPut("api/admin/customers/{id:int}")]
+    public async Task<IActionResult> EditApi(int id, [FromBody] AdminCustomerEditProfileModel model)
+    {
+        return await ProcessEditAsync(id, model, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessEditAsync(int id, AdminCustomerEditProfileModel model, bool isApi)
+    {
         if (model == null || string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName) || string.IsNullOrWhiteSpace(model.Email))
         {
             var msg = string.IsNullOrWhiteSpace(model?.FirstName)
@@ -296,12 +309,12 @@ public class CustomersController : Controller
                 : string.IsNullOrWhiteSpace(model?.LastName)
                     ? "Last name is required."
                     : "Email is required.";
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", msg));
             }
             TempData["Error"] = TempData["ErrorMessage"] = msg;
-            return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
+            return Redirect($"/admin/customers/{id}?tab=profile");
         }
 
         var customer = await _dbContext.Users
@@ -309,12 +322,12 @@ public class CustomersController : Controller
 
         if (customer == null)
         {
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
             TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/customers");
         }
 
         // Email uniqueness check
@@ -326,12 +339,12 @@ public class CustomersController : Controller
 
             if (emailTaken)
             {
-                if (IsJsonRequest())
+                if (isApi)
                 {
                     return Conflict(new ApiErrorResponse("DUPLICATE_EMAIL", "Email address is already in use by another account."));
                 }
                 TempData["Error"] = TempData["ErrorMessage"] = "Email address is already in use by another account.";
-                return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
+                return Redirect($"/admin/customers/{id}?tab=profile");
             }
 
             customer.Email = targetEmail;
@@ -345,7 +358,7 @@ public class CustomersController : Controller
 
         await _dbContext.SaveChangesAsync();
 
-        if (IsJsonRequest())
+        if (isApi)
         {
             return Ok(new
             {
@@ -362,7 +375,7 @@ public class CustomersController : Controller
         }
 
         TempData["Success"] = TempData["SuccessMessage"] = $"Profile for '{customer.FullName}' updated successfully.";
-        return RedirectToAction(nameof(Detail), new { id, tab = "profile" });
+        return Redirect($"/admin/customers/{id}?tab=profile");
     }
 
     [HttpPost("admin/customers/{id:int}/toggle-status")]
@@ -377,7 +390,7 @@ public class CustomersController : Controller
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
             TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/customers");
         }
 
         // BR-13: Deactivate / reactivate
@@ -394,28 +407,40 @@ public class CustomersController : Controller
         }
 
         TempData["Success"] = TempData["SuccessMessage"] = msg;
-        return RedirectToAction(nameof(Detail), new { id, tab = "security" });
+        var referer = Request.Headers.Referer.ToString();
+        if (referer.Contains($"/admin/customers/{id}"))
+        {
+            return Redirect($"/admin/customers/{id}?tab=security");
+        }
+        return Redirect("/admin/customers");
     }
 
     [HttpPost("admin/customers/{id:int}/reset-password")]
-    [HttpPost("api/admin/customers/{id:int}/reset-password")]
-    public async Task<IActionResult> ResetPassword(
-        int id,
-        [FromBody] AdminCustomerResetPasswordModel? jsonModel,
-        [FromForm] AdminCustomerResetPasswordModel? formModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(int id, [FromForm] AdminCustomerResetPasswordModel model)
     {
-        var model = jsonModel ?? formModel;
+        return await ProcessResetPasswordAsync(id, model, isApi: false);
+    }
+
+    [HttpPost("api/admin/customers/{id:int}/reset-password")]
+    public async Task<IActionResult> ResetPasswordApi(int id, [FromBody] AdminCustomerResetPasswordModel model)
+    {
+        return await ProcessResetPasswordAsync(id, model, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessResetPasswordAsync(int id, AdminCustomerResetPasswordModel model, bool isApi)
+    {
         var newPassword = model?.NewPassword;
 
         if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
         {
             var msg = "Password must be at least 6 characters long.";
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", msg));
             }
             TempData["Error"] = TempData["ErrorMessage"] = msg;
-            return RedirectToAction(nameof(Detail), new { id, tab = "security" });
+            return Redirect($"/admin/customers/{id}?tab=security");
         }
 
         var customer = await _dbContext.Users
@@ -423,12 +448,12 @@ public class CustomersController : Controller
 
         if (customer == null)
         {
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return NotFound(new ApiErrorResponse("NOT_FOUND", $"Customer with ID {id} not found."));
             }
             TempData["Error"] = TempData["ErrorMessage"] = "Customer not found.";
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/customers");
         }
 
         // AS-21 / LM-5: Admin resets password directly without email tokens
@@ -438,21 +463,21 @@ public class CustomersController : Controller
         if (!result.Succeeded)
         {
             var errorMsg = string.Join(" ", result.Errors.Select(e => e.Description));
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("PASSWORD_RESET_FAILED", errorMsg));
             }
             TempData["Error"] = TempData["ErrorMessage"] = errorMsg;
-            return RedirectToAction(nameof(Detail), new { id, tab = "security" });
+            return Redirect($"/admin/customers/{id}?tab=security");
         }
 
         var successMsg = $"Password for '{customer.FullName}' has been reset successfully.";
-        if (IsJsonRequest())
+        if (isApi)
         {
             return Ok(new { success = true, message = successMsg });
         }
 
         TempData["Success"] = TempData["SuccessMessage"] = successMsg;
-        return RedirectToAction(nameof(Detail), new { id, tab = "security" });
+        return Redirect($"/admin/customers/{id}?tab=security");
     }
 }

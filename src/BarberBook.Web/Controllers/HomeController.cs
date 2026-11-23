@@ -322,7 +322,18 @@ public class HomeController : Controller
 
     private bool IsJsonRequest()
     {
-        return Request.Path.StartsWithSegments("/api") ||
-               Request.Headers.Accept.ToString().Contains("application/json");
+        var accept = Request.Headers.Accept.ToString();
+        if (accept.Contains("text/html"))
+        {
+            return false;
+        }
+
+        var path = Request.Path.Value ?? string.Empty;
+        var contentType = Request.ContentType ?? string.Empty;
+
+        return path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase) ||
+               path.Equals("/api", StringComparison.OrdinalIgnoreCase) ||
+               accept.Contains("application/json") ||
+               contentType.Contains("application/json");
     }
 }

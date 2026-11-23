@@ -291,13 +291,13 @@ public class BarbersController : Controller
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
             TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
         // 2. Duplicate Email Check
@@ -305,13 +305,13 @@ public class BarbersController : Controller
         var existingUser = await _userManager.FindByEmailAsync(cleanEmail);
         if (existingUser != null)
         {
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("DUPLICATE_EMAIL", $"An account with email '{cleanEmail}' already exists."));
             }
 
             TempData["ErrorMessage"] = $"An account with email '{cleanEmail}' already exists.";
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
         // 3. Create ApplicationUser
@@ -330,13 +330,13 @@ public class BarbersController : Controller
         if (!identityResult.Succeeded)
         {
             var errorMsg = string.Join(" ", identityResult.Errors.Select(e => e.Description));
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("IDENTITY_ERROR", errorMsg));
             }
 
             TempData["ErrorMessage"] = errorMsg;
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
         await _userManager.AddToRoleAsync(user, "Barber");
@@ -379,13 +379,13 @@ public class BarbersController : Controller
             CompletedAppointmentsCount = 0
         };
 
-        if (isApi || IsJsonRequest())
+        if (isApi)
         {
             return CreatedAtAction(nameof(Details), new { id = barber.Id }, resultDto);
         }
 
         TempData["SuccessMessage"] = $"Barber account for {barber.DisplayName} created successfully.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/barbers");
     }
 
     [HttpPost("admin/barbers/{id:int}/edit")]
@@ -412,13 +412,13 @@ public class BarbersController : Controller
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
             TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
         // 2. Find barber
@@ -427,7 +427,7 @@ public class BarbersController : Controller
 
         if (barber == null)
         {
-            return (isApi || IsJsonRequest())
+            return isApi
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found."))
                 : NotFound();
         }
@@ -469,32 +469,41 @@ public class BarbersController : Controller
             IsActive = barber.IsActive && barber.User.IsActive
         };
 
-        if (isApi || IsJsonRequest())
+        if (isApi)
         {
             return Ok(resultDto);
         }
 
         TempData["SuccessMessage"] = $"Barber profile for {barber.DisplayName} updated successfully.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/barbers");
     }
 
     [HttpPost("admin/barbers/{id:int}/reset-password")]
-    [HttpPost("api/admin/barbers/{id:int}/reset-password")]
-    public async Task<IActionResult> ResetPassword(int id, [FromBody] ResetBarberPasswordRequest? jsonRequest, [FromForm] ResetBarberPasswordRequest? formRequest)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(int id, [FromForm] ResetBarberPasswordRequest request)
     {
-        var request = jsonRequest ?? formRequest ?? new ResetBarberPasswordRequest();
+        return await ProcessResetPasswordAsync(id, request, isApi: false);
+    }
 
+    [HttpPost("api/admin/barbers/{id:int}/reset-password")]
+    public async Task<IActionResult> ResetPasswordApi(int id, [FromBody] ResetBarberPasswordRequest request)
+    {
+        return await ProcessResetPasswordAsync(id, request, isApi: true);
+    }
+
+    private async Task<IActionResult> ProcessResetPasswordAsync(int id, ResetBarberPasswordRequest request, bool isApi)
+    {
         var validationResult = await _resetPasswordValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
             TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
         var barber = await _dbContext.Barbers
@@ -502,7 +511,7 @@ public class BarbersController : Controller
 
         if (barber == null)
         {
-            return IsJsonRequest()
+            return isApi
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Barber with ID {id} not found."))
                 : NotFound();
         }
@@ -510,7 +519,9 @@ public class BarbersController : Controller
         var barberUser = await _userManager.FindByIdAsync(barber.UserId.ToString());
         if (barberUser == null)
         {
-            return NotFound(new ApiErrorResponse("NOT_FOUND", "User account not found."));
+            return isApi
+                ? NotFound(new ApiErrorResponse("NOT_FOUND", "User account not found."))
+                : NotFound();
         }
         barber.User = barberUser;
 
@@ -520,22 +531,22 @@ public class BarbersController : Controller
         if (!result.Succeeded)
         {
             var errorMsg = string.Join(" ", result.Errors.Select(e => e.Description));
-            if (IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("PASSWORD_RESET_FAILED", errorMsg));
             }
 
             TempData["ErrorMessage"] = errorMsg;
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/barbers");
         }
 
-        if (IsJsonRequest())
+        if (isApi)
         {
             return Ok(new { success = true, message = $"Password for {barber.DisplayName} reset successfully." });
         }
 
         TempData["SuccessMessage"] = $"Password for {barber.DisplayName} reset successfully.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/barbers");
     }
 
     [HttpPost("admin/barbers/{id:int}/toggle-status")]
@@ -569,12 +580,23 @@ public class BarbersController : Controller
         }
 
         TempData["SuccessMessage"] = $"Barber {barber.DisplayName} has been {statusText}.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/barbers");
     }
 
     private bool IsJsonRequest()
     {
-        return Request.Path.StartsWithSegments("/api") ||
-               Request.Headers.Accept.ToString().Contains("application/json");
+        var accept = Request.Headers.Accept.ToString();
+        if (accept.Contains("text/html"))
+        {
+            return false;
+        }
+
+        var path = Request.Path.Value ?? string.Empty;
+        var contentType = Request.ContentType ?? string.Empty;
+
+        return path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase) ||
+               path.Equals("/api", StringComparison.OrdinalIgnoreCase) ||
+               accept.Contains("application/json") ||
+               contentType.Contains("application/json");
     }
 }

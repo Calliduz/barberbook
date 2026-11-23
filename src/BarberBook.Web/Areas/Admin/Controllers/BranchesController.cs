@@ -148,13 +148,13 @@ public class BranchesController : Controller
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
             TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/branches");
         }
 
         var parseOpen = LocalTimePattern.CreateWithInvariantCulture("HH:mm").Parse(request.OpeningTime);
@@ -190,13 +190,13 @@ public class BranchesController : Controller
             CompletedAppointmentsCount = 0
         };
 
-        if (isApi || IsJsonRequest())
+        if (isApi)
         {
             return Created($"/api/admin/branches/{branch.Id}", resultDto);
         }
 
         TempData["SuccessMessage"] = $"Branch '{branch.Name}' created successfully.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/branches");
     }
 
     [HttpPost("admin/branches/{id:int}/edit")]
@@ -218,19 +218,19 @@ public class BranchesController : Controller
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors.ToDictionary(e => e.PropertyName, e => e.ErrorMessage);
-            if (isApi || IsJsonRequest())
+            if (isApi)
             {
                 return BadRequest(new ApiErrorResponse("VALIDATION_ERROR", "Validation failed.", errors));
             }
 
             TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Index));
+            return Redirect("/admin/branches");
         }
 
         var branch = await _dbContext.Branches.FirstOrDefaultAsync(b => b.Id == id);
         if (branch == null)
         {
-            return (isApi || IsJsonRequest())
+            return isApi
                 ? NotFound(new ApiErrorResponse("NOT_FOUND", $"Branch with ID {id} not found."))
                 : NotFound();
         }
@@ -260,13 +260,13 @@ public class BranchesController : Controller
             IsActive = branch.IsActive
         };
 
-        if (isApi || IsJsonRequest())
+        if (isApi)
         {
             return Ok(resultDto);
         }
 
         TempData["SuccessMessage"] = $"Branch '{branch.Name}' updated successfully.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/branches");
     }
 
     [HttpPost("admin/branches/{id:int}/toggle-status")]
@@ -292,7 +292,7 @@ public class BranchesController : Controller
         }
 
         TempData["SuccessMessage"] = $"Branch '{branch.Name}' has been {statusText}.";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/branches");
     }
 
     [HttpGet("admin/branches/{id:int}/barbers")]
@@ -382,7 +382,7 @@ public class BranchesController : Controller
 
         await _dbContext.SaveChangesAsync();
 
-        if (isApi || IsJsonRequest())
+        if (isApi)
         {
             return Ok(new
             {
@@ -393,12 +393,23 @@ public class BranchesController : Controller
         }
 
         TempData["SuccessMessage"] = $"Staff arrangement updated for '{branch.Name}' ({selectedIds.Count} barbers assigned).";
-        return RedirectToAction(nameof(Index));
+        return Redirect("/admin/branches");
     }
 
     private bool IsJsonRequest()
     {
-        return Request.Path.StartsWithSegments("/api") ||
-               Request.Headers.Accept.ToString().Contains("application/json");
+        var accept = Request.Headers.Accept.ToString();
+        if (accept.Contains("text/html"))
+        {
+            return false;
+        }
+
+        var path = Request.Path.Value ?? string.Empty;
+        var contentType = Request.ContentType ?? string.Empty;
+
+        return path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase) ||
+               path.Equals("/api", StringComparison.OrdinalIgnoreCase) ||
+               accept.Contains("application/json") ||
+               contentType.Contains("application/json");
     }
 }
