@@ -20,6 +20,20 @@ public interface IReportingService
     Task<MonthlySalesReportDto> GetMonthlySalesAsync(int year, int month, CancellationToken ct = default);
 
     /// <summary>
+    /// Generates weekly sales report covering 7 calendar days (Monday to Sunday) in Asia/Manila,
+    /// including day-by-day totals for each day of the week, grand totals, and breakdowns per service and per barber.
+    /// Only 'completed' appointments are counted (BR-07, BR-11).
+    /// </summary>
+    Task<WeeklySalesReportDto> GetWeeklySalesAsync(LocalDate weekDate, CancellationToken ct = default);
+
+    /// <summary>
+    /// Generates yearly sales report covering all 12 months (January to December) in Asia/Manila,
+    /// including month-by-month totals for each month of the year, grand totals, and breakdowns per service and per barber.
+    /// Only 'completed' appointments are counted (BR-07, BR-11).
+    /// </summary>
+    Task<YearlySalesReportDto> GetYearlySalesAsync(int year, CancellationToken ct = default);
+
+    /// <summary>
     /// RP-3: Generates customer transaction ledger including date, service, barber, status,
     /// amount (newest first) and total spent. Supports optional date range filtering (BR-12).
     /// </summary>

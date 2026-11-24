@@ -309,6 +309,282 @@ public class ReportingService : IReportingService
     }
 
     /// <inheritdoc />
+    public async Task<WeeklySalesReportDto> GetWeeklySalesAsync(LocalDate weekDate, CancellationToken ct = default)
+    {
+        // Calculate Monday as the start of the week and Sunday as the end of the week in Asia/Manila (BR-11)
+        int daysFromMonday = (int)weekDate.DayOfWeek - (int)IsoDayOfWeek.Monday;
+        var monday = weekDate.PlusDays(-daysFromMonday);
+        var sunday = monday.PlusDays(6);
+
+        var weekStartUtc = monday.AtStartOfDayInZone(_zone).ToInstant();
+        var nextWeekStartUtc = sunday.PlusDays(1).AtStartOfDayInZone(_zone).ToInstant();
+
+        // Query all completed appointments in the week in Asia/Manila (BR-07, BR-11)
+        var appointments = await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.Status == AppointmentStatus.Completed &&
+                        a.StartsAt >= weekStartUtc &&
+                        a.StartsAt < nextWeekStartUtc)
+            .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: false, ct: ct);
+
+        // Group appointments by their local calendar date in Asia/Manila
+        var appointmentsByDate = appointments
+            .GroupBy(a => a.StartsAt.InZone(_zone).Date)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // HW-2, INV-06: Query product sales in the week
+        var weekProductSales = await _dbContext.ProductSales
+            .AsNoTracking()
+            .Where(s => s.SoldAt >= weekStartUtc && s.SoldAt < nextWeekStartUtc)
+            .ToListAsync(ct);
+        await _dbContext.HydrateProductSalesAsync(weekProductSales, ct);
+
+        var productSalesByDate = weekProductSales
+            .GroupBy(s => s.SoldAt.InZone(_zone).Date)
+            .ToDictionary(g => g.Key, g => g.SelectMany(s => s.Items).ToList());
+
+        // 7 day totals (Monday through Sunday)
+        var dailyTotals = new List<WeeklyDaySalesDto>(7);
+        for (int i = 0; i < 7; i++)
+        {
+            var dayDate = monday.PlusDays(i);
+            decimal dayServiceSales = 0m;
+            int dayApptsCount = 0;
+
+            if (appointmentsByDate.TryGetValue(dayDate, out var dayAppts) && dayAppts.Count > 0)
+            {
+                dayServiceSales = dayAppts.Sum(a => a.Price);
+                dayApptsCount = dayAppts.Count;
+            }
+
+            decimal dayProductSales = 0m;
+            if (productSalesByDate.TryGetValue(dayDate, out var dayPItems) && dayPItems.Count > 0)
+            {
+                dayProductSales = dayPItems.Sum(x => x.LineTotal);
+            }
+
+            var dayGrandTotal = dayServiceSales + dayProductSales;
+
+            dailyTotals.Add(new WeeklyDaySalesDto
+            {
+                DayIndex = i + 1,
+                Date = dayDate,
+                DateFormatted = dayDate.ToString("MMM d, yyyy", CultureInfo.InvariantCulture),
+                DayOfWeek = dayDate.ToString("ddd", CultureInfo.InvariantCulture),
+                CompletedCount = dayApptsCount,
+                TotalSales = dayServiceSales,
+                FormattedTotalSales = FormattingHelpers.FormatPeso(dayServiceSales),
+                ProductSales = dayProductSales,
+                FormattedProductSales = FormattingHelpers.FormatPeso(dayProductSales),
+                GrandTotal = dayGrandTotal,
+                FormattedGrandTotal = FormattingHelpers.FormatPeso(dayGrandTotal)
+            });
+        }
+
+        var totalSales = dailyTotals.Sum(d => d.TotalSales);
+        var totalCompleted = dailyTotals.Sum(d => d.CompletedCount);
+
+        var byService = appointments
+            .GroupBy(a => a.ServiceName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Count(),
+                TotalSales = g.Sum(a => a.Price),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        var byBarber = appointments
+            .GroupBy(a => a.Barber?.DisplayName ?? "Staff")
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Count(),
+                TotalSales = g.Sum(a => a.Price),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        var allWeekPItems = weekProductSales.SelectMany(s => s.Items).ToList();
+        var weekProductSalesTotal = allWeekPItems.Sum(i => i.LineTotal);
+        var weekGrandTotal = totalSales + weekProductSalesTotal;
+
+        var productSalesPerProduct = allWeekPItems
+            .GroupBy(i => i.ProductName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Sum(x => x.Quantity),
+                TotalSales = g.Sum(x => x.LineTotal),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(x => x.LineTotal))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        return new WeeklySalesReportDto
+        {
+            WeekStartDate = monday,
+            WeekEndDate = sunday,
+            WeekRangeFormatted = $"{monday.ToString("MMM d", CultureInfo.InvariantCulture)} – {sunday.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)}",
+            TotalSales = totalSales,
+            FormattedTotalSales = FormattingHelpers.FormatPeso(totalSales),
+            CompletedCount = totalCompleted,
+            DailyTotals = dailyTotals,
+            ByService = byService,
+            ByBarber = byBarber,
+            ProductSales = weekProductSalesTotal,
+            FormattedProductSales = FormattingHelpers.FormatPeso(weekProductSalesTotal),
+            ProductSalesCount = weekProductSales.Count,
+            ProductSalesPerProduct = productSalesPerProduct,
+            GrandTotal = weekGrandTotal,
+            FormattedGrandTotal = FormattingHelpers.FormatPeso(weekGrandTotal)
+        };
+    }
+
+    /// <inheritdoc />
+    public async Task<YearlySalesReportDto> GetYearlySalesAsync(int year, CancellationToken ct = default)
+    {
+        var yearStart = new LocalDate(year, 1, 1);
+        var nextYearStart = new LocalDate(year + 1, 1, 1);
+        var yearStartUtc = yearStart.AtStartOfDayInZone(_zone).ToInstant();
+        var nextYearStartUtc = nextYearStart.AtStartOfDayInZone(_zone).ToInstant();
+
+        // Query all completed appointments in the year in Asia/Manila (BR-07, BR-11)
+        var appointments = await _dbContext.Appointments
+            .AsNoTracking()
+            .Where(a => a.Status == AppointmentStatus.Completed &&
+                        a.StartsAt >= yearStartUtc &&
+                        a.StartsAt < nextYearStartUtc)
+            .ToListAsync(ct);
+        await _dbContext.HydrateAppointmentsAsync(appointments, includeCustomer: false, includeBarber: true, includeService: false, ct: ct);
+
+        // Group appointments by their local calendar month in Asia/Manila
+        var appointmentsByMonth = appointments
+            .GroupBy(a => a.StartsAt.InZone(_zone).Month)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // HW-2, INV-06: Query product sales in the year
+        var yearProductSales = await _dbContext.ProductSales
+            .AsNoTracking()
+            .Where(s => s.SoldAt >= yearStartUtc && s.SoldAt < nextYearStartUtc)
+            .ToListAsync(ct);
+        await _dbContext.HydrateProductSalesAsync(yearProductSales, ct);
+
+        var productSalesByMonth = yearProductSales
+            .GroupBy(s => s.SoldAt.InZone(_zone).Month)
+            .ToDictionary(g => g.Key, g => g.SelectMany(s => s.Items).ToList());
+
+        // 12 month totals (January through December)
+        var monthlyTotals = new List<YearlyMonthSalesDto>(12);
+        string[] monthNames = new[] { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+        string[] monthShorts = new[] { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+        for (int m = 1; m <= 12; m++)
+        {
+            decimal monthServiceSales = 0m;
+            int monthApptsCount = 0;
+
+            if (appointmentsByMonth.TryGetValue(m, out var mAppts) && mAppts.Count > 0)
+            {
+                monthServiceSales = mAppts.Sum(a => a.Price);
+                monthApptsCount = mAppts.Count;
+            }
+
+            decimal monthProductSales = 0m;
+            if (productSalesByMonth.TryGetValue(m, out var mPItems) && mPItems.Count > 0)
+            {
+                monthProductSales = mPItems.Sum(x => x.LineTotal);
+            }
+
+            var monthGrandTotal = monthServiceSales + monthProductSales;
+
+            monthlyTotals.Add(new YearlyMonthSalesDto
+            {
+                Month = m,
+                MonthName = monthNames[m],
+                MonthShort = monthShorts[m],
+                CompletedCount = monthApptsCount,
+                TotalSales = monthServiceSales,
+                FormattedTotalSales = FormattingHelpers.FormatPeso(monthServiceSales),
+                ProductSales = monthProductSales,
+                FormattedProductSales = FormattingHelpers.FormatPeso(monthProductSales),
+                GrandTotal = monthGrandTotal,
+                FormattedGrandTotal = FormattingHelpers.FormatPeso(monthGrandTotal)
+            });
+        }
+
+        var totalSales = monthlyTotals.Sum(d => d.TotalSales);
+        var totalCompleted = monthlyTotals.Sum(d => d.CompletedCount);
+
+        var byService = appointments
+            .GroupBy(a => a.ServiceName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Count(),
+                TotalSales = g.Sum(a => a.Price),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        var byBarber = appointments
+            .GroupBy(a => a.Barber?.DisplayName ?? "Staff")
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Count(),
+                TotalSales = g.Sum(a => a.Price),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(a => a.Price))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        var allYearPItems = yearProductSales.SelectMany(s => s.Items).ToList();
+        var yearProductSalesTotal = allYearPItems.Sum(i => i.LineTotal);
+        var yearGrandTotal = totalSales + yearProductSalesTotal;
+
+        var productSalesPerProduct = allYearPItems
+            .GroupBy(i => i.ProductName)
+            .Select(g => new GroupSalesBreakdownDto
+            {
+                Name = g.Key,
+                Count = g.Sum(x => x.Quantity),
+                TotalSales = g.Sum(x => x.LineTotal),
+                FormattedTotalSales = FormattingHelpers.FormatPeso(g.Sum(x => x.LineTotal))
+            })
+            .OrderByDescending(g => g.TotalSales)
+            .ThenBy(g => g.Name)
+            .ToList();
+
+        return new YearlySalesReportDto
+        {
+            Year = year,
+            TotalSales = totalSales,
+            FormattedTotalSales = FormattingHelpers.FormatPeso(totalSales),
+            CompletedCount = totalCompleted,
+            MonthlyTotals = monthlyTotals,
+            ByService = byService,
+            ByBarber = byBarber,
+            ProductSales = yearProductSalesTotal,
+            FormattedProductSales = FormattingHelpers.FormatPeso(yearProductSalesTotal),
+            ProductSalesCount = yearProductSales.Count,
+            ProductSalesPerProduct = productSalesPerProduct,
+            GrandTotal = yearGrandTotal,
+            FormattedGrandTotal = FormattingHelpers.FormatPeso(yearGrandTotal)
+        };
+    }
+
+    /// <inheritdoc />
     public async Task<CustomerTransactionsReportDto> GetCustomerTransactionsAsync(
         int customerId,
         LocalDate? startDate = null,

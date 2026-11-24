@@ -2,7 +2,153 @@
 @{
     ViewData["Title"] = "Sales & Transaction Reports";
     string[] monthNames = new[] { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+    // --- Prepare Chart Payloads in C# ---
+    // 1. Daily Chart Payload
+    var dailyHourlyLabels = new[] { "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM" };
+    var dailyHourlyAmounts = new decimal[11];
+    foreach (var item in Model.DailyReport.CombinedJournal)
+    {
+        if (DateTime.TryParse(item.Time, out var dt))
+        {
+            int idx = dt.Hour - 9;
+            if (idx >= 0 && idx < dailyHourlyAmounts.Length)
+            {
+                dailyHourlyAmounts[idx] += item.Amount;
+            }
+        }
+    }
+
+    var dailyCatLabels = new List<string>();
+    var dailyCatValues = new List<decimal>();
+    foreach (var s in Model.DailyReport.ByService)
+    {
+        dailyCatLabels.Add(s.Name);
+        dailyCatValues.Add(s.TotalSales);
+    }
+    if (Model.DailyReport.ProductSales.Total > 0)
+    {
+        dailyCatLabels.Add("Retail Products");
+        dailyCatValues.Add(Model.DailyReport.ProductSales.Total);
+    }
+    if (dailyCatLabels.Count == 0)
+    {
+        dailyCatLabels.Add("No Sales Recorded");
+        dailyCatValues.Add(0);
+    }
+
+    var dailyBarberLabels = Model.DailyReport.ByBarber.Select(b => b.Name).ToList();
+    var dailyBarberValues = Model.DailyReport.ByBarber.Select(b => b.TotalSales).ToList();
+    if (dailyBarberLabels.Count == 0)
+    {
+        dailyBarberLabels.Add("No Active Barbers");
+        dailyBarberValues.Add(0);
+    }
+
+    // 2. Weekly Chart Payload
+    var weeklyDays = Model.WeeklyReport.DailyTotals.Select(d => $"{d.DayOfWeek} ({d.Date.Month}/{d.Date.Day})").ToList();
+    var weeklyGrand = Model.WeeklyReport.DailyTotals.Select(d => d.GrandTotal).ToList();
+    var weeklyCuts = Model.WeeklyReport.DailyTotals.Select(d => d.ServiceSales).ToList();
+    var weeklyProd = Model.WeeklyReport.DailyTotals.Select(d => d.ProductSales).ToList();
+    var weeklyBarberLabels = Model.WeeklyReport.ByBarber.Select(b => b.Name).ToList();
+    var weeklyBarberValues = Model.WeeklyReport.ByBarber.Select(b => b.TotalSales).ToList();
+    if (weeklyBarberLabels.Count == 0)
+    {
+        weeklyBarberLabels.Add("No Barber Activity");
+        weeklyBarberValues.Add(0);
+    }
+
+    // 3. Monthly Chart Payload
+    var monthlyDays = Model.MonthlyReport.DailyTotals.Select(d => $"Day {d.Day}").ToList();
+    var monthlyDaily = Model.MonthlyReport.DailyTotals.Select(d => d.GrandTotal).ToList();
+    var monthlyCumul = new List<decimal>();
+    decimal runTotal = 0m;
+    foreach (var d in Model.MonthlyReport.DailyTotals)
+    {
+        runTotal += d.GrandTotal;
+        monthlyCumul.Add(runTotal);
+    }
+    var monthlyCatLabels = new List<string>();
+    var monthlyCatValues = new List<decimal>();
+    foreach (var s in Model.MonthlyReport.ByService)
+    {
+        monthlyCatLabels.Add(s.Name);
+        monthlyCatValues.Add(s.TotalSales);
+    }
+    if (Model.MonthlyReport.ProductSales > 0)
+    {
+        monthlyCatLabels.Add("Retail Products");
+        monthlyCatValues.Add(Model.MonthlyReport.ProductSales);
+    }
+    if (monthlyCatLabels.Count == 0)
+    {
+        monthlyCatLabels.Add("No Sales This Month");
+        monthlyCatValues.Add(0);
+    }
+
+    // 4. Yearly Chart Payload
+    var yearlyMonths = Model.YearlyReport.MonthlyTotals.Select(m => m.MonthShort).ToList();
+    var yearlyTotals = Model.YearlyReport.MonthlyTotals.Select(m => m.GrandTotal).ToList();
+    var yearlyCuts = Model.YearlyReport.MonthlyTotals.Select(m => m.ServiceSales).ToList();
+    var yearlyProducts = Model.YearlyReport.MonthlyTotals.Select(m => m.ProductSales).ToList();
+    var yearlyCatLabels = new List<string>();
+    var yearlyCatValues = new List<decimal>();
+    foreach (var s in Model.YearlyReport.ByService)
+    {
+        yearlyCatLabels.Add(s.Name);
+        yearlyCatValues.Add(s.TotalSales);
+    }
+    if (Model.YearlyReport.ProductSales > 0)
+    {
+        yearlyCatLabels.Add("Retail Grooming");
+        yearlyCatValues.Add(Model.YearlyReport.ProductSales);
+    }
+    if (yearlyCatLabels.Count == 0)
+    {
+        yearlyCatLabels.Add("No Sales Recorded");
+        yearlyCatValues.Add(0);
+    }
+
+    var chartDataJson = System.Text.Json.JsonSerializer.Serialize(new {
+        activeTab = Model.ActiveTab,
+        daily = new {
+            hourlyLabels = dailyHourlyLabels,
+            hourlyAmounts = dailyHourlyAmounts,
+            catLabels = dailyCatLabels,
+            catValues = dailyCatValues,
+            barberLabels = dailyBarberLabels,
+            barberValues = dailyBarberValues
+        },
+        weekly = new {
+            days = weeklyDays,
+            grand = weeklyGrand,
+            cuts = weeklyCuts,
+            prod = weeklyProd,
+            barberLabels = weeklyBarberLabels,
+            barberValues = weeklyBarberValues
+        },
+        monthly = new {
+            days = monthlyDays,
+            daily = monthlyDaily,
+            cumul = monthlyCumul,
+            catLabels = monthlyCatLabels,
+            catValues = monthlyCatValues
+        },
+        yearly = new {
+            months = yearlyMonths,
+            totals = yearlyTotals,
+            cuts = yearlyCuts,
+            prod = yearlyProducts,
+            catLabels = yearlyCatLabels,
+            catValues = yearlyCatValues
+        }
+    });
 }
+
+<!-- Embedded Chart Data JSON Payload -->
+<script id="reportChartsPayload" type="application/json">
+@Html.Raw(chartDataJson)
+</script>
 
 <div class="space-y-6">
     <!-- Header -->
@@ -16,7 +162,7 @@
             <p class="mt-1 text-sm text-slate-600 font-sans">Automated financial journals generated strictly from completed customer appointments and counter sales.</p>
         </div>
         <div class="mt-4 sm:mt-0 flex flex-wrap gap-2">
-            <a href="/admin/reports/export?tab=@Model.ActiveTab&date=@Model.SelectedDateString&year=@Model.SelectedYear&month=@Model.SelectedMonth" 
+            <a href="/admin/reports/export?tab=@Model.ActiveTab&date=@Model.SelectedDateString&weekDate=@Model.SelectedWeekDateString&year=@Model.SelectedYear&month=@Model.SelectedMonth" 
                class="h-[38px] px-4 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1.5 transition whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                 <span>Export to CSV / Excel</span>
@@ -28,17 +174,27 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs: Daily, Weekly, Monthly, Yearly, Customers, Barbers -->
     <div class="flex border-b border-slate-200 gap-2 sm:gap-4 overflow-x-auto">
         <a href="/admin/reports?tab=daily&date=@Model.SelectedDateString"
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "daily" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253 3v12a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V7.5A2.25 2.25 0 0018.75 5.25H5.25A2.25 2.25 0 003 7.5v12" /></svg>
             <span>Daily Sales</span>
         </a>
+        <a href="/admin/reports?tab=weekly&weekDate=@Model.SelectedWeekDateString"
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "weekly" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" /></svg>
+            <span>Weekly Sales</span>
+        </a>
         <a href="/admin/reports?tab=monthly&year=@Model.SelectedYear&month=@Model.SelectedMonth"
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "monthly" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
             <span>Monthly Sales</span>
+        </a>
+        <a href="/admin/reports?tab=yearly&year=@Model.SelectedYear"
+           class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "yearly" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
+            <span>Yearly Sales</span>
         </a>
         <a href="/admin/reports?tab=customers&customerId=@Model.SelectedCustomerId"
            class="py-3 px-4 border-b-2 text-sm font-bold whitespace-nowrap transition flex items-center gap-2 @(Model.ActiveTab == "customers" ? "border-amber-600 text-amber-700 bg-amber-50/50" : "border-transparent text-slate-600 hover:text-slate-900")">
@@ -114,6 +270,51 @@
                 <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
                     <div class="bg-amber-500 h-full transition-all" style="width: @dailyCutsPct%;"></div>
                     <div class="bg-emerald-500 h-full transition-all" style="width: @dailyProdPct%;"></div>
+                </div>
+            </div>
+
+            <!-- DAILY SALES CHARTS (Line Graph + Pie Graph + Bar Graph) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Line Chart: Hourly Revenue Trajectory (7 cols) -->
+                <div class="lg:col-span-7 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">INTRADAY TRAJECTORY</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Hourly Revenue Stream (Line Graph)</h3>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-500">9:00 AM – 7:00 PM</span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="dailyHourlyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie / Doughnut Chart: Category & Revenue Share (5 cols) -->
+                <div class="lg:col-span-5 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700">REVENUE DISTRIBUTION</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Sales by Category & Service (Pie Graph)</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Mix</span>
+                    </div>
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <canvas id="dailyCategoryPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Sales per Master Barber (Full width) -->
+                <div class="lg:col-span-12 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">BARBER PERFORMANCE</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Completed Service Sales by Master Barber (Bar Graph)</h3>
+                        </div>
+                        <span class="text-xs text-slate-500 font-semibold">@Model.DailyReport.ByBarber.Count active barber(s)</span>
+                    </div>
+                    <div class="relative h-56 w-full">
+                        <canvas id="dailyBarberBarChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -299,6 +500,268 @@
             </div>
         </div>
     }
+    else if (Model.ActiveTab == "weekly")
+    {
+        <!-- WEEKLY SALES VIEW -->
+        <div class="space-y-6">
+            <!-- Filter Bar: Week Picker & Presets -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <form id="weeklyDateForm" method="get" action="/admin/reports" class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <input type="hidden" name="tab" value="weekly" />
+                    <label for="weekDate" class="text-xs font-bold uppercase tracking-wider text-slate-600">Select Any Date in Week:</label>
+                    <input type="date" id="weekDate" name="weekDate" value="@Model.SelectedWeekDateString" onchange="this.form.submit()"
+                           class="filter-control h-[38px] text-xs font-bold text-slate-900" />
+                </form>
+
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Week Range</span>
+                        <span class="text-sm font-serif font-bold text-slate-800">@Model.SelectedWeekRangeFormatted</span>
+                    </div>
+                    <div class="text-right border-l border-slate-200 pl-4">
+                        <span class="text-xs uppercase font-bold text-slate-500 block">Weekly Grand Total</span>
+                        <span class="text-2xl font-serif font-black text-emerald-700">@Model.WeeklyReport.FormattedGrandTotal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">7-Day Service Sales</span>
+                    <h3 class="text-2xl font-serif font-black text-slate-900 mt-1">@Model.WeeklyReport.FormattedTotalSales</h3>
+                    <p class="text-xs text-slate-500 mt-1">@Model.WeeklyReport.CompletedCount Completed Appointments</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">7-Day Retail Products</span>
+                    <h3 class="text-2xl font-serif font-black text-amber-700 mt-1">@Model.WeeklyReport.FormattedProductSales</h3>
+                    <p class="text-xs text-slate-500 mt-1">@Model.WeeklyReport.ProductSalesCount counter sale(s) recorded</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Weekly Combined Total</span>
+                    <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.WeeklyReport.FormattedGrandTotal</h3>
+                    <p class="text-xs text-slate-500 mt-1">Services + Retail Grooming</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Daily Average Revenue</span>
+                    @{
+                        var dailyAvg = Model.WeeklyReport.GrandTotal / 7m;
+                    }
+                    <h3 class="text-2xl font-serif font-black text-slate-800 mt-1">₱@dailyAvg.ToString("N2")</h3>
+                    <p class="text-xs text-slate-500 mt-1">Average per calendar day</p>
+                </div>
+            </div>
+
+            <!-- WEEKLY SALES CHARTS (Line Graph + Grouped Bar Graph + Pie Graph) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Line Chart: 7-Day Revenue Trend (7 cols) -->
+                <div class="lg:col-span-7 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">7-DAY REVENUE TRAJECTORY</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Daily Revenue Trend (Line Graph)</h3>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-500">Mon &rarr; Sun</span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="weeklyTrendLineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie / Doughnut Chart: Weekly Revenue by Master Barber (5 cols) -->
+                <div class="lg:col-span-5 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700">STAFF PERFORMANCE</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Weekly Revenue Share by Barber (Pie Graph)</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Weekly</span>
+                    </div>
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <canvas id="weeklyBarberPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Grouped Bar Chart: Cuts vs Products (Full width) -->
+                <div class="lg:col-span-12 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">COMPARATIVE DAILY REVENUE</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Cuts & Services vs Retail Products Day-by-Day (Bar Graph)</h3>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-bold">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Cuts</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Products</span>
+                        </div>
+                    </div>
+                    <div class="relative h-56 w-full">
+                        <canvas id="weeklyBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly 7-Day Day-by-Day Summary Table -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">7-Day Sales Ledger · @Model.SelectedWeekRangeFormatted</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Sum of daily totals equals weekly total: Cuts @Model.WeeklyReport.FormattedTotalSales &bull; Products @Model.WeeklyReport.FormattedProductSales &bull; Grand Total @Model.WeeklyReport.FormattedGrandTotal</p>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">@Model.WeeklyReport.CompletedCount total appointments</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-6">Date</th>
+                                <th class="py-3 px-6 text-center">Day of Week</th>
+                                <th class="py-3 px-6 text-center">Completed Visits</th>
+                                <th class="py-3 px-6 text-right">Service Sales</th>
+                                <th class="py-3 px-6 text-right">Product Sales</th>
+                                <th class="py-3 px-6 text-right font-black">Grand Total</th>
+                                <th class="py-3 px-6 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var day in Model.WeeklyReport.DailyTotals)
+                            {
+                                <tr class="hover:bg-slate-50/80 transition @(day.GrandTotal > 0 ? "bg-amber-50/20" : "")">
+                                    <td class="py-3 px-6 font-bold text-slate-900">
+                                        @day.DateFormatted
+                                    </td>
+                                    <td class="py-3 px-6 text-center text-xs font-semibold text-slate-500">
+                                        @day.DayOfWeek
+                                    </td>
+                                    <td class="py-3 px-6 text-center font-medium @(day.CompletedCount > 0 ? "text-slate-900 font-bold" : "text-slate-400")">
+                                        @day.CompletedCount
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-slate-800">
+                                        @day.FormattedTotalSales
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-amber-800">
+                                        @day.FormattedProductSales
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-bold text-slate-900">
+                                        @day.FormattedGrandTotal
+                                    </td>
+                                    <td class="py-3 px-6 text-right">
+                                        @if (day.GrandTotal > 0)
+                                        {
+                                            <a href="/admin/reports?tab=daily&date=@day.Date.ToString("yyyy-MM-dd", null)" class="text-xs font-bold text-amber-700 hover:underline">
+                                                View Daily →
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-xs text-slate-400">No activity</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tr>
+                                <td colspan="2" class="py-3.5 px-6 uppercase text-xs tracking-wider">Weekly Total:</td>
+                                <td class="py-3.5 px-6 text-center font-serif text-base">@Model.WeeklyReport.CompletedCount</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900">@Model.WeeklyReport.FormattedTotalSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-amber-800">@Model.WeeklyReport.FormattedProductSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-800">@Model.WeeklyReport.FormattedGrandTotal</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Weekly Breakdowns: Barber, Service & Retail Product -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Per Barber -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Weekly Breakdown by Barber</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-bold text-slate-600">Services</span>
+                    </div>
+                    @if (!Model.WeeklyReport.ByBarber.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No barber sales recorded this week.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var b in Model.WeeklyReport.ByBarber)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Per Service -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Weekly Breakdown by Service</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">Services</span>
+                    </div>
+                    @if (!Model.WeeklyReport.ByService.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No services rendered this week.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var s in Model.WeeklyReport.ByService)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Per Product -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Weekly Breakdown by Product</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold">Products</span>
+                    </div>
+                    @if (!Model.WeeklyReport.ProductSalesPerProduct.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No retail product sales recorded this week.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var prod in Model.WeeklyReport.ProductSalesPerProduct)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 border border-amber-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@prod.Name</span>
+                                        <span class="text-xs text-slate-500">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-amber-800">@prod.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
     else if (Model.ActiveTab == "monthly")
     {
         <!-- MONTHLY SALES VIEW -->
@@ -337,6 +800,37 @@
                 </div>
             </div>
 
+            <!-- MONTHLY SALES CHARTS (Line Graph + Pie Graph) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Line Chart: 31-Day Cumulative & Daily Revenue (7 cols) -->
+                <div class="lg:col-span-7 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">MONTHLY TRAJECTORY</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Day-by-Day Revenue Curve (Line Graph)</h3>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-500">@monthNames[Model.SelectedMonth] @Model.SelectedYear</span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="monthlyTrajectoryLineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie / Doughnut Chart: Monthly Service Menu Share (5 cols) -->
+                <div class="lg:col-span-5 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700">SERVICE DISTRIBUTION</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Monthly Service Share (Pie Graph)</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Monthly</span>
+                    </div>
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <canvas id="monthlyServicePieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Visual Comparative Bar Chart (Cuts vs Products Sales) -->
             @{
                 var maxDaySales = Model.MonthlyReport.DailyTotals.Any() ? Model.MonthlyReport.DailyTotals.Max(d => Math.Max(d.ServiceSales, d.ProductSales)) : 0m;
@@ -347,7 +841,7 @@
                     <div>
                         <div class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-0.5">
                             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
-                            <span>COMPARATIVE DAILY REVENUE DISTRIBUTION</span>
+                            <span>COMPARATIVE DAILY REVENUE DISTRIBUTION (BAR GRAPH)</span>
                         </div>
                         <h3 class="text-base font-serif font-bold text-slate-900">Cuts Sales vs. Product Sales · @monthNames[Model.SelectedMonth] @Model.SelectedYear</h3>
                         <p class="text-xs text-slate-500">Visual comparison of daily grooming service revenues vs retail counter sales.</p>
@@ -548,6 +1042,272 @@
                     {
                         <div class="space-y-3">
                             @foreach (var prod in Model.MonthlyReport.ProductSalesPerProduct)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 border border-amber-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@prod.Name</span>
+                                        <span class="text-xs text-slate-500">@prod.Count unit@(prod.Count > 1 ? "s" : "") sold</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-amber-800">@prod.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.ActiveTab == "yearly")
+    {
+        <!-- YEARLY SALES VIEW -->
+        <div class="space-y-6">
+            <!-- Filter Bar: Year Selector -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <form id="yearlyDateForm" method="get" action="/admin/reports" class="flex items-center gap-3 w-full sm:w-auto">
+                    <input type="hidden" name="tab" value="yearly" />
+                    <label for="year" class="text-xs font-bold uppercase tracking-wider text-slate-600">Select Calendar Year:</label>
+                    <select id="year" name="year" onchange="this.form.submit()" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-bold text-slate-900 shadow-sm">
+                        @for (int y = 2025; y <= 2028; y++)
+                        {
+                            <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+                        }
+                    </select>
+                </form>
+
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Annual Cuts Sales</span>
+                        <span class="text-base font-serif font-bold text-slate-800">@Model.YearlyReport.FormattedTotalSales</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Annual Products</span>
+                        <span class="text-base font-serif font-bold text-amber-700">@Model.YearlyReport.FormattedProductSales</span>
+                    </div>
+                    <div class="text-right border-l border-slate-200 pl-4">
+                        <span class="text-xs uppercase font-bold text-slate-500 block">Annual Grand Total</span>
+                        <span class="text-2xl font-serif font-black text-emerald-700">@Model.YearlyReport.FormattedGrandTotal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yearly Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">12-Month Service Sales</span>
+                    <h3 class="text-2xl font-serif font-black text-slate-900 mt-1">@Model.YearlyReport.FormattedTotalSales</h3>
+                    <p class="text-xs text-slate-500 mt-1">@Model.YearlyReport.CompletedCount Completed Visits</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">12-Month Retail Products</span>
+                    <h3 class="text-2xl font-serif font-black text-amber-700 mt-1">@Model.YearlyReport.FormattedProductSales</h3>
+                    <p class="text-xs text-slate-500 mt-1">@Model.YearlyReport.ProductSalesCount counter sale(s) recorded</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Annual Grand Total</span>
+                    <h3 class="text-2xl font-serif font-black text-emerald-700 mt-1">@Model.YearlyReport.FormattedGrandTotal</h3>
+                    <p class="text-xs text-slate-500 mt-1">In-shop settlement for @Model.YearlyReport.Year</p>
+                </div>
+
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5">
+                    <span class="text-xs uppercase font-bold text-slate-500 block">Monthly Average Run-Rate</span>
+                    @{
+                        var monthlyAvg = Model.YearlyReport.GrandTotal / 12m;
+                    }
+                    <h3 class="text-2xl font-serif font-black text-slate-800 mt-1">₱@monthlyAvg.ToString("N2")</h3>
+                    <p class="text-xs text-slate-500 mt-1">Average per month</p>
+                </div>
+            </div>
+
+            <!-- YEARLY SALES CHARTS (Line Graph + Stacked Bar Graph + Pie Graph) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Line Chart: 12-Month Revenue Curve (7 cols) -->
+                <div class="lg:col-span-7 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">12-MONTH REVENUE TRAJECTORY</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Annual Revenue Trajectory Curve (Line Graph)</h3>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-500">Jan &rarr; Dec @Model.YearlyReport.Year</span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="yearlyTrendLineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie / Doughnut Chart: Annual Category Split (5 cols) -->
+                <div class="lg:col-span-5 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700">ANNUAL PRODUCT & SERVICE MIX</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Revenue Distribution (Pie Graph)</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Annual</span>
+                    </div>
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <canvas id="yearlyDistributionPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Stacked Bar Chart: Monthly Service Cuts vs Products (Full width) -->
+                <div class="lg:col-span-12 bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-5 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700">MONTH-BY-MONTH REVENUE SPLIT</div>
+                            <h3 class="text-sm font-serif font-bold text-slate-900">Monthly Cuts vs Products Breakdown (Stacked Bar Graph)</h3>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-bold">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Cuts (Services)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Retail Products</span>
+                        </div>
+                    </div>
+                    <div class="relative h-56 w-full">
+                        <canvas id="yearlyStackedBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12-Month Table -->
+            <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-serif font-bold text-slate-900">12-Month Annual Financial Ledger · @Model.YearlyReport.Year</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Sum of 12 monthly totals equals annual total: Services @Model.YearlyReport.FormattedTotalSales &bull; Products @Model.YearlyReport.FormattedProductSales &bull; Grand Total @Model.YearlyReport.FormattedGrandTotal</p>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">@Model.YearlyReport.CompletedCount total completed visits</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-6">Month</th>
+                                <th class="py-3 px-6 text-center">Completed Visits</th>
+                                <th class="py-3 px-6 text-right">Service Sales</th>
+                                <th class="py-3 px-6 text-right">Product Sales</th>
+                                <th class="py-3 px-6 text-right font-black">Grand Total</th>
+                                <th class="py-3 px-6 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var m in Model.YearlyReport.MonthlyTotals)
+                            {
+                                <tr class="hover:bg-slate-50/80 transition @(m.GrandTotal > 0 ? "bg-amber-50/20" : "")">
+                                    <td class="py-3 px-6 font-bold text-slate-900">
+                                        @m.MonthName @Model.YearlyReport.Year
+                                    </td>
+                                    <td class="py-3 px-6 text-center font-medium @(m.CompletedCount > 0 ? "text-slate-900 font-bold" : "text-slate-400")">
+                                        @m.CompletedCount
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-slate-800">
+                                        @m.FormattedTotalSales
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-medium text-amber-800">
+                                        @m.FormattedProductSales
+                                    </td>
+                                    <td class="py-3 px-6 text-right font-serif font-bold text-slate-900">
+                                        @m.FormattedGrandTotal
+                                    </td>
+                                    <td class="py-3 px-6 text-right">
+                                        @if (m.GrandTotal > 0)
+                                        {
+                                            <a href="/admin/reports?tab=monthly&year=@Model.YearlyReport.Year&month=@m.Month" class="text-xs font-bold text-amber-700 hover:underline">
+                                                View Month →
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-xs text-slate-400">No activity</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-200 text-slate-900">
+                            <tr>
+                                <td class="py-3.5 px-6 uppercase text-xs tracking-wider">Annual Total (@Model.YearlyReport.Year):</td>
+                                <td class="py-3.5 px-6 text-center font-serif text-base">@Model.YearlyReport.CompletedCount</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-slate-900">@Model.YearlyReport.FormattedTotalSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-amber-800">@Model.YearlyReport.FormattedProductSales</td>
+                                <td class="py-3.5 px-6 text-right font-serif text-base text-emerald-800">@Model.YearlyReport.FormattedGrandTotal</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Yearly Breakdowns: Barber, Service & Retail Product -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Per Barber -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Annual Breakdown by Barber</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-bold text-slate-600">Services</span>
+                    </div>
+                    @if (!Model.YearlyReport.ByBarber.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No barber sales recorded this year.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var b in Model.YearlyReport.ByBarber)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@b.Name</span>
+                                        <span class="text-xs text-slate-500">@b.Count appointment@(b.Count > 1 ? "s" : "") completed</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@b.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Per Service -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Annual Breakdown by Service</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">Services</span>
+                    </div>
+                    @if (!Model.YearlyReport.ByService.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No services rendered this year.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var s in Model.YearlyReport.ByService)
+                            {
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div>
+                                        <span class="font-bold text-slate-900 block text-sm">@s.Name</span>
+                                        <span class="text-xs text-slate-500">@s.Count service@(s.Count > 1 ? "s" : "") rendered</span>
+                                    </div>
+                                    <span class="font-serif font-bold text-base text-slate-900">@s.FormattedTotalSales</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Per Product -->
+                <div class="bg-white/95 rounded-2xl border border-amber-900/10 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Annual Breakdown by Product</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold">Products</span>
+                    </div>
+                    @if (!Model.YearlyReport.ProductSalesPerProduct.Any())
+                    {
+                        <p class="text-xs text-slate-400 italic">No retail product sales recorded this year.</p>
+                    }
+                    else
+                    {
+                        <div class="space-y-3">
+                            @foreach (var prod in Model.YearlyReport.ProductSalesPerProduct)
                             {
                                 <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/40 border border-amber-100">
                                     <div>
@@ -785,6 +1545,7 @@
     }
 </div>
 
+@section Scripts {
 <script>
     function getTodayStr() {
         return new Date().toISOString().split('T')[0];
@@ -850,4 +1611,510 @@
             }
         }
     }
+
+    // Chart.js Palette & Tooltip Formatter
+    const currencyFormatter = (val) => '₱' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const chartPalette = [
+        '#f59e0b', // Amber-500
+        '#10b981', // Emerald-500
+        '#6366f1', // Indigo-500
+        '#f43f5e', // Rose-500
+        '#0ea5e9', // Sky-500
+        '#8b5cf6', // Violet-500
+        '#eab308', // Yellow-500
+        '#64748b'  // Slate-500
+    ];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Chart === 'undefined') return;
+
+        const payloadEl = document.getElementById('reportChartsPayload');
+        if (!payloadEl) return;
+
+        let payload;
+        try {
+            payload = JSON.parse(payloadEl.textContent);
+        } catch (e) {
+            console.error('Failed to parse chart payload JSON:', e);
+            return;
+        }
+
+        if (payload.activeTab === 'daily') {
+            // --- DAILY SALES CHARTS ---
+            // 1. Hourly Line Chart
+            const hourlyCanvas = document.getElementById('dailyHourlyChart');
+            if (hourlyCanvas && payload.daily) {
+                new Chart(hourlyCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: payload.daily.hourlyLabels,
+                        datasets: [{
+                            label: 'Hourly Sales (₱)',
+                            data: payload.daily.hourlyAmounts,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#f59e0b',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' Revenue: ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Category / Service Revenue Pie / Doughnut Chart
+            const catCanvas = document.getElementById('dailyCategoryPieChart');
+            if (catCanvas && payload.daily) {
+                new Chart(catCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: payload.daily.catLabels,
+                        datasets: [{
+                            data: payload.daily.catValues,
+                            backgroundColor: chartPalette.slice(0, payload.daily.catLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '62%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. Daily Barber Bar Chart
+            const barberBarCanvas = document.getElementById('dailyBarberBarChart');
+            if (barberBarCanvas && payload.daily) {
+                new Chart(barberBarCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: payload.daily.barberLabels,
+                        datasets: [{
+                            label: 'Service Cuts (₱)',
+                            data: payload.daily.barberValues,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 8,
+                            maxBarThickness: 48
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.dataset.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        else if (payload.activeTab === 'weekly') {
+            // --- WEEKLY SALES CHARTS ---
+            // 1. 7-Day Revenue Trend Line Chart
+            const wTrendCanvas = document.getElementById('weeklyTrendLineChart');
+            if (wTrendCanvas && payload.weekly) {
+                new Chart(wTrendCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: payload.weekly.days,
+                        datasets: [
+                            {
+                                label: 'Grand Total (₱)',
+                                data: payload.weekly.grand,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.10)',
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 3,
+                                pointBackgroundColor: '#10b981',
+                                pointRadius: 4
+                            },
+                            {
+                                label: 'Service Cuts (₱)',
+                                data: payload.weekly.cuts,
+                                borderColor: '#f59e0b',
+                                borderWidth: 2,
+                                borderDash: [4, 4],
+                                fill: false,
+                                tension: 0.35,
+                                pointBackgroundColor: '#f59e0b',
+                                pointRadius: 3
+                            },
+                            {
+                                label: 'Retail Products (₱)',
+                                data: payload.weekly.prod,
+                                borderColor: '#0ea5e9',
+                                borderWidth: 2,
+                                borderDash: [2, 2],
+                                fill: false,
+                                tension: 0.35,
+                                pointBackgroundColor: '#0ea5e9',
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.dataset.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Weekly Barber Revenue Pie / Doughnut Chart
+            const wBarberPieCanvas = document.getElementById('weeklyBarberPieChart');
+            if (wBarberPieCanvas && payload.weekly) {
+                new Chart(wBarberPieCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: payload.weekly.barberLabels,
+                        datasets: [{
+                            data: payload.weekly.barberValues,
+                            backgroundColor: chartPalette.slice(0, payload.weekly.barberLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. Weekly Cuts vs Products Grouped Bar Chart
+            const wBarCanvas = document.getElementById('weeklyBarChart');
+            if (wBarCanvas && payload.weekly) {
+                new Chart(wBarCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: payload.weekly.days,
+                        datasets: [
+                            {
+                                label: 'Cuts & Services (₱)',
+                                data: payload.weekly.cuts,
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 6,
+                                maxBarThickness: 32
+                            },
+                            {
+                                label: 'Retail Products (₱)',
+                                data: payload.weekly.prod,
+                                backgroundColor: '#10b981',
+                                borderRadius: 6,
+                                maxBarThickness: 32
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.dataset.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        else if (payload.activeTab === 'monthly') {
+            // --- MONTHLY SALES CHARTS ---
+            // 1. 31-Day Cumulative & Daily Revenue Trajectory Line Chart
+            const mTrajCanvas = document.getElementById('monthlyTrajectoryLineChart');
+            if (mTrajCanvas && payload.monthly) {
+                new Chart(mTrajCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: payload.monthly.days,
+                        datasets: [
+                            {
+                                label: 'Cumulative Month Revenue (₱)',
+                                data: payload.monthly.cumul,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                                fill: true,
+                                tension: 0.3,
+                                borderWidth: 2.5,
+                                pointRadius: 2,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Daily Sales (₱)',
+                                data: payload.monthly.daily,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.4)',
+                                borderWidth: 1.5,
+                                pointRadius: 2,
+                                tension: 0.2,
+                                yAxisID: 'y'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.dataset.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Monthly Service Share Pie / Doughnut Chart
+            const mServiceCanvas = document.getElementById('monthlyServicePieChart');
+            if (mServiceCanvas && payload.monthly) {
+                new Chart(mServiceCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: payload.monthly.catLabels,
+                        datasets: [{
+                            data: payload.monthly.catValues,
+                            backgroundColor: chartPalette.slice(0, payload.monthly.catLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        else if (payload.activeTab === 'yearly') {
+            // --- YEARLY SALES CHARTS ---
+            // 1. 12-Month Revenue Curve Line Chart
+            const yTrendCanvas = document.getElementById('yearlyTrendLineChart');
+            if (yTrendCanvas && payload.yearly) {
+                new Chart(yTrendCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: payload.yearly.months,
+                        datasets: [{
+                            label: 'Total Annual Revenue (₱)',
+                            data: payload.yearly.totals,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#10b981',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' Revenue: ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Annual Category Distribution Pie Chart
+            const yDistCanvas = document.getElementById('yearlyDistributionPieChart');
+            if (yDistCanvas && payload.yearly) {
+                new Chart(yDistCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: payload.yearly.catLabels,
+                        datasets: [{
+                            data: payload.yearly.catValues,
+                            backgroundColor: chartPalette.slice(0, payload.yearly.catLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. 12-Month Stacked Bar Chart: Cuts vs Products
+            const yBarCanvas = document.getElementById('yearlyStackedBarChart');
+            if (yBarCanvas && payload.yearly) {
+                new Chart(yBarCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: payload.yearly.months,
+                        datasets: [
+                            {
+                                label: 'Cuts & Services (₱)',
+                                data: payload.yearly.cuts,
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 4,
+                                maxBarThickness: 36
+                            },
+                            {
+                                label: 'Retail Products (₱)',
+                                data: payload.yearly.prod,
+                                backgroundColor: '#10b981',
+                                borderRadius: 4,
+                                maxBarThickness: 36
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { callback: (v) => '₱' + v }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ' ' + ctx.dataset.label + ': ' + currencyFormatter(ctx.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
 </script>
+}

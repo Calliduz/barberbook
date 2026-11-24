@@ -433,11 +433,76 @@ public class ReportingServiceAndReportsTests : IClassFixture<WebApplicationFacto
         var respDaily = await customerClient.GetAsync("/api/reports/daily");
         respDaily.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
+        var respWeekly = await customerClient.GetAsync("/api/reports/weekly");
+        respWeekly.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
         var respMonthly = await customerClient.GetAsync("/api/reports/monthly");
         respMonthly.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var respYearly = await customerClient.GetAsync("/api/reports/yearly");
+        respYearly.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         var respPage = await customerClient.GetAsync("/admin/reports");
         // MVC redirects to AccessDenied or returns 403
         (respPage.StatusCode == HttpStatusCode.Redirect || respPage.StatusCode == HttpStatusCode.Forbidden).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task T10_T11_RP01_GetWeeklySales_20260914_SumMatchesDailyTotalsAndApi()
+    {
+        // Covers Weekly sales report, BR-07, BR-11, API endpoint
+        await EnsureSeededAsync();
+        using var scope = _factory.Services.CreateScope();
+        var reportingService = scope.ServiceProvider.GetRequiredService<IReportingService>();
+
+        var testDate = new LocalDate(2026, 9, 14); // Monday
+        var weekReport = await reportingService.GetWeeklySalesAsync(testDate);
+
+        weekReport.DailyTotals.Should().HaveCount(7);
+        weekReport.WeekStartDate.Should().Be(new LocalDate(2026, 9, 14));
+        weekReport.WeekEndDate.Should().Be(new LocalDate(2026, 9, 20));
+        weekReport.CompletedCount.Should().Be(6);
+        weekReport.TotalSales.Should().Be(1340.00m);
+        weekReport.TotalSales.Should().Be(weekReport.DailyTotals.Sum(d => d.TotalSales));
+        weekReport.GrandTotal.Should().Be(weekReport.DailyTotals.Sum(d => d.GrandTotal));
+
+        // Test API endpoint as Admin
+        var adminClient = await CreateAuthenticatedClientAsync(AdminEmail, AdminPassword);
+        var apiResp = await adminClient.GetAsync("/api/admin/reports/weekly?weekDate=2026-09-14");
+        apiResp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var apiData = await apiResp.Content.ReadFromJsonAsync<WeeklySalesReportDto>();
+        apiData.Should().NotBeNull();
+        apiData!.TotalSales.Should().Be(1340.00m);
+        apiData.DailyTotals.Should().HaveCount(7);
+    }
+
+    [Fact]
+    public async Task T10_T11_RP02_GetYearlySales_2026_SumMatchesMonthlyTotalsAndApi()
+    {
+        // Covers Yearly sales report, BR-07, BR-11, API endpoint
+        await EnsureSeededAsync();
+        using var scope = _factory.Services.CreateScope();
+        var reportingService = scope.ServiceProvider.GetRequiredService<IReportingService>();
+
+        var yearReport = await reportingService.GetYearlySalesAsync(2026);
+
+        yearReport.MonthlyTotals.Should().HaveCount(12);
+        yearReport.Year.Should().Be(2026);
+        yearReport.TotalSales.Should().Be(yearReport.MonthlyTotals.Sum(m => m.TotalSales));
+        yearReport.GrandTotal.Should().Be(yearReport.MonthlyTotals.Sum(m => m.GrandTotal));
+        yearReport.CompletedCount.Should().Be(yearReport.MonthlyTotals.Sum(m => m.CompletedCount));
+        // August ₱370 + September ₱1340 = ₱1,710.00 (+ dynamic today if running in 2026)
+        yearReport.TotalSales.Should().BeGreaterThanOrEqualTo(1710.00m);
+        yearReport.CompletedCount.Should().BeGreaterThanOrEqualTo(8);
+
+        // Test API endpoint as Admin
+        var adminClient = await CreateAuthenticatedClientAsync(AdminEmail, AdminPassword);
+        var apiResp = await adminClient.GetAsync("/api/admin/reports/yearly?year=2026");
+        apiResp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var apiData = await apiResp.Content.ReadFromJsonAsync<YearlySalesReportDto>();
+        apiData.Should().NotBeNull();
+        apiData!.Year.Should().Be(2026);
+        apiData.TotalSales.Should().Be(yearReport.TotalSales);
+        apiData.MonthlyTotals.Should().HaveCount(12);
     }
 }

@@ -502,36 +502,65 @@
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
                                     @if (!isRetired)
                                     {
-                                        <button onclick="openAssignModal(@eq.Id, '@eq.Name', '@eq.AssetTag', @(eq.CurrentBarberId ?? 0))"
-                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition">
+                                        <button type="button"
+                                                data-id="@eq.Id"
+                                                data-name="@eq.Name"
+                                                data-tag="@eq.AssetTag"
+                                                data-barber-id="@(eq.CurrentBarberId ?? 0)"
+                                                onclick="openAssignModal(this)"
+                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-900 hover:bg-amber-500/20 transition active:scale-95">
                                             @(eq.CurrentBarberId.HasValue ? "Reassign" : "Assign")
                                         </button>
                                         @if (eq.CurrentBarberId.HasValue)
                                         {
                                             <form method="post" action="/admin/inventory/equipment/@eq.Id/return" class="inline">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition" title="Return to Shop Storage">
+                                                <button type="submit" class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition active:scale-95" title="Return to Shop Storage">
                                                     Return
                                                 </button>
                                             </form>
                                         }
-                                        <button onclick="openAdminInspectModal(@eq.Id, '@eq.Name', '@eq.AssetTag')"
-                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                        <button type="button"
+                                                data-id="@eq.Id"
+                                                data-name="@eq.Name"
+                                                data-tag="@eq.AssetTag"
+                                                onclick="openAdminInspectModal(this)"
+                                                class="py-1 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95">
                                             Inspect
                                         </button>
                                     }
-                                    <button onclick="openEquipmentTimelineDrawer(@eq.Id, '@eq.Name', '@eq.AssetTag')"
-                                            class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
+                                    <button type="button"
+                                            data-id="@eq.Id"
+                                            data-name="@eq.Name"
+                                            data-tag="@eq.AssetTag"
+                                            onclick="openEquipmentTimelineDrawer(this)"
+                                            class="py-1 px-2.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition active:scale-95">
                                         History
                                     </button>
-                                    <button onclick="openEditEquipmentModal(@eq.Id, '@eq.Name', '@eq.Category', '@(eq.BrandModel ?? "")', '@(eq.SerialNo ?? "")', '@(eq.PurchaseDate ?? "")', '@(eq.PurchaseCost ?? 0)', '@eq.Condition', '@eq.Status', @eq.InspectionIntervalDays, '@(eq.Notes ?? "")')"
-                                            class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700 transition">
+                                    <button type="button"
+                                            data-id="@eq.Id"
+                                            data-name="@eq.Name"
+                                            data-category="@eq.Category"
+                                            data-brand-model="@(eq.BrandModel ?? "")"
+                                            data-serial-no="@(eq.SerialNo ?? "")"
+                                            data-purchase-date="@(eq.PurchaseDate ?? "")"
+                                            data-cost="@(eq.PurchaseCost ?? 0)"
+                                            data-condition="@eq.Condition"
+                                            data-status="@eq.Status"
+                                            data-interval="@eq.InspectionIntervalDays"
+                                            data-notes="@(eq.Notes ?? "")"
+                                            onclick="openEditEquipmentModal(this)"
+                                            class="py-1 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-700 transition active:scale-95">
                                         Edit
                                     </button>
                                     @if (!isRetired)
                                     {
-                                        <button onclick="openRetireModal(@eq.Id, '@eq.Name', '@eq.AssetTag')"
-                                                class="py-1 px-2 rounded-lg text-xs font-medium text-rose-500 hover:text-rose-800 transition">
+                                        <button type="button"
+                                                data-id="@eq.Id"
+                                                data-name="@eq.Name"
+                                                data-tag="@eq.AssetTag"
+                                                onclick="openRetireModal(this)"
+                                                class="py-1 px-2 rounded-lg text-xs font-medium text-rose-500 hover:text-rose-800 transition active:scale-95">
                                             Retire
                                         </button>
                                     }
@@ -1036,7 +1065,14 @@
         });
     });
 
-    function openAssignModal(id, name, tag, currentBarberId) {
+    function openAssignModal(arg1, name, tag, currentBarberId) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            tag = arg1.getAttribute('data-tag');
+            currentBarberId = parseInt(arg1.getAttribute('data-barber-id'), 10) || 0;
+        }
         document.getElementById('assignEquipmentForm').action = '/admin/inventory/equipment/' + id + '/assign';
         document.getElementById('assignModalSubtitle').innerText = name + ' (' + tag + ')';
         if (currentBarberId > 0) {
@@ -1047,13 +1083,25 @@
         openModal('assignEquipmentModal');
     }
 
-    function openAdminInspectModal(id, name, tag) {
+    function openAdminInspectModal(arg1, name, tag) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            tag = arg1.getAttribute('data-tag');
+        }
         document.getElementById('adminInspectForm').action = '/admin/inventory/equipment/' + id + '/inspect';
         document.getElementById('adminInspectSubtitle').innerText = name + ' (' + tag + ')';
         openModal('adminInspectModal');
     }
 
-    async function openEquipmentTimelineDrawer(id, name, tag) {
+    async function openEquipmentTimelineDrawer(arg1, name, tag) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            tag = arg1.getAttribute('data-tag');
+        }
         document.getElementById('eqTimelineSubtitle').innerText = name + ' (' + tag + ')';
         document.getElementById('eqTimelineContent').innerHTML = '<div class="text-center py-10 text-xs text-slate-400">Loading history...</div>';
 
@@ -1179,30 +1227,31 @@
     const adjustQtyInput = document.getElementById('adjustQuantityInput');
     if (adjustQtyInput) {
         adjustQtyInput.addEventListener('input', function () {
-        const val = parseInt(this.value, 10);
-        const projectedEl = document.getElementById('adjustProjectedStock');
-        const errorEl = document.getElementById('adjustErrorNotice');
-        const submitBtn = document.getElementById('adjustSubmitButton');
+            const val = parseInt(this.value, 10);
+            const projectedEl = document.getElementById('adjustProjectedStock');
+            const errorEl = document.getElementById('adjustErrorNotice');
+            const submitBtn = document.getElementById('adjustSubmitButton');
 
-        if (isNaN(val) || val === 0) {
-            projectedEl.innerText = currentStockValue + ' ' + currentUnitValue;
-            errorEl.classList.add('hidden');
-            submitBtn.disabled = isNaN(val) || val === 0;
-            return;
-        }
+            if (isNaN(val) || val === 0) {
+                projectedEl.innerText = currentStockValue + ' ' + currentUnitValue;
+                errorEl.classList.add('hidden');
+                submitBtn.disabled = isNaN(val) || val === 0;
+                return;
+            }
 
-        const projected = currentStockValue + val;
-        projectedEl.innerText = projected + ' ' + currentUnitValue;
+            const projected = currentStockValue + val;
+            projectedEl.innerText = projected + ' ' + currentUnitValue;
 
-        if (projected < 0) {
-            errorEl.innerText = 'Adjustment would result in negative stock (' + projected + '). Stock cannot go below zero.';
-            errorEl.classList.remove('hidden');
-            submitBtn.disabled = true;
-        } else {
-            errorEl.classList.add('hidden');
-            submitBtn.disabled = false;
-        }
-    });
+            if (projected < 0) {
+                errorEl.innerText = 'Adjustment would result in negative stock (' + projected + '). Stock cannot go below zero.';
+                errorEl.classList.remove('hidden');
+                submitBtn.disabled = true;
+            } else {
+                errorEl.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+    }
 
     async function openHistoryDrawer(arg1, name, sku) {
         let id = arg1;
@@ -1266,37 +1315,61 @@
         document.getElementById('historyDrawer').classList.add('hidden');
     }
 
-    function openEditEquipmentModal(id, name, category, brandModel, serialNo, purchaseDate, cost, condition, status, interval, notes) {
+    function openEditEquipmentModal(arg1, name, category, brandModel, serialNo, purchaseDate, cost, condition, status, interval, notes) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            category = arg1.getAttribute('data-category');
+            brandModel = arg1.getAttribute('data-brand-model');
+            serialNo = arg1.getAttribute('data-serial-no');
+            purchaseDate = arg1.getAttribute('data-purchase-date');
+            cost = arg1.getAttribute('data-cost');
+            condition = arg1.getAttribute('data-condition');
+            status = arg1.getAttribute('data-status');
+            interval = arg1.getAttribute('data-interval');
+            notes = arg1.getAttribute('data-notes');
+        }
         document.getElementById('editEquipmentForm').action = '/admin/inventory/equipment/' + id + '/edit';
-        document.getElementById('editEqName').value = name;
-        document.getElementById('editEqCategory').value = category;
-        document.getElementById('editEqBrandModel').value = brandModel;
-        document.getElementById('editEqSerialNo').value = serialNo;
-        document.getElementById('editEqCost').value = cost;
-        document.getElementById('editEqInterval').value = interval;
-        document.getElementById('editEqNotes').value = notes;
+        document.getElementById('editEqName').value = name || '';
+        document.getElementById('editEqCategory').value = category || '';
+        document.getElementById('editEqBrandModel').value = brandModel || '';
+        document.getElementById('editEqSerialNo').value = serialNo || '';
+        document.getElementById('editEqCost').value = cost || '';
+        document.getElementById('editEqInterval').value = interval || '30';
+        document.getElementById('editEqNotes').value = notes || '';
 
         const condSelect = document.getElementById('editEqCondition');
-        for (let i = 0; i < condSelect.options.length; i++) {
-            if (condSelect.options[i].value.toLowerCase() === condition.toLowerCase()) {
-                condSelect.selectedIndex = i;
-                break;
+        if (condSelect && condition) {
+            for (let i = 0; i < condSelect.options.length; i++) {
+                if (condSelect.options[i].value.toLowerCase() === condition.toLowerCase()) {
+                    condSelect.selectedIndex = i;
+                    break;
+                }
             }
         }
 
         const statSelect = document.getElementById('editEqStatus');
-        for (let i = 0; i < statSelect.options.length; i++) {
-            const val = statSelect.options[i].value.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-            if (val === status.toLowerCase() || statSelect.options[i].value.toLowerCase() === status.toLowerCase()) {
-                statSelect.selectedIndex = i;
-                break;
+        if (statSelect && status) {
+            for (let i = 0; i < statSelect.options.length; i++) {
+                const val = statSelect.options[i].value.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+                if (val === status.toLowerCase() || statSelect.options[i].value.toLowerCase() === status.toLowerCase()) {
+                    statSelect.selectedIndex = i;
+                    break;
+                }
             }
         }
 
         openModal('editEquipmentModal');
     }
 
-    function openRetireModal(id, name, tag) {
+    function openRetireModal(arg1, name, tag) {
+        let id = arg1;
+        if (typeof arg1 === 'object' && arg1 !== null && arg1.getAttribute) {
+            id = arg1.getAttribute('data-id');
+            name = arg1.getAttribute('data-name');
+            tag = arg1.getAttribute('data-tag');
+        }
         document.getElementById('retireEquipmentForm').action = '/admin/inventory/equipment/' + id + '/retire';
         document.getElementById('retireEqTitle').innerText = name + ' (' + tag + ')';
         openModal('retireEquipmentModal');
